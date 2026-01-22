@@ -29,7 +29,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 last_el_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
-                primary_player.cards_in_play[chosen_planet][last_el_index].command_until_combat += 1
+                primary_player.cards_in_play[chosen_planet + 1][last_el_index].command_until_combat += 1
                 self.delete_reaction()
     elif current_reaction == "Shadow Hunt":
         card_name = primary_player.cards_removed_from_game[self.misc_counter]
