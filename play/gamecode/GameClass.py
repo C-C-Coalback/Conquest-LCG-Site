@@ -5322,7 +5322,7 @@ class Game:
                         self.maksim_squadron_enabled = False
                         if game_update_string[1] == "0":
                             self.maksim_squadron_active = True
-                            if self.apoka:
+                            if self.apoka or self.blackstone:
                                 pos_holder = self.positions_of_units_to_take_damage[0]
                                 player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
                                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
@@ -7351,8 +7351,8 @@ class Game:
                                 if not self.choices_available:
                                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
                                             == "Maksim's Squadron":
-                                        if not self.apoka or not primary_player.get_once_per_phase_used_given_pos(
-                                                planet_pos, unit_pos):
+                                        if not (self.apoka or self.blackstone) or not \
+                                                primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                                             if self.maksim_squadron_enabled and not primary_player.hit_by_gorgul:
                                                 self.last_shield_string = game_update_string
                                                 self.choice_context = "Use Maksim's Squadron?"
@@ -10644,7 +10644,13 @@ class Game:
                     cost += 1
                 if winner.resources >= cost:
                     if not winner.gut_and_pillage_used:
-                        if winner.search_hand_for_card("Gut and Pillage"):
+                        if self.game.blackstone:
+                            if winner.can_play_limited:
+                                if winner.search_hand_for_card("Gut and Pillage"):
+                                    self.create_reaction("Gut and Pillage", winner.name_player,
+                                                         (int(winner.number), -1, -1))
+                                    reactions_exist = True
+                        elif winner.search_hand_for_card("Gut and Pillage"):
                             self.create_reaction("Gut and Pillage", winner.name_player, (int(winner.number), -1, -1))
                             reactions_exist = True
                 if winner.search_hand_for_card("Scavenging Run"):

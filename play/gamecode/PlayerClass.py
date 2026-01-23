@@ -2242,7 +2242,8 @@ class Player:
             if planet != -2 and not card.check_for_a_trait("Drone"):
                 for i in range(len(self.cards_in_play[planet + 1])):
                     if self.get_ability_given_pos(planet, i) == "Commander Bravestorm":
-                        if not self.get_once_per_phase_used_given_pos(planet, i) or not self.game.apoka:
+                        if not self.get_once_per_phase_used_given_pos(planet, i) or not \
+                                (self.game.apoka or self.game.blackstone):
                             self.game.create_reaction("Commander Bravestorm", self.name_player,
                                                       (int(self.number), planet, i))
         self.game.queued_sound = "onplay"
@@ -6476,7 +6477,8 @@ class Player:
             return True
         elif faction == "Astra Militarum" and \
                 self.get_ability_given_pos(planet_pos, unit_pos) == "Gue'vesa Overseer" or \
-                (self.game.apoka and self.get_ability_given_pos(planet_pos, unit_pos) == "Ardent Auxiliaries"):
+                ((self.game.apoka or self.game.blackstone) and
+                 self.get_ability_given_pos(planet_pos, unit_pos) == "Ardent Auxiliaries"):
             return True
         return False
 
@@ -7344,7 +7346,7 @@ class Player:
             if self.get_card_type_given_pos(planet_num, card_pos) == "Army":
                 for i in range(len(self.cards_in_play[planet_num + 1])):
                     if self.get_ability_given_pos(planet_num, i) == "Shrieking Exarch":
-                        if not self.game.apoka:
+                        if not self.game.apoka and not self.game.blackstone:
                             self.game.create_reaction("Shrieking Exarch", self.name_player,
                                                       (int(self.number), planet_num, i))
                         elif not self.check_if_already_have_reaction_of_position("Shrieking Exarch", planet_num, i):
@@ -7353,7 +7355,7 @@ class Player:
                                                           (int(self.number), planet_num, i))
                 for i in range(len(other_player.cards_in_play[planet_num + 1])):
                     if other_player.get_ability_given_pos(planet_num, i) == "Shrieking Exarch":
-                        if not self.game.apoka:
+                        if not self.game.apoka and not self.game.blackstone:
                             self.game.create_reaction("Shrieking Exarch", other_player.name_player,
                                                       (int(other_player.number), planet_num, i))
                         elif not other_player.check_if_already_have_reaction_of_position(

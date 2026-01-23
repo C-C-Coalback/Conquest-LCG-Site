@@ -364,7 +364,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         await CommandPhase.update_game_event_command_section(self, secondary_player.name_player, game_update_string)
     elif current_reaction == "Endless Legions":
         if self.chosen_first_card:
-            if self.apoka:
+            if self.apoka or self.blackstone:
                 if chosen_planet != self.last_planet_checked_for_battle:
                     card_name = self.misc_target_choice
                     card = self.preloaded_find_card(card_name)

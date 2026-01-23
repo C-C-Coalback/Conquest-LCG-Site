@@ -2494,6 +2494,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                             primary_player.add_resources(2)
                         else:
                             primary_player.add_resources(3)
+                            if self.blackstone:
+                                primary_player.can_play_limited = False
                         primary_player.gut_and_pillage_used = True
                         await primary_player.dark_eldar_event_played()
                     self.delete_reaction()
@@ -2984,7 +2986,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if primary_player.get_ability_given_pos(-2, i) == "Invasion Site":
                     i_site_loc = i
             if i_site_loc != -1:
-                if self.apoka:
+                if self.apoka or self.blackstone:
                     primary_player.add_resources(3)
                 else:
                     primary_player.add_resources(primary_player.highest_cost_invasion_site)
