@@ -230,6 +230,11 @@ async def start_resolving_interrupt(self, name, game_update_string):
             if self.apoka:
                 primary_player.add_resources(2)
                 primary_player.discard_card_name_from_hand("Death Serves the Emperor")
+            elif self.blackstone:
+                if primary_player.spend_resources(2):
+                    primary_player.death_serves_used = True
+                    primary_player.add_resources(primary_player.highest_death_serves_value)
+                    primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             else:
                 primary_player.death_serves_used = True
                 primary_player.add_resources(primary_player.highest_death_serves_value)

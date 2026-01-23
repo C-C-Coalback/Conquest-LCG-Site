@@ -6796,11 +6796,12 @@ class Player:
                 if not self.does_own_interrupt_exist("Death Serves the Emperor"):
                     if self.search_hand_for_card("Death Serves the Emperor"):
                         if not self.death_serves_used or self.game.apoka:
-                            self.game.create_interrupt("Death Serves the Emperor", self.name_player,
-                                                       (int(self.number), -1, -1))
-                            cost = self.get_cost_given_pos(-2, card_pos)
-                            if cost > self.highest_death_serves_value:
-                                self.highest_death_serves_value = cost
+                            if not self.game.blackstone or self.get_resources() > 1:
+                                self.game.create_interrupt("Death Serves the Emperor", self.name_player,
+                                                           (int(self.number), -1, -1))
+                                cost = self.get_cost_given_pos(-2, card_pos)
+                                if cost > self.highest_death_serves_value:
+                                    self.highest_death_serves_value = cost
             if self.check_for_trait_given_pos(-2, card_pos, "Dark Angels"):
                 if self.search_card_in_hq("Standard of Devastation"):
                     self.game.create_reaction("Standard of Devastation", self.name_player,
@@ -7304,11 +7305,12 @@ class Player:
                 if not self.does_own_interrupt_exist("Death Serves the Emperor"):
                     if self.search_hand_for_card("Death Serves the Emperor"):
                         if not self.death_serves_used or self.game.apoka:
-                            self.game.create_interrupt("Death Serves the Emperor", self.name_player,
-                                                       (int(self.number), -1, -1))
-                            cost = self.get_cost_given_pos(planet_num, card_pos)
-                            if cost > self.highest_death_serves_value:
-                                self.highest_death_serves_value = cost
+                            if not self.game.blackstone or self.resources > 1:
+                                self.game.create_interrupt("Death Serves the Emperor", self.name_player,
+                                                           (int(self.number), -1, -1))
+                                cost = self.get_cost_given_pos(planet_num, card_pos)
+                                if cost > self.highest_death_serves_value:
+                                    self.highest_death_serves_value = cost
                 if not self.does_own_reaction_exist("The Bloodrunna"):
                     for i in range(len(self.cards_in_play[planet_num + 1])):
                         if i != card_pos:
