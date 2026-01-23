@@ -1519,6 +1519,8 @@ class Player:
         if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
             if self.check_for_enemy_warlord(planet_id):
                 return True
+        if self.cards_in_play[planet_id + 1][unit_id].get_ranged_from_additions():
+            return True
         if self.get_blanked_given_pos(planet_id, unit_id):
             return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Firstborn Battalion":

@@ -905,7 +905,7 @@ class UnitCard(Card):
     def set_ranged(self, new_val):
         self.ranged = new_val
 
-    def get_ranged(self):
+    def get_ranged_from_additions(self):
         if self.ranged_eop:
             return True
         if self.ranged_eor:
@@ -918,6 +918,11 @@ class UnitCard(Card):
             if self.attachments[i].get_ability() == "Bladed Lotus Rifle":
                 if self.check_for_a_trait("Kabalite"):
                     return True
+        return False
+
+    def get_ranged(self):
+        if self.get_ranged_from_additions():
+            return True
         if self.get_blanked():
             return False
         if self.lost_keywords_eop:
