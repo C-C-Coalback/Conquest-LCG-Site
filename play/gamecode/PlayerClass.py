@@ -922,9 +922,9 @@ class Player:
                             single_card_string = current_card.deepstrike_card_name
                         if single_card_string in self.cards_that_have_errata:
                             if self.game.apoka:
-                                card_array[i] = card_array[i] + "_apoka"
+                                single_card_string = single_card_string + "_apoka"
                             elif self.game.blackstone:
-                                card_array[i] = card_array[i] + "_blackstone"
+                                single_card_string = single_card_string + "_blackstone"
                         single_card_string = single_card_string + "|"
                         if current_card.ready:
                             single_card_string += "R|"
