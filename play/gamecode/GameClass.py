@@ -10645,7 +10645,7 @@ class Game:
                     cost += 1
                 if winner.resources >= cost:
                     if not winner.gut_and_pillage_used:
-                        if self.game.blackstone:
+                        if self.blackstone:
                             if winner.can_play_limited:
                                 if winner.search_hand_for_card("Gut and Pillage"):
                                     self.create_reaction("Gut and Pillage", winner.name_player,
