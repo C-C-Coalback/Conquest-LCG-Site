@@ -9,7 +9,8 @@ def lobby(request):
 
 
 valid_backgrounds = ["/static/images/ImperialAquila.jpg", "/static/images/Heldrakes.jpg", "/static/images/Box_Art.jpg",
-                     "/static/images/Death_Guard.jpg", "/static/images/Necrons_Awakening.jpg"]
+                     "/static/images/Death_Guard.jpg", "/static/images/Necrons_Awakening.jpg",
+                     "/static/images/Chaos_v_Orks.jpg", "/static/images/Tyranids_v_Tau.jpg"]
 
 
 def game(request, game_id):

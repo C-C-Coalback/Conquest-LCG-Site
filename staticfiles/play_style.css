@@ -559,9 +559,9 @@ h4 {
     position:absolute;
     border-width: 6px;
     border-style: double;
-    border-color: lightblue;
+    border-color: black;
     overflow-y:auto;
-    background: rgba(30, 30, 34, 1.0);
+    background: rgba(210, 210, 210, 1.0);
     bottom:40px;
     right:10px;
     width: calc(10vw + 30px);
@@ -600,6 +600,7 @@ h4 {
     flex-direction: row;
     pointer-events: auto;
     z-index: 1001;
+    background: rgb(210, 210, 210);
 }
 
 summary::-webkit-details-marker {
@@ -816,7 +817,7 @@ legend {
     display: flex;
     flex-direction: column;
     pointer-events: auto;
-    background: transparent;
+    background: rgb(210, 210, 210);
 }
 
 .info-box-sub {
