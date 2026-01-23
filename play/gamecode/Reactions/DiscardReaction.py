@@ -151,6 +151,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                 if card.get_faction() == "Necrons" and card.get_cost() < 4 and card.get_is_unit():
                     num, planet, unit = self.positions_of_unit_triggering_reaction[0]
                     if primary_player.add_card_to_planet(card, planet) != -1:
+                        primary_player.used_optimized_protocol = True
                         position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
                         primary_player.cards_in_play[planet + 1][position_of_unit]. \
                             valid_target_dynastic_weaponry = True

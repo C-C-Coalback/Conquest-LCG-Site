@@ -395,7 +395,8 @@ class Game:
                                  "The Blinded Princess", "Champion of Khorne", "Arrogant Haemonculus",
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
                                  "Spray and Pray", "Grey Hunters", "Shambling Revenant", "Flayer Affliction",
-                                 "Avatar of Khaine", "Aun'la Prince", "Carnifex", "Gleeful Plague Beast"]
+                                 "Avatar of Khaine", "Aun'la Prince", "Carnifex", "Gleeful Plague Beast",
+                                 "Triarch Stalkers Procession"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -10868,6 +10869,8 @@ class Game:
         self.p2.gut_and_pillage_used = False
         self.p1.used_reanimation_protocol = False
         self.p2.used_reanimation_protocol = False
+        self.p1.used_optimized_protocol = False
+        self.p2.used_optimized_protocol = False
         self.p1.accept_any_challenge_used = False
         self.p2.accept_any_challenge_used = False
         self.p1.unconquerable_fear_used = False
@@ -10904,8 +10907,6 @@ class Game:
         self.actions_allowed = True
         self.p1.add_resources(4)
         self.p2.add_resources(4)
-        self.p1.used_reanimation_protocol = False
-        self.p2.used_reanimation_protocol = False
         self.p1.draw_card()
         self.p1.draw_card()
         self.p2.draw_card()

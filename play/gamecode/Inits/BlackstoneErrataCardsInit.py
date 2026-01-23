@@ -48,5 +48,17 @@ def blackstone_errata_cards_init():
         CardClasses.ArmyCard("Shrieking Exarch", "Reaction: After an army unit is destroyed at this planet, draw 1 card"
                                                  " and deal 1 damage to a target enemy unit. (Limit once per phase.)",
                              "Warrior. Elite.", 5, "Eldar", "Common", 4, 6, 2, False),
+        CardClasses.ArmyCard("Genestealer Hybrids", "Cannot be deployed from your hand.\n"
+                                                    "Each other unit you control at this planet "
+                                                    "cannot be damaged by Area Effect.\n"
+                                                    "This unit must be declared as a defender, if able.",
+                             "Hybrid. Genestealer.", 2, "Tyranids", "Signature", 2, 2, 1, False),
+        CardClasses.ArmyCard("Triarch Stalkers Procession", "No Wargear Attachments.\n"
+                                                            "Forced Reaction: After this unit enters play, "
+                                                            "have your opponent draw 2 cards.", "Vehicle.",
+                             3, faction, "Common", 4, 6, 2, False, wargear_attachments_permitted=False),
+        CardClasses.SupportCard("Imperial Bastion", "Your warlord's ability can trigger twice "
+                                                    "per round instead of once.", "Location. Genestealer.",
+                                1, faction, "Signature", False),
     ]
     return blackstone_errata_cards_array

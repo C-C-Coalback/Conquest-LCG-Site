@@ -136,6 +136,7 @@ class Player:
         self.last_resources_string = ""
         self.last_discard_string = ""
         self.used_reanimation_protocol = False
+        self.used_optimized_protocol = False
         self.senatorum_directives_used = False
         self.waaagh_arbuttz_active = False
         self.harbinger_of_eternity_active = False
@@ -1955,6 +1956,9 @@ class Player:
         if self.get_ability_given_pos(-2, last_element_index) == "Court of the Stormlord":
             self.game.create_reaction("Court of the Stormlord", self.name_player,
                                       (int(self.number), -2, last_element_index))
+        if self.get_ability_given_pos(-2, last_element_index) == "Triarch Stalkers Procession" and self.game.blackstone:
+            self.game.create_reaction("Triarch Stalkers Procession", self.name_player,
+                                      (int(self.number), -2, last_element_index))
         elif self.get_ability_given_pos(-2, last_element_index) == "Flayed Ones Revenants":
             self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                        (int(self.number), -2, last_element_index))
@@ -2460,6 +2464,9 @@ class Player:
             if self.get_ability_given_pos(position, last_element_index) == "Hybrid Metamorph":
                 self.game.create_reaction("Hybrid Metamorph", self.name_player,
                                           (int(self.number), position, last_element_index))
+            if self.get_ability_given_pos(position, last_element_index) == "Triarch Stalkers Procession" and self.game.blackstone:
+                self.game.create_reaction("Triarch Stalkers Procession", self.name_player,
+                                          (int(self.number), position, last_element_index))
             if self.get_ability_given_pos(position, last_element_index) == "Frenzied Wulfen":
                 self.game.create_reaction("Frenzied Wulfen", self.name_player, (int(self.number), position,
                                                                                 last_element_index))
@@ -2839,7 +2846,7 @@ class Player:
                             if card.get_ability() == "Munitorum Support":
                                 self.game.create_reaction("Munitorum Support", self.name_player,
                                                           (int(self.number), position, location_of_unit))
-                            if card.get_ability() == "Triarch Stalkers Procession":
+                            if card.get_ability() == "Triarch Stalkers Procession" and not self.game.blackstone:
                                 other_player.draw_card()
                                 other_player.draw_card()
                             if card.check_for_a_trait("Torture"):
@@ -2981,7 +2988,7 @@ class Player:
                             if card.get_ability() == "First Line Rhinos":
                                 self.game.create_reaction("First Line Rhinos", self.name_player,
                                                           (int(self.number), position, location_of_unit))
-                            if card.get_ability() == "Triarch Stalkers Procession":
+                            if card.get_ability() == "Triarch Stalkers Procession" and not self.game.blackstone:
                                 other_player.draw_card()
                                 other_player.draw_card()
                             if card.get_ability() == "Scheming Warlock":
@@ -5178,6 +5185,8 @@ class Player:
         return area_effect
 
     def optimized_protocol_check(self):
+        if self.used_optimized_protocol and self.game.blackstone:
+            return False
         if self.search_hand_for_card("Optimized Protocol"):
             return True
         elif self.search_for_card_everywhere("Harbinger of Eternity") \
