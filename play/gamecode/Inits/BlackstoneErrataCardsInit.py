@@ -56,9 +56,9 @@ def blackstone_errata_cards_init():
         CardClasses.ArmyCard("Triarch Stalkers Procession", "No Wargear Attachments.\n"
                                                             "Forced Reaction: After this unit enters play, "
                                                             "have your opponent draw 2 cards.", "Vehicle.",
-                             3, faction, "Common", 4, 6, 2, False, wargear_attachments_permitted=False),
+                             3, "Necrons", "Common", 4, 6, 2, False, wargear_attachments_permitted=False),
         CardClasses.SupportCard("Imperial Bastion", "Your warlord's ability can trigger twice "
                                                     "per round instead of once.", "Location. Genestealer.",
-                                1, faction, "Signature", False),
+                                1, "Astra Militarum", "Signature", False),
     ]
     return blackstone_errata_cards_array
