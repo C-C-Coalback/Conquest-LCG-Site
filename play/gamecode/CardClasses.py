@@ -731,12 +731,8 @@ class UnitCard(Card):
             return True
         return False
 
-    def get_sweep(self):
-        sweep = self.sweep
-        if self.new_ability:
-            sweep = self.new_sweep
-        if self.get_blanked():
-            sweep = 0
+    def get_sweep_additions(self):
+        sweep = 0
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Crown of Control":
                 sweep += 1
@@ -753,6 +749,15 @@ class UnitCard(Card):
         sweep += self.sweep_next
         sweep += self.sweep_eog
         self.sweep_next = 0
+        return sweep
+
+    def get_sweep(self):
+        sweep = self.sweep
+        if self.new_ability:
+            sweep = self.new_sweep
+        if self.get_blanked():
+            sweep = 0
+        sweep += self.get_sweep_additions()
         return sweep
 
     def get_lumbering(self):
