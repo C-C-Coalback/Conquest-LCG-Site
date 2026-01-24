@@ -707,32 +707,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
             else:
                 await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
     elif self.action_chosen == "Squadron Redeployment":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        origin_planet = self.unit_to_move_position[0]
-        origin_pos = self.unit_to_move_position[1]
-        dest_planet = int(game_update_string[1])
-        hand_pos = primary_player.aiming_reticle_coords_hand
+        origin_planet, origin_pos = self.misc_target_unit
+        dest_planet = chosen_planet
         primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-        new_pos = len(primary_player.cards_in_play[dest_planet + 1])
-        if self.positions_of_units_to_take_damage:
-            for i in range(len(self.positions_of_units_to_take_damage)):
-                self.positions_of_units_to_take_damage[i] = [int(primary_player.get_number()),
-                                                             dest_planet, new_pos]
         primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
-        self.action_chosen = ""
-        self.player_with_action = ""
-        self.mode = "Normal"
-        self.card_pos_to_deploy = -1
-        if self.phase == "DEPLOY":
-            self.player_with_deploy_turn = secondary_player.name_player
-            self.number_with_deploy_turn = secondary_player.number
-        primary_player.discard_card_from_hand(hand_pos)
-        primary_player.aiming_reticle_coords_hand = None
+        secondary_player.create_enemy_played_event_reactions()
+        self.action_cleanup()
     elif self.action_chosen == "Mycetic Spores":
         if self.player_with_action == self.name_1:
             primary_player = self.p1

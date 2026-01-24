@@ -2174,18 +2174,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.action_cleanup()
                     self.position_of_actioned_card = (-1, -1)
     elif self.action_chosen == "Squadron Redeployment":
-        if self.unit_to_move_position == [-1, -1]:
-            if self.player_with_action == self.name_1:
-                primary_player = self.p1
-            else:
-                primary_player = self.p2
+        if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
-                planet_pos = -2
-                unit_pos = int(game_update_string[2])
                 if primary_player.headquarters[unit_pos].get_attachments():
                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                        self.unit_to_move_position = [planet_pos, unit_pos]
+                        self.misc_target_unit = (planet_pos, unit_pos)
+                        self.chosen_first_card = True
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         else:
             await self.send_update_message("Already selected unit to move")

@@ -920,8 +920,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.send_update_message("No battle taking place")
                     elif ability == "Squadron Redeployment":
                         self.action_chosen = "Squadron Redeployment"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        self.misc_target_unit = (-1, -1)
+                        self.chosen_first_card = False
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Warpstorm":
                         self.action_chosen = "Warpstorm"
                         primary_player.discard_card_from_hand(hand_pos)
