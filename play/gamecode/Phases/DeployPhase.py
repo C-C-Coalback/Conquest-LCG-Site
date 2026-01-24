@@ -466,13 +466,14 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                                                         self.position_of_actioned_card[1])
             primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
                 valid_target_dynastic_weaponry = True
-            if "Dynastic Weaponry" in primary_player.discard:
-                if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
-                    self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+            if own_card:
+                if "Dynastic Weaponry" in primary_player.discard:
+                    if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                        self.create_reaction("Dynastic Weaponry", primary_player.name_player,
+                                             (int(primary_player.get_number()), planet_pos, position_of_unit))
+                if primary_player.optimized_protocol_check():
+                    self.create_reaction("Optimized Protocol", primary_player.name_player,
                                          (int(primary_player.get_number()), planet_pos, position_of_unit))
-            if primary_player.optimized_protocol_check():
-                self.create_reaction("Optimized Protocol", primary_player.name_player,
-                                     (int(primary_player.get_number()), planet_pos, position_of_unit))
         elif self.action_chosen == "Merciless Reclamation":
             del primary_player.discard[self.anrakyr_unit_position]
             primary_player.aiming_reticle_coords_discard = None
