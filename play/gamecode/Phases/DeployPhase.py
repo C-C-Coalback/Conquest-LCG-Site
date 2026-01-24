@@ -226,6 +226,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         player = self.p2
                         other_player = self.p1
                     planet_chosen = int(game_update_string[1])
+                    self.planet_pos_to_deploy = planet_chosen
                     card = player.get_card_in_hand(self.card_pos_to_deploy)
                     if self.deepstrike_deployment_active:
                         if player.put_card_into_reserve(card, planet_chosen):
