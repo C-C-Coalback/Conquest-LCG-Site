@@ -911,6 +911,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             if player.get_ability_given_pos(i, j) == "Talyesin's Spiders":
                                                 self.create_reaction("Talyesin's Spiders", player.name_player,
                                                                      (int(player.number), i, j))
+                                for i in range(len(player.headquarters)):
+                                    if player.get_ability_given_pos(-2, i) == "Talyesin's Spiders":
+                                        self.create_reaction("Talyesin's Spiders", player.name_player,
+                                                             (int(player.number), -2, i))
                 elif self.defender_position == -1:
                     can_continue = False
                     if int(game_update_string[2]) == self.attacker_planet:
