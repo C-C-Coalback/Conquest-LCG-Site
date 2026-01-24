@@ -3823,7 +3823,9 @@ class Game:
                             self.choice_context = "Use Slumbering Gardens?"
                         elif chosen_choice == "Searing Brand":
                             self.choice_context = "Choose card to discard for Searing Brand"
-                            self.choices_available = ["Yes", "No"]
+                            self.choices_available = []
+                            for i in range(len(primary_player.cards)):
+                                self.choices_available.append(primary_player.cards[i])
                             self.misc_counter = 0
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
