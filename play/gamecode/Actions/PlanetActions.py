@@ -707,12 +707,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
             else:
                 await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
     elif self.action_chosen == "Squadron Redeployment":
-        origin_planet, origin_pos = self.misc_target_unit
-        dest_planet = chosen_planet
-        primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-        primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
-        secondary_player.create_enemy_played_event_reactions()
-        self.action_cleanup()
+        if self.chosen_first_card:
+            origin_planet, origin_pos = self.misc_target_unit
+            dest_planet = chosen_planet
+            primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+            primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
+            secondary_player.create_enemy_played_event_reactions()
+            self.action_cleanup()
     elif self.action_chosen == "Mycetic Spores":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
