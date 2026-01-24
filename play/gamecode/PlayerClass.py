@@ -7871,6 +7871,10 @@ class Player:
                         if self.cards_in_play[i + 1][j].get_ability() == "Taurox APC":
                             self.game.create_reaction("Taurox APC", self.name_player,
                                                       (int(self.number), i, j))
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Taurox APC":
+                    self.game.create_reaction("Taurox APC", self.name_player,
+                                              (int(self.number), -2, i))
 
     def special_get_card_type_given_pos(self, sent_in_value):
         if sent_in_value is None:
