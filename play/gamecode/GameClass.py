@@ -1010,11 +1010,19 @@ class Game:
                 else:
                     player = self.p2
                     secondary_player = self.p1
+            if self.interrupts_waiting_on_resolution:
+                if self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+                    if self.player_resolving_interrupts[0] == self.name_1:
+                        player = self.p1
+                        secondary_player = self.p2
+                    else:
+                        player = self.p2
+                        secondary_player = self.p1
             if name == player.name_player:
                 if len(game_update_string) == 1:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         print("Play card with not all discounts")
-                        await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
+                        await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                               discounts=self.discounts_applied)
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
@@ -1026,7 +1034,7 @@ class Game:
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                             if self.discounts_applied >= self.available_discounts:
-                                await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
+                                await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                                       discounts=self.discounts_applied)
                                 self.mode = "Normal"
                     elif game_update_string[0] == "HAND":
@@ -1061,7 +1069,7 @@ class Game:
                                         self.damage_for_unit_to_take_on_play.append(damage)
                                     if self.discounts_applied >= self.available_discounts:
                                         await DeployPhase.deploy_card_routine(self, name,
-                                                                              self.planet_aiming_reticle_position,
+                                                                              self.planet_pos_to_deploy,
                                                                               discounts=self.discounts_applied)
                 elif len(game_update_string) == 4:
                     if game_update_string[0] == "IN_PLAY":
@@ -1072,7 +1080,7 @@ class Game:
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                             if self.discounts_applied >= self.available_discounts:
-                                await DeployPhase.deploy_card_routine(self, name, self.planet_aiming_reticle_position,
+                                await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                                       discounts=self.discounts_applied)
                                 self.mode = "Normal"
                 elif len(game_update_string) == 5:
@@ -1087,7 +1095,7 @@ class Game:
                                     self.discounts_applied += discount_received
                                 if self.discounts_applied >= self.available_discounts:
                                     await DeployPhase.deploy_card_routine(self, name,
-                                                                          self.planet_aiming_reticle_position,
+                                                                          self.planet_pos_to_deploy,
                                                                           discounts=self.discounts_applied)
                                     self.mode = "Normal"
                 elif len(game_update_string) == 6:
@@ -1102,7 +1110,7 @@ class Game:
                                         self.discounts_applied += discount_received
                                     if self.discounts_applied >= self.available_discounts:
                                         await DeployPhase.deploy_card_routine(self, name,
-                                                                              self.planet_aiming_reticle_position,
+                                                                              self.planet_pos_to_deploy,
                                                                               discounts=self.discounts_applied)
                                         self.mode = "Normal"
 

@@ -119,6 +119,10 @@ class Player:
                              "Ardaci-strain Broodlord", "Ravenous Horror"]
         self.tyranid_warlord_list = ["Old One Eye", "The Swarmlord", "Subject Omega-X62113",
                                      "Parasite of Mortrex", "Magus Harid", "Red Terror"]
+        self.simple_limited_unique_discounts = ["Fortress-Monastery", "Imperial Bunker",
+                                                "Bigtoof Banna", "Fortress of Madness",
+                                                "Altar of Torment", "Corsair Trading Port",
+                                                "Frontline Launch Bay", "Timeworn Stasis-Crypt"]
         self.synapse_name = ""
         self.warlord_faction = ""
         self.consumption_sacs_list = [True, True, True, True, True, True, True]
@@ -4419,36 +4423,31 @@ class Player:
                     discounts_available += 1
             return discounts_available
         for i in range(len(self.headquarters)):
-            if self.headquarters[i].get_applies_discounts():
-                print("applies")
-                if self.headquarters[i].get_is_faction_limited_unique_discounter():
-                    print("is fac lim uni dis")
-                    if self.headquarters[i].get_faction() == faction_of_card:
-                        print("faction ok")
-                        if self.headquarters[i].get_ready():
-                            print("ready")
-                            self.set_aiming_reticle_in_play(-2, i, "green")
-                            discounts_available += self.headquarters[i].get_discount_amount()
-                elif self.headquarters[i].get_ability() == "Parasitic Scarabs":
-                    if faction_of_card == "Necrons":
+            if self.headquarters[i].get_ability() in self.simple_limited_unique_discounts:
+                if self.get_ready_given_pos(-2, i):
+                    if faction_of_card == self.get_faction_given_pos(-2, i):
                         discounts_available += 1
                         self.set_aiming_reticle_in_play(-2, i, "green")
-                elif self.headquarters[i].get_ability() == "Digestion Pool":
-                    if self.headquarters[i].get_ready():
-                        if planet_chosen is not None:
-                            if self.game.infested_planets[planet_chosen]:
-                                discounts_available += 2
-                                self.set_aiming_reticle_in_play(-2, i, "green")
-                elif self.headquarters[i].get_ability() == "STC Fragment":
-                    if self.headquarters[i].get_ready():
-                        if "Elite" in traits:
+            elif self.headquarters[i].get_ability() == "Parasitic Scarabs":
+                if faction_of_card == "Necrons":
+                    discounts_available += 1
+                    self.set_aiming_reticle_in_play(-2, i, "green")
+            elif self.headquarters[i].get_ability() == "Digestion Pool":
+                if self.headquarters[i].get_ready():
+                    if planet_chosen is not None:
+                        if self.game.infested_planets[planet_chosen]:
                             discounts_available += 2
                             self.set_aiming_reticle_in_play(-2, i, "green")
-                elif self.headquarters[i].get_ability() == "Bonesinger Choir":
-                    if faction_of_card == "Eldar":
-                        if "Vehicle" in traits or "Drone" in traits:
-                            discounts_available += 2
-                            self.set_aiming_reticle_in_play(-2, i, "green")
+            elif self.headquarters[i].get_ability() == "STC Fragment":
+                if self.headquarters[i].get_ready():
+                    if "Elite" in traits:
+                        discounts_available += 2
+                        self.set_aiming_reticle_in_play(-2, i, "green")
+            elif self.headquarters[i].get_ability() == "Bonesinger Choir":
+                if faction_of_card == "Eldar":
+                    if "Vehicle" in traits or "Drone" in traits:
+                        discounts_available += 2
+                        self.set_aiming_reticle_in_play(-2, i, "green")
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist":
                     discounts_available += 1
@@ -4767,18 +4766,16 @@ class Player:
 
     def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None, name_of_card=""):
         discount = 0
-        if self.headquarters[pos].get_applies_discounts():
-            if self.headquarters[pos].get_is_faction_limited_unique_discounter():
-                if self.headquarters[pos].get_faction() == faction_of_card:
-                    if self.headquarters[pos].get_ready():
-                        self.headquarters[pos].exhaust_card()
-                        discount += self.headquarters[pos].get_discount_amount()
-            elif self.headquarters[pos].get_ability() == "Digestion Pool":
-                if self.headquarters[pos].get_ready():
-                    if target_planet is not None:
-                        if self.game.infested_planets[target_planet]:
-                            discount += 2
-                            self.exhaust_given_pos(-2, pos)
+        if self.headquarters[pos].get_ability() in self.simple_limited_unique_discounts:
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                self.headquarters[pos].exhaust_card()
+                discount += 1
+                self.reset_aiming_reticle_in_play(-2, pos)
+        if self.headquarters[pos].get_ability() == "Digestion Pool":
+            if self.headquarters[pos].aiming_reticle_color == "green":
+                self.headquarters[pos].exhaust_card()
+                discount += 2
+                self.reset_aiming_reticle_in_play(-2, pos)
         if self.headquarters[pos].get_ability() == "Gorzod":
             if self.headquarters[pos].aiming_reticle_color == "green":
                 discount += 1
