@@ -56,6 +56,29 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             await self.send_update_message(ability + " activated")
+                elif ability == "Positional Relay":
+                    if card_chosen.get_ready():
+                        if player_owning_card.name_player == primary_player.get_name_player():
+                            card_chosen.exhaust_card()
+                            attachment_count = primary_player.count_attachments_controlled()
+                            if attachment_count > 0:
+                                self.action_chosen = ability
+                                self.resolving_search_box = True
+                                self.what_to_do_with_searched_card = "DRAW"
+                                self.traits_of_searched_card = None
+                                self.card_type_of_searched_card = "Attachment"
+                                self.faction_of_searched_card = None
+                                self.max_cost_of_searched_card = 99
+                                self.all_conditions_searched_card_required = True
+                                self.no_restrictions_on_chosen_card = False
+                                primary_player.number_cards_to_search = attachment_count
+                                if primary_player.number_cards_to_search > len(primary_player.deck):
+                                    primary_player.number_cards_to_search = len(primary_player.deck)
+                                self.cards_in_search_box = primary_player.deck[
+                                                           0:primary_player.number_cards_to_search]
+                                self.name_player_who_is_searching = primary_player.get_name_player()
+                                self.number_who_is_searching = primary_player.get_number()
+                            self.action_cleanup()
                 elif ability == "Missile Pod":
                     if primary_player.get_name_player() == self.player_with_action:
                         player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
