@@ -1536,6 +1536,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.misc_counter = 0
             else:
                 self.delete_reaction()
+        elif current_reaction == "Triarch Stalkers Procession":
+            secondary_player.draw_card()
+            secondary_player.draw_card()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Krak Grenade":
             for i in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments)):
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments[i].get_ability() == "Krak Grenade":
