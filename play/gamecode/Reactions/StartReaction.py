@@ -2438,13 +2438,13 @@ async def start_resolving_reaction(self, name, game_update_string):
                 can_continue = True
                 if self.nullify_enabled:
                     if secondary_player.nullify_check():
-                        await self.send_update_message(primary_player.name_player + " wants to play Vow of Honor" +
+                        await self.send_update_message(primary_player.name_player + " wants to play " + current_reaction +
                                                        "; Nullify window offered.")
                         self.choices_available = ["Yes", "No"]
                         self.name_player_making_choices = secondary_player.name_player
                         self.choice_context = "Use Nullify?"
                         self.nullified_card_pos = -1
-                        self.nullified_card_name = "Vow of Honor"
+                        self.nullified_card_name = current_reaction
                         self.cost_card_nullified = 1
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction Event"
@@ -2772,6 +2772,19 @@ async def start_resolving_reaction(self, name, game_update_string):
                 await self.send_update_message(
                     "No valid targets for Canoptek Scarab Swarm!"
                 )
+                self.delete_reaction()
+        elif current_reaction == "Murder Cogitator":
+            primary_player.exhaust_card_in_hq_given_name("Murder Cogitator")
+            await primary_player.reveal_top_card_deck()
+            card = primary_player.get_top_card_deck()
+            if card is not None:
+                if card.get_is_unit() and card.get_faction() == "Chaos":
+                    await self.send_update_message("Card is drawn")
+                    primary_player.draw_card()
+                else:
+                    await self.send_update_message("Card is not drawn")
+            more = primary_player.search_card_in_hq("Murder Cogitator", ready_relevant=True)
+            if not more:
                 self.delete_reaction()
         elif current_reaction == "Fall Back!":
             if primary_player.resources < 1:
