@@ -1572,6 +1572,10 @@ class Game:
 
     async def send_victory_proper(self, winner_name, reason):
         victory_string = "GAME_INFO/VICTORY_MESSAGE/" + winner_name + "/" + reason
+        if winner_name == self.name_1:
+            self.p1.is_the_winner = True
+        elif winner_name == self.name_2:
+            self.p2.is_the_winner = True
         await self.send_update_message(victory_string)
 
     def determine_last_planet(self):

@@ -58,6 +58,10 @@ class Player:
         self.has_turn = True
         self.retreating = False
         self.has_passed = False
+        self.total_resources_gained = 0
+        self.total_cards_draw = 0
+        self.total_damage_dealt_by_attacks = 0
+        self.deck_string = ""
         self.phase = "Deploy"
         self.round_number = 1
         self.resources = 0
@@ -66,6 +70,7 @@ class Player:
         self.icons_gained = [0, 0, 0]
         self.headquarters = []
         self.deck = []
+        self.is_the_winner = False
         self.discard = []
         self.planets_in_play = [True, True, True, True, True, False, False]
         self.cards_in_play = [[] for _ in range(8)]
@@ -308,7 +313,9 @@ class Player:
         self.shuffle_deck()
         self.deck_loaded = True
         self.cards_in_play[0] = planet_array
-        self.resources = self.headquarters[0].get_starting_resources()
+        self.deck_string = raw_deck
+        self.resources = 0
+        self.add_resources(self.headquarters[0].get_starting_resources())
         preparation_cards_exist = False
         for i in range(len(self.preparation_cards)):
             if self.preparation_cards[i] in self.deck:
@@ -323,6 +330,7 @@ class Player:
                 if self.deck[i] in self.preparation_cards:
                     self.cards.append(self.deck[i])
                     del self.deck[i]
+                    self.total_cards_draw += 1
                     num_cards_left = num_cards_left - 1
                     i = i - 1
                 i = i + 1
@@ -384,7 +392,9 @@ class Player:
         self.shuffle_deck()
         self.deck_loaded = True
         self.cards_in_play[0] = planet_array
-        self.resources = self.headquarters[0].get_starting_resources()
+        self.deck_string = raw_deck
+        self.resources = 0
+        self.add_resources(self.headquarters[0].get_starting_resources())
         preparation_cards_exist = False
         for i in range(len(self.preparation_cards)):
             if self.preparation_cards[i] in self.deck:
@@ -399,6 +409,7 @@ class Player:
                 if self.deck[i] in self.preparation_cards:
                     self.cards.append(self.deck[i])
                     del self.deck[i]
+                    self.total_cards_draw += 1
                     num_cards_left = num_cards_left - 1
                     i = i - 1
                 i = i + 1
@@ -1288,6 +1299,7 @@ class Player:
             self.lost_due_to_deck = True
             print("Deck is empty, you lose!")
         else:
+            self.total_cards_draw += 1
             self.cards.append(self.deck[0])
             del self.deck[0]
 
@@ -1380,6 +1392,7 @@ class Player:
 
     def add_resources(self, amount, refund=False):
         if not refund:
+            self.total_resources_gained += amount
             if not self.check_if_already_have_reaction("Dying Sun Marauder"):
                 for i in range(len(self.headquarters)):
                     if self.get_ability_given_pos(-2, i) == "Dying Sun Marauder":
@@ -5857,7 +5870,9 @@ class Player:
         for i in range(len(bodyguard_damage_list)):
             self.assign_damage_to_pos(planet_id, bodyguard_damage_list[i], 1, is_reassign=True, can_shield=False)
         if damage_on_card_after > damage_on_card_before:
+            other_player = self.get_other_player()
             if att_pos is not None:
+                other_player.total_damage_dealt_by_attacks += total_damage_that_can_be_blocked
                 for i in range(len(other_player.cards_in_play[planet_id + 1])):
                     if other_player.search_attachments_at_pos(planet_id, i, "Data Analyzer"):
                         self.game.create_interrupt("Data Analyzer Aggressive", other_player.name_player,

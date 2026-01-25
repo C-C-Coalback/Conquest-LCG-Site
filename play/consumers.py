@@ -458,6 +458,42 @@ class GameConsumer(AsyncWebsocketConsumer):
                         elif self.name == active_games[self.game_position].name_2:
                             await active_games[self.game_position].send_victory_proper(
                                 active_games[self.game_position].name_1, "concession")
+                    elif message[1] == "savegame":
+                        cwd = os.getcwd()
+                        stored_game_data_dir = os.path.join(cwd, "saved_games")
+                        if not os.path.exists(stored_game_data_dir):
+                            os.mkdir(stored_game_data_dir)
+                        target_save_file = os.path.join(stored_game_data_dir, self.room_name) + ".txt"
+                        with open(target_save_file, "w") as f:
+                            current_string = "-----\nDECK P1\n-----\n"
+                            current_string += active_games[self.game_position].p1.deck_string
+                            current_string += "\n-----\nDECK P2\n-----\n"
+                            current_string += active_games[self.game_position].p2.deck_string
+                            current_string += "\n-----GAME DETAILS-----\nERRATA:\t"
+                            if active_games[self.game_position].blackstone:
+                                current_string += "BLACKSTONE"
+                            elif active_games[self.game_position].apoka:
+                                current_string += "APOKA"
+                            else:
+                                current_string += "NONE"
+                            current_string += "\n"
+                            current_string += "WINNER:\t"
+                            if active_games[self.game_position].p1.is_the_winner:
+                                current_string += active_games[self.game_position].p1.name_player
+                            elif active_games[self.game_position].p2.is_the_winner:
+                                current_string += active_games[self.game_position].p2.name_player
+                            else:
+                                current_string += "N/A"
+                            current_string += "\n"
+                            current_string += "\n-----\nP1 DETAILS\n-----\n"
+                            current_string += "RESOURCES GAINED:\t" + str(active_games[self.game_position].p1.total_resources_gained) + "\n"
+                            current_string += "CARDS DRAWN:\t" + str(active_games[self.game_position].p1.total_cards_draw) + "\n"
+                            current_string += "DAMAGE DEALT (ATTACKS):\t" + str(active_games[self.game_position].p1.total_damage_dealt_by_attacks) + "\n"
+                            current_string += "\n-----\nP2 DETAILS\n-----\n"
+                            current_string += "RESOURCES GAINED:\t" + str(active_games[self.game_position].p2.total_resources_gained) + "\n"
+                            current_string += "CARDS DRAWN:\t" + str(active_games[self.game_position].p2.total_cards_draw) + "\n"
+                            current_string += "DAMAGE DEALT (ATTACKS):\t" + str(active_games[self.game_position].p2.total_damage_dealt_by_attacks) + "\n"
+                            f.write(current_string)
                     elif message[1] == "Error":
                         raise ValueError
                     elif message[1] == "force-quit-reactions":
