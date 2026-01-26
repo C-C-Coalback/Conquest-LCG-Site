@@ -1364,6 +1364,14 @@ class Player:
                         return True
         return False
 
+    def count_reactions(self, reaction_name):
+        count = 0
+        for i in range(len(self.game.reactions_needing_resolving)):
+            if self.game.reactions_needing_resolving[i] == reaction_name:
+                if self.game.player_who_resolves_reaction[i] == self.name_player:
+                    count += 1
+        return count
+
     def count_reactions_of_position(self, reaction_name, pla, pos):
         count = 0
         for i in range(len(self.game.reactions_needing_resolving)):

@@ -3897,7 +3897,6 @@ class Game:
                                 if primary_player.get_ability_given_pos(-2, i) == "Intercept":
                                     if primary_player.get_ready_given_pos(-2, i):
                                         primary_player.exhaust_given_pos(-2, i)
-                                        new_pos = i
                             self.intercept_active = True
                             self.name_player_intercept = primary_player.name_player
                         elif game_update_string[1] == "1":

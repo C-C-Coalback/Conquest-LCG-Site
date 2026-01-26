@@ -1220,6 +1220,19 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.misc_target_unit = (-1, -1)
                             self.chosen_first_card = False
                             self.chosen_second_card = False
+                            for i in range(7):
+                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    if primary_player.get_ability_given_pos(i, j) == "Tomb Blade Squadron":
+                                        if not primary_player.cards_in_play[i + 1][j].misc_ability_used:
+                                            if primary_player.count_reactions("Tomb Blade Squadron") < 2:
+                                                self.create_reaction("Tomb Blade Squadron", primary_player.name_player,
+                                                                     (int(primary_player.number), -1, -1))
+                            for i in range(len(primary_player.headquarters)):
+                                if primary_player.get_ability_given_pos(-2, i) == "Tomb Blade Squadron":
+                                    if not primary_player.headquarters[i].misc_ability_used:
+                                        if primary_player.count_reactions("Tomb Blade Squadron") < 2:
+                                            self.create_reaction("Tomb Blade Squadron", primary_player.name_player,
+                                                                 (int(primary_player.number), -1, -1))
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Raiding Portal":
