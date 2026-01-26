@@ -25,6 +25,7 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                     if primary_player.get_name_player() == self.player_with_action:
                         if primary_player.spend_resources(1):
                             self.action_chosen = ability
+                            self.misc_target_player = player_owning_card.name_player
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.send_update_message(ability + " activated")
