@@ -6778,6 +6778,7 @@ class Player:
 
     def destroy_card_in_hq(self, card_pos):
         self.search_for_preemptive_destroy_interrupts()
+        other_player = self.get_other_player()
         if self.headquarters[card_pos].get_card_type() == "Warlord":
             if self.headquarters[card_pos].get_name() == "Termagant":
                 self.add_card_in_hq_to_discard(card_pos)
