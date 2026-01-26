@@ -59,48 +59,32 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
 async def manual_plannum_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
-            if self.unit_to_move_position[0] != -1 and self.unit_to_move_position[1] != -1:
-                if self.player_resolving_battle_ability == self.name_1:
-                    player = self.p1
-                else:
-                    player = self.p2
-                player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
-                                                    self.unit_to_move_position[1])
-                player.move_unit_to_planet(self.unit_to_move_position[0], self.unit_to_move_position[1],
-                                           int(game_update_string[1]))
+            if self.chosen_first_card:
+                primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0],
+                                                            self.misc_target_unit[1])
+                primary_player.move_unit_to_planet(self.misc_target_unit[0], self.misc_target_unit[1],
+                                                   int(game_update_string[1]))
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                      game_update_string)
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HQ":
             if game_update_string[1] == str(self.number_resolving_battle_ability):
-                if self.player_resolving_battle_ability == self.name_1:
-                    player = self.p1
-                else:
-                    player = self.p2
-                if player.headquarters[int(game_update_string[2])].get_card_type() != "Warlord" and \
-                        player.headquarters[int(game_update_string[2])].get_card_type() != "Support":
-                    if self.unit_to_move_position[0] != -1:
-                        player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
-                                                            self.unit_to_move_position[1])
-                    self.unit_to_move_position = (-2, int(game_update_string[2]))
-                    player.set_aiming_reticle_in_play(-2, self.unit_to_move_position[1], "blue")
+                if primary_player.get_card_type_given_pos(-2, int(game_update_string[2])) not in ["Warlord", "Support"]:
+                    if self.chosen_first_card:
+                        primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
+                    self.chosen_first_card = True
+                    self.misc_target_unit = (-2, int(game_update_string[2]))
+                    primary_player.set_aiming_reticle_in_play(-2, self.misc_target_unit[1], "blue")
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if game_update_string[1] == str(self.number_resolving_battle_ability):
-                if self.player_resolving_battle_ability == self.name_1:
-                    player = self.p1
-                else:
-                    player = self.p2
-                if player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
-                        .get_card_type() != "Warlord" and \
-                        player.cards_in_play[int(game_update_string[2]) + 1][int(game_update_string[3])] \
-                                .get_card_type() != "Support":
-                    if self.unit_to_move_position[0] != -1:
-                        player.reset_aiming_reticle_in_play(self.unit_to_move_position[0],
-                                                            self.unit_to_move_position[1])
-                    self.unit_to_move_position = (int(game_update_string[2]), int(game_update_string[3]))
-                    player.set_aiming_reticle_in_play(self.unit_to_move_position[0],
-                                                      self.unit_to_move_position[1], "blue")
+                if primary_player.get_card_type_given_pos(int(game_update_string[2]),
+                                                          int(game_update_string[3])) not in ["Warlord", "Support"]:
+                    if self.chosen_first_card:
+                        primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
+                    self.chosen_first_card = True
+                    self.misc_target_unit = (int(game_update_string[2]), int(game_update_string[3]))
+                    primary_player.set_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
 
 
 async def manual_gareth_prime_ability(self, name, game_update_string, primary_player, secondary_player):
