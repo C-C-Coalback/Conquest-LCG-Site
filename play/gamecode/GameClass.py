@@ -6108,13 +6108,12 @@ class Game:
                             primary_player.add_resources(1)
                         self.delete_reaction()
                     elif self.choice_context == "Shadowsun plays attachment from hand or discard?":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         if game_update_string[1] == "0":
                             self.shadowsun_chose_hand = True
                             self.reactions_needing_resolving[0] = "Commander Shadowsun hand"
                             self.location_hand_attachment_shadowsun = -1
+                            self.resolving_search_box = False
                             await self.send_update_message("Choose card in hand")
                         else:
                             self.shadowsun_chose_hand = False
