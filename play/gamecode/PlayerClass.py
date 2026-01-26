@@ -6117,6 +6117,7 @@ class Player:
             for i in range(len(self.headquarters)):
                 if self.check_for_trait_given_pos(-2, i, trait):
                     return True
+            return False
         for i in range(len(self.cards_in_play[planet_id + 1])):
             if self.check_for_trait_given_pos(planet_id, i, trait):
                 return True
