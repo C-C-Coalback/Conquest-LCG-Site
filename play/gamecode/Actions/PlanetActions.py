@@ -715,30 +715,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
             secondary_player.create_enemy_played_event_reactions()
             self.action_cleanup()
     elif self.action_chosen == "Mycetic Spores":
-        if self.player_with_action == self.name_1:
-            primary_player = self.p1
-            secondary_player = self.p2
-        else:
-            primary_player = self.p2
-            secondary_player = self.p1
-        if primary_player.search_card_at_planet(chosen_planet, "Termagant", ability_checking=False):
-            origin_planet = self.unit_to_move_position[0]
-            origin_pos = self.unit_to_move_position[1]
-            dest_planet = int(game_update_string[1])
-            primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                        self.position_of_actioned_card[1])
-            new_pos = len(primary_player.cards_in_play[dest_planet + 1])
-            if self.positions_of_units_to_take_damage:
-                for i in range(len(self.positions_of_units_to_take_damage)):
-                    self.positions_of_units_to_take_damage[i] = [int(primary_player.get_number()),
-                                                                 dest_planet, new_pos]
-            primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
-            self.position_of_actioned_card = (-1, -1)
-            self.action_chosen = ""
-            self.player_with_action = ""
-            self.mode = "Normal"
-            self.card_pos_to_deploy = -1
+        if self.chosen_first_card:
+            if primary_player.search_card_at_planet(chosen_planet, "Termagant", ability_checking=False):
+                origin_planet, origin_pos = self.misc_target_unit
+                dest_planet = chosen_planet
+                primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
+                self.action_cleanup()
     elif self.action_chosen == "Anrakyr the Traveller":
         if self.anrakyr_unit_position != -1:
             self.planet_pos_to_deploy = int(game_update_string[1])

@@ -2694,6 +2694,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     else:
                         self.delete_reaction()
         elif current_reaction == "Drifting Spore Mines":
+            self.misc_target_unit = (planet_pos, unit_pos)
             if planet_pos != 6 or self.planets_in_play_array[5]:
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.player_who_resolves_reaction[0] = secondary_player.name_player
