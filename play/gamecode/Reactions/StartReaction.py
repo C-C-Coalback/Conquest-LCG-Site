@@ -478,8 +478,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.chosen_second_card = False
             self.need_to_reset_tomb_blade_squadron = True
             self.misc_target_unit = (-1, -1)
-            await self.send_update_message("You will need to press pass when you "
-                                           "are done resolving Tomb Blade Squadrons")
         elif current_reaction == "Omega Zero Command":
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             self.delete_reaction()
