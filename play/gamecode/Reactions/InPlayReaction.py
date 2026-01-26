@@ -1067,14 +1067,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Soul Grinder":
             if primary_player.get_number() == game_update_string[1]:
                 planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
-                unit_pos_sg = self.positions_of_unit_triggering_reaction[0][2]
-                planet_pos = int(game_update_string[2])
-                unit_pos = int(game_update_string[3])
                 if planet_pos == planet_pos_sg:
-                    if primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
-                            get_card_type() != "Warlord":
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
-                        secondary_player.reset_aiming_reticle_in_play(planet_pos_sg, unit_pos_sg)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Wrathful Dreadnought":

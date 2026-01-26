@@ -780,11 +780,11 @@ def resolve_winnings(self, winner, loser, planet_id):
                     self.create_reaction("Devourer Venomthrope", winner.name_player,
                                          (int(winner.get_number()), i, j))
     for i in range(len(winner.cards_in_play[planet_id + 1])):
-        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Soul Grinder":
+        if winner.get_ability_given_pos(planet_id, i) == "Soul Grinder":
             self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
-        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Toxic Venomthrope":
+        if winner.get_ability_given_pos(planet_id, i) == "Toxic Venomthrope":
             self.create_reaction("Toxic Venomthrope", winner.name_player, (int(winner.get_number()), planet_id, i))
-        if winner.cards_in_play[planet_id + 1][i].get_ability() == "Caustic Tyrannofex":
+        if winner.get_ability_given_pos(planet_id, i) == "Caustic Tyrannofex":
             self.create_reaction("Caustic Tyrannofex", winner.name_player, (int(winner.get_number()), planet_id, i))
         if winner.check_for_trait_given_pos(planet_id, i, "Kabalite"):
             if winner.get_card_type_given_pos(planet_id, i) == "Army":
