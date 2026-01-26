@@ -8320,9 +8320,7 @@ class Game:
                         await self.send_update_message(total_string)
                         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
                     if self.reactions_needing_resolving[0] == "Soul Grinder":
-                        planet_pos = self.positions_of_unit_triggering_reaction[0][1]
-                        unit_pos = self.positions_of_unit_triggering_reaction[0][2]
-                        secondary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                        secondary_player.reset_all_aiming_reticles_play_hq()
                     if self.reactions_needing_resolving[0] == "Tunneling Mawloc":
                         self.infest_planet(self.misc_target_planet, primary_player)
                     if self.reactions_needing_resolving[0] == "Awakened Geomancer":
