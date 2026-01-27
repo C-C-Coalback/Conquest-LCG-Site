@@ -11101,6 +11101,12 @@ class Game:
         self.number_with_combat_turn = self.number_reset_combat_turn
 
     def force_set_battle_initiative(self, name, number):
+        if name == self.name_1:
+            self.p1.has_initiative_for_battle = True
+            self.p2.has_initiative_for_battle = False
+        elif name == self.name_2:
+            self.p2.has_initiative_for_battle = True
+            self.p1.has_initiative_for_battle = False
         self.player_with_combat_turn = name
         self.player_reset_combat_turn = name
         self.number_with_combat_turn = number
