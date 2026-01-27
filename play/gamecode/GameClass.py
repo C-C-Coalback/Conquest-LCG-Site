@@ -11107,7 +11107,6 @@ class Game:
         elif name == self.name_2:
             self.p2.has_initiative_for_battle = True
             self.p1.has_initiative_for_battle = False
-            "Slake the Thirst"
         self.player_with_combat_turn = name
         self.player_reset_combat_turn = name
         self.number_with_combat_turn = number
