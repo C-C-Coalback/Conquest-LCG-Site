@@ -7334,6 +7334,11 @@ class Player:
                 if self.search_card_in_hq("Standard of Devastation"):
                     self.game.create_reaction("Standard of Devastation", self.name_player,
                                               (int(self.number), -1, -1))
+            if other_player.search_card_in_hq("Cato's Stronghold", ready_relevant=True):
+                if not other_player.check_if_already_have_reaction("Cato's Stronghold"):
+                    self.game.create_reaction("Cato's Stronghold", other_player.name_player,
+                                              (int(other_player.number), -1, -1))
+                other_player.allowed_planets_cato_stronghold.append(planet_num)
             if self.cards_in_play[planet_num + 1][card_pos].get_has_deepstrike():
                 if self.search_card_in_hq("Klan Totem", ready_relevant=True):
                     if not self.check_if_already_have_reaction("Klan Totem"):
@@ -7664,10 +7669,6 @@ class Player:
                                     already_using_murder_cogitator = True
                         if not already_using_murder_cogitator:
                             self.game.create_reaction("Murder Cogitator", self.name_player, (int(self.number), -1, -1))
-        if other_player.search_card_in_hq("Cato's Stronghold", ready_relevant=True):
-            if not other_player.check_if_already_have_reaction("Cato's Stronghold"):
-                self.game.create_reaction("Cato's Stronghold", other_player.name_player, (int(other_player.number), -1, -1))
-            other_player.allowed_planets_cato_stronghold.append(planet_num)
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "3rd Company Tactical Squad":
