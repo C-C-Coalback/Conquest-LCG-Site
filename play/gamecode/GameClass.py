@@ -4794,7 +4794,7 @@ class Game:
                         self.name_player_making_choices = name
                     elif self.choice_context == "Which Player? (Slake the Thirst):":
                         self.misc_target_choice = game_update_string[1]
-                        self.choices_available = []
+                        self.choices_available = ["0"]
                         for i in range(len(self.p1.cards)):
                             if len(self.choices_available) < 4:
                                 self.choices_available.append(str(i + 1))
@@ -11107,6 +11107,7 @@ class Game:
         elif name == self.name_2:
             self.p2.has_initiative_for_battle = True
             self.p1.has_initiative_for_battle = False
+            "Slake the Thirst"
         self.player_with_combat_turn = name
         self.player_reset_combat_turn = name
         self.number_with_combat_turn = number
