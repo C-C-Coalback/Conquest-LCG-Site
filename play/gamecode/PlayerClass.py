@@ -107,6 +107,7 @@ class Player:
         self.mobile_resolved = True
         self.indirect_damage_applied = 0
         self.total_indirect_damage = 0
+        self.allowed_units_alaitoc_shrine = []
         self.cards_recently_discarded = []
         self.stored_cards_recently_discarded = []
         self.stored_targets_the_emperor_protects = []
@@ -3423,14 +3424,10 @@ class Player:
                                               (int(self.number), destination, new_pos))
             if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
                 if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
-                    alaitoc_shrine_already_present = False
-                    for i in range(len(self.game.reactions_needing_resolving)):
-                        if self.game.reactions_needing_resolving[i] == "Alaitoc Shrine":
-                            alaitoc_shrine_already_present = True
-                    if not alaitoc_shrine_already_present:
+                    if not self.check_if_already_have_reaction("Alaitoc Shrine"):
                         self.game.create_reaction("Alaitoc Shrine", self.name_player,
                                                   (int(self.number), -1, -1))
-                        self.game.allowed_units_alaitoc_shrine.append([int(self.number), destination, new_pos])
+                    self.allowed_units_alaitoc_shrine.append((int(self.number), destination, new_pos))
             for i in range(len(self.cards_in_play[destination + 1])):
                 if self.game.phase != "COMMAND":
                     if self.get_ability_given_pos(destination, i) == "Acquisition Phalanx":
@@ -7669,8 +7666,8 @@ class Player:
                             self.game.create_reaction("Murder Cogitator", self.name_player, (int(self.number), -1, -1))
         if other_player.search_card_in_hq("Cato's Stronghold", ready_relevant=True):
             if not other_player.check_if_already_have_reaction("Cato's Stronghold"):
-                other_player.allowed_planets_cato_stronghold.append(planet_num)
                 self.game.create_reaction("Cato's Stronghold", other_player.name_player, (int(other_player.number), -1, -1))
+            other_player.allowed_planets_cato_stronghold.append(planet_num)
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "3rd Company Tactical Squad":

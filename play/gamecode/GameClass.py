@@ -257,7 +257,6 @@ class Game:
         self.first_card_damaged = True
         self.sweep_value = 0
         self.combat_round_number = 0
-        self.allowed_units_alaitoc_shrine = []
         self.committing_warlords = False
         self.resolving_search_box = False
         self.banshee_power_sword_extra_attack = 0
@@ -8245,7 +8244,7 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Foresight":
                         primary_player.aiming_reticle_coords_hand = None
                     if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
-                        self.allowed_units_alaitoc_shrine = []
+                        primary_player.allowed_units_alaitoc_shrine = []
                     if self.reactions_needing_resolving[0] == "The Blood Pits":
                         if self.misc_misc:
                             for i in range(len(self.misc_misc)):
