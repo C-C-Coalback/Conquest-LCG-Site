@@ -291,6 +291,8 @@
                 document.getElementById('synapse-card').innerHTML = `<img id=` + synapseName + ` src=` + route + ` class="db-image">`
             } else if (split_data[0] === "Pledge") {
                 var pledgeName = split_data[1].split(' ').join('_');
+                cardCount = cardCount + 1;
+                updateCardCount();
                 route = "/static/images/CardImages/" + pledgeName + ".jpg";
                 document.getElementById('pledge-card').innerHTML = `<img id=` + pledgeName + ` src=` + route + ` class="db-image">`
             } else if (split_data[0] === "Army"){
@@ -453,11 +455,13 @@
                 document.getElementById("chat-log").value += " (" + text + ")";
             }
         }
+        cardCount = 8;
         const pledge_name = document.getElementById("pledge-card").children[0].id;
         document.getElementById("chat-log").value += "\n"
         if (pledge_name != "EmptyPledge") {
             document.getElementById("chat-log").value += pledge_name.split('_').join(' ');
             document.getElementById("chat-log").value += "\n"
+            cardCount = cardCount + 1;
         }
         document.getElementById("chat-log").value += "----------------------------------------------------------------------\n"
         document.getElementById("chat-log").value += "Signature Squad\n\n";
@@ -490,7 +494,6 @@
         document.getElementById("chat-log").value += "----------------------------------------------------------------------\n";
         document.getElementById("chat-log").value += "Army\n\n";
         var elements = document.getElementById("army-cards").children;
-        cardCount = 8;
         var text = "";
         for (i = 0; i < elements.length; i++) {
             var collection = elements[i].children;
