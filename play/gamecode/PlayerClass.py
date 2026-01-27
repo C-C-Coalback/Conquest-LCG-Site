@@ -137,6 +137,7 @@ class Player:
         self.dark_possession_remove_after_play = False
         self.enslaved_faction = ""
         self.chosen_enslaved_faction = False
+        self.allowed_planets_cato_stronghold = []
         self.erekiels_queued = 0
         self.nahumekh_value = 0
         self.last_hand_string = ""
@@ -7667,7 +7668,9 @@ class Player:
                         if not already_using_murder_cogitator:
                             self.game.create_reaction("Murder Cogitator", self.name_player, (int(self.number), -1, -1))
         if other_player.search_card_in_hq("Cato's Stronghold", ready_relevant=True):
-            self.game.create_reaction("Cato's Stronghold", other_player.name_player, (int(other_player.number), -1, -1))
+            if not other_player.check_if_already_have_reaction("Cato's Stronghold"):
+                other_player.allowed_planets_cato_stronghold.append(planet_num)
+                self.game.create_reaction("Cato's Stronghold", other_player.name_player, (int(other_player.number), -1, -1))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "3rd Company Tactical Squad":

@@ -1691,8 +1691,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.action_cleanup()
     elif self.action_chosen == "Master Program":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = -2
-            unit_pos = int(game_update_string[2])
             if not self.chosen_first_card:
                 if primary_player.headquarters[unit_pos].check_for_a_trait("Drone", primary_player.etekh_trait):
                     if primary_player.sacrifice_card_in_hq(unit_pos):

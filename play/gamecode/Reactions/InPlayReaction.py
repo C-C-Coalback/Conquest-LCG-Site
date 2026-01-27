@@ -2188,26 +2188,36 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Cato's Stronghold":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):
-                if self.cato_stronghold_activated:
-                    if planet_pos in self.allowed_planets_cato_stronghold:
-                        if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                            can_continue = True
-                            possible_interrupts = []
-                            if player_owning_card.name_player == primary_player.name_player:
-                                possible_interrupts = secondary_player.intercept_check()
-                            if player_owning_card.name_player == secondary_player.name_player:
-                                possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                                    planet_pos, unit_pos, intercept_possible=True)
-                                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                                    can_continue = False
-                                    await self.send_update_message("Immune to enemy card abilities.")
-                            if possible_interrupts and can_continue:
-                                primary_player.ready_given_pos(planet_pos, unit_pos)
-                                self.delete_reaction()
-                                self.allowed_planets_cato_stronghold = []
-                                self.cato_stronghold_activated = False
-                        else:
-                            await self.send_update_message("Unit already ready")
+                if planet_pos in primary_player.allowed_planets_cato_stronghold:
+                    if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        can_continue = True
+                        possible_interrupts = []
+                        if player_owning_card.name_player == primary_player.name_player:
+                            possible_interrupts = secondary_player.intercept_check()
+                        if player_owning_card.name_player == secondary_player.name_player:
+                            possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                                planet_pos, unit_pos, intercept_possible=True)
+                            if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                                can_continue = False
+                                await self.send_update_message("Immune to enemy card abilities.")
+                        if possible_interrupts and can_continue:
+                            can_continue = False
+                            await self.send_update_message("Some sort of interrupt may be used.")
+                            self.choices_available = possible_interrupts
+                            self.choices_available.insert(0, "No Interrupt")
+                            self.name_player_making_choices = secondary_player.name_player
+                            self.choice_context = "Interrupt Effect?"
+                            self.nullified_card_name = current_reaction
+                            self.cost_card_nullified = 0
+                            self.nullify_string = "/".join(game_update_string)
+                            self.first_player_nullified = primary_player.name_player
+                            self.nullify_context = "Reaction"
+                        if can_continue:
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            self.delete_reaction()
+                            primary_player.allowed_planets_cato_stronghold = []
+                    else:
+                        await self.send_update_message("Unit already ready")
         elif current_reaction == "Beasthunter Wyches":
             if int(primary_player.get_number()) == int(
                     self.positions_of_unit_triggering_reaction[0][0]):

@@ -125,12 +125,6 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False,
                                                       by_enemy_unit=False)
                 self.delete_reaction()
-    elif current_reaction == "Cato's Stronghold":
-        if not self.cato_stronghold_activated:
-            if primary_player.get_ability_given_pos(-2, unit_pos) == "Cato's Stronghold":
-                if primary_player.get_ready_given_pos(-2, unit_pos):
-                    primary_player.exhaust_given_pos(-2, unit_pos)
-                    self.cato_stronghold_activated = True
     elif current_reaction == "Decayed Gardens":
         if player_owning_card.get_lumbering_given_pos(planet_pos, unit_pos):
             player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")

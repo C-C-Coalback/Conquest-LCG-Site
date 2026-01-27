@@ -257,8 +257,6 @@ class Game:
         self.first_card_damaged = True
         self.sweep_value = 0
         self.combat_round_number = 0
-        self.cato_stronghold_activated = False
-        self.allowed_planets_cato_stronghold = []
         self.allowed_units_alaitoc_shrine = []
         self.committing_warlords = False
         self.resolving_search_box = False
@@ -8243,8 +8241,7 @@ class Game:
                     if self.reactions_needing_resolving[0] == "Power from Pain":
                         await self.send_update_message("No sacrifice for Power from Pain")
                     if self.reactions_needing_resolving[0] == "Cato's Stronghold":
-                        self.cato_stronghold_activated = False
-                        self.allowed_planets_cato_stronghold = []
+                        primary_player.allowed_planets_cato_stronghold = []
                     if self.reactions_needing_resolving[0] == "Foresight":
                         primary_player.aiming_reticle_coords_hand = None
                     if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
