@@ -6952,6 +6952,9 @@ class Game:
             for j in range(len(player.cards_in_play[i + 1])):
                 if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
                     self.discounts_applied = self.discounts_applied - 1
+        for i in range(len(player.headquarters)):
+            if player.get_ability_given_pos(-2, i) == "Uncontrollable Rioters":
+                self.discounts_applied = self.discounts_applied - 1
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):
                 if i != planet_chosen:
@@ -7019,6 +7022,9 @@ class Game:
             for j in range(len(player.cards_in_play[i + 1])):
                 if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
                     self.available_discounts = self.available_discounts - 1
+        for i in range(len(player.headquarters)):
+            if player.get_ability_given_pos(-2, i) == "Uncontrollable Rioters":
+                self.available_discounts = self.available_discounts - 1
         if card.check_for_a_trait("Elite"):
             self.available_discounts += player.master_warpsmith_count
             if self.planet_array[planet_chosen] == "Essio":
