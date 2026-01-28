@@ -48,11 +48,12 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             primary_player.draw_card()
             self.delete_interrupt()
     elif current_interrupt == "The Shadow Suit":
-        if self.chosen_first_card:
-            if planet_pos == self.misc_target_planet:
-                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                    primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                    self.delete_interrupt()
+        if game_update_string[1] == primary_player.number:
+            if self.chosen_first_card:
+                if planet_pos == self.misc_target_planet:
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.delete_interrupt()
     elif current_interrupt == "Mark of Slaanesh":
         if game_update_string[1] == primary_player.number:
             dest_planet = self.positions_of_units_interrupting[0][1]
