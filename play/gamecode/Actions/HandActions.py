@@ -674,30 +674,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.name_player_making_choices = primary_player.name_player
-                        self.choices_available = []
-                        self.choice_context = "Awake the Sleepers"
-                        for i in range(len(primary_player.discard)):
-                            card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                                      self.apoka_errata_cards, self.cards_that_have_errata)
-                            if card.get_faction() == "Necrons":
-                                self.choices_available.append(card.get_name())
-                        self.resolving_search_box = True
-                        if not self.choices_available:
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            self.resolving_search_box = False
-                            if not primary_player.harbinger_of_eternity_active:
-                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                                primary_player.aiming_reticle_coords_hand = None
-                            await self.send_update_message(
-                                "No valid targets for Awake the Sleepers"
-                            )
-                            self.action_cleanup()
-                        else:
-                            await self.send_update_message(
-                                "Press the pass button to stop shuffling any more cards in."
-                            )
+                        await self.send_update_message(
+                            "Press the pass button to stop shuffling any more cards in."
+                        )
                     elif ability == "Drudgery":
                         if primary_player.can_play_limited:
                             primary_player.can_play_limited = False

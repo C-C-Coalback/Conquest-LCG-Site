@@ -43,28 +43,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.action_chosen = ability
                         primary_player.remove_card_from_game(ability)
                         primary_player.harbinger_of_eternity_active = True
-                        self.name_player_making_choices = primary_player.name_player
-                        self.choices_available = []
-                        self.choice_context = "Awake the Sleepers"
-                        for i in range(len(primary_player.discard)):
-                            card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                                      self.apoka_errata_cards, self.cards_that_have_errata)
-                            if card.get_faction() == "Necrons":
-                                self.choices_available.append(card.get_name())
-                        self.resolving_search_box = True
-                        if not self.choices_available:
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            self.resolving_search_box = False
-                            await self.send_update_message(
-                                "No valid targets for Awake the Sleepers"
-                            )
-                            secondary_player.create_enemy_played_event_reactions()
-                            self.action_cleanup()
-                        else:
-                            await self.send_update_message(
-                                "Press the pass button to stop shuffling any more cards in."
-                            )
+                        await self.send_update_message(
+                            "Press the pass button to stop shuffling any more cards in."
+                        )
             elif ability == "Eldritch Reaping":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     await self.send_update_message(
@@ -166,6 +147,11 @@ async def update_game_event_action_discard(self, name, game_update_string):
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
         self.action_cleanup()
+    elif self.action_chosen == "Awake the Sleepers":
+        if chosen_discard == int(primary_player.number):
+            card = primary_player.get_card_in_discard(pos_discard)
+            if card.get_faction() == "Necrons":
+                primary_player.shuffle_card_in_discard_into_deck(pos_discard)
     elif self.action_chosen == "Soul Seizure":
         if not self.chosen_first_card:
             if chosen_discard == int(secondary_player.number):

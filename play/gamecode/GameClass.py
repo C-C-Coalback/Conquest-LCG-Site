@@ -1240,6 +1240,14 @@ class Game:
                         self.action_cleanup()
                     elif self.action_chosen == "Biomass Extraction":
                         self.action_cleanup()
+                    elif self.action_chosen == "Awake the Sleepers":
+                        if not primary_player.harbinger_of_eternity_active:
+                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.harbinger_of_eternity_active = False
+                        primary_player.aiming_reticle_coords_hand = None
+                        primary_player.shuffle_deck()
+                        secondary_player.create_enemy_played_event_reactions()
+                        self.action_cleanup()
                     elif self.action_chosen == "Whirling Death":
                         await self.send_update_message("Stopping Whirling Death")
                         secondary_player.create_enemy_played_event_reactions()
@@ -3069,17 +3077,6 @@ class Game:
                         self.choice_context = ""
                         self.name_player_making_choices = ""
                         self.resolving_search_box = False
-                    if self.choice_context == "Awake the Sleepers":
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
-                        self.choices_available = []
-                        self.resolving_search_box = False
-                        if not primary_player.harbinger_of_eternity_active:
-                            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                        primary_player.aiming_reticle_coords_hand = None
-                        primary_player.shuffle_deck()
-                        secondary_player.create_enemy_played_event_reactions()
-                        self.action_cleanup()
                     elif self.choice_context == "Prototype Crisis Suit choices":
                         self.delete_reaction()
                         self.reset_choices_available()
@@ -6046,24 +6043,6 @@ class Game:
                         if self.amount_that_can_be_removed_by_shield[0] < 1:
                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                    elif self.choice_context == "Awake the Sleepers":
-                        target_name = self.choices_available[int(game_update_string[1])]
-                        primary_player.deck.append(target_name)
-                        primary_player.discard.remove(target_name)
-                        del self.choices_available[int(game_update_string[1])]
-                        if not self.choices_available:
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
-                            self.resolving_search_box = False
-                            if not primary_player.harbinger_of_eternity_active:
-                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                            primary_player.aiming_reticle_coords_hand = None
-                            await self.send_update_message(
-                                "No valid targets for Awake the Sleepers"
-                            )
-                            primary_player.shuffle_deck()
-                            secondary_player.create_enemy_played_event_reactions()
-                            self.action_cleanup()
                     elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?" or \
                             self.choice_context == "Homing Beacon: Gain Card or Resource?":
                         self.reset_choices_available()
