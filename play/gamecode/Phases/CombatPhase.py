@@ -1190,7 +1190,10 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if secondary_player.get_faction_given_pos(
                                             self.defender_planet, self.defender_position) == "Orks" and \
                                             secondary_player.check_for_trait_given_pos(
-                                                self.defender_planet, self.defender_position, "Soldier"):
+                                                self.defender_planet, self.defender_position, "Soldier") and \
+                                            secondary_player.get_card_type_given_pos(
+                                                self.defendet_planet, self.defender_position
+                                            ) == "Army":
                                         can_continue = False
                                         await self.send_update_message(
                                             "Fake Ooman Base can be used to cancel the attack"
