@@ -2781,8 +2781,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                 else:
                     await self.send_update_message("Card is not drawn")
             if primary_player.search_card_in_hq("Murder Cogitator", ready_relevant=True):
-                self.game.create_reaction("Murder Cogitator", primary_player.name_player,
-                                          (int(primary_player.number), -1, -1))
+                self.create_reaction("Murder Cogitator", primary_player.name_player,
+                                     (int(primary_player.number), -1, -1))
             self.delete_reaction()
         elif current_reaction == "Fall Back!":
             if primary_player.resources < 1:
