@@ -278,7 +278,7 @@ class Game:
         self.positions_of_units_interrupting = []
         self.extra_interrupt_info = []
         self.location_hand_attachment_shadowsun = -1
-        self.name_attachment_discard_shadowsun = ""
+        self.location_attachment_discard_shadowsun = -1
         self.units_damaged_by_attack = []
         self.units_damaged_by_attack_from_sm = []
         self.alternative_shields = ["Indomitable", "Glorious Intervention", "Faith Denies Death", "Uphold His Honor",
@@ -6113,33 +6113,11 @@ class Game:
                             self.resolving_search_box = False
                             await self.send_update_message("Choose card in hand")
                         else:
+                            self.reactions_needing_resolving[0] = "Commander Shadowsun discard"
                             self.shadowsun_chose_hand = False
-                            self.name_attachment_discard_shadowsun = ""
-                            self.choice_context = "Shadowsun attachment from discard:"
+                            self.location_attachment_discard_shadowsun = -1
                             self.name_player_making_choices = name
-                            for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                                if (card.get_card_type() == "Attachment" and card.get_faction() == "Tau" and
-                                    card.get_cost() < 3) or card.get_name() == "Shadowsun's Stealth Cadre":
-                                    if card.get_name() not in self.choices_available:
-                                        self.choices_available.append(card.get_name())
-                            if not self.choices_available:
-                                self.choice_context = ""
-                                self.name_player_making_choices = ""
-                                await self.send_update_message("No valid cards in discard")
-                                self.resolving_search_box = False
-                                self.delete_reaction()
-                            else:
-                                await self.send_update_message("Choose card in discard")
-                    elif self.choice_context == "Shadowsun attachment from discard:":
-                        self.name_attachment_discard_shadowsun = self.choices_available[int(game_update_string[1])]
-                        await self.send_update_message(
-                            "Selected a " + self.name_attachment_discard_shadowsun)
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
-                        self.reactions_needing_resolving[0] = "Commander Shadowsun discard"
+                            self.resolving_search_box = False
                     elif self.choice_context == "Which deck to use Crucible of Malediction:":
                         self.reset_choices_available()
                         if game_update_string[1] == "0":

@@ -69,30 +69,29 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         await self.send_update_message("Invalid target")
         elif current_reaction == "Commander Shadowsun discard":
-            if planet_pos == primary_player.warlord_commit_location:
-                if game_update_string[1] == primary_player.number:
-                    player_receiving_attachment = primary_player
-                    own_attachment = True
-                else:
-                    player_receiving_attachment = secondary_player
-                    own_attachment = False
-                card = self.preloaded_find_card(self.name_attachment_discard_shadowsun)
-                army_unit_as_attachment = False
-                if card.get_name() == "Shadowsun's Stealth Cadre":
-                    army_unit_as_attachment = True
-                not_own_attachment = not own_attachment
-                if player_receiving_attachment.attach_card(card, planet_pos, unit_pos,
-                                                           not_own_attachment=not_own_attachment,
-                                                           army_unit_as_attachment=army_unit_as_attachment):
-                    i = 0
-                    removed_card = False
-                    if card.get_name() in primary_player.discard:
-                        primary_player.discard.remove(card.get_name())
-                    self.name_attachment_discard_shadowsun = ""
-                    self.resolving_search_box = False
-                    self.delete_reaction()
-                else:
-                    await self.send_update_message("Invalid target")
+            if self.location_attachment_discard_shadowsun != -1:
+                if planet_pos == primary_player.warlord_commit_location:
+                    if game_update_string[1] == primary_player.number:
+                        player_receiving_attachment = primary_player
+                        own_attachment = True
+                    else:
+                        player_receiving_attachment = secondary_player
+                        own_attachment = False
+                    card = primary_player.get_card_in_discard(self.location_attachment_discard_shadowsun)
+                    army_unit_as_attachment = False
+                    if card.get_name() == "Shadowsun's Stealth Cadre":
+                        army_unit_as_attachment = True
+                    not_own_attachment = not own_attachment
+                    if player_receiving_attachment.attach_card(card, planet_pos, unit_pos,
+                                                               not_own_attachment=not_own_attachment,
+                                                               army_unit_as_attachment=army_unit_as_attachment):
+                        del primary_player.discard[self.location_attachment_discard_shadowsun]
+                        primary_player.aiming_reticle_coords_discard = None
+                        self.location_attachment_discard_shadowsun = -1
+                        self.resolving_search_box = False
+                        self.delete_reaction()
+                    else:
+                        await self.send_update_message("Invalid target")
         elif current_reaction == "Ku'gath Plaguefather":
             if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
                 if primary_player.number == game_update_string[1]:

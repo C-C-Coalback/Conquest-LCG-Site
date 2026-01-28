@@ -4167,6 +4167,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card[0],
                     self.position_of_actioned_card[1])
                 self.position_of_actioned_card = (-1, -1)
+                self.action_cleanup()
     elif self.action_chosen == "Hallow Librarium":
         if game_update_string[1] == "1":
             player_receiving_buff = self.p1
