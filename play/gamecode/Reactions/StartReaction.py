@@ -1703,7 +1703,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
             self.delete_reaction()
         elif current_reaction == "War Walker Squadron":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             attachments = primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()
             name_targets = []
             for i in range(len(attachments)):
@@ -1736,7 +1735,6 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
         elif current_reaction == "Sniper Drone Team":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
