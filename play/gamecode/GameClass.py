@@ -9808,6 +9808,9 @@ class Game:
                     if self.debug_mode == "exhaust-card":
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.debug_mode = None
+                    elif self.debug_mode == "destroy":
+                        primary_player.destroy_card_in_play(planet_pos, unit_pos)
+                        self.debug_mode = None
                     elif self.debug_mode == "ready-card":
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.debug_mode = None
@@ -9842,6 +9845,9 @@ class Game:
                     elif self.debug_mode == "ready-card":
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.debug_mode = None
+                    elif self.debug_mode == "destroy":
+                        primary_player.destroy_card_in_play(planet_pos, unit_pos)
+                        self.debug_mode = None
                     elif self.debug_mode == "clear-reticle":
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                         self.debug_mode = None
@@ -9852,6 +9858,30 @@ class Game:
                             self.misc_target_player = game_update_string[1]
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             await self.send_update_message("Now select the planet to move to.")
+            elif len(game_update_string) == 5:
+                if game_update_string[0] == "ATTACHMENT":
+                    if game_update_string[1] == "HQ":
+                        planet_pos = -2
+                        unit_pos = int(game_update_string[3])
+                        attachment_pos = int(game_update_string[4])
+                        primary_player = self.p2
+                        if game_update_string[2] == "1":
+                            primary_player = self.p1
+                        if self.debug_mode == "destroy":
+                            primary_player.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                            self.debug_mode = None
+            elif len(game_update_string) == 6:
+                if game_update_string[0] == "ATTACHMENT":
+                    if game_update_string[1] == "IN_PLAY":
+                        planet_pos = int(game_update_string[3])
+                        unit_pos = int(game_update_string[4])
+                        attachment_pos = int(game_update_string[5])
+                        primary_player = self.p2
+                        if game_update_string[2] == "1":
+                            primary_player = self.p1
+                        if self.debug_mode == "destroy":
+                            primary_player.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                            self.debug_mode = None
         except:
             self.debug_mode = None
 

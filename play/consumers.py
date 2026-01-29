@@ -732,10 +732,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                         if card.get_shields() != -1:
                             if card.get_card_type() in ["Army", "Token", "Synapse", "Support"]:
                                 if message[2] == "1":
-                                    active_games[self.game_position].p1.headquarters.append(copy.deepcopy(card))
+                                    active_games[self.game_position].p1.add_to_hq(card)
                                     await active_games[self.game_position].p1.send_hq()
                                 elif message[2] == "2":
-                                    active_games[self.game_position].p2.headquarters.append(copy.deepcopy(card))
+                                    active_games[self.game_position].p2.add_to_hq(card)
                                     await active_games[self.game_position].p2.send_hq()
                     elif message[1] == "add-to-play" and len(message) > 4:
                         planet_pos = int(message[3])
@@ -746,12 +746,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 if card.get_shields() != -1:
                                     if card.get_card_type() in ["Army", "Token", "Synapse"]:
                                         if message[2] == "1":
-                                            active_games[self.game_position].p1.cards_in_play[planet_pos + 1].append(
-                                                copy.deepcopy(card))
+                                            active_games[self.game_position].p1.add_card_to_planet(card, planet_pos)
                                             await active_games[self.game_position].p1.send_units_at_planet(planet_pos)
                                         elif message[2] == "2":
-                                            active_games[self.game_position].p2.cards_in_play[planet_pos + 1].append(
-                                                copy.deepcopy(card))
+                                            active_games[self.game_position].p2.add_card_to_planet(card, planet_pos)
                                             await active_games[self.game_position].p2.send_units_at_planet(planet_pos)
                     elif (message[1] == "addcard" or message[1] == "add-card") and len(message) > 3:
                         card_name = message[3]
@@ -805,6 +803,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
                                 await active_games[self.game_position].p2.send_hand()
                                 await active_games[self.game_position].p2.send_discard()
+                    elif message[1] == "destroy":
+                        if len(message) == 2:
+                            active_games[self.game_position].debug_mode = "destroy"
+                            await self.receive_game_update("Click card to destroy.")
                     elif message[1] == "discard-name" and len(message) > 3:
                         if message[2] == "1":
                             active_games[self.game_position].p1.discard_card_name_from_hand(message[3])
