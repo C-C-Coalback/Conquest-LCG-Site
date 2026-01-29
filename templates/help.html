@@ -52,13 +52,28 @@
   <p><b>/toggle-search</b> - Toggles a particular problem variable in the game.</p>
   <p><b>/cancel-debug</b> - Cancels debug mode.</p>
   <h3>Safe commands</h3>
-  <p><b>/sort-hand</b> - Sorts a player's hand. Only the owner of the hand can sort their hand.</p>
-  <p><b>/shuffle-deck/{player_num}</b> - Shuffle a player's deck.</p>
-  <p><b>/rearrange-deck/{player_num}/{num_cards}</b> - Allows you to rearrange the top {num_cards} of a player's deck.</p>
-  <p><b>/stop-rearrange-deck</b> - Stops rearranging a deck.</p>
+  <p>There are two types of safe commands, which can be thought of by how difficult they are to use.</p>
+  <h4>Simple commands</h4>
+  <p>Simple commands generally only involve a single "/" at the beginning of the command, and then prompt the user to click cards in the game to carry out the rest of the command. The command /cancel-debug can be used to quit these commands.</p>
+  <p>The simple commands are:</p>
+  <p><b>/cancel-debug</b> - Cancels an active debug command.</p>
+  <p><b>/savegame</b> - Saves the game as a file on the server. Exact details are unimportant as only I can access the saved game data, but if you encounter a bug and want to submit an error report, use this command.</p>
   <p><b>/unpass-combat</b> - Unpasses both players, letting them take combat turns even if they had passed. Only available in combat phase.</p>
   <p><b>/unpass-deploy</b> - Unpasses both players, letting them take deploy turns even if they had passed. Only available in deploy phase.</p>
   <p><b>/skip-deploy</b> - Skips the current player's deploy turn. Only available in deploy phase.</p>
+  <p><b>/move-to-top-discard</b> - Prompts the user to click a card in discard to move to the top of the discard.</p>
+  <p><b>/discard</b> - Prompts the user to click a card in hand to discard it. Use /cancel-debug to cancel.</p>
+  <p><b>/sort-hand</b> - Sorts a player's hand. Only the owner of the hand can sort their hand.</p>
+  <p><b>/clear-reticle</b> - Prompts the user to click a card to remove the reticle. Use /cancel-debug to cancel.</p>
+  <p><b>/ready-card</b> - Prompts the user to click a card to ready it. Use /cancel-debug to cancel.</p>
+  <p><b>/exhaust-card</b> - Prompts the user to click a card to exhaust it. Use /cancel-debug to cancel.</p>
+  <p><b>/destroy</b> - Prompts the user to click a card to destroy it. Can destroy all types of cards.</p>
+  <p><b>/move-unit</b> - Prompts the user to select a unit to move, then prompts a planet to move to. Does not support moving to the HQ. Use /cancel-debug to cancel.</p>
+  <h4>Complex commands</h4>
+  <p>Complex commands are more technically demanding than the simple commands, but allow for greater precision or control.</p>
+  <p><b>/shuffle-deck/{player_num}</b> - Shuffle a player's deck.</p>
+  <p><b>/rearrange-deck/{player_num}/{num_cards}</b> - Allows you to rearrange the top {num_cards} of a player's deck.</p>
+  <p><b>/stop-rearrange-deck</b> - Stops rearranging a deck.</p>
   <p><b>/set-resources/{player_num}/{amount}</b> - Set the resources of a player to {amount}.</p>
   <p><b>/addcard/{player_num}/{card_name}</b> - Adds a card with the name {card_name} to a player's hand. If the card does not exist, nothing happens. Only attachments, events, army units and supports may be added to the hand.</p>
   <p><b>/add-to-hq/{player_num}/{card_name}</b> - Adds a card with the name {card_name} to a player's HQ. If the card does not exist, nothing happens. Only supports, army, token and synapse units may be added to the HQ.</p>
@@ -71,15 +86,11 @@
   <p><b>/fully-remove/{player_num}/{card_pos}</b> - A player removes the card at {card_pos} in their removed from game pile completely.</p>
   <p><b>/infest-planet/{planet_pos}</b> - Infest target planet.</p>
   <p><b>/clear-infestation/{planet_pos}</b> - Remove infestation from target planet.</p>
-  <p><b>/clear-reticle</b> - Prompts the user to click a card to remove the reticle. Use /cancel-debug to cancel.</p>
   <p><b>/clear-reticle/{player_num}/{planet_pos}/{unit_pos}</b> - Clears a reticle at the given position. Use -2 for {planet_pos} to target the HQ.</p>
-  <p><b>/ready-card</b> - Prompts the user to click a card to ready it. Use /cancel-debug to cancel.</p>
   <p><b>/ready-card/{player_num}/{planet_pos}/{unit_pos}</b> - Readies a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
-  <p><b>/exhaust-card</b> - Prompts the user to click a card to exhaust it. Use /cancel-debug to cancel.</p>
   <p><b>/exhaust-card/{player_num}/{planet_pos}/{unit_pos}</b> - Exhausts a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
   <p><b>/set-damage/{player_num}/{planet_pos}/{unit_pos}/{amount}</b> - Sets the damage on a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
   <p><b>/set-faith/{player_num}/{planet_pos}/{unit_pos}/{amount}</b> - Sets the faith on a card at the given position. Use -2 for {planet_pos} to target the HQ.</p>
-  <p><b>/move-unit</b> - Prompts the user to select a unit to move, then prompts a planet to move to. Does not support moving to the HQ. Use /cancel-debug to cancel.</p>
   <p><b>/move-unit/{player_num}/{planet_pos}/{unit_pos}/{destination_planet_pos}</b> - Moves a unit at the given position to the destination planet. Use -2 for {planet_pos} or {destination_planet_pos} to target the HQ.</p>
   <p><b>/assign-damage/{player_num}/{planet_pos}/{unit_pos}/{amount}</b> - Assigns damage, which allows shielding, a unit at the given position. Use -2 for {planet_pos} to target the HQ.</p>
 </div>
