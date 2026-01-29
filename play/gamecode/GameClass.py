@@ -9821,6 +9821,14 @@ class Game:
                             self.misc_target_player = game_update_string[1]
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             await self.send_update_message("Now select the planet to move to.")
+                elif game_update_string[0] == "HAND":
+                    hand_pos = int(game_update_string[2])
+                    primary_player = self.p2
+                    if game_update_string[1] == "1":
+                        primary_player = self.p1
+                    if self.debug_mode == "discard-hand":
+                        primary_player.discard_card_from_hand(hand_pos)
+                        self.debug_mode = None
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     planet_pos = int(game_update_string[2])

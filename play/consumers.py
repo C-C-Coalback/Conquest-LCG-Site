@@ -791,16 +791,20 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 active_games[self.game_position].p2.draw_card()
                             await active_games[self.game_position].p2.send_hand()
                             await active_games[self.game_position].send_decks()
-                    elif message[1] == "discard" and len(message) > 3:
-                        hand_pos = int(message[3])
-                        if message[2] == "1":
-                            active_games[self.game_position].p1.discard_card_from_hand(hand_pos)
-                            await active_games[self.game_position].p1.send_hand()
-                            await active_games[self.game_position].p1.send_discard()
-                        elif message[2] == "2":
-                            active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
-                            await active_games[self.game_position].p2.send_hand()
-                            await active_games[self.game_position].p2.send_discard()
+                    elif message[1] == "discard":
+                        if len(message) == 2:
+                            active_games[self.game_position].debug_mode = "discard-hand"
+                            await self.receive_game_update("Click card in hand to discard.")
+                        if len(message) > 3:
+                            hand_pos = int(message[3])
+                            if message[2] == "1":
+                                active_games[self.game_position].p1.discard_card_from_hand(hand_pos)
+                                await active_games[self.game_position].p1.send_hand()
+                                await active_games[self.game_position].p1.send_discard()
+                            elif message[2] == "2":
+                                active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
+                                await active_games[self.game_position].p2.send_hand()
+                                await active_games[self.game_position].p2.send_discard()
                     elif message[1] == "discard-name" and len(message) > 3:
                         if message[2] == "1":
                             active_games[self.game_position].p1.discard_card_name_from_hand(message[3])
