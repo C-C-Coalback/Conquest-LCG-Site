@@ -803,6 +803,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
                                 await active_games[self.game_position].p2.send_hand()
                                 await active_games[self.game_position].p2.send_discard()
+                    elif message[1] == "force-deepstrike":
+                        if len(message) == 2:
+                            if active_games[self.game_position].last_planet_checked_for_battle != -1:
+                                active_games[self.game_position].start_battle_deepstrike = True
+                                await active_games[self.game_position].send_info_box()
                     elif message[1] == "move-to-top-discard":
                         if len(message) == 2:
                             active_games[self.game_position].debug_mode = "move-to-top-discard"
