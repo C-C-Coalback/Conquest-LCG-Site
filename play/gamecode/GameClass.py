@@ -8954,14 +8954,23 @@ class Game:
                                 self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
                                                      (int(primary_player.number), def_pla, def_pos))
                                 self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
-                    if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh"):
+                    if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh") and def_pla != -2:
                         for i in range(7):
                             if i != def_pla:
                                 for j in range(len(primary_player.cards_in_play[i + 1])):
                                     if primary_player.get_ability_given_pos(i, j) == "Seekers of Pleasure":
-                                        self.create_reaction("Seekers of Pleasure", primary_player.name_player,
-                                                             (int(primary_player.number), i, j),
-                                                             additional_info=def_pla)
+                                        if not primary_player.check_if_already_have_reaction_of_position(
+                                                "Seekers of Pleasure", i, j):
+                                            self.create_reaction("Seekers of Pleasure", primary_player.name_player,
+                                                                 (int(primary_player.number), i, j),
+                                                                 additional_info=def_pla)
+                        for i in range(len(primary_player.headquarters)):
+                            if primary_player.get_ability_given_pos(-2, i) == "Seekers of Pleasure":
+                                if not primary_player.check_if_already_have_reaction_of_position(
+                                        "Seekers of Pleasure", -2, i):
+                                    self.create_reaction("Seekers of Pleasure", primary_player.name_player,
+                                                         (int(primary_player.number), -2, i),
+                                                         additional_info=def_pla)
                     if self.card_names_triggering_damage[0] in self.valid_crushing_blow_triggers:
                         if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
                             if secondary_player.search_hand_for_card("Crushing Blow"):
