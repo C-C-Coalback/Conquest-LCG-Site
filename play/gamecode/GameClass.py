@@ -4447,7 +4447,7 @@ class Game:
                             self.valid_targets_for_indirect = ["Army", "Synapse", "Warlord", "Token"]
                             self.location_of_indirect = "ALL"
                         else:
-                            secondary_player.total_indirect_damage = int(own_choice)
+                            secondary_player.total_indirect_damage = int(enemy_choice)
                             secondary_player.indirect_damage_applied = 0
                             self.valid_targets_for_indirect = ["Army", "Synapse", "Warlord", "Token"]
                             self.location_of_indirect = "ALL"
