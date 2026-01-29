@@ -13,6 +13,7 @@ from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQIn
 from .Intercept import InPlayIntercept, HQIntercept
 from . import CardClasses
 import os
+import sys
 
 
 def create_planets(planet_array_objects):
@@ -54,6 +55,10 @@ class Game:
         self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
+        self.random_seed = random.randrange(sys.maxsize)
+        random.seed(self.random_seed)
+        self.random_seed = str(self.random_seed)
+        self.game_events_as_mono_string = ""
         self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder", "Sanctified Aggressor",
                                     "Incubus of the Severed", "Lurking Termagant"]
         self.attack_being_resolved = False
@@ -547,6 +552,7 @@ class Game:
                 with open(path_to_player_decks, 'r') as f:
                     deck_content = f.read()
                 print(deck_content)
+                self.game_events_as_mono_string += self.name_1 + "|||" + "/loaddeck/" + deck_name + "\n"
                 self.p1.setup_player_no_send(deck_content, self.planet_array)
         if deck_2:
             deck_name = deck_2
@@ -556,6 +562,7 @@ class Game:
                 with open(path_to_player_decks, 'r') as f:
                     deck_content = f.read()
                 print(deck_content)
+                self.game_events_as_mono_string += self.name_2 + "|||" + "/loaddeck/" + deck_name + "\n"
                 self.p2.setup_player_no_send(deck_content, self.planet_array)
 
     async def send_queued_message(self):

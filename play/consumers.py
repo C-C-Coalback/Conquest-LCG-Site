@@ -409,6 +409,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                     current_game_id = i
             if current_game_id != -1:
                 try:
+                    game_relevant_string = self.name + "|||" + "/".join(message[1:])
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, message[1:])
                 except:
                     try:
@@ -423,6 +425,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             del message[0]
             try:
                 if message[0] == "" and len(message) > 1:
+                    game_relevant_string = self.name + "|||" + "/".join(message)
+                    active_games[self.game_position].game_events_as_mono_string += game_relevant_string + "\n"
                     if message[1] != "loaddeck":
                         await self.receive_game_update(
                             self.name + " is using a command: " + "/".join(message)
@@ -493,6 +497,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                             current_string += "RESOURCES GAINED:\t" + str(active_games[self.game_position].p2.total_resources_gained) + "\n"
                             current_string += "CARDS DRAWN:\t" + str(active_games[self.game_position].p2.total_cards_draw) + "\n"
                             current_string += "DAMAGE DEALT (ATTACKS):\t" + str(active_games[self.game_position].p2.total_damage_dealt_by_attacks) + "\n"
+                            current_string += "\n-----\nREPLAY DETAILS\n-----\n"
+                            current_string += "RANDOM SEED:\t" + active_games[self.game_position].random_seed + "\n"
+                            current_string += "MOVE DETAILS:\n" + active_games[self.game_position].game_events_as_mono_string + "\n"
                             f.write(current_string)
                     elif message[1] == "Error":
                         raise ValueError
