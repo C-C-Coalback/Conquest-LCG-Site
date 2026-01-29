@@ -3529,9 +3529,7 @@ class Player:
                 if i != last_element_index:
                     if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
                         if not self.get_once_per_phase_used_given_pos(-2, i):
-                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor",
-                                                                                    self.name_player,
-                                                                                    (int(self.number), -2, i)):
+                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", -2, i):
                                 self.game.create_interrupt("Frontline Counsellor", self.name_player,
                                                            (int(self.number), -2, i), extra_info=origin_planet)
             for i in range(7):
@@ -3541,8 +3539,7 @@ class Player:
                             if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
                                 if not self.get_once_per_phase_used_given_pos(i, j):
                                     if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor",
-                                                                                            self.name_player,
-                                                                                            (int(self.number), i, j)):
+                                                                                            i, j):
                                         self.game.create_interrupt("Frontline Counsellor", self.name_player,
                                                                    (int(self.number), i, j), extra_info=origin_planet)
             if self.game.last_planet_checked_for_battle == destination:
@@ -7849,8 +7846,7 @@ class Player:
             if i != last_element_index:
                 if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
                     if not self.get_once_per_phase_used_given_pos(-2, i):
-                        if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", self.name_player,
-                                                                                (int(self.number), -2, i)):
+                        if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", -2, i):
                             self.game.create_interrupt("Frontline Counsellor", self.name_player,
                                                        (int(self.number), -2, i), extra_info=planet_id)
         for i in range(7):
@@ -7858,9 +7854,7 @@ class Player:
                 for j in range(len(self.cards_in_play[i + 1])):
                     if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
                         if not self.get_once_per_phase_used_given_pos(i, j):
-                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor",
-                                                                                    self.name_player,
-                                                                                    (int(self.number), i, j)):
+                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", i, j):
                                 self.game.create_interrupt("Frontline Counsellor", self.name_player,
                                                            (int(self.number), i, j), extra_info=planet_id)
         if self.get_ability_given_pos(-2, last_element_index) == "Growing Tide":
