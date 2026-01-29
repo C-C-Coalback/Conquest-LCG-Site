@@ -3454,12 +3454,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.first_player_nullified = primary_player.name_player
             self.nullify_context = "Event Action"
         if can_continue:
-            if not player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_unique():
-                player_being_routed.rout_unit(planet_pos, unit_pos)
-                secondary_player.create_enemy_played_event_reactions()
-                self.action_cleanup()
-                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                primary_player.aiming_reticle_coords_hand = None
+            player_being_routed.rout_unit(planet_pos, unit_pos)
+            secondary_player.create_enemy_played_event_reactions()
+            self.action_cleanup()
+            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+            primary_player.aiming_reticle_coords_hand = None
     elif self.action_chosen == "Attuned Gyrinx":
         if abs(self.position_of_actioned_card[0] - planet_pos) == 1:
             if self.misc_target_unit[0] != planet_pos:
