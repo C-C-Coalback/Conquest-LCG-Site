@@ -101,13 +101,17 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         has_deepstrike = card.get_has_deepstrike()
                         if card.get_card_type() == "Attachment" and primary_player.farsight_relevant:
                             has_deepstrike = True
+                        if card.get_name() in self.cards_with_dash_cost or card.get_name() == "Genestealer Hybrids":
+                            self.card_pos_to_deploy = previous_card_pos_to_deploy
+                            return None
                         if card.get_limited() and not primary_player.can_play_limited and not \
                                 self.paying_shrieking_exarch_cost:
                             await self.send_update_message("You have already played a Limited card this round!")
+                            self.card_pos_to_deploy = previous_card_pos_to_deploy
                             return None
-                        self.faction_of_card_to_play = card.get_faction()
-                        self.name_of_card_to_play = card.get_name()
-                        self.traits_of_card_to_play = card.get_traits()
+                        previous_faction = self.faction_of_card_to_play
+                        previous_name = self.name_of_card_to_play
+                        previous_traits = self.traits_of_card_to_play
                         if self.paying_shrieking_exarch_cost:
                             if self.card_pos_to_deploy != previous_card_pos_to_deploy:
                                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
@@ -124,6 +128,9 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             if card.check_for_a_trait("Pledge") and not primary_player.can_play_pledge:
                                 await self.send_update_message("Pledges can only be played on the first deploy turn.")
                             else:
+                                self.faction_of_card_to_play = card.get_faction()
+                                self.name_of_card_to_play = card.get_name()
+                                self.traits_of_card_to_play = card.get_traits()
                                 played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
                                                                                      already_checked=True, card=card)[0]
                                 primary_player.aiming_reticle_color = ""
@@ -149,9 +156,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.resolving_search_box = True
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
-                        elif card.get_name() in self.cards_with_dash_cost or card.get_name() == "Genestealer Hybrids":
-                            self.card_pos_to_deploy = -1
-                            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                         elif card.get_card_type() == "Army":
                             if (primary_player.warlord_faction == "Necrons" and (
                                     card.get_faction() == primary_player.enslaved_faction or
@@ -170,19 +174,32 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                             self.card_type_of_selected_card_in_hand = "Army"
                                             self.misc_counter = 0
+                                            self.faction_of_card_to_play = card.get_faction()
+                                            self.name_of_card_to_play = card.get_name()
+                                            self.traits_of_card_to_play = card.get_traits()
                                     else:
                                         primary_player.aiming_reticle_color = "blue"
                                         primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                         self.card_type_of_selected_card_in_hand = "Army"
+                                        self.faction_of_card_to_play = card.get_faction()
+                                        self.name_of_card_to_play = card.get_name()
+                                        self.traits_of_card_to_play = card.get_traits()
                                         if card.get_name() == "Quartermasters":
                                             self.choices_available = ["HQ", "Normal"]
                                             self.choice_context = "Quartermasters to HQ?"
                                             self.name_player_making_choices = primary_player.name_player
                                             self.resolving_search_box = True
+                                else:
+                                    self.card_pos_to_deploy = previous_card_pos_to_deploy
+                            else:
+                                self.card_pos_to_deploy = previous_card_pos_to_deploy
                         elif card.get_card_type() == "Attachment":
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                             self.card_type_of_selected_card_in_hand = "Attachment"
+                            self.faction_of_card_to_play = card.get_faction()
+                            self.name_of_card_to_play = card.get_name()
+                            self.traits_of_card_to_play = card.get_traits()
                             if primary_player.search_card_in_hq("WAAAGH! Arbuttz", ready_relevant=True):
                                 self.choices_available = ["Yes", "No"]
                                 self.choice_context = "Use WAAAGH! Arbuttz?"
