@@ -2615,12 +2615,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
     elif self.action_chosen == "Aun'shi's Sanctum":
-        ethereal_present = False
-        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-            if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
-                    "Ethereal", primary_player.etekh_trait):
-                ethereal_present = True
-        if ethereal_present:
+        if primary_player.check_if_trait_at_planet(planet_pos, "Ethereal"):
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.action_cleanup()
     elif self.action_chosen == "Saint Celestine":
