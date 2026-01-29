@@ -803,6 +803,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 active_games[self.game_position].p2.discard_card_from_hand(hand_pos)
                                 await active_games[self.game_position].p2.send_hand()
                                 await active_games[self.game_position].p2.send_discard()
+                    elif message[1] == "move-to-top-discard":
+                        if len(message) == 2:
+                            active_games[self.game_position].debug_mode = "move-to-top-discard"
+                            await self.receive_game_update("Click card in discard to move to top.")
                     elif message[1] == "destroy":
                         if len(message) == 2:
                             active_games[self.game_position].debug_mode = "destroy"

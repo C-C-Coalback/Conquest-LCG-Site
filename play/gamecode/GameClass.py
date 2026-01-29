@@ -9832,6 +9832,14 @@ class Game:
                     if self.debug_mode == "discard-hand":
                         primary_player.discard_card_from_hand(hand_pos)
                         self.debug_mode = None
+                elif game_update_string[0] == "IN_DISCARD":
+                    discard_pos = int(game_update_string[2])
+                    primary_player = self.p2
+                    if game_update_string[1] == "1":
+                        primary_player = self.p1
+                    if self.debug_mode == "move-to-top-discard":
+                        primary_player.move_to_top_of_discard(discard_pos)
+                        self.debug_mode = None
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     planet_pos = int(game_update_string[2])
