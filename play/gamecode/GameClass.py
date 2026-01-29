@@ -8806,6 +8806,7 @@ class Game:
                         self.p2.headquarters[i].hit_by_which_storming_librarians.remove(id_storm_lib)
             self.asking_which_reaction = True
             self.already_resolving_reaction = False
+            self.asking_if_reaction = False
             self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]
             del self.reactions_needing_resolving[0]
             del self.player_who_resolves_reaction[0]
@@ -8855,6 +8856,7 @@ class Game:
                 else:
                     player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
             self.asking_which_interrupt = True
+            self.asking_if_interrupt = False
             self.last_player_who_resolved_interrupt = self.player_resolving_interrupts[0]
             del self.interrupts_waiting_on_resolution[0]
             del self.player_resolving_interrupts[0]
