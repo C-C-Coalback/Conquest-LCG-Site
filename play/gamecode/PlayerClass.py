@@ -3525,6 +3525,10 @@ class Player:
             self.game.just_moved_units = True
             self.remove_card_from_play(origin_planet, origin_position)
             self.aunla_prince_check(destination, new_pos, origin_planet)
+            if self.get_ability_given_pos(destination, new_pos) == "Quartermasters":
+                if self.get_damage_given_pos(destination, new_pos) > 0:
+                    self.game.create_reaction("Quartermasters", self.name_player,
+                                              (int(self.number), destination, new_pos))
             for i in range(len(self.headquarters)):
                 if i != last_element_index:
                     if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
