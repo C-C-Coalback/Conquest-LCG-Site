@@ -468,7 +468,6 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if abs(chosen_planet - planet_pos) == 1:
             if not self.infested_planets[chosen_planet]:
                 self.infest_planet(chosen_planet, primary_player)
-                primary_player.draw_card()
                 for i in range(len(primary_player.headquarters)):
                     if primary_player.get_ability_given_pos(-2, i) == "Ardaci-strain Broodlord":
                         primary_player.set_once_per_phase_used_given_pos(-2, i, True)

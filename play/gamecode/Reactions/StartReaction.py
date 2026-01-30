@@ -2885,6 +2885,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Cato's Stronghold":
             primary_player.exhaust_card_in_hq_given_name("Cato's Stronghold")
+        elif current_reaction == "Ardaci-strain Broodlord":
+            primary_player.draw_card()
         elif current_reaction == "Seekers of Pleasure":
             target_pla = self.additional_reactions_info[0]
             if target_pla is not None:
