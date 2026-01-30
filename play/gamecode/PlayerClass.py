@@ -6808,6 +6808,10 @@ class Player:
         else:
             if self.headquarters[card_pos].get_ability() == "Carnivore Pack":
                 self.add_resources(3)
+            if self.headquarters[card_pos].get_has_hive_mind():
+                if self.search_card_in_hq("Leviathan Hive Ship", ready_relevant=True):
+                    if not self.check_if_already_have_reaction("Leviathan Hive Ship"):
+                        self.game.create_reaction("Leviathan Hive Ship", self.name_player, (int(self.number), -1, -1))
             if self.headquarters[card_pos].get_ability() == "Shrouded Harlequin":
                 self.game.create_reaction("Shrouded Harlequin", self.name_player,
                                           (int(self.number), -1, -1))
@@ -7425,6 +7429,10 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Canoptek Scarab Swarm":
                 self.game.create_reaction("Canoptek Scarab Swarm", self.name_player,
                                           (int(self.number), -1, -1))
+            if self.cards_in_play[planet_num + 1][card_pos].get_has_hive_mind():
+                if self.search_card_in_hq("Leviathan Hive Ship", ready_relevant=True):
+                    if not self.check_if_already_have_reaction("Leviathan Hive Ship"):
+                        self.game.create_reaction("Leviathan Hive Ship", self.name_player, (int(self.number), -1, -1))
             if self.surrogate_host_check():
                 warlord_pla, warlord_pos = self.get_location_of_warlord()
                 if warlord_pla != planet_num:
@@ -7689,7 +7697,7 @@ class Player:
                     if self.search_for_card_everywhere("Commissar Somiel"):
                         self.game.create_reaction("Commissar Somiel", self.name_player, (int(self.number), -1, -1))
 
-        if card.has_hive_mind:
+        if card.get_has_hive_mind():
             for i in range(len(self.headquarters)):
                 if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
                     self.game.create_reaction("Hive Ship Tendrils", self.name_player, (self.number, -2, i))
@@ -7774,7 +7782,7 @@ class Player:
                 if self.game.name_1 == self.name_player:
                     dis_player = self.game.p2
                 dis_player.add_card_to_discard(card_name)
-        if card.has_hive_mind:
+        if card.get_has_hive_mind():
             for i in range(len(self.headquarters)):
                 if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
                     self.game.create_reaction("Hive Ship Tendrils", self.name_player, (self.number, -2, i))

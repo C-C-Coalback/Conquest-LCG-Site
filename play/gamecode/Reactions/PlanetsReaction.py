@@ -193,6 +193,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     self.resolving_search_box = True
                 else:
                     self.delete_reaction()
+    elif current_reaction == "Leviathan Hive Ship":
+        if self.chosen_first_card:
+            card = primary_player.get_card_in_discard(primary_player.aiming_reticle_coords_discard)
+            primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
+            del primary_player.discard[primary_player.aiming_reticle_coords_discard]
+            primary_player.aiming_reticle_coords_discard = None
+            self.delete_reaction()
     elif current_reaction == "The Broken Sigil":
         if chosen_planet != 0:
             await self.send_update_message("Chosen " + self.planet_array[chosen_planet] +

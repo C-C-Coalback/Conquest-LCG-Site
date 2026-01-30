@@ -3353,7 +3353,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             else:
                 primary_player = self.p2
             if game_update_string[1] == primary_player.get_number():
-                if primary_player.cards_in_play[planet_pos + 1][unit_pos].has_hive_mind:
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_has_hive_mind():
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")

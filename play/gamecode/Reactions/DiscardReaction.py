@@ -122,6 +122,13 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             self.card_to_deploy = card
                             new_game_update_string = ["IN_PLAY", primary_player.number, str(planet_pos), str(unit_pos)]
                             await DeployPhase.deploy_card_routine_attachment(self, name, new_game_update_string)
+        elif current_reaction == "Leviathan Hive Ship":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_name() in primary_player.cards_recently_destroyed:
+                    if card.get_has_hive_mind() and card.get_card_type() == "Army" and card.get_cost() < 4:
+                        primary_player.aiming_reticle_coords_discard = pos_discard
+                        self.chosen_first_card = True
         elif current_reaction == "Scavenging Kroot Rider":
             if self.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
@@ -187,7 +194,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
             if not self.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
-                    if card.get_card_type() == "Army" and card.has_hive_mind:
+                    if card.get_card_type() == "Army" and card.get_has_hive_mind():
                         primary_player.aiming_reticle_coords_discard = pos_discard
                         self.chosen_first_card = True
         elif current_reaction == "Spreading Genestealer Brood":

@@ -103,6 +103,15 @@ class Card:
         self.card_moved_recently = False
         self.cannot_remove_damage_eor = False
 
+    def get_has_hive_mind(self):
+        if self.get_blanked():
+            return False
+        if self.has_hive_mind:
+            return True
+        if self.get_ability() == "Caustic Tyrannofex" and self.misc_ability_used:
+            return True
+        return False
+
     def get_extra_info_string(self):
         string = ""
         if self.blanked_eop:
@@ -789,13 +798,6 @@ class UnitCard(Card):
         if self.new_ability:
             return self.new_unstoppable
         return self.unstoppable
-
-    def get_has_hive_mind(self):
-        if self.get_blanked():
-            return False
-        if self.lost_keywords_eop:
-            return False
-        return self.has_hive_mind
 
     def get_reaction_available(self):
         return self.reaction_available

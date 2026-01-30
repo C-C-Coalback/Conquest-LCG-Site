@@ -2874,11 +2874,9 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.discard_inquis_caius_wroth = True
             secondary_player.discard_inquis_caius_wroth = True
         elif current_reaction == "Leviathan Hive Ship":
-            self.resolving_search_box = True
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Leviathan Hive Ship?"
-            self.name_player_making_choices = self.player_who_resolves_reaction[0]
-            self.delete_reaction()
+            primary_player.aiming_reticle_coords_discard = None
+            self.chosen_first_card = False
+            primary_player.exhaust_card_in_hq_given_name("Leviathan Hive Ship")
         elif current_reaction == "Holy Sepulchre":
             self.resolving_search_box = True
             self.choices_available = ["Yes", "No"]

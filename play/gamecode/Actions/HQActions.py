@@ -2183,7 +2183,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
     elif self.action_chosen == "Mycetic Spores":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
-                if primary_player.headquarters[unit_pos].has_hive_mind:
+                if primary_player.headquarters[unit_pos].get_has_hive_mind():
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
