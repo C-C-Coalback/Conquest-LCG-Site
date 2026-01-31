@@ -20,7 +20,7 @@
 <div class="auto-deck-build">
     <div id="warlord-card" class="poster-card"><img id="Nazdreg" src="/static/images/CardImages/Cardback.jpg" class="db-image"></div>
     <div id="synapse-card" class="poster-card"><img id="Cardback" src="/static/images/CardImages/Cardback.jpg" class="db-image"></div>
-    <div id="pledge-card" class="poster-card"><img id="EmptyPledge" src="/static/images/CardImages/Cardback.jpg" class="db-image"></div>
+    <div id="pledge-card" class="poster-card" onclick="removePledge();"><img id="EmptyPledge" src="/static/images/CardImages/Cardback.jpg" class="db-image"></div>
     <div id="details">Details<br>
         <label for="name-deck">Name:</label>
         <input id="name-deck" type="search" size="28"><br>
@@ -109,6 +109,17 @@
         clearDecks();
         updatePreference();
         loadMore();
+    }
+
+    function removePledge() {
+        var e = document.getElementById("pledge-card").children[0];
+        const pledge_name = e.id;
+        if (pledge_name !== "EmptyPledge") {
+            cardCount = cardCount - 1;
+            e.id = "EmptyPledge";
+            e.src = "/static/images/CardImages/Cardback.jpg";
+        }
+        updateCardCount();
     }
 
     function updatePreference() {

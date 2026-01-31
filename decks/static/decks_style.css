@@ -75,6 +75,7 @@
 
 #pledge-card {
     grid-area: pledge-card;
+    cursor: pointer;
 }
 
 #synapse-card {
