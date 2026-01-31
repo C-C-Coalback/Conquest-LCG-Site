@@ -103,6 +103,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 self.name_player_making_choices = primary_player.name_player
                                 self.position_of_actioned_card = (planet_pos, unit_pos)
                                 self.resolving_search_box = True
+                                self.mode = "Normal"
                     elif ability == "Mycetic Spores":
                         if card.get_ready():
                             self.action_chosen = ability
