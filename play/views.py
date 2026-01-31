@@ -14,13 +14,12 @@ valid_backgrounds = ["/static/images/ImperialAquila.jpg", "/static/images/Heldra
 
 
 def game(request, game_id):
-    _, spec_lobbies = get_lobbies()
-    is_second_player = False
-    for i in range(len(spec_lobbies)):
-        if spec_lobbies[i][2] == game_id:
-            if request.user.username == spec_lobbies[i][1]:
-                is_second_player = True
     active_games = get_active_games()
+    is_second_player = False
+    for i in range(len(active_games)):
+        if active_games[i].game_id == game_id:
+            if request.user.username == active_games[i].p2.name_player:
+                is_second_player = True
     cardback_1 = "Cardback"
     cardback_2 = "Cardback"
     username = request.user.username
