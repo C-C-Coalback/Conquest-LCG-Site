@@ -777,6 +777,20 @@ class Game:
             self.last_initiative_string = initiative_string
             await self.send_update_message(initiative_string)
 
+    async def begin_asking_nullify(self, primary_player, secondary_player, effect_name, cost_card, game_update_string,
+                                   nullify_context, nullified_card_pos=-1):
+        await self.send_update_message(
+            primary_player.name_player + " wants to play " + effect_name + "; Nullify window offered.")
+        self.choices_available = ["Yes", "No"]
+        self.name_player_making_choices = secondary_player.name_player
+        self.choice_context = "Use Nullify?"
+        self.nullified_card_pos = nullified_card_pos
+        self.nullified_card_name = effect_name
+        self.cost_card_nullified = cost_card
+        self.nullify_string = "/".join(game_update_string)
+        self.first_player_nullified = primary_player.name_player
+        self.nullify_context = nullify_context
+
     async def send_info_box(self, force=False):
         info_string = "GAME_INFO/INFO_BOX/"
         if self.phase == "SETUP":
