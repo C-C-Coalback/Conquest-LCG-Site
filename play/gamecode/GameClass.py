@@ -506,6 +506,7 @@ class Game:
         self.name_player_deepstriking = self.name_1
         self.choosing_target_for_deepstruck_attachment = False
         self.deepstruck_attachment_pos = (-1, -1)
+        self.deepstruck_attachment_is_in_play = False
         self.xv805_enforcer_active = False
         self.asking_if_use_xv805_enforcer = False
         self.asking_amount_xv805_enforcer = False

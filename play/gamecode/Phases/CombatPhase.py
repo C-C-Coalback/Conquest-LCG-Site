@@ -73,11 +73,16 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player = self.p2
                             other_player = self.p1
                         og_pla, og_pos = self.deepstruck_attachment_pos
-                        player.add_card_to_discard(player.cards_in_reserve[og_pla][og_pos].get_name())
-                        del player.cards_in_reserve[og_pla][og_pos]
+                        if self.deepstruck_attachment_is_in_play:
+                            player.add_card_to_discard(player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name)
+                            del player.cards_in_play[og_pla + 1][og_pos]
+                        else:
+                            player.add_card_to_discard(player.cards_in_reserve[og_pla][og_pos].get_name())
+                            del player.cards_in_reserve[og_pla][og_pos]
                         player.deepstrike_attachment_extras(og_pla)
                         self.choosing_target_for_deepstruck_attachment = False
                         self.deepstruck_attachment_pos = (-1, -1)
+                        self.deepstruck_attachment_is_in_play = False
                         player.has_passed = True
                         if not other_player.has_passed:
                             self.name_player_making_choices = other_player.name_player
@@ -402,6 +407,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         player.cards_in_reserve[chosen_planet][chosen_unit]. \
                                             aiming_reticle_color = "blue"
                                         self.deepstruck_attachment_pos = (chosen_planet, chosen_unit)
+                                        self.deepstruck_attachment_is_in_play = False
                                         await self.send_update_message("deepstriking attachment")
 
         elif game_update_string[0] == "IN_PLAY":
@@ -424,17 +430,18 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             player_receiving_attachment = other_player
                             not_own_att = True
                         og_pla, og_pos = self.deepstruck_attachment_pos
-                        if not player.idden_base_active:
-                            card = player.cards_in_reserve[og_pla][og_pos]
-                        else:
+                        if self.deepstruck_attachment_is_in_play:
                             card = self.preloaded_find_card(
                                 player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name)
-                        if ((not player.idden_base_active) or ((og_pla, og_pos) != (chosen_planet, chosen_unit)) or
+                        else:
+                            card = player.cards_in_reserve[og_pla][og_pos]
+                        if ((not self.deepstruck_attachment_is_in_play) or
+                            ((og_pla, og_pos) != (chosen_planet, chosen_unit)) or
                                 player_receiving_attachment.name_player != player.name_player) and \
                                 og_pla == chosen_planet:
                             if player_receiving_attachment.attach_card(card, chosen_planet, chosen_unit,
                                                                        not_own_attachment=not_own_att):
-                                if not player.idden_base_active:
+                                if not self.deepstruck_attachment_is_in_play:
                                     del player.cards_in_reserve[og_pla][og_pos]
                                 else:
                                     player.discard_attachments_from_card(og_pla, og_pos)
@@ -442,6 +449,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 player.deepstrike_attachment_extras(chosen_planet)
                                 self.choosing_target_for_deepstruck_attachment = False
                                 self.deepstruck_attachment_pos = (-1, -1)
+                                self.deepstruck_attachment_is_in_play = False
                                 if not other_player.has_passed:
                                     self.name_player_making_choices = other_player.name_player
                                     self.choice_context = "Deepstrike cards?"
@@ -529,6 +537,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                 player.cards_in_play[chosen_planet + 1][chosen_unit]. \
                                                     aiming_reticle_color = "blue"
                                                 self.deepstruck_attachment_pos = (chosen_planet, chosen_unit)
+                                                self.deepstruck_attachment_is_in_play = True
                                                 await self.send_update_message("deepstriking attachment")
             elif name == self.player_with_combat_turn:
                 print(self.number_with_combat_turn)

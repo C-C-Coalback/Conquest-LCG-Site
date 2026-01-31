@@ -743,7 +743,7 @@ class Player:
             del self.cards_in_reserve[planet_id][0]
 
     def get_card_type_in_reserve(self, planet_id, unit_id, in_play_card=False):
-        if self.idden_base_active and not in_play_card:
+        if self.idden_base_active or in_play_card:
             card_name = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
             card = self.game.preloaded_find_card(card_name)
             return card.get_card_type()
