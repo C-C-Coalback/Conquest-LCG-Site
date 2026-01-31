@@ -5640,7 +5640,7 @@ class Player:
         if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
             if self.get_ability_given_pos(planet_id, unit_id) != "Broderick Worr":
                 if self.game.get_green_icon(planet_id):
-                    if self.search_for_card_everywhere("Broderick Worr"):
+                    if self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True):
                         attack_value += 1
         if card.get_faction() == "Tau":
             for i in range(len(self.cards_in_play[planet_id + 1])):
@@ -7958,7 +7958,7 @@ class Player:
                                            " resources were spent due to Imperial Blockade."
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
-                every_worr_check = self.search_for_card_everywhere("Broderick Worr")
+                every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
                 if every_worr_check:
                     if self.game.get_green_icon(planet_id):
                         return False
@@ -8054,7 +8054,7 @@ class Player:
             if own_umbral_check or enemy_umbral_check:
                 return False
             if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
-                every_worr_check = self.search_for_card_everywhere("Broderick Worr")
+                every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
                 if every_worr_check:
                     if self.game.get_green_icon(planet_id):
                         return False
