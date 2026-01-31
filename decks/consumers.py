@@ -3,6 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .deckscode import Initfunctions, FindCard
 import os
 import copy
+import shutil
 
 cards_array = Initfunctions.init_player_cards()
 blackstone_array = Initfunctions.init_blackstone_player_cards()
@@ -248,6 +249,11 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
     return "SUCCESS"
 
 
+def create_default_decks(username):
+    if not os.path.exists("decks/DeckStorage/" + username):
+        shutil.copytree("decks/default_decks/", "decks/DeckStorage/" + username)
+
+
 class DecksConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = "decks"
@@ -266,11 +272,12 @@ class DecksConsumer(AsyncWebsocketConsumer):
         await self.send_stored_decks()
 
     async def send_stored_decks(self, value=0, required_faction=""):
-        if not os.path.isdir("decks/DeckStorage/" + self.name):
-            print("Path does not exist")
-        elif self.name == "":
+        if self.name == "":
             print("Not logged in")
         else:
+            if not os.path.isdir("decks/DeckStorage/" + self.name):
+                print("Path does not exist")
+                create_default_decks(self.name)
             decks_user = get_decks_user(self.user.username, value, value + 5, required_faction=required_faction)
             for i in range(len(decks_user)):
                 await self.send_deck(decks_user[i][0])
