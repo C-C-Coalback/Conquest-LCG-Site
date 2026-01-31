@@ -781,6 +781,8 @@ class Game:
         info_string = "GAME_INFO/INFO_BOX/"
         if self.phase == "SETUP":
             info_string += "Unspecified/"
+        elif self.choosing_unit_for_nullify:
+            info_string += self.name_player_using_nullify + "/"
         elif self.resolving_consumption:
             info_string += "Unspecified/"
         elif self.manual_bodyguard_resolution:
@@ -828,6 +830,8 @@ class Game:
         info_string += "Mode: " + self.mode + "/"
         if self.phase == "SETUP":
             info_string += "Setup/"
+        elif self.choosing_unit_for_nullify:
+            info_string += "Nullify: " + self.name_player_using_nullify + "/"
         elif self.resolving_consumption:
             info_string += "P1:"
             for i in range(len(self.p1.consumption_sacs_list)):
