@@ -7645,14 +7645,13 @@ class Game:
                         elif primary_player.headquarters[hq_pos].get_ability() == "Faith and Hatred":
                             if self.positions_attackers_of_units_to_take_damage[0] is not None:
                                 if primary_player.headquarters[hq_pos].get_ready():
-                                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
-                                        primary_player.exhaust_given_pos(-2, hq_pos)
-                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                                        self.amount_that_can_be_removed_by_shield[0] = \
-                                            self.amount_that_can_be_removed_by_shield[0] - 1
-                                        if self.amount_that_can_be_removed_by_shield[0] == 0:
-                                            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                                            await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                                    primary_player.exhaust_given_pos(-2, hq_pos)
+                                    primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
+                                    self.amount_that_can_be_removed_by_shield[0] = \
+                                        self.amount_that_can_be_removed_by_shield[0] - 1
+                                    if self.amount_that_can_be_removed_by_shield[0] == 0:
+                                        primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Null Shield Matrix":
                             if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                                 if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
