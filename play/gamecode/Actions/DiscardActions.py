@@ -233,6 +233,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                     if not card.get_unique() and not card.check_for_a_trait("Elite"):
                         self.misc_target_player = card.get_ability()
                         self.chosen_first_card = True
+                        primary_player.remove_card_from_game(card.get_name())
                         del primary_player.discard[pos_discard]
                         await self.send_update_message("Granting the " + card.get_ability() + "'s text box.")
     elif self.action_chosen == "Particle Whip":
