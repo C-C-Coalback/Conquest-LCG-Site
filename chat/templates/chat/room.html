@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 
 
-{% block title %}Chat Room{% endblock %}
+{% block title %}Chat{% endblock %}
 
 {% block content %}
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
+{% load static %}
+    <link rel="stylesheet" href="{% static 'chat_style.css' %}">
+    <div id="chat-container">
+        <div style="display:flex; justify-content: center; align-items: center;">
+            <h1>{{room_name}} Chat Room</h1>
+        </div>
+        <div id="chat-log"></div>
+        <div>
+            <input id="chat-message-input" type="text">
+            <input id="chat-message-submit" type="button" value="Send">
+        </div>
+    </div>
     {{ room_name|json_script:"room-name" }}
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
@@ -22,7 +31,19 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+            var text = data.message;
+            var split_text = data.message.split(":");
+            var new_img = `<div class="chat-message">
+            <img class="avatar-chat" src="/media/` + split_text[0] + `.jpg" onerror="this.onerror=null; this.src='/static/images/defaultprofile.jpg'">
+            `;
+            if (split_text[0] === "server") {
+                new_img = `
+                <img class="avatar-chat" src="/static/images/server.jpg" onerror="this.onerror=null; this.src='/static/images/defaultprofile.jpg'">
+                `;
+            }
+            document.querySelector('#chat-log').innerHTML += (new_img + data.message + '</div>');
+            var textarea = document.getElementById('chat-log');
+            textarea.scrollTop = textarea.scrollHeight;
         };
 
         chatSocket.onclose = function(e) {

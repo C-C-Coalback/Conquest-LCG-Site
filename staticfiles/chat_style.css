@@ -1,0 +1,38 @@
+#chat-message-submit {
+    position:relative;
+    float: right;
+    width: 50px;
+}
+
+#chat-message-input {
+    position:relative;
+    height: 15px;
+    width: calc(100% - 70px);
+}
+
+.chat-message {
+    border-width: 2px;
+    border-style: outset;
+    border-color: black;
+}
+
+.avatar-chat {
+    position:relative;
+    width: 40px;
+    height: 40px;
+}
+
+#chat-log {
+    position:relative;
+    border-width: 6px;
+    border-style: double;
+    border-color: lightblue;
+    overflow-y:auto;
+    background: rgba(210, 210, 210, 1.0);
+    height: 50vh;
+}
+
+#chat-container {
+    margin: auto;
+    width: 50%;
+}
