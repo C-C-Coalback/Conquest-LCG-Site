@@ -1086,7 +1086,7 @@ class Player:
 
     def increase_retaliate_given_pos_eop(self, planet_id, unit_id, value):
         if planet_id == -2:
-            self.headquarters[unit_ud].increase_retaliate_eop(value)
+            self.headquarters[unit_id].increase_retaliate_eop(value)
             return None
         self.cards_in_play[planet_id + 1][unit_id].increase_retaliate_eop(value)
         return None
