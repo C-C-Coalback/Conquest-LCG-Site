@@ -647,6 +647,8 @@ class UnitCard(Card):
             string += "Extra Attack (NEXT): " + str(self.extra_attack_until_next_attack) + "\n"
         if self.attack_set_next is not None:
             string += "Attack Set (NEXT): " + str(self.attack_set_next) + "\n"
+        if self.attack != self.actual_attack:
+            string += "Printed Attack Set: " + str(self.attack) + "\n"
         if self.extra_attack_until_end_of_battle != 0:
             string += "Extra Attack (EOB): " + str(self.extra_attack_until_end_of_battle) + "\n"
         if self.extra_attack_until_end_of_phase != 0:
