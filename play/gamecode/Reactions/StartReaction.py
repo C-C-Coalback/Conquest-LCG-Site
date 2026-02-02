@@ -2888,6 +2888,16 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Ardaci-strain Broodlord":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             primary_player.draw_card()
+        elif current_reaction == "Sanctified Aggressor":
+            num_warlords = 0
+            for k in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or primary_player.name_player in primary_player.cards_in_play[planet_pos + 1][unit_pos].hit_by_frenzied_wulfen_names:
+                    num_warlords += 1
+            for k in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or primary_player.name_player in secondary_player.cards_in_play[planet_pos + 1][unit_pos].hit_by_frenzied_wulfen_names:
+                    num_warlords += 1
+            if num_warlords < 2:
+                self.delete_reaction()
         elif current_reaction == "Seekers of Pleasure":
             target_pla = self.additional_reactions_info[0]
             if target_pla is not None:
