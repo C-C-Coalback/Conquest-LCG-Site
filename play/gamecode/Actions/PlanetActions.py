@@ -834,10 +834,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
         await self.send_update_message("You many now continue with Rapid Evolution")
     elif self.action_chosen == "Soul Seizure":
         if self.chosen_first_card:
-            card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array,
+            card = FindCard.find_card(secondary_player.discard[secondary_player.aiming_reticle_coords_discard], self.card_array,
                                       self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
             primary_player.add_card_to_planet(card, chosen_planet, is_owner_of_card=False)
-            del secondary_player.discard[self.anrakyr_unit_position]
+            del secondary_player.discard[secondary_player.aiming_reticle_coords_discard]
+            secondary_player.aiming_reticle_coords_discard = None
             await primary_player.dark_eldar_event_played()
             primary_player.torture_event_played("Soul Seizure")
             secondary_player.create_enemy_played_event_reactions()
