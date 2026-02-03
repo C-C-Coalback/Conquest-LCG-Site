@@ -243,93 +243,94 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         player = self.p2
                         other_player = self.p1
                     planet_chosen = int(game_update_string[1])
-                    self.planet_pos_to_deploy = planet_chosen
-                    card = player.get_card_in_hand(self.card_pos_to_deploy)
-                    if self.deepstrike_deployment_active:
-                        if player.put_card_into_reserve(card, planet_chosen):
-                            player.remove_card_from_hand(self.card_pos_to_deploy)
-                            player.aiming_reticle_coords_hand = None
-                            self.card_pos_to_deploy = -1
-                            self.deepstrike_deployment_active = False
-                            self.action_cleanup()
-                            if player.extra_deploy_turn_active:
-                                player.extra_deploy_turn_active = False
-                                player.has_passed = True
-                                if self.p1.has_passed and self.p2.has_passed:
-                                    await self.send_update_message("Both passed, move to warlord movement.")
-                                    await self.change_phase("COMMAND")
-                    elif card.get_card_type() == "Army":
-                        if other_player.search_card_at_planet(planet_chosen, "Raving Cryptek"):
-                            await self.send_update_message("Raving Cryptek detected! Please choose two")
-                            self.choices_available = []
-                            for i in range(len(player.cards)):
-                                card = self.preloaded_find_card(player.cards[i])
-                                if card.get_is_unit():
-                                    self.choices_available.append(card.get_name())
-                            if len(self.choices_available) < 2:
-                                await self.send_update_message("Not enough units to satisfy Raving Cryptek.")
+                    if self.card_pos_to_deploy < len(player.cards):
+                        self.planet_pos_to_deploy = planet_chosen
+                        card = player.get_card_in_hand(self.card_pos_to_deploy)
+                        if self.deepstrike_deployment_active:
+                            if player.put_card_into_reserve(card, planet_chosen):
+                                player.remove_card_from_hand(self.card_pos_to_deploy)
+                                player.aiming_reticle_coords_hand = None
+                                self.card_pos_to_deploy = -1
+                                self.deepstrike_deployment_active = False
+                                self.action_cleanup()
+                                if player.extra_deploy_turn_active:
+                                    player.extra_deploy_turn_active = False
+                                    player.has_passed = True
+                                    if self.p1.has_passed and self.p2.has_passed:
+                                        await self.send_update_message("Both passed, move to warlord movement.")
+                                        await self.change_phase("COMMAND")
+                        elif card.get_card_type() == "Army":
+                            if other_player.search_card_at_planet(planet_chosen, "Raving Cryptek"):
+                                await self.send_update_message("Raving Cryptek detected! Please choose two")
                                 self.choices_available = []
+                                for i in range(len(player.cards)):
+                                    card = self.preloaded_find_card(player.cards[i])
+                                    if card.get_is_unit():
+                                        self.choices_available.append(card.get_name())
+                                if len(self.choices_available) < 2:
+                                    await self.send_update_message("Not enough units to satisfy Raving Cryptek.")
+                                    self.choices_available = []
+                                else:
+                                    self.choice_context = "Raving Cryptek: Choose first card"
+                                    self.name_player_making_choices = player.name_player
+                                    self.resolving_search_box = True
+                                    self.misc_target_planet = planet_chosen
                             else:
-                                self.choice_context = "Raving Cryptek: Choose first card"
-                                self.name_player_making_choices = player.name_player
-                                self.resolving_search_box = True
-                                self.misc_target_planet = planet_chosen
-                        else:
-                            self.discounts_applied = 0
-                            await self.calculate_available_discounts_unit(planet_chosen, card, player)
-                            await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
-                            if card.check_for_a_trait("Elite"):
-                                player.master_warpsmith_count = 0
-                            self.card_to_deploy = card
-                            if self.available_discounts > self.discounts_applied:
-                                self.stored_mode = self.mode
-                                self.mode = "DISCOUNT"
-                                self.planet_aiming_reticle_position = int(game_update_string[1])
-                                self.planet_aiming_reticle_active = True
-                            else:
-                                await deploy_card_routine(self, name, game_update_string[1],
-                                                          discounts=self.discounts_applied)
-                    elif card.get_card_type() == "Attachment":
-                        if card.planet_attachment and (card.ability != "Trapped Objective" or
-                                                       planet_chosen != self.round_number):
-                            can_continue = True
-                            if card.get_unique():
-                                if player.search_for_unique_card(card.get_name()):
-                                    can_continue = False
-                            if card.get_limited():
-                                if not player.can_play_limited:
-                                    can_continue = False
-                            if card.limit_one_per_unit:
-                                for i in range(len(player.attachments_at_planet[planet_chosen])):
-                                    if player.attachments_at_planet[planet_chosen][i].get_name() == card.get_name():
+                                self.discounts_applied = 0
+                                await self.calculate_available_discounts_unit(planet_chosen, card, player)
+                                await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
+                                if card.check_for_a_trait("Elite"):
+                                    player.master_warpsmith_count = 0
+                                self.card_to_deploy = card
+                                if self.available_discounts > self.discounts_applied:
+                                    self.stored_mode = self.mode
+                                    self.mode = "DISCOUNT"
+                                    self.planet_aiming_reticle_position = int(game_update_string[1])
+                                    self.planet_aiming_reticle_active = True
+                                else:
+                                    await deploy_card_routine(self, name, game_update_string[1],
+                                                              discounts=self.discounts_applied)
+                        elif card.get_card_type() == "Attachment":
+                            if card.planet_attachment and (card.ability != "Trapped Objective" or
+                                                           planet_chosen != self.round_number):
+                                can_continue = True
+                                if card.get_unique():
+                                    if player.search_for_unique_card(card.get_name()):
                                         can_continue = False
-                            if card.red_required:
-                                if not self.get_red_icon(planet_chosen):
-                                    can_continue = False
-                            if card.blue_required:
-                                if not self.get_blue_icon(planet_chosen):
-                                    can_continue = False
-                            if card.green_required:
-                                if not self.get_green_icon(planet_chosen):
-                                    can_continue = False
-                            if can_continue:
-                                cost = card.get_cost()
-                                discounts = player.search_hq_for_discounts("", "", is_attachment=True)
-                                cost = cost - discounts
-                                if player.spend_resources(cost):
-                                    player.add_attachment_to_planet(planet_chosen, card)
-                                    player.remove_card_from_hand(self.card_pos_to_deploy)
-                                    self.card_pos_to_deploy = -1
-                                    self.planet_pos_to_deploy = -1
-                                    player.aiming_reticle_coords_hand = None
-                                    self.queued_sound = "onplay"
-                                    self.action_cleanup()
-                                    if player.extra_deploy_turn_active:
-                                        player.extra_deploy_turn_active = False
-                                        player.has_passed = True
-                                        if self.p1.has_passed and self.p2.has_passed:
-                                            await self.send_update_message("Both passed, move to warlord movement.")
-                                            await self.change_phase("COMMAND")
+                                if card.get_limited():
+                                    if not player.can_play_limited:
+                                        can_continue = False
+                                if card.limit_one_per_unit:
+                                    for i in range(len(player.attachments_at_planet[planet_chosen])):
+                                        if player.attachments_at_planet[planet_chosen][i].get_name() == card.get_name():
+                                            can_continue = False
+                                if card.red_required:
+                                    if not self.get_red_icon(planet_chosen):
+                                        can_continue = False
+                                if card.blue_required:
+                                    if not self.get_blue_icon(planet_chosen):
+                                        can_continue = False
+                                if card.green_required:
+                                    if not self.get_green_icon(planet_chosen):
+                                        can_continue = False
+                                if can_continue:
+                                    cost = card.get_cost()
+                                    discounts = player.search_hq_for_discounts("", "", is_attachment=True)
+                                    cost = cost - discounts
+                                    if player.spend_resources(cost):
+                                        player.add_attachment_to_planet(planet_chosen, card)
+                                        player.remove_card_from_hand(self.card_pos_to_deploy)
+                                        self.card_pos_to_deploy = -1
+                                        self.planet_pos_to_deploy = -1
+                                        player.aiming_reticle_coords_hand = None
+                                        self.queued_sound = "onplay"
+                                        self.action_cleanup()
+                                        if player.extra_deploy_turn_active:
+                                            player.extra_deploy_turn_active = False
+                                            player.has_passed = True
+                                            if self.p1.has_passed and self.p2.has_passed:
+                                                await self.send_update_message("Both passed, move to warlord movement.")
+                                                await self.change_phase("COMMAND")
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if self.mode == "Normal":
