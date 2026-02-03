@@ -4785,7 +4785,7 @@ class Game:
                         self.misc_counter += 1
                         self.choices_available = primary_player.cards
                         if self.misc_counter > 1:
-                            secondary_player.discard_card_from_hand(secondary_player.aiming_reticle_coords_hand)
+                            secondary_player.discard_card_name_from_hand("Searing Brand")
                             secondary_player.aiming_reticle_coords_hand = None
                             primary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
