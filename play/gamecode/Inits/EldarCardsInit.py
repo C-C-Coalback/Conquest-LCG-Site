@@ -121,7 +121,7 @@ def eldar_cards_init():
                                                        "No Wargear Attachments.\n"
                                                        "While you control a non-Eldar warlord, "
                                                        "this unit gains Area Effect (2).", "Vehicle. Elite.",
-                             6, faction, "Common", 4, 4, 2, False),
+                             6, faction, "Common", 4, 4, 2, False, flying=True, wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Vaulting Harlequin", "Combat Action: Exhaust this unit to have it gain "
                                                    "Flying until the end of the phase.", "Warrior. Harlequin.",
                              3, faction, "Common", 1, 4, 2, False,
