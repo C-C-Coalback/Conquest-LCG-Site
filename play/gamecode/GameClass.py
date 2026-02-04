@@ -66,6 +66,7 @@ class Game:
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, apoka_errata_cards, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, cards_dict, apoka_errata_cards, self)
         self.phase = "SETUP"
+        self.last_game_update_string = []
         self.round_number = 0
         self.current_board_state = ""
         self.running = True
@@ -248,6 +249,7 @@ class Game:
         self.chosen_first_card = False
         self.chosen_second_card = False
         self.misc_target_planet = -1
+        self.can_retreat_warlord = True
         self.misc_target_unit = (-1, -1)
         self.misc_target_unit_2 = (-1, -1)
         self.misc_target_attachment = (-1, -1, -1)
@@ -5059,13 +5061,22 @@ class Game:
                             primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                 resolving_attack = False
                             primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
+                            primary_player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
                             primary_player.retreat_unit(self.attacker_planet, self.attacker_position)
                             self.reset_combat_positions()
                             self.number_with_combat_turn = secondary_player.get_number()
                             self.player_with_combat_turn = secondary_player.get_name_player()
                         elif game_update_string[1] == "1":
+                            self.can_retreat_warlord = False
                             self.reset_choices_available()
                             self.resolving_search_box = False
+                            self.attacker_planet = -1
+                            self.attacker_position = -1
+                            await CombatPhase.update_game_event_combat_section(
+                                self, primary_player.name_player, self.last_game_update_string
+                            )
+                            self.last_game_update_string = []
+                            self.can_retreat_warlord = True
                     elif self.choice_context == "Absorb a planet:":
                         chosen_choice = self.choices_available[int(game_update_string[1])]
                         self.planets_removed_from_game.append(chosen_choice)

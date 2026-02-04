@@ -701,14 +701,19 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             if can_continue:
                                 is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
                                 if is_ready:
+                                    valid_unit = True
                                     if player.cards_in_play[chosen_planet + 1][chosen_unit] \
-                                            .get_card_type() == "Warlord":
+                                            .get_card_type() == "Warlord" and self.can_retreat_warlord:
                                         self.choices_available = ["Yes", "No"]
                                         self.choice_context = "Retreat Warlord?"
                                         self.name_player_making_choices = player.name_player
                                         self.resolving_search_box = True
+                                        self.last_game_update_string = game_update_string
+                                        valid_unit = False
+                                        player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
+                                        self.attacker_planet = chosen_planet
+                                        self.attacker_position = chosen_unit
                                     print("Unit ready, can be used")
-                                    valid_unit = True
                                 else:
                                     print("Unit not ready")
                         if valid_unit:
