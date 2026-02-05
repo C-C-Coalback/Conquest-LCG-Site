@@ -929,8 +929,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.ready_given_pos(warlord_planet, warlord_pos)
             self.delete_reaction()
         elif current_reaction == "Formosan Black Ship":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
-            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+            primary_player.exhaust_card_in_hq_given_name(current_reaction)
             primary_player.summon_token_at_planet("Guardsman", primary_player.last_planet_sacrifice)
             primary_player.summon_token_at_planet("Guardsman", primary_player.last_planet_sacrifice)
             self.delete_reaction()
