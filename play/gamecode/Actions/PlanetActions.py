@@ -535,7 +535,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Daring Assault":
         if self.chosen_first_card:
             planet_pos, unit_pos = self.misc_target_unit
-            if not secondary_player.check_for_warlord(chosen_planet):
+            if planet_pos != chosen_planet:
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = None
