@@ -103,6 +103,9 @@ class Card:
         self.card_moved_recently = False
         self.cannot_remove_damage_eor = False
 
+    def spend_faith(self, faith):
+        return False
+
     def get_has_hive_mind(self):
         if self.get_blanked():
             return False
