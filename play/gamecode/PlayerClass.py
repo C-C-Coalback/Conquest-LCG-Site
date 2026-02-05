@@ -3747,14 +3747,9 @@ class Player:
                         self.game.create_reaction("Ragnar Blackmane", self.name_player,
                                                   (int(self.number), planet_pos, j))
                 if self.get_ability_given_pos(planet_pos, j) == "Sanctified Aggressor":
-                    num_warlords = 0
-                    for k in range(len(planets_list)):
-                        if planets_list[i] == planet_pos:
-                            num_warlords += 1
-                    if num_warlords > 1:
-                        if not self.check_if_already_have_reaction_of_position("Sanctified Aggressor", planet_pos, j):
-                            self.game.create_reaction("Sanctified Aggressor", self.name_player,
-                                                      (int(self.number), planet_pos, j))
+                    if not self.check_if_already_have_reaction_of_position("Sanctified Aggressor", planet_pos, j):
+                        self.game.create_reaction("Sanctified Aggressor", self.name_player,
+                                                  (int(self.number), planet_pos, j))
 
     def commit_synapse_to_planet(self):
         if self.synapse_commit_location != -1:
