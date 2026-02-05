@@ -533,7 +533,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     elif is_a_reaction:
         pass
     else:
-        self.action_cleanup()
+        if self.action_chosen:
+            self.action_cleanup()
     if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
         if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
             self.delete_interrupt()
