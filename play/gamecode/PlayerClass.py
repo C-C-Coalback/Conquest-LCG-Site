@@ -6034,6 +6034,8 @@ class Player:
                         damage = damage - 2
                     else:
                         self.headquarters[unit_id].get_attachments()[i].ready_card()
+        if self.search_attachments_at_pos(-2, unit_id, "Heavy Marker Drone"):
+            damage = damage * 2
         prior_damage = self.headquarters[unit_id].get_damage()
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
         afterwards_damage = self.headquarters[unit_id].get_damage()
