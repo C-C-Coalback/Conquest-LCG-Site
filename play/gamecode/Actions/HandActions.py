@@ -275,7 +275,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
                         enemy_pla, enemy_pos = secondary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_pla, warlord_pos) and \
-                                secondary_player.get_ready_given_pos(warlord_pla, warlord_pos):
+                                secondary_player.get_ready_given_pos(enemy_pla, enemy_pos):
                             primary_player.exhaust_given_pos(warlord_pla, warlord_pos)
                             primary_player.discard_card_from_hand(hand_pos)
                             self.action_chosen = ability
