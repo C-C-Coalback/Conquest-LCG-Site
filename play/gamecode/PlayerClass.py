@@ -6694,7 +6694,7 @@ class Player:
                     if phase == "DEPLOY":
                         self.game.create_reaction("Warlock Destructor", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Charging Juggernaut":
-                    if phase == "DEPLOY":
+                    if phase == "DEPLOY" and i != self.game.round_number:
                         self.game.create_reaction("Charging Juggernaut", self.name_player, (int(self.number), i, j))
                 if self.cards_in_play[i + 1][j].get_ability() == "Shard of the Deceiver":
                     self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), i, j))
