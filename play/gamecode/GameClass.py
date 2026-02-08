@@ -10697,7 +10697,7 @@ class Game:
             if self.p2.search_card_in_hq("Sacaellum Infestors", ready_relevant=True):
                 self.create_reaction("Sacaellum Infestors", self.name_2, (2, planet, -1))
             if player_doing_infesting.search_for_card_everywhere("Ardaci-strain Broodlord", limit_phase_rel=True):
-                planet_pos, unit_pos = self.get_card_from_everywhere("Ardaci-strain Broodlord", limit_phase_rel=True)
+                planet_pos, unit_pos = player_doing_infesting.get_card_from_everywhere("Ardaci-strain Broodlord", limit_phase_rel=True)
                 if not player_doing_infesting.check_if_already_have_reaction("Ardaci-strain Broodlord"):
                     self.create_reaction("Ardaci-strain Broodlord", player_doing_infesting.name_player,
                                          (int(player_doing_infesting.number), planet_pos, unit_pos),
