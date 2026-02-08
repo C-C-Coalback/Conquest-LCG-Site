@@ -1156,6 +1156,38 @@ class Player:
             self.last_discard_string = joined_string
             await self.game.send_update_message(joined_string)
 
+    def get_card_from_everywhere(self, card_name, ability=True, ready_relevant=False, must_own=False,
+                                 limit_phase_rel=False, limit_round_rel=False, bloodied_relevant=False):
+        for i in range(len(self.headquarters)):
+            if self.get_ability_given_pos(-2, i, bloodied_relevant=bloodied_relevant) == card_name:
+                if card_name == "Magus Harid":
+                    for j in range(len(self.headquarters)):
+                        if self.get_ability_given_pos(-2, j) == "Imperial Bastion":
+                            if self.headquarters[i].once_per_round_used:
+                                if not self.headquarters[j].once_per_round_used:
+                                    return -2, i
+                if (not limit_phase_rel or not self.headquarters[i].once_per_phase_used) and \
+                        (not limit_round_rel or not self.headquarters[i].once_per_round_used):
+                    return -2, i
+            if self.search_attachments_at_pos(-2, i, card_name, ready_relevant=ready_relevant):
+                return -2, i
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_ability_given_pos(i, j, bloodied_relevant=bloodied_relevant) == card_name:
+                    if card_name == "Magus Harid":
+                        for k in range(len(self.headquarters)):
+                            if self.get_ability_given_pos(-2, k) == "Imperial Bastion":
+                                if self.cards_in_play[i + 1][j].once_per_round_used:
+                                    if not self.cards_in_play[i + 1][j].once_per_round_used:
+                                        return i, j
+                    if (not limit_phase_rel or not self.cards_in_play[i + 1][j].once_per_phase_used) and \
+                            (not limit_round_rel or not self.cards_in_play[i + 1][j].once_per_round_used):
+                        return i, j
+                if self.search_attachments_at_pos(i, j, card_name, ready_relevant=ready_relevant,
+                                                  must_match_name=must_own):
+                    return i, j
+        return -1, -1
+
     def search_for_card_everywhere(self, card_name, ability=True, ready_relevant=False, must_own=False,
                                    limit_phase_rel=False, limit_round_rel=False, bloodied_relevant=False):
         for i in range(len(self.headquarters)):

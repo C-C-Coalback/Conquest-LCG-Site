@@ -465,6 +465,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     i = i + 1
                 self.delete_reaction()
     elif current_reaction == "Ardaci-strain Broodlord":
+        planet_pos = self.additional_reactions_info[0]
         if abs(chosen_planet - planet_pos) == 1:
             if not self.infested_planets[chosen_planet]:
                 self.infest_planet(chosen_planet, primary_player)
