@@ -43,6 +43,15 @@
             position:relative;
             margin:auto;
         }
+        #players-in-lobby {
+
+        }
+        #add_players_to_me {
+            background-color: lightblue;
+            border: 2px solid blue;
+            padding: 10px;
+            margin: 10px;
+        }
         #create-lobby-submit {
             position:relative;
             margin:auto;
@@ -104,11 +113,17 @@
     <div id="whole-container">
         <input id="create-lobby-submit" type="button" value="Create lobby">
         <div id="lobby-container">
-            <h2 id="available">Available Lobbies</h2>
+            <div id="players-in-lobby">
+                <h2 style="background-color:aliceblue">Players in Lobby</h2>
+                <div id="add_players_to_me">
+                    <p></p>
+                </div>
+            </div>
+            <h2 id="available" style="background-color:aliceblue">Available Lobbies</h2>
             <div id="add_to_me">
                 <p></p>
             </div>
-            <h2 id="active">Active Games</h2>
+            <h2 id="active" style="background-color:aliceblue">Active Games</h2>
             <div id="add_spec_to_me">
                 <p></p>
             </div>
@@ -211,12 +226,18 @@
                 deleteLobby()
             } else if (split_string[0] === "Move to game") {
                 moveToGame(split_string[1], split_string[2], split_string[3])
-            } else if (split_string[0] == "Delete spec") {
+            } else if (split_string[0] === "Delete spec") {
                 deleteSpec()
-            } else if (split_string[0] == "Create spec") {
+            } else if (split_string[0] === "Create spec") {
                 addSpec(split_string[1], split_string[2], split_string[3]);
-            } else if (split_string[0] == "Send Deck") {
+            } else if (split_string[0] === "Send Deck") {
                 addDeck(split_string[1], split_string[2], split_string[3]);
+            } else if (split_string[0] === "players_in_lobby") {
+                document.getElementById("add_players_to_me").innerHTML = ``;
+                var usernames = split_string[1].split("|");
+                for (var i = 0; i < usernames.length; i++) {
+                    document.getElementById("add_players_to_me").innerHTML += `<p>` + usernames[i] + `</p>`;
+                }
             } else {
                 addLobby(split_string[1], split_string[2], split_string[3], split_string[4], split_string[5], split_string[6])
             }

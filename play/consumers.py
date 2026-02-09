@@ -23,6 +23,7 @@ blackstone_errata_cards_array = Initfunctions.init_blackstone_errata_cards()
 active_lobbies = [[], [], [], [], [], [], [], []]
 spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
 active_games = []
+players_in_lobby = []
 
 condition_lobby = threading.Condition()
 
@@ -85,6 +86,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         global active_lobbies
         global condition_lobby
         global spectator_games
+        global players_in_lobby
         self.room_name = "lobby"
         self.room_group_name = "lobby"
         self.user = self.scope["user"]
@@ -123,6 +125,14 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             warlord_name = decks_user[i][1]
             message = "Send Deck/" + self.user.username + "/" + deck_name + "/" + warlord_name + "/"
             await self.chat_message({"type": "chat.message", "message": message})
+        user_name = self.user.username
+        if user_name == "":
+            user_name = "Anonymous"
+        players_in_lobby.append(user_name)
+        message = "players_in_lobby/" + "|".join(players_in_lobby)
+        await self.channel_layer.group_send(
+            self.room_group_name, {"type": "chat.message", "message": message}
+        )
         condition_lobby.notify_all()
         condition_lobby.release()
 
@@ -315,7 +325,20 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave room group
+        global players_in_lobby
+        try:
+            user_name = self.user.username
+            if self.user.username == "":
+                user_name = "Anonymous"
+            if user_name in players_in_lobby:
+                players_in_lobby.remove(user_name)
+        except Exception as e:
+            print(e)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        message = "players_in_lobby/" + "|".join(players_in_lobby)
+        await self.channel_layer.group_send(
+            self.room_group_name, {"type": "chat.message", "message": message}
+        )
 
     def create_game(self, name_1, name_2, game_id, errata, sector="Traxis", deck_1="", deck_2=""):
         global active_games

@@ -41,9 +41,6 @@ h4 {
     position: relative;
     height: calc(48vh + 10px);
     width: 75vw;
-    border-width: 10px;
-    border-style: dashed;
-    border-color: green;
     grid-area: inplay;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
@@ -444,7 +441,7 @@ h4 {
 
 #headquarters-player-1 {
     position:relative;
-    border: 5px solid red;
+    border: 5px solid green;
     overflow-y:hidden;
     overflow-x:auto;
     background: rgba(47, 40, 153, 0.3);
@@ -636,7 +633,7 @@ summary:focus {
     position:relative;
     bottom:0;
     margin: auto;
-    border: 5px solid red;
+    border: 5px solid green;
     max-width: 55vw;
     overflow-x:auto;
     overflow-y:hidden;
