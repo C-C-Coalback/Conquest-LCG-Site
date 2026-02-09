@@ -286,7 +286,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     else:
                         second_player = first_name
                         temp = deck_1
-                        deck_1 = deck_2
+                        deck_1 = temp
                         deck_2 = deck_1
                 elif decider_first_player == "Yourself":
                     pass
@@ -294,7 +294,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     first_player = second_name
                     second_player = first_name
                     temp = deck_1
-                    deck_1 = deck_2
+                    deck_1 = temp
                     deck_2 = deck_1
                 game_id = self.create_game(first_player, second_player, game_id, errata, sector=sector,
                                            deck_1=deck_1, deck_2=deck_2)
