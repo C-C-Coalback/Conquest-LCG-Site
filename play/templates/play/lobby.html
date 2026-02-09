@@ -136,6 +136,18 @@
                  Private
                 </div>
                 <br>
+                <div style="display: inline">
+                    <div style="float:left">
+                        First Player:
+                    </div>
+                    <select id="first-player" style="float:left">
+                        <option value="Random" selected="selected">Random</option>
+                        <option value="Yourself">Yourself</option>
+                        <option value="Opponent">Opponent</option>
+                    </select>
+                </div>
+                <br>
+                <br>
                 <select id="sector" style="float: left; margin-top: 0px;">
                     <option value="Traxis" selected="selected">Traxis</option>
                     <option value="Gardis">Gardis</option>
@@ -286,8 +298,9 @@
                 errata_string = "Blackstone";
             }
             const sector = document.getElementById("sector").value;
+            const first_player = document.getElementById("first-player").value;
             lobbySocket.send(JSON.stringify({
-                'message': "Create lobby" + "/" + private.toString() + "/" + errata_string + "/" + sector + "/" + deck_name
+                'message': "Create lobby" + "/" + private.toString() + "/" + errata_string + "/" + sector + "/" + deck_name + "/" + first_player
             }));
         };
 

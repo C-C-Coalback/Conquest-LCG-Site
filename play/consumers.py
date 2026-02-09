@@ -20,7 +20,7 @@ planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 blackstone_errata_cards_array = Initfunctions.init_blackstone_errata_cards()
 
-active_lobbies = [[], [], [], [], [], [], [], []]
+active_lobbies = [[], [], [], [], [], [], [], [], []]
 spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
 active_games = []
 players_in_lobby = []
@@ -102,7 +102,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         for i in range(len(active_lobbies[0])):
             message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
                       + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] +\
-                      "/" + active_lobbies[7][i]
+                      "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
             await self.chat_message({"type": "chat.message", "message": message})
         i = 0
         print("CURRENT SPEC")
@@ -190,11 +190,13 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             active_lobbies[5].append(split_message[4])
             active_lobbies[6].append("")
             active_lobbies[7].append(datetime.datetime.today().strftime("%I:%M%p, %B %d, %Y"))
+            active_lobbies[8].append(split_message[5])
             print(active_lobbies)
             le = len(active_lobbies[0]) - 1
             split_message[0] += "/" + active_lobbies[0][le] + "/" + active_lobbies[1][le] + \
                                 "/" + active_lobbies[2][le] + "/" + active_lobbies[3][le] + \
-                                "/" + active_lobbies[4][le] + "/" + active_lobbies[7][le]
+                                "/" + active_lobbies[4][le] + "/" + active_lobbies[7][le] + \
+                                "/" + active_lobbies[8][le]
             print(split_message[0])
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "chat.message", "message": split_message[0]}
@@ -211,6 +213,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     del active_lobbies[5][i]
                     del active_lobbies[6][i]
                     del active_lobbies[7][i]
+                    del active_lobbies[8][i]
                     i += -1
                 i += 1
             print(active_lobbies)
@@ -239,7 +242,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
                               + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
-                              "/" + active_lobbies[7][i]
+                              "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
@@ -273,7 +276,21 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 sector = active_lobbies[4][game_num]
                 deck_1 = active_lobbies[5][game_num]
                 deck_2 = active_lobbies[6][game_num]
-                game_id = self.create_game(first_name, second_name, game_id, errata, sector=sector,
+                first_player = first_name
+                second_player = second_name
+                decider_first_player = active_lobbies[8][game_num]
+                if decider_first_player == "Random":
+                    first_player = random.choice([first_name, second_name])
+                    if first_player == first_name:
+                        second_player = second_name
+                    else:
+                        second_player = first_name
+                elif decider_first_player == "Yourself":
+                    pass
+                else:
+                    first_player = second_name
+                    second_player = first_name
+                game_id = self.create_game(first_player, second_player, game_id, errata, sector=sector,
                                            deck_1=deck_1, deck_2=deck_2)
                 if active_lobbies[2][game_num] == "Public":
                     current_time = datetime.datetime.now()
@@ -297,12 +314,13 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                         del active_lobbies[5][i]
                         del active_lobbies[6][i]
                         del active_lobbies[7][i]
+                        del active_lobbies[8][i]
                         i += -1
                     i += 1
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
                               + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
-                              "/" + active_lobbies[7][i]
+                              "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
