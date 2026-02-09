@@ -6,5 +6,4 @@ from .consumers import get_card_names
 
 def decks(request):
     card_names = get_card_names(request.user.username)
-    print("card names", card_names)
     return render(request, "decks.html", {"auto_complete": card_names})
