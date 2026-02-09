@@ -85,6 +85,7 @@
             gap: 20px;
         }
         #flex-container {
+            margin-top: 20px;
             display: flex;
             justify-content: center;
         }
@@ -107,8 +108,22 @@
             width: 50px;
             height: 70px;
         }
+        #disconnected-warning {
+            display: none;
+            background-color: orange;
+            opacity: 0.9;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            border-width: 2px;
+            border-color: orangered;
+            border-style: double;
+        }
 </style>
-<h2>Lobby</h2>
+<div id="disconnected-warning">
+    <h1 style="color: red;">Warning: You have been disconnected!</h1><h2>You will need to refresh the page.</h2>
+</div>
 <div id="flex-container">
     <div id="whole-container">
         <input id="create-lobby-submit" type="button" value="Create lobby">
@@ -439,5 +454,10 @@
                 .innerHTML +=
                 `<h3>Already Lobbied</h3>`;
         }
+
+        lobbySocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+            document.getElementById("disconnected-warning").style.display = "block";
+        };
 </script>
 {% endblock %}

@@ -10,6 +10,9 @@
         <option value="{{ card_name }}"></option>
     {% endfor %}
 </datalist>
+<div id="disconnected-warning">
+    <h1 style="color: red;">Warning: You have been disconnected!</h1><h2>You will need to refresh the page.</h2>
+</div>
 <input id="toggle-manual" type="button" value="Show/Hide Manual" onclick="showDeckImport();">
 <div id="manual-deck-import">
 <textarea id="chat-log" cols="100" rows="10"></textarea><br>
@@ -675,8 +678,9 @@
     }
 
     decksSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
+        console.error('Chat socket closed unexpectedly');
+        document.getElementById("disconnected-warning").style.display = "block";
+    };
 
     document.querySelector('#chat-message-input').focus();
         document.querySelector('#chat-message-input').onkeyup = function(e) {

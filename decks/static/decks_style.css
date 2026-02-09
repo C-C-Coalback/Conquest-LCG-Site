@@ -78,6 +78,19 @@
     cursor: pointer;
 }
 
+#disconnected-warning {
+    display: none;
+    background-color: orange;
+    opacity: 0.9;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    border-width: 2px;
+    border-color: orangered;
+    border-style: double;
+}
+
 #synapse-card {
     grid-area: synapse-card;
 }
