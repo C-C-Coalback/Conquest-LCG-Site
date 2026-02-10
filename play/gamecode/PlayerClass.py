@@ -6166,6 +6166,8 @@ class Player:
         return other_player
 
     def get_bloodied_given_pos(self, planet_id, unit_id):
+        if planet_id == -1:
+            return False
         if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
             return False
         if planet_id == -2:
