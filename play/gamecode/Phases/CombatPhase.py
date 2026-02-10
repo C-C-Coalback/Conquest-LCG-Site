@@ -773,6 +773,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         i = i - 1
                                     i = i + 1
                             valid_adjacent_and_self_planets = []
+                            self.sweep_active = False
+                            self.sweep_value = 0
                             if self.attacker_planet != 0:
                                 valid_adjacent_and_self_planets.append(self.attacker_planet - 1)
                             valid_adjacent_and_self_planets.append(self.attacker_planet)
