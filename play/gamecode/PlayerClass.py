@@ -3465,10 +3465,10 @@ class Player:
                     if self.get_ability_given_pos(destination, i) == "Acquisition Phalanx":
                         self.game.create_reaction("Acquisition Phalanx", self.name_player,
                                                   (int(self.number), destination, i))
+            if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn", ready_relevant=True):
+                self.game.create_reaction("Third Eye of Trazyn", self.name_player,
+                                          (int(self.number), destination, new_pos))
             if self.game.phase == "COMBAT":
-                if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn", ready_relevant=True):
-                    self.game.create_reaction("Third Eye of Trazyn", self.name_player,
-                                              (int(self.number), destination, new_pos))
                 if other_player.search_card_at_planet(destination, "Eloquent Confessor"):
                     if self.game.phase == "COMBAT":
                         self.game.create_reaction("Eloquent Confessor", other_player.name_player,
