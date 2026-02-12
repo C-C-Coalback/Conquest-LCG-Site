@@ -3480,15 +3480,18 @@ class Game:
                         target_choice = self.choices_available[int(game_update_string[1])]
                         self.card_to_deploy = self.preloaded_find_card(target_choice)
                         card = self.card_to_deploy
+                        self.resolving_search_box = False
                         self.discounts_applied = 0
+                        diff = 0
                         if game_update_string[1] == self.misc_target_choice:
                             self.discounts_applied = -2
+                            diff = 2
                         await self.calculate_available_discounts_unit(self.misc_target_planet, card, primary_player)
                         await self.calculate_automatic_discounts_unit(self.misc_target_planet, card, primary_player)
                         self.reset_choices_available()
                         if card.check_for_a_trait("Elite"):
                             primary_player.master_warpsmith_count = 0
-                        if self.available_discounts > (self.discounts_applied + 2):
+                        if self.available_discounts > (self.discounts_applied + diff):
                             self.stored_mode = self.mode
                             self.mode = "DISCOUNT"
                             self.planet_aiming_reticle_position = self.misc_target_planet
