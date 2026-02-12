@@ -2086,15 +2086,15 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_hq("Guardsman")
             self.delete_reaction()
         elif current_reaction == "Krieg Armoured Regiment":
-            if "Krieg Armoured Regiment" in primary_player.discard and \
-                    "Krieg Armoured Regiment" in primary_player.stored_cards_recently_discarded:
+            if "Krieg Armoured Regiment" in primary_player.discard:
                 primary_player.discard.remove("Krieg Armoured Regiment")
                 primary_player.deck.append("Krieg Armoured Regiment")
                 primary_player.number_cards_to_search = 6
                 self.resolving_search_box = True
                 try:
-                    primary_player.stored_cards_recently_discarded.remove("Krieg Armoured Regiment")
-                    primary_player.stored_cards_recently_destroyed.remove("Krieg Armoured Regiment")
+                    if current_reaction in primary_player.stored_cards_recently_discarded:
+                        primary_player.stored_cards_recently_discarded.remove("Krieg Armoured Regiment")
+                        primary_player.stored_cards_recently_destroyed.remove("Krieg Armoured Regiment")
                 except ValueError:
                     pass
                 if len(primary_player.deck) > 5:
