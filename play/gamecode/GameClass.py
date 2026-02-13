@@ -4326,7 +4326,7 @@ class Game:
                         primary_player.deck.append(chosen_choice)
                         del primary_player.deck[int(game_update_string[1])]
                         self.reset_choices_available()
-                        self.resolving_search_box = True
+                        self.resolving_search_box = False
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
                     elif self.choice_context == "The Dawnsinger Choice":
