@@ -3473,6 +3473,8 @@ class Player:
                     if self.game.phase == "COMBAT":
                         self.game.create_reaction("Eloquent Confessor", other_player.name_player,
                                                   (int(other_player.number), destination, new_pos))
+            if self.get_ability_given_pos(destination, new_pos) == "Venomous Fiend":
+                self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
             self.remove_card_from_hq(origin_position)
             return True
         else:
@@ -3673,7 +3675,7 @@ class Player:
                                     if vael_relevant:
                                         self.game.create_reaction("The Inevitable Decay", other_player.name_player,
                                                                   (int(self.number), -1, -1))
-        if self.cards_in_play[destination + 1][new_pos].get_ability() == "Venomous Fiend":
+        if self.get_ability_given_pos(destination, new_pos) == "Venomous Fiend":
             self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
         return True
 
