@@ -3894,6 +3894,7 @@ class Game:
                                 last_game_update_string = ["IN_PLAY", primary_player.get_number(),
                                                            str(current_planet),
                                                            str(current_unit)]
+                                self.resolving_search_box = False
                                 await CombatPhase.update_game_event_combat_section(
                                     self, secondary_player.name_player, last_game_update_string)
                             elif self.interrupts_waiting_on_resolution[0] == "Counterblow" or \
@@ -4189,6 +4190,7 @@ class Game:
                                 self.p2.has_passed = True
                                 self.reset_combat_positions()
                         self.reset_choices_available()
+                        self.resolving_search_box = False
                     elif self.choice_context == "CWA: Infest Planet?":
                         if chosen_choice == "Yes":
                             self.infest_planet(self.misc_target_planet, primary_player)
