@@ -7762,7 +7762,8 @@ class Game:
                             if hurt_planet == planet_pos and hurt_pos != unit_pos:
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
-                                    primary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
+                                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                                    self.starmist_raiment = False
                                     self.amount_that_can_be_removed_by_shield[0] = \
                                         self.amount_that_can_be_removed_by_shield[0] - 1
                                     if self.amount_that_can_be_removed_by_shield[0] < 1:
@@ -8062,6 +8063,21 @@ class Game:
                                     self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                                          (int(primary_player.number), planet_pos, unit_pos))
                                 await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                    else:
+                        planet_pos = int(game_update_string[2])
+                        unit_pos = int(game_update_string[3])
+                        hurt_num, hurt_planet, hurt_pos = self.positions_of_units_to_take_damage[0]
+                        if self.starmist_raiment:
+                            if hurt_planet == planet_pos and hurt_pos != unit_pos:
+                                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                                    primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
+                                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                                    self.starmist_raiment = False
+                                    self.amount_that_can_be_removed_by_shield[0] = \
+                                        self.amount_that_can_be_removed_by_shield[0] - 1
+                                    if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                        primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                        await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif len(game_update_string) == 5:
                 if planet_pos == -2:
                     if game_update_string[0] == "ATTACHMENT":
