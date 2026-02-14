@@ -850,6 +850,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 active_games[self.game_position].p2.draw_card()
                             await active_games[self.game_position].p2.send_hand()
                             await active_games[self.game_position].send_decks()
+                    elif message[1] == "retreat-unit":
+                        if len(message) == 2:
+                            active_games[self.game_position].debug_mode = "retreat-unit"
+                            await self.receive_game_update("Click card in play to retreat.")
                     elif message[1] == "discard":
                         if len(message) == 2:
                             active_games[self.game_position].debug_mode = "discard-hand"

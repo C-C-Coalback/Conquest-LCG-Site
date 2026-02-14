@@ -9876,6 +9876,9 @@ class Game:
                     elif self.debug_mode == "clear-reticle":
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                         self.debug_mode = None
+                    elif self.debug_mode == "retreat-unit":
+                        primary_player.retreat_unit(planet_pos, unit_pos)
+                        self.debug_mode = None
                     elif self.debug_mode == "move-unit" and not self.chosen_first_card:
                         if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
                             self.chosen_first_card = True
