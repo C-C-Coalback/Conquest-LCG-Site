@@ -8911,6 +8911,7 @@ class Game:
         secondary_player.reset_card_name_misc_ability("Null Shield Matrix")
         primary_player.phalanx_shield_value = 0
         secondary_player.phalanx_shield_value = 0
+        dmg_to_add_back = 0
         if not self.retaliate_used:
             if self.amount_that_can_be_removed_by_shield[0] > 2:
                 player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
@@ -8943,9 +8944,10 @@ class Game:
                             health = primary_player.get_health_given_pos(def_pla, def_pos)
                             damage = primary_player.get_damage_given_pos(def_pla, def_pos)
                             if health >= damage:
+                                dmg_to_add_back += 1
                                 primary_player.remove_damage_from_pos(def_pla, def_pos, 1)
                                 self.create_interrupt("Chapter Champion Varn", primary_player.name_player,
-                                                      (int(primary_player.number), -1, -1))
+                                                      (int(primary_player.number), def_pla, def_pos))
                 if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
                     if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
                         if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
@@ -9097,6 +9099,9 @@ class Game:
             if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+        if dmg_to_add_back > 0:
+            player_num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+            primary_player.increase_damage_at_pos(planet_pos, unit_pos, dmg_to_add_back)
         del self.damage_on_units_list_before_new_damage[0]
         del self.damage_is_preventable[0]
         del self.positions_of_units_to_take_damage[0]
@@ -9174,6 +9179,8 @@ class Game:
                             self.name_player_making_choices = self.name_2
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.interrupts_waiting_on_resolution[0]
                             self.name_player_making_choices = self.player_resolving_interrupts[0]
                             self.asking_if_interrupt = True
@@ -9188,6 +9195,8 @@ class Game:
                         self.asking_which_interrupt = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
+                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                                self.choices_available = ["Yes"]
                             self.choice_context = self.interrupts_waiting_on_resolution[0]
                             self.name_player_making_choices = self.player_resolving_interrupts[0]
                             self.asking_if_interrupt = True
