@@ -3679,6 +3679,14 @@ class Player:
             self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
         return True
 
+    def search_ready_unit_at_planet(self, planet_pos):
+        if planet_pos == -2:
+            return False
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.get_ready_given_pos(planet_pos, i):
+                return True
+        return False
+
     def commit_warlord_to_planet_from_planet(self, origin_planet, dest_planet):
         self.warlord_commit_location = dest_planet
         if origin_planet == -2:
