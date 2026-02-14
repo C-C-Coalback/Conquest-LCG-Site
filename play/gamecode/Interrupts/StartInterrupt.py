@@ -282,7 +282,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "Desperate Captives":
             dmg = 0
             for i in range(len(secondary_player.headquarters)):
-                if secondary_player.check_is_unit_at_pos(-2, unit_pos):
+                if secondary_player.check_is_unit_at_pos(-2, i):
                     dmg += 2
             self.location_of_indirect = "HQ"
             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
