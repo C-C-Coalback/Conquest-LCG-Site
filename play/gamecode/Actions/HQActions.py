@@ -1349,6 +1349,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     await self.send_update_message("Faith paid, please continue.")
                     self.chosen_first_card = True
                     self.chosen_second_card = False
+    elif self.action_chosen == "Lethal Toxin Sacs":
+        if game_update_string[1] == primary_player.get_number():
+            card = FindCard.find_card("Lethal Toxin Sacs", self.card_array, self.cards_dict,
+                                      self.apoka_errata_cards, self.cards_that_have_errata)
+            played_card = primary_player. \
+                play_attachment_card_to_in_play(card, planet_pos, unit_pos, army_unit_as_attachment=False, discounts=0)
+            if played_card:
+                primary_player.discard.remove("Lethal Toxin Sacs")
+                primary_player.aiming_reticle_coords_discard = None
+                self.action_cleanup()
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
