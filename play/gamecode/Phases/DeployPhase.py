@@ -101,7 +101,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         has_deepstrike = card.get_has_deepstrike()
                         if card.get_card_type() == "Attachment" and primary_player.farsight_relevant:
                             has_deepstrike = True
-                        if card.get_name() in self.cards_with_dash_cost or card.get_name() == "Genestealer Hybrids":
+                        if card.get_name() == "Genestealer Hybrids":
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
                             return None
                         if card.get_limited() and not primary_player.can_play_limited and not \
@@ -151,6 +151,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             print("deepstrike", card.get_deepstrike_value())
                             self.stored_deploy_string = game_update_string
                             self.choices_available = ["Normal Deploy", "Deploy into Reserve"]
+                            if card.get_name() in self.cards_with_dash_cost:
+                                self.choices_available = ["Deploy into Reserve"]
                             self.choice_context = "Deploy into reserve?"
                             self.name_player_making_choices = primary_player.name_player
                             self.resolving_search_box = True

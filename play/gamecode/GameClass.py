@@ -5114,7 +5114,7 @@ class Game:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
                     elif self.choice_context == "Deploy into reserve?":
-                        if self.choices_available[int(game_update_string[1])] == "Normal Deploy":
+                        if chosen_choice == "Normal Deploy":
                             self.deepstrike_allowed = False
                             self.reset_choices_available()
                             self.resolving_search_box = False
