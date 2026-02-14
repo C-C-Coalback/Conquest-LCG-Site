@@ -335,9 +335,11 @@ class Card:
     def get_text(self):
         return self.text
 
-    def get_traits(self):
+    def get_traits(self, etekh_trait=""):
         if self.blanked_traits_eog:
             return ""
+        if etekh_trait:
+            return self.traits + " " + etekh_trait + "."
         return self.traits
 
     def check_for_a_trait(self, trait_to_find, etekh_trait=""):

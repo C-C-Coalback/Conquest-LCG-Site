@@ -4823,39 +4823,33 @@ class Player:
 
     def perform_discount_at_pos_hq(self, pos, faction_of_card, traits, target_planet=None, name_of_card=""):
         discount = 0
-        if self.headquarters[pos].get_ability() in self.simple_limited_unique_discounts:
-            if self.headquarters[pos].aiming_reticle_color == "green":
+        if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() in self.simple_limited_unique_discounts:
                 self.headquarters[pos].exhaust_card()
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
-        if self.headquarters[pos].get_ability() == "Digestion Pool":
-            if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() == "Digestion Pool":
                 self.headquarters[pos].exhaust_card()
                 discount += 2
                 self.reset_aiming_reticle_in_play(-2, pos)
-        if self.headquarters[pos].get_ability() == "Gorzod":
-            if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() == "Gorzod":
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
-        if self.headquarters[pos].get_ability() == "Parasitic Scarabs":
-            if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() == "Parasitic Scarabs":
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
                 self.assign_damage_to_pos(-2, pos, 1, by_enemy_unit=False)
                 self.game.damage_for_unit_to_take_on_play.append(1)
                 self.discard_top_card_deck()
-        if self.headquarters[pos].get_ability() == "Sae'lum Enclave":
-            if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() == "Sae'lum Enclave":
                 self.exhaust_given_pos(-2, pos)
                 discount += 2
                 self.reset_aiming_reticle_in_play(-2, pos)
-        if self.headquarters[pos].get_ability() == "Prophets of Flesh":
-            if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() == "Prophets of Flesh":
                 self.exhaust_given_pos(-2, pos)
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
-        if self.headquarters[pos].get_ability() == "Air Protection Fleet":
-            if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() == "Air Protection Fleet":
                 self.exhaust_given_pos(-2, pos)
                 discount += 1
                 self.reset_aiming_reticle_in_play(-2, pos)
@@ -4863,26 +4857,25 @@ class Player:
                     self.guardsman_tracker_apf += 1
                 elif name_of_card == "Ardent Auxiliaries" and (self.game.apoka or self.game.blackstone):
                     self.guardsman_tracker_apf += 1
-        if "Elite" in traits:
             if self.headquarters[pos].get_ability() == "STC Fragment":
                 if self.headquarters[pos].get_ready():
                     self.exhaust_given_pos(-2, pos)
                     discount += 2
                     if self.game.apoka:
                         self.game.deploy_exhausted = True
-        if self.headquarters[pos].get_ability() == "Bonesinger Choir":
-            if self.headquarters[pos].aiming_reticle_color == "green":
+            if self.headquarters[pos].get_ability() == "Bonesinger Choir":
                 self.exhaust_given_pos(-2, pos)
                 discount += 2
                 self.reset_aiming_reticle_in_play(-2, pos)
-        if "Daemon" in traits:
             if self.headquarters[pos].get_ability() == "Cultist":
+                self.reset_aiming_reticle_in_play(-2, pos)
                 if self.sacrifice_card_in_hq(pos):
                     discount += 1
                     if name_of_card == "Venomcrawler":
                         discount += 1
             elif self.headquarters[pos].get_ability() == "Splintered Path Acolyte":
                 discount += 2
+                self.reset_aiming_reticle_in_play(-2, pos)
                 self.sacrifice_card_in_hq(pos)
         return discount
 
@@ -5170,29 +5163,28 @@ class Player:
 
     def perform_discount_at_pos_in_play(self, planet_pos, unit_pos, traits, name_of_card=""):
         discount = 0
-        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Crushface":
-            if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+        if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Crushface":
                 self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 discount += 1
-        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Gorzod":
-            if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Gorzod":
                 self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 discount += 1
-        if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Parasitic Scarabs":
-            if self.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "green":
+            if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Parasitic Scarabs":
                 discount += 1
                 self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.game.damage_for_unit_to_take_on_play.append(1)
                 self.discard_top_card_deck()
-        if "Daemon" in traits:
             if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Cultist":
+                self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 if self.sacrifice_card_in_play(planet_pos, unit_pos):
                     discount += 1
                     if name_of_card == "Venomcrawler":
                         discount += 1
             elif self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Splintered Path Acolyte":
                 discount += 2
+                self.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 self.sacrifice_card_in_play(planet_pos, unit_pos)
         return discount
 

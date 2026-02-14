@@ -6868,7 +6868,7 @@ class Game:
         other_player = self.p1
         if player.name_player == self.name_1:
             other_player = self.p2
-        if card.check_for_a_trait("Haemonculus"):
+        if card.check_for_a_trait("Haemonculus", etekh_trait=player.etekh_trait):
             for i in range(len(player.cards_in_play[planet_chosen + 1])):
                 if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
                     self.discounts_applied = self.discounts_applied - 1
@@ -6925,10 +6925,10 @@ class Game:
         if player.name_player == self.name_1:
             other_player = self.p2
         self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
-                                                                  card.get_traits(),
+                                                                  card.get_traits(etekh_trait=player.etekh_trait),
                                                                   planet_chosen=planet_chosen,
                                                                   name_of_card=card.get_name())
-        if card.check_for_a_trait("Haemonculus"):
+        if card.check_for_a_trait("Haemonculus", etekh_trait=player.etekh_trait):
             for i in range(len(player.cards_in_play[planet_chosen + 1])):
                 if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
                     self.available_discounts = self.available_discounts - 1
@@ -6997,9 +6997,8 @@ class Game:
                             slaanesh_temptation = True
         if slaanesh_temptation:
             self.available_discounts -= 1
-        self.available_discounts += player.search_all_planets_for_discounts(self.traits_of_card_to_play,
-                                                                            card.get_faction(),
-                                                                            name_of_card=card.get_name())
+        self.available_discounts += player.search_all_planets_for_discounts(
+            card.get_traits(etekh_trait=player.etekh_trait), card.get_faction(), name_of_card=card.get_name())
         self.available_discounts += temp_av_disc
 
     def create_reactions_phase_begins(self):
