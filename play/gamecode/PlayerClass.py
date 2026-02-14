@@ -3615,7 +3615,7 @@ class Player:
                 if self.search_card_in_hq("Deathly Web Shrine", ready_relevant=True):
                     self.game.create_reaction("Deathly Web Shrine", self.name_player,
                                               (int(self.number), destination, -1))
-                if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn"):
+                if self.search_attachments_at_pos(destination, new_pos, "Third Eye of Trazyn", ready_relevant=True):
                     self.game.create_reaction("Third Eye of Trazyn", self.name_player,
                                               (int(self.number), destination, new_pos))
                 if other_player.search_card_at_planet(destination, "Eloquent Confessor"):
