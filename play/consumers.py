@@ -561,6 +561,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                             current_string += "RANDOM SEED:\t" + active_games[self.game_position].random_seed + "\n"
                             current_string += "MOVE DETAILS:\n" + active_games[self.game_position].game_events_as_mono_string + "\n"
                             f.write(current_string)
+                        await self.receive_game_update("Saved the game!")
                     elif message[1] == "Error":
                         raise ValueError
                     elif message[1] == "force-quit-reactions":
