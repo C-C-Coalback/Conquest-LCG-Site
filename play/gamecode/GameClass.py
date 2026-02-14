@@ -4082,7 +4082,6 @@ class Game:
                     elif self.choice_context == "Munitorum Support Take":
                         planet_pos, unit_pos = self.position_of_actioned_card
                         primary_player.return_attachment_to_hand(-2, unit_pos, int(game_update_string[1]))
-                        self.player_with_action = ""
                         self.reset_choices_available()
                         self.resolving_search_box = False
                     elif self.choice_context == "Senatorum Directives Reassign":

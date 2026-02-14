@@ -210,7 +210,26 @@ async def update_game_event_deploy_section(self, name, game_update_string):
         elif game_update_string[0] == "HQ":
             if name == self.player_with_deploy_turn:
                 if self.mode == "Normal":
-                    if self.card_pos_to_deploy != -1:
+                    is_munitorum = False
+                    if self.number_with_deploy_turn == "1":
+                        player = self.p1
+                    else:
+                        player = self.p2
+                    if game_update_string[1] == player.get_number():
+                        if player.get_ability_given_pos(-2, int(game_update_string[2])) == "Munitorum Support":
+                            if not player.get_once_per_round_used_given_pos(-2, int(game_update_string[2])):
+                                player.set_once_per_round_used_given_pos(-2, int(game_update_string[2]))
+                                attachments = player.get_all_attachments_at_pos(-2, int(game_update_string[2]))
+                                if attachments:
+                                    self.choices_available = []
+                                    for i in range(len(attachments)):
+                                        self.choices_available.append(attachments[i].get_name())
+                                    self.choice_context = "Munitorum Support Take"
+                                    self.name_player_making_choices = player.name_player
+                                    self.position_of_actioned_card = (-2, int(game_update_string[2]))
+                                    self.resolving_search_box = True
+                                is_munitorum = True
+                    if self.card_pos_to_deploy != -1 and not is_munitorum:
                         if game_update_string[1] == self.number_with_deploy_turn:
                             await deploy_card_routine_attachment(self, name, game_update_string)
                         else:
