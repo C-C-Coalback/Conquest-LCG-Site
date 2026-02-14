@@ -981,6 +981,10 @@
                         if (card_data_split.length > 7) {
                             if (is_ready === "R") {
                                 style_string = ` style="margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
+                            } else if (is_ready === "PR") {
+                                style_string = ` style="rotate: 270deg; margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
+                            } else if (is_ready === "PE") {
+                                style_string = ` style="margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
                             } else {
                                 style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
                             }
