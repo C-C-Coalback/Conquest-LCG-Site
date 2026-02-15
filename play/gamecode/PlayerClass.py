@@ -8049,7 +8049,7 @@ class Player:
             if self.get_area_effect_given_pos(planet_pos, unit_pos) > 0:
                 keywords.append("Area Effect")
             if self.get_sweep_given_pos(planet_pos, unit_pos) > 0:
-                kewords.append("Sweep")
+                keywords.append("Sweep")
             if self.get_ranged_given_pos(planet_pos, unit_pos):
                 keywords.append("Ranged")
             if self.get_lumbering_given_pos(planet_pos, unit_pos):
