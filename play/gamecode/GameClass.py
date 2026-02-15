@@ -10578,7 +10578,7 @@ class Game:
                     for i in range(len(winner.cards_in_reserve[planet_id])):
                         if winner.cards_in_reserve[planet_id][i].get_ability() == "Squiggoth Brute":
                             self.create_reaction("WAAAGH! Ungskar Deepstrike", winner.name_player,
-                                                 (int(winner.number), -1, -1))
+                                                 (int(winner.number), planet_id, -1))
                             reactions_exist = True
             if winner.search_card_in_hq("Novokh Dynasty"):
                 for i in range(len(winner.cards_in_reserve[planet_id])):
