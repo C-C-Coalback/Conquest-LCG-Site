@@ -4895,7 +4895,10 @@ class Game:
                     elif self.choice_context == "Which Player? (Slake the Thirst):":
                         self.misc_target_choice = game_update_string[1]
                         self.choices_available = ["0"]
-                        for i in range(len(self.p1.cards)):
+                        target_player = primary_player
+                        if game_update_string[1] == "1":
+                            target_player = secondary_player
+                        for i in range(len(target_player.cards)):
                             if len(self.choices_available) < 4:
                                 self.choices_available.append(str(i + 1))
                         self.choice_context = "How Many Cards? (Slake the Thirst):"
@@ -4905,7 +4908,7 @@ class Game:
                             secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
                     elif self.choice_context == "How Many Cards? (Slake the Thirst):":
-                        num_cards = int(game_update_string[1]) + 1
+                        num_cards = int(chosen_choice)
                         if self.misc_target_choice == "0":
                             for _ in range(num_cards):
                                 primary_player.discard_card_at_random()
