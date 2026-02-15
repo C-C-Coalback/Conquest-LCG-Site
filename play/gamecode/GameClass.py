@@ -222,6 +222,7 @@ class Game:
         self.player_resolving_battle_ability = ""
         self.number_resolving_battle_ability = -1
         self.choices_available = []
+        self.show_choices_as_images = []
         self.name_player_making_choices = ""
         self.choice_context = ""
         self.damage_from_atrox = False
@@ -747,7 +748,13 @@ class Game:
     async def send_search(self, force=False):
         card_string = ""
         if self.rearranging_deck:
-            card_string = "/".join(self.deck_part_being_rearranged)
+            choices_array = []
+            for i in range(len(self.deck_part_being_rearranged)):
+                if i == len(self.deck_part_being_rearranged) - 1:
+                    choices_array.append(self.deck_part_being_rearranged[i] + "|" + "N")
+                else:
+                    choices_array.append(self.deck_part_being_rearranged[i] + "|" + "Y")
+            card_string = "/".join(choices_array)
             card_string = "GAME_INFO/CHOICE/" + self.name_player_rearranging_deck + "/" \
                           + "Rearranging Deck" + "/" + card_string
         elif self.cards_in_search_box and self.name_player_who_is_searching:
@@ -755,7 +762,14 @@ class Game:
             card_string = "GAME_INFO/SEARCH/" + self.name_player_who_is_searching + "/" \
                           + self.what_to_do_with_searched_card + "/" + card_string
         elif self.choices_available and self.name_player_making_choices:
-            card_string = "/".join(self.choices_available)
+            choices_array = []
+            if len(self.show_choices_as_images) == len(self.choices_available):
+                for i in range(len(self.choices_available)):
+                    choices_array.append(self.choices_available[i] + "|" + self.show_choices_as_images[i])
+            else:
+                for i in range(len(self.choices_available)):
+                    choices_array.append(self.choices_available[i] + "|" + "N")
+            card_string = "/".join(choices_array)
             card_string = "GAME_INFO/CHOICE/" + self.name_player_making_choices + "/" \
                           + self.choice_context + "/" + card_string
         else:

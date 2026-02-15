@@ -1016,13 +1016,28 @@
                         document.getElementById(target_headquarters).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "CHOICE") {
-                    var full_string = `<details open=""><summary>` + split_data[3] + `</summary>`;
+                    var full_string = `<div id="choices-container"><div id="header-choices-container">` + split_data[3] + `</div>`;
+                    console.log(split_data)
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
-                            full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + split_data[i] + `" onclick="testImageButton(this.id);"><br>`
+                            var choice_data = split_data[i].split("|");
+                            if (choice_data.length === 2) {
+                                if (choice_data[1] === "N") {
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
+                                } else {
+                                    var card_name = choice_data[0];
+                                    var string_id = (i-4).toString();
+                                    string_id = "CHOICE/" + string_id;
+                                    card_name = card_name.split(' ').join('_');
+                                    var route_text = "/static/images/CardImages/" + card_name + ".jpg";
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDef(this.dataset.cardsrc)"><br>`
+                                }
+                            } else {
+                                full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
+                            }
                         }
                     }
-                    full_string += `</details>`;
+                    full_string += `</div>`;
                     document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "SOUND") {
                     console.log("trying to play sound")
@@ -1041,7 +1056,7 @@
                 } else if (split_data[1] === "VICTORY_MESSAGE") {
                     displayVictoryMessage(split_data[2], split_data[3]);
                 } else if (split_data[1] === "SEARCH") {
-                    var full_string = `<details open=""><summary>` + split_data[3] + `</summary>`;
+                    var full_string = `<div id="choices-container"><div id="header-choices-container">` + split_data[3] + `</div>`;
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
                             var card_name = split_data[i];
@@ -1058,7 +1073,7 @@
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                     }
-                    full_string += `</details>`;
+                    full_string += `</div>`;
                     document.getElementById("search-collapse").innerHTML = full_string;
                 } else if (split_data[1] === "HAND") {
                     var target_id = 'current-hand-player-' + split_data[2];
