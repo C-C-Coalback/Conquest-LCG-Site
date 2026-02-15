@@ -2023,6 +2023,8 @@ class Game:
                     self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     await winner.send_victory_display()
+                    if self.round_number == 6:
+                        await self.send_victory_proper(winner.name_player, "capturing the last planet")
                 elif self.round_number != self.last_planet_checked_for_battle and not self.herald_of_the_waagh_active:
                     if winner.check_for_warlord(self.last_planet_checked_for_battle):
                         winner.retreat_warlord()
