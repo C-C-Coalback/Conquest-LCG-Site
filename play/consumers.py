@@ -323,10 +323,26 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                         del active_lobbies[8][i]
                         i += -1
                     i += 1
+                message = "Delete lobby"
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "chat.message", "message": message}
+                )
                 for i in range(len(active_lobbies[0])):
                     message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
                               + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
                               "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
+                    await self.channel_layer.group_send(
+                        self.room_group_name, {"type": "chat.message", "message": message}
+                    )
+                message = "Delete spec"
+                print("CURRENT SPEC")
+                print(spectator_games)
+                await self.channel_layer.group_send(
+                    self.room_group_name, {"type": "chat.message", "message": message}
+                )
+                for i in range(len(spectator_games)):
+                    message = "Create spec/" + spectator_games[i][0] + "/" + spectator_games[i][1] + "/" + \
+                              spectator_games[i][2]
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
