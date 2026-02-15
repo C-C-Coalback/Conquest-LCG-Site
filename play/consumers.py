@@ -592,6 +592,16 @@ class GameConsumer(AsyncWebsocketConsumer):
                         active_games[self.game_position].reset_choices_available()
                         active_games[self.game_position].resolving_search_box = False
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "swap-choice":
+                        await self.receive_game_update("Swapping Choices")
+                        if active_games[self.game_position].name_player_making_choices == active_games[self.game_position].name_1:
+                            active_games[self.game_position].name_player_making_choices = active_games[
+                                self.game_position].name_2
+                        elif active_games[self.game_position].name_player_making_choices == active_games[self.game_position].name_2:
+                            active_games[self.game_position].name_player_making_choices = active_games[
+                                self.game_position].name_1
+                        await active_games[self.game_position].send_search(force=True)
+                        await active_games[self.game_position].send_info_box()
                     elif message[1] == "cancel-attack":
                         if active_games[self.game_position].attacker_planet != -1:
                             if active_games[self.game_position].number_with_combat_turn == "1":
