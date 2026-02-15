@@ -466,7 +466,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         # await self.send(text_data=json.dumps({"message": message}))
             elif split_message[0] == "SEND DECK":
                 message_to_send = ""
-                split_message[1] = split_message[1].replace("\"Subject: &Omega;-X62113\"", "")
+                split_message[1] = split_message[1].replace("\"Subject: Ω-X62113\"", "Subject Omega-X62113")
                 split_message[1] = split_message[1].replace("idden Base", "'idden Base")
                 split_message[1] = split_message[1].replace("\"", "")
                 true_split_message = split_message[1].split(sep="\n")
