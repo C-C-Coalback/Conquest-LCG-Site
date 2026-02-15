@@ -5,9 +5,8 @@ h4 {
 .box {
     position: relative;
     height: auto;
-    width: 99vw;
+    width: 98vw;
     border: 5px solid blue;
-    overflow: scroll;
 }
 
 #full-game-box {
@@ -24,7 +23,7 @@ h4 {
     height: 98vh;
     position: relative;
     width: 81vw;
-    overflow: scroll;
+    overflow-x: scroll;
 }
 
 #helper-text-box {
@@ -49,8 +48,6 @@ h4 {
     "play20 play21 play22 play23 play24 play25 play26"
     "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
     "play10 play11 play12 play13 play14 play15 play16";
-    overflow-x: scroll;
-    overflow-y: scroll;
     justify-self: center;
     align-self: center;
 }
