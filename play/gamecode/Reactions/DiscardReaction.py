@@ -21,7 +21,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Saint Erika":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
-                if card.get_name() in primary_player.stored_cards_recently_discarded:
+                if card.get_name() in primary_player.cards_recently_discarded:
                     if card.get_faction() == "Astra Militarum" and card.get_card_type() == "Army":
                         if not card.check_for_a_trait("Elysia") and not card.check_for_a_trait("Saint"):
                             primary_player.cards.append(card.get_name())
@@ -115,8 +115,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                 if self.chosen_first_card:
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Attachment" and \
-                            (card.get_name() in primary_player.stored_cards_recently_discarded or
-                             card.get_name() in primary_player.cards_recently_discarded):
+                            (card.get_name() in primary_player.cards_recently_discarded):
                         if not card.planet_attachment:
                             planet_pos, unit_pos = self.misc_target_unit
                             self.card_to_deploy = card
@@ -152,8 +151,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Army" and card.check_for_a_trait("Harlequin") and \
-                            (card.get_name() in primary_player.stored_cards_recently_discarded or
-                             card.get_name() in primary_player.cards_recently_discarded):
+                            (card.get_name() in primary_player.cards_recently_discarded):
                         primary_player.cards.append(card.get_name())
                         primary_player.remove_card_from_discard(pos_discard)
                         self.misc_target_choice = card.get_name()

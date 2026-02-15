@@ -2159,8 +2159,8 @@ class Game:
                 self.choices_available = []
                 self.name_player_making_choices = self.first_player_nullified
                 self.choice_context = "Target Fall Back:"
-                for i in range(len(primary_player.stored_cards_recently_destroyed)):
-                    card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                for i in range(len(primary_player.cards_recently_destroyed)):
+                    card = FindCard.find_card(primary_player.cards_recently_destroyed[i],
                                               self.card_array, self.cards_dict,
                                               self.apoka_errata_cards, self.cards_that_have_errata
                                               )
@@ -5460,12 +5460,12 @@ class Game:
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.cards.append(target)
                         primary_player.discard.remove(target)
-                        primary_player.stored_cards_recently_discarded.remove(target)
+                        primary_player.cards_recently_discarded.remove(target)
                         primary_player.exhaust_card_in_hq_given_name("Holy Sepulchre")
                         self.choices_available = []
                         if self.holy_sepulchre_check(primary_player):
-                            for i in range(len(primary_player.stored_cards_recently_discarded)):
-                                card = FindCard.find_card(primary_player.stored_cards_recently_discarded[i],
+                            for i in range(len(primary_player.cards_recently_discarded)):
+                                card = FindCard.find_card(primary_player.cards_recently_discarded[i],
                                                           self.card_array, self.cards_dict,
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
@@ -5570,8 +5570,8 @@ class Game:
                         try:
                             primary_player.stored_targets_the_emperor_protects.remove(target)
                             primary_player.discard.remove(target)
-                            primary_player.stored_cards_recently_discarded.remove(target)
-                            primary_player.stored_cards_recently_destroyed.remove(target)
+                            primary_player.cards_recently_discarded.remove(target)
+                            primary_player.cards_recently_destroyed.remove(target)
                         except ValueError:
                             pass
                         self.choices_available = primary_player.stored_targets_the_emperor_protects
@@ -5593,27 +5593,20 @@ class Game:
                         primary_player.add_to_hq(card)
                         try:
                             primary_player.discard.remove(target)
-                            primary_player.stored_cards_recently_discarded.remove(target)
-                            primary_player.stored_cards_recently_destroyed.remove(target)
+                            primary_player.cards_recently_discarded.remove(target)
+                            primary_player.cards_recently_destroyed.remove(target)
                         except ValueError:
                             pass
                         primary_player.discard_card_name_from_hand("Fall Back!")
+                        if len(self.choices_available) > 1:
+                            if primary_player.search_hand_for_card("Fall Back!") and primary_player.resources > 0:
+                                self.create_reaction("Fall Back!", primary_player.name_player,
+                                                     (int(primary_player.number), -1, -1))
                         self.choices_available = []
-                        if self.fall_back_check(primary_player):
-                            for i in range(len(primary_player.stored_cards_recently_destroyed)):
-                                card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
-                                                          self.card_array, self.cards_dict,
-                                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                                if card.check_for_a_trait("Elite") and card.get_is_unit():
-                                    self.choices_available.append(card.get_name())
-                                    self.create_choices(
-                                        self.choices_available,
-                                        general_imaging_format="All"
-                                    )
                         if not self.choices_available:
                             self.resolving_search_box = False
                             self.reset_choices_available()
-                            self.delete_reaction()
+                        self.delete_reaction()
                     elif self.choice_context == "Choose target for Canoptek Scarab Swarm:":
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.cards.append(target)
@@ -5816,8 +5809,8 @@ class Game:
                             else:
                                 self.choices_available = []
                                 self.choice_context = "Target Fall Back:"
-                                for i in range(len(primary_player.stored_cards_recently_destroyed)):
-                                    card = FindCard.find_card(primary_player.stored_cards_recently_destroyed[i],
+                                for i in range(len(primary_player.cards_recently_destroyed)):
+                                    card = FindCard.find_card(primary_player.cards_recently_destroyed[i],
                                                               self.card_array, self.cards_dict,
                                                               self.apoka_errata_cards, self.cards_that_have_errata)
                                     if card.check_for_a_trait("Elite") and card.get_is_unit():
@@ -5833,8 +5826,8 @@ class Game:
                         if game_update_string[1] == "0":
                             self.choices_available = []
                             self.choice_context = "Target Holy Sepulchre:"
-                            for i in range(len(primary_player.stored_cards_recently_discarded)):
-                                card = FindCard.find_card(primary_player.stored_cards_recently_discarded[i],
+                            for i in range(len(primary_player.cards_recently_discarded)):
+                                card = FindCard.find_card(primary_player.cards_recently_discarded[i],
                                                           self.card_array, self.cards_dict,
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
@@ -6541,7 +6534,7 @@ class Game:
 
     def holy_sepulchre_check(self, player):
         if player.search_card_in_hq("Holy Sepulchre", ready_relevant=True):
-            for card_name in player.stored_cards_recently_discarded:
+            for card_name in player.cards_recently_discarded:
                 card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
                                           self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_faction() == "Space Marines" and card.get_is_unit():
@@ -6550,7 +6543,7 @@ class Game:
 
     def leviathan_hive_ship_check(self, player):
         if player.search_card_in_hq("Leviathan Hive Ship", ready_relevant=True):
-            for card_name in player.stored_cards_recently_destroyed:
+            for card_name in player.cards_recently_destroyed:
                 card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
                                           self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_is_unit():
@@ -6558,45 +6551,9 @@ class Game:
                         return True
         return False
 
-    def fall_back_check(self, player):
-        if player.search_hand_for_card("Fall Back!"):
-            for card_name in player.stored_cards_recently_discarded:
-                card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                if card.check_for_a_trait("Elite"):
-                    return True
-        return False
-
     async def complete_destruction_checks(self):
-        if not self.reactions_needing_resolving and not self.interrupts_waiting_on_resolution \
-                and not self.cards_in_search_box and not self.choices_available:
-            self.p1.stored_cards_recently_discarded = copy.deepcopy(self.p1.cards_recently_discarded)
-            self.p2.stored_cards_recently_discarded = copy.deepcopy(self.p2.cards_recently_discarded)
-            self.p1.stored_cards_recently_destroyed = copy.deepcopy(self.p1.cards_recently_destroyed)
-            self.p2.stored_cards_recently_destroyed = copy.deepcopy(self.p2.cards_recently_destroyed)
-        else:
-            self.p1.stored_cards_recently_discarded += copy.deepcopy(self.p1.cards_recently_discarded)
-            self.p2.stored_cards_recently_discarded += copy.deepcopy(self.p2.cards_recently_discarded)
-            self.p1.stored_cards_recently_destroyed += copy.deepcopy(self.p1.cards_recently_destroyed)
-            self.p2.stored_cards_recently_destroyed += copy.deepcopy(self.p2.cards_recently_destroyed)
         if self.reactions_on_destruction_permitted:
             self.reactions_on_destruction_permitted = False
-            if self.fall_back_check(self.p1):
-                already_fall_back = False
-                for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "Fall Back!":
-                        if self.player_who_resolves_reaction[i] == self.name_1:
-                            already_fall_back = True
-                if not already_fall_back:
-                    self.create_reaction("Fall Back!", self.name_1, (1, -1, -1))
-            if self.fall_back_check(self.p2):
-                already_fall_back = False
-                for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "Fall Back!":
-                        if self.player_who_resolves_reaction[i] == self.name_2:
-                            already_fall_back = True
-                if not already_fall_back:
-                    self.create_reaction("Fall Back!", self.name_2, (2, -1, -1))
             if self.holy_sepulchre_check(self.p1):
                 already_sepulchre = False
                 for i in range(len(self.reactions_needing_resolving)):
@@ -6657,10 +6614,6 @@ class Game:
             self.card_names_that_caused_damage = []
             self.on_kill_effects_of_attacker = []
             self.furiable_unit_position = (-1, -1)
-            self.p1.cards_recently_discarded = []
-            self.p2.cards_recently_discarded = []
-            self.p1.cards_recently_destroyed = []
-            self.p2.cards_recently_destroyed = []
             print("All units have been damaged. Move to destruction")
             for i in range(7):
                 await self.destroy_check_cards_at_planet(self.p1, i)
@@ -9878,6 +9831,7 @@ class Game:
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.debug_mode = None
                     elif self.debug_mode == "destroy":
+                        print("trying to destroy")
                         primary_player.destroy_card_in_play(planet_pos, unit_pos)
                         self.debug_mode = None
                     elif self.debug_mode == "clear-reticle":
@@ -10119,6 +10073,10 @@ class Game:
                 self.convert_delayed()
                 self.p1.highest_cost_invasion_site = 0
                 self.p2.highest_cost_invasion_site = 0
+                self.p1.cards_recently_destroyed = []
+                self.p1.cards_recently_discarded = []
+                self.p2.cards_recently_discarded = []
+                self.p2.cards_recently_destroyed = []
                 self.p1.stored_targets_the_emperor_protects = []
                 self.p2.stored_targets_the_emperor_protects = []
                 self.p1.valid_planets_berzerker_warriors = [False, False, False, False, False, False, False]

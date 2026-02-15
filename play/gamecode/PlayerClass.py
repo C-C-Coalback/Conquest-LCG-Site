@@ -109,10 +109,8 @@ class Player:
         self.total_indirect_damage = 0
         self.allowed_units_alaitoc_shrine = []
         self.cards_recently_discarded = []
-        self.stored_cards_recently_discarded = []
         self.stored_targets_the_emperor_protects = []
         self.cards_recently_destroyed = []
-        self.stored_cards_recently_destroyed = []
         self.num_nullify_played = 0
         self.warlord_just_got_destroyed = False
         self.lost_due_to_deck = False
@@ -6923,6 +6921,10 @@ class Player:
                         if not self.check_if_already_have_reaction("Wyrdboy Stikk"):
                             self.game.create_reaction("Wyrdboy Stikk", self.name_player,
                                                       (int(self.number), -1, -1))
+            if self.check_for_trait_given_pos(-2, card_pos, "Elite"):
+                if not self.check_if_already_have_reaction("Fall Back!"):
+                    if self.search_hand_for_card("Fall Back!"):
+                        self.game.create_reaction("Fall Back!", self.name_player, (int(self.number), -1, -1))
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
             self.game.queued_sound = "destroy"
@@ -7265,6 +7267,7 @@ class Player:
                     self.warlord_just_got_destroyed = True
         else:
             other_player = self.get_other_player()
+            print("destroying")
             if other_player.looted_skrap_active:
                 if planet_num == other_player.looted_skrap_planet:
                     if other_player.looted_skrap_count > 0:
@@ -7497,6 +7500,10 @@ class Player:
                             if self.get_ready_given_pos(-2, i):
                                 self.game.create_reaction("Secluded Apothecarion", self.name_player,
                                                           (int(self.number), -2, i))
+            if self.check_for_trait_given_pos(planet_num, card_pos, "Elite"):
+                if not self.check_if_already_have_reaction("Fall Back!"):
+                    if self.search_hand_for_card("Fall Back!"):
+                        self.game.create_reaction("Fall Back!", self.name_player, (int(self.number), -1, -1))
             self.cards_recently_destroyed.append(self.cards_in_play[planet_num + 1][card_pos].get_name())
             self.add_card_in_play_to_discard(planet_num, card_pos)
             self.game.queued_sound = "destroy"
@@ -7728,7 +7735,6 @@ class Player:
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
                 self.add_card_to_discard(card_name)
-                self.cards_recently_discarded.append(card_name)
             else:
                 dis_player = self.game.p1
                 if self.game.name_1 == self.name_player:
@@ -7741,7 +7747,6 @@ class Player:
                 if self.get_faction_given_pos(planet_num, card_pos) == "Astra Militarum":
                     if self.search_for_card_everywhere("Commissar Somiel"):
                         self.game.create_reaction("Commissar Somiel", self.name_player, (int(self.number), -1, -1))
-
         if card.get_has_hive_mind():
             for i in range(len(self.headquarters)):
                 if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
@@ -7821,7 +7826,6 @@ class Player:
         if card.get_card_type() != "Token":
             if card.name_owner == self.name_player:
                 self.add_card_to_discard(card_name)
-                self.cards_recently_discarded.append(card_name)
             else:
                 dis_player = self.game.p1
                 if self.game.name_1 == self.name_player:

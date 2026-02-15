@@ -2122,9 +2122,9 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.number_cards_to_search = 6
                 self.resolving_search_box = True
                 try:
-                    if current_reaction in primary_player.stored_cards_recently_discarded:
-                        primary_player.stored_cards_recently_discarded.remove("Krieg Armoured Regiment")
-                        primary_player.stored_cards_recently_destroyed.remove("Krieg Armoured Regiment")
+                    if current_reaction in primary_player.cards_recently_discarded:
+                        primary_player.cards_recently_discarded.remove("Krieg Armoured Regiment")
+                        primary_player.cards_recently_destroyed.remove("Krieg Armoured Regiment")
                 except ValueError:
                     pass
                 if len(primary_player.deck) > 5:
@@ -2840,13 +2840,37 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Fall Back!":
             if primary_player.resources < 1:
                 self.delete_reaction()
-            elif primary_player.urien_relevant and primary_player.resources < 2:
-                self.delete_reaction()
             else:
-                self.resolving_search_box = True
-                self.choices_available = ["Yes", "No"]
-                self.choice_context = "Use Fall Back?"
-                self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                if secondary_player.nullify_check() and self.nullify_enabled:
+                    await self.send_update_message(
+                        primary_player.name_player + " wants to play Fall Back; "
+                                                     "Nullify window offered.")
+                    self.choices_available = ["Yes", "No"]
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Use Nullify?"
+                    self.nullified_card_pos = -1
+                    self.nullified_card_name = "Fall Back"
+                    self.cost_card_nullified = 1
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction Event"
+                else:
+                    self.choices_available = []
+                    self.name_player_making_choices = primary_player.name_player
+                    self.choice_context = "Target Fall Back:"
+                    for i in range(len(primary_player.cards_recently_destroyed)):
+                        card = FindCard.find_card(primary_player.cards_recently_destroyed[i],
+                                                  self.card_array, self.cards_dict,
+                                                  self.apoka_errata_cards, self.cards_that_have_errata)
+                        if card.check_for_a_trait("Elite") and card.get_is_unit():
+                            self.choices_available.append(card.get_name())
+                            self.create_choices(
+                                self.choices_available,
+                                general_imaging_format="All"
+                            )
+                    if not self.choices_available:
+                        self.reset_choices_available()
+                        self.delete_reaction()
         elif current_reaction == "Third Eye of Trazyn":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             self.misc_target_planet = planet_pos
