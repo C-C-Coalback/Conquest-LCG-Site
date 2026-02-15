@@ -587,6 +587,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                         if active_games[self.game_position].choice_context == "Interrupt Enemy Movement Effect?":
                             active_games[self.game_position].reset_choices_available()
                         await active_games[self.game_position].send_info_box()
+                    elif message[1] == "force-quit-choices":
+                        await self.receive_game_update("FORCEFULLY QUITTING CHOICES")
+                        active_games[self.game_position].reset_choices_available()
+                        active_games[self.game_position].resolving_search_box = False
+                        await active_games[self.game_position].send_info_box()
                     elif message[1] == "cancel-attack":
                         if active_games[self.game_position].attacker_planet != -1:
                             if active_games[self.game_position].number_with_combat_turn == "1":
