@@ -163,29 +163,45 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.player_with_combat_turn = secondary_player.get_name_player()
             elif name == self.player_with_combat_turn:
                 if self.number_with_combat_turn == "1":
-                    self.number_with_combat_turn = "2"
-                    self.player_with_combat_turn = self.name_2
-                    self.p1.has_passed = True
-                    self.reset_combat_positions()
-                    for planet in range(7):
-                        for j in range(len(self.p1.cards_in_play[planet + 1])):
-                            self.p1.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                    can_continue = True
                     if self.mode == "Normal":
-                        await self.send_update_message(self.name_1 + " passes their combat turn.")
+                        if self.p1.search_ready_unit_at_planet(self.last_planet_checked_for_battle):
+                            if len(self.p2.cards_in_play[self.last_planet_checked_for_battle + 1]) == 0:
+                                can_continue = False
+                    if not can_continue:
+                        await self.send_update_message("You are forced to win the battle if you don't have a way to exhaust your units.")
                     else:
-                        await self.send_update_message(self.name_1 + " passes their retreat turn.")
+                        self.number_with_combat_turn = "2"
+                        self.player_with_combat_turn = self.name_2
+                        self.p1.has_passed = True
+                        self.reset_combat_positions()
+                        for planet in range(7):
+                            for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                self.p1.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                        if self.mode == "Normal":
+                            await self.send_update_message(self.name_1 + " passes their combat turn.")
+                        else:
+                            await self.send_update_message(self.name_1 + " passes their retreat turn.")
                 else:
-                    self.number_with_combat_turn = "1"
-                    self.player_with_combat_turn = self.name_1
-                    self.p2.has_passed = True
-                    self.reset_combat_positions()
-                    for planet in range(7):
-                        for j in range(len(self.p2.cards_in_play[planet + 1])):
-                            self.p2.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                    can_continue = True
                     if self.mode == "Normal":
-                        await self.send_update_message(self.name_2 + " passes their combat turn.")
+                        if self.p2.search_ready_unit_at_planet(self.last_planet_checked_for_battle):
+                            if len(self.p1.cards_in_play[self.last_planet_checked_for_battle + 1]) == 0:
+                                can_continue = False
+                    if not can_continue:
+                        await self.send_update_message("You are forced to win the battle if you don't have a way to exhaust your units.")
                     else:
-                        await self.send_update_message(self.name_2 + " passes their retreat turn.")
+                        self.number_with_combat_turn = "1"
+                        self.player_with_combat_turn = self.name_1
+                        self.p2.has_passed = True
+                        self.reset_combat_positions()
+                        for planet in range(7):
+                            for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                self.p2.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                        if self.mode == "Normal":
+                            await self.send_update_message(self.name_2 + " passes their combat turn.")
+                        else:
+                            await self.send_update_message(self.name_2 + " passes their retreat turn.")
                 if self.p1.has_passed and self.p2.has_passed:
                     if self.mode == "Normal":
                         if self.ranged_skirmish_active:
