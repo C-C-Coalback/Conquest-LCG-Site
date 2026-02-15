@@ -4043,6 +4043,8 @@ class Game:
                         if chosen_choice == "Duplicate":
                             if primary_player.spend_resources(1):
                                 self.cult_duplicity_available = False
+                                self.reset_choices_available()
+                                self.resolving_search_box = False
                                 if self.misc_target_choice == "Health":
                                     self.misc_target_choice = "Faith"
                                     self.misc_counter = 5
