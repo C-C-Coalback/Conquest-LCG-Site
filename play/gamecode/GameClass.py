@@ -6478,7 +6478,7 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
-        if planet != -1 and pos != -1:
+        if planet != -1 and pos != -1 and planet != -2:
             if primary_player.check_if_card_is_destroyed(planet, pos):
                 if self.on_kill_effects_of_attacker[i]:
                     for j in range(len(self.on_kill_effects_of_attacker[i])):
