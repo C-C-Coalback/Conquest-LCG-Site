@@ -745,6 +745,24 @@ class Game:
             self.last_deck_string_2 = card_two
             await self.send_update_message("GAME_INFO/DECK/2/" + card_two)
 
+    def create_choices(self, choices_array, general_imaging_format="No Images", custom_array=None):
+        self.choices_available = choices_array
+        self.resolving_search_box = True
+        if custom_array is not None:
+            if len(custom_array) == len(self.choices_available):
+                self.show_choices_as_images = custom_array
+        else:
+            if general_imaging_format == "No Images":
+                self.show_choices_as_images = ["N" for _ in range(len(choices_array))]
+            elif general_imaging_format == "All But Last":
+                self.show_choices_as_images = ["Y" for _ in range(len(choices_array))]
+                if self.choices_available:
+                    self.show_choices_as_images[-1] = "N"
+            elif general_imaging_format == "All":
+                self.show_choices_as_images = ["Y" for _ in range(len(choices_array))]
+            elif general_imaging_format == "All Planets":
+                self.show_choices_as_images = ["P" for _ in range(len(choices_array))]
+
     async def send_search(self, force=False):
         card_string = ""
         if self.rearranging_deck:
@@ -773,6 +791,7 @@ class Game:
             card_string = "GAME_INFO/CHOICE/" + self.name_player_making_choices + "/" \
                           + self.choice_context + "/" + card_string
         else:
+            self.show_choices_as_images = []
             card_string = "GAME_INFO/SEARCH//Nothing here"
         if card_string != self.last_search_string or force:
             self.last_search_string = card_string
@@ -1370,6 +1389,10 @@ class Game:
                                             self.choices_available = \
                                                 primary_player.deck[:primary_player.number_cards_to_search]
                                             if self.choices_available:
+                                                self.create_choices(
+                                                    self.choices_available,
+                                                    general_imaging_format="All"
+                                                )
                                                 self.choice_context = "The Orgiastic Feast Rally 1"
                                                 self.misc_target_choice = ""
                                                 self.name_player_making_choices = primary_player.name_player
@@ -1920,6 +1943,7 @@ class Game:
         self.choices_available = []
         self.name_player_making_choices = ""
         self.choice_context = ""
+        self.show_choices_as_images = []
 
     def reset_battle_resolve_attributes(self):
         self.need_to_resolve_battle_ability = False
@@ -2142,14 +2166,23 @@ class Game:
                                               )
                     if card.check_for_a_trait("Elite") and card.get_is_unit():
                         self.choices_available.append(card.get_name())
+                    self.create_choices(self.choices_available, general_imaging_format="All But Last")
             elif self.nullify_context == "The Emperor Protects":
                 self.name_player_making_choices = self.first_player_nullified
                 self.choice_context = "Target The Emperor Protects:"
                 self.choices_available = primary_player.stored_targets_the_emperor_protects
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
             elif self.nullify_context == "Made Ta Fight":
                 self.name_player_making_choices = self.first_player_nullified
                 self.choice_context = "Target Made Ta Fight:"
                 self.choices_available = primary_player.stored_targets_the_emperor_protects
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
             elif self.nullify_context == "Launch da Snots":
                 primary_player.spend_resources(1)
                 extra_attack = primary_player.count_copies_at_planet(self.attacker_planet,
@@ -2517,9 +2550,7 @@ class Game:
             else:
                 await self.complete_backlash(primary_player, secondary_player)
         elif game_update_string[1] == "1":
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
             self.backlash_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
@@ -2616,9 +2647,7 @@ class Game:
             elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
                 await self.resolve_battle_conclusion(secondary_player, game_string="")
         elif game_update_string[1] == "1":
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
             self.communications_relay_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
@@ -2662,9 +2691,7 @@ class Game:
             elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
                 await self.resolve_battle_conclusion(secondary_player, game_string="")
         elif game_update_string[1] == "1":
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
             self.communications_relay_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
@@ -2673,9 +2700,7 @@ class Game:
 
     async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
         if game_update_string[1] == "0":
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
             primary_player.exhaust_card_in_hq_given_name("Communications Relay")
             if self.nullify_context == "Event Action":
                 secondary_player.aiming_reticle_coords_hand = None
@@ -2705,9 +2730,7 @@ class Game:
             elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
                 await self.resolve_battle_conclusion(secondary_player, game_string="")
         elif game_update_string[1] == "1":
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
             self.communications_relay_enabled = False
             new_string_list = self.nullify_string.split(sep="/")
             print("String used:", new_string_list)
@@ -2886,9 +2909,14 @@ class Game:
                 await self.resolve_battle_conclusion(name, game_update_string)
             else:
                 self.choices_available = winner.deck[:num_cards]
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All But Last"
+                )
                 self.choices_available.append("Stop")
                 self.choice_context = "Heletine Move"
                 self.name_player_making_choices = winner.name_player
+                self.create_choices(self.choices_available)
                 self.resolving_search_box = True
                 await self.send_update_message("Please choose which cards to put on the bottom of your deck.")
         elif self.battle_ability_to_resolve == "Ice World Hydras IV":
@@ -2934,6 +2962,7 @@ class Game:
                 await self.send_update_message("Some sort of interrupt may be used.")
                 self.choices_available = interrupts
                 self.choices_available.insert(0, "No Interrupt")
+                self.create_choices(self.choices_available)
                 self.name_player_making_choices = loser.name_player
                 self.choice_context = "Interrupt Enemy Discard Effect?"
                 self.resolving_search_box = True
@@ -2953,6 +2982,7 @@ class Game:
             if self.last_planet_checked_for_battle == self.round_number:
                 self.choices_available.remove("Switch")
             self.choice_context = "Craftworld Lugath Choice"
+            self.create_choices(self.choices_available)
             self.name_player_making_choices = winner.name_player
             self.resolving_search_box = True
         elif self.battle_ability_to_resolve == "Ironforge":
@@ -2983,6 +3013,7 @@ class Game:
             self.choices_available = winner.deck[:winner.number_cards_to_search]
             if self.choices_available:
                 self.choice_context = "Zarvoss Foundry Rally"
+                self.create_choices(self.choices_available, general_imaging_format="All")
                 self.name_player_making_choices = winner.name_player
                 self.resolving_search_box = True
             else:
@@ -3031,6 +3062,7 @@ class Game:
             if not self.choices_available:
                 await self.resolve_battle_conclusion(name, game_update_string)
             else:
+                self.create_choices(self.choices_available)
                 self.choice_context = "Navida Prime Target"
                 self.name_player_making_choices = winner.name_player
         elif self.battle_ability_to_resolve == "The Frozen Heart":
@@ -3042,6 +3074,7 @@ class Game:
             if not self.choices_available:
                 await self.resolve_battle_conclusion(name, game_update_string)
             else:
+                self.create_choices(self.choices_available)
                 self.choice_context = "The Frozen Heart Target"
                 self.name_player_making_choices = winner.name_player
         elif self.battle_ability_to_resolve == "Anshan":
@@ -3115,9 +3148,7 @@ class Game:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.choice_context == "Shadowsun attachment from discard:":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         self.resolving_search_box = False
                     elif self.choice_context == "Prototype Crisis Suit choices":
                         self.delete_reaction()
@@ -3317,22 +3348,16 @@ class Game:
                                 await self.complete_nullify()
                                 self.nullify_count = 0
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             await self.complete_nullify()
                             self.nullify_count = 0
                     elif self.choice_context == "Use Nullify?":
                         if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.choosing_unit_for_nullify = True
                             self.name_player_using_nullify = primary_player.name_player
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             await self.complete_nullify()
                             self.nullify_count = 0
                     elif self.choice_context == "Quartermasters to HQ?":
@@ -3360,6 +3385,10 @@ class Game:
                                 primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
                                 del primary_player.deck[int(game_update_string[1])]
                                 self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                                self.create_choices(
+                                    self.choices_available,
+                                    general_imaging_format="All"
+                                )
                                 if not self.choices_available:
                                     self.reset_choices_available()
                                     self.resolving_search_box = False
@@ -3373,6 +3402,10 @@ class Game:
                                 del primary_player.deck[int(game_update_string[1])]
                                 primary_player.cards.append(card.get_name())
                                 self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                                self.create_choices(
+                                    self.choices_available,
+                                    general_imaging_format="All"
+                                )
                                 if not self.choices_available:
                                     self.reset_choices_available()
                                     self.resolving_search_box = False
@@ -3442,6 +3475,10 @@ class Game:
                     elif self.choice_context == "Raving Cryptek: Choose second card":
                         second_choice = self.choices_available[int(game_update_string[1])]
                         self.choices_available = [second_choice, self.misc_target_choice]
+                        self.create_choices(
+                            self.choices_available,
+                            general_imaging_format="All"
+                        )
                         await self.send_update_message(primary_player.name_player + " reveals " +
                                                        self.misc_target_choice + " and " + second_choice +
                                                        ". Please choose one to give +2 cost.")
@@ -3871,6 +3908,10 @@ class Game:
                             self.choices_available = []
                             for i in range(len(primary_player.cards)):
                                 self.choices_available.append(primary_player.cards[i])
+                            self.create_choices(
+                                self.choices_available,
+                                general_imaging_format="All"
+                            )
                             self.misc_counter = 0
                         elif chosen_choice == "Backlash":
                             self.choices_available = ["Yes", "No"]
@@ -4749,6 +4790,10 @@ class Game:
                                 if card.get_card_type() == "Attachment" and card.check_for_a_trait("Condition"):
                                     if card_name not in self.choices_available:
                                         self.choices_available.append(card_name)
+                                        self.create_choices(
+                                            self.choices_available,
+                                            general_imaging_format="All"
+                                        )
                             if not self.choices_available:
                                 self.choices_available = ["Deck", "Discard"]
                                 self.choice_context = "Sweep Attack: Search which area?"
@@ -4768,6 +4813,10 @@ class Game:
                                 if card.get_card_type() == "Attachment" and card.check_for_a_trait("Condition"):
                                     if card_name not in self.choices_available:
                                         self.choices_available.append(card_name)
+                                        self.create_choices(
+                                            self.choices_available,
+                                            general_imaging_format="All"
+                                        )
                             if not self.choices_available:
                                 self.choices_available = ["Deck", "Discard"]
                                 self.choice_context = "Parasite of Mortrex: Search which area?"
@@ -4804,6 +4853,10 @@ class Game:
                         primary_player.discard_card_from_hand(int(game_update_string[1]))
                         self.misc_counter += 1
                         self.choices_available = primary_player.cards
+                        self.create_choices(
+                            self.choices_available,
+                            general_imaging_format="All"
+                        )
                         if self.misc_counter > 1:
                             if "Searing Brand" in secondary_player.cards:
                                 secondary_player.discard_card_name_from_hand("Searing Brand")
@@ -4814,12 +4867,15 @@ class Game:
                     elif self.choice_context == "Searing Brand":
                         if game_update_string[1] == "0":
                             self.choices_available = primary_player.cards
+                            self.create_choices(
+                                self.choices_available,
+                                general_imaging_format="All"
+                            )
                             self.misc_counter = 0
                             self.choice_context = "Choose card to discard for Searing Brand"
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
+
                             self.searing_brand_cancel_enabled = False
                             new_string_list = self.nullify_string.split(sep="/")
                             print("String used:", new_string_list)
@@ -5010,9 +5066,7 @@ class Game:
                             await self.send_update_message(
                                 self.name_player_making_choices + " may mulligan their hand.")
                         if primary_player.mulligan_done and secondary_player.mulligan_done:
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
                             await self.send_update_message(
                                 "Both players setup, good luck and have fun!")
@@ -5037,9 +5091,7 @@ class Game:
                                 secondary_player.warlord_faction == "Necrons":
                             await self.create_necrons_wheel_choice(secondary_player)
                         else:
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                     elif self.choice_context == "Blood Axe Strategist Destination":
                         self.reset_choices_available()
                         self.resolving_search_box = False
@@ -5048,9 +5100,7 @@ class Game:
                             primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
                             self.delete_reaction()
                     elif self.choice_context == "Use Reanimating Warriors?":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         if game_update_string[1] == "0":
                             self.chosen_first_card = False
                             self.asked_if_resolve_effect = True
@@ -5110,9 +5160,7 @@ class Game:
                         primary_player.force_due_to_dark_possession = True
                         primary_player.cards.append(self.choices_available[int(game_update_string[1])])
                         primary_player.pos_card_dark_possession = len(primary_player.cards) - 1
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         await self.update_game_event_action(name, game_update_string)
                     elif self.choice_context == "Kabalite Blackguard Amount":
                         if game_update_string[1] == "0":
@@ -5144,9 +5192,7 @@ class Game:
                             self.canceled_card_bonuses[self.misc_target_planet] = True
                         elif game_update_string[1] == "1":
                             self.canceled_resource_bonuses[self.misc_target_planet] = True
-                        self.choice_context = ""
-                        self.choices_available = []
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
@@ -5177,6 +5223,10 @@ class Game:
                                     self.misc_counter += 1
                                     if self.misc_counter == 1:
                                         self.choices_available = primary_player.deck[:8]
+                                        self.create_choices(
+                                            self.choices_available,
+                                            general_imaging_format="All"
+                                        )
                                     else:
                                         self.delete_reaction()
                                         self.reset_choices_available()
@@ -5194,14 +5244,10 @@ class Game:
                                 await self.send_update_message(
                                     "No Valid Targets for Dark Possession!"
                                 )
-                                self.choices_available = []
-                                self.choice_context = ""
-                                self.name_player_making_choices = ""
+                                self.reset_choices_available()
                                 primary_player.dark_possession_active = False
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             primary_player.dark_possession_active = False
                     elif self.choice_context == "Wisdom of the Serpent trait":
                         target_choice = self.choices_available[int(game_update_string[1])]
@@ -5327,15 +5373,11 @@ class Game:
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "No Mercy"
                             else:
-                                self.choices_available = []
-                                self.choice_context = ""
-                                self.name_player_making_choices = ""
+                                self.reset_choices_available()
                                 self.create_interrupt("No Mercy", name, (-1, -1, -1))
                                 self.already_resolving_interrupt = True
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             await self.better_shield_card_resolution(
                                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                                 can_no_mercy=False)
@@ -5428,6 +5470,10 @@ class Game:
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
+                                    self.create_choices(
+                                        self.choices_available,
+                                        general_imaging_format="All"
+                                    )
                         if not self.choices_available:
                             self.choice_context = ""
                             self.name_player_making_choices = ""
@@ -5489,16 +5535,13 @@ class Game:
                             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                         self.position_of_actioned_card[1])
                             self.action_cleanup()
-                        self.name_player_making_choices = ""
-                        self.choices_available = []
-                        self.choice_context = ""
+                        self.reset_choices_available()
+
                     elif self.choice_context == "Repair Bay":
                         card_name = self.choices_available[int(game_update_string[1])]
                         primary_player.deck.insert(0, card_name)
                         primary_player.discard.remove(card_name)
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                     elif self.choice_context == "Target Made Ta Fight:":
                         target = self.choices_available[int(game_update_string[1])]
                         card = FindCard.find_card(target, self.card_array, self.cards_dict,
@@ -5532,6 +5575,10 @@ class Game:
                         except ValueError:
                             pass
                         self.choices_available = primary_player.stored_targets_the_emperor_protects
+                        self.create_choices(
+                            self.choices_available,
+                            general_imaging_format="All"
+                        )
                         self.emp_protecc()
                         self.resolving_search_box = False
                         self.reset_choices_available()
@@ -5559,6 +5606,10 @@ class Game:
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
                                 if card.check_for_a_trait("Elite") and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
+                                    self.create_choices(
+                                        self.choices_available,
+                                        general_imaging_format="All"
+                                    )
                         if not self.choices_available:
                             self.resolving_search_box = False
                             self.reset_choices_available()
@@ -5567,15 +5618,11 @@ class Game:
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.cards.append(target)
                         primary_player.discard.remove(target)
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         self.delete_reaction()
                         self.resolving_search_box = False
                     elif self.choice_context == "Autarch Celachia":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         self.action_chosen = ""
                         self.player_with_action = ""
                         self.mode = "Normal"
@@ -5600,13 +5647,9 @@ class Game:
                     elif self.choice_context == "Keyword copied from Brood Chamber" or \
                             self.choice_context == "Evolutionary Adaptation":
                         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                     elif self.choice_context == "Move how much damage to Old One Eye?":
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         hurt_planet = self.misc_target_planet
                         hurt_pos = self.misc_target_unit
                         old_one_planet, old_one_pos = self.old_one_eye_pos
@@ -5666,9 +5709,7 @@ class Game:
                             self.delete_reaction()
                     elif self.choice_context == "Heavy Venom Cannon":
                         planet, unit, att = self.misc_target_attachment
-                        self.choice_context = ""
-                        self.choices_available = []
-                        self.name_player_making_choices = ""
+                        self.reset_choices_available()
                         target_player = primary_player
                         if self.misc_target_player == secondary_player.name_player:
                             target_player = secondary_player
@@ -5722,11 +5763,13 @@ class Game:
                                 self.nullify_context = "Made Ta Fight"
                             else:
                                 self.choices_available = primary_player.stored_targets_the_emperor_protects
+                                self.create_choices(
+                                    self.choices_available,
+                                    general_imaging_format="All"
+                                )
                                 self.choice_context = "Target Made Ta Fight:"
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
                             self.delete_reaction()
                     elif self.choice_context == "Use The Emperor Protects?":
@@ -5746,12 +5789,14 @@ class Game:
                                 self.nullify_context = "The Emperor Protects"
                             else:
                                 self.choices_available = primary_player.stored_targets_the_emperor_protects
+                                self.create_choices(
+                                    self.choices_available,
+                                    general_imaging_format="All"
+                                )
                                 self.choice_context = "Target The Emperor Protects:"
                         elif game_update_string[1] == "1":
                             primary_player.stored_targets_the_emperor_protects = []
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
                     elif self.choice_context == "Use Fall Back?":
                         if game_update_string[1] == "0":
@@ -5777,10 +5822,12 @@ class Game:
                                                               self.apoka_errata_cards, self.cards_that_have_errata)
                                     if card.check_for_a_trait("Elite") and card.get_is_unit():
                                         self.choices_available.append(card.get_name())
+                                        self.create_choices(
+                                            self.choices_available,
+                                            general_imaging_format="All"
+                                        )
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
                     elif self.choice_context == "Use Holy Sepulchre?":
                         if game_update_string[1] == "0":
@@ -5792,15 +5839,15 @@ class Game:
                                                           self.apoka_errata_cards, self.cards_that_have_errata)
                                 if card.get_faction() == "Space Marines" and card.get_is_unit():
                                     self.choices_available.append(card.get_name())
+                                    self.create_choices(
+                                        self.choices_available,
+                                        general_imaging_format="All"
+                                    )
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.resolving_search_box = False
                     elif self.choice_context == "Use an extra source of damage?":
                         if self.choices_available[int(game_update_string[1])] == "The Fury of Sicarius":
@@ -5811,19 +5858,13 @@ class Game:
                             self.choices_available = ["Yes", "No"]
                         else:
                             self.auto_card_destruction = True
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                     elif self.choice_context == "Use Crushing Blow?":
                         planet_pos, unit_pos = self.furiable_unit_position
                         if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.auto_card_destruction = True
                     elif self.choice_context == "Brutal Cunning: amount of damage":
                         if game_update_string[1] == "0":
@@ -5834,13 +5875,9 @@ class Game:
                     elif self.choice_context == "Use The Fury of Sicarius?":
                         planet_pos, unit_pos = self.furiable_unit_position
                         if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             self.auto_card_destruction = True
                     elif self.choice_context == "Use Liatha?":
                         if game_update_string[1] == "0":
@@ -5891,14 +5928,10 @@ class Game:
                                     secondary_player.name_player, self.last_shield_string, alt_shields=False)
                     elif self.choice_context == "Use alternative shield effect?":
                         if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             await self.better_shield_card_resolution(name, self.last_shield_string, alt_shields=False)
                         elif game_update_string[1] == "1":
-                            self.choices_available = []
-                            self.choice_context = ""
-                            self.name_player_making_choices = ""
+                            self.reset_choices_available()
                             if primary_player.cards[self.pos_shield_card] == "Indomitable":
                                 if secondary_player.nullify_check():
                                     await self.send_update_message(
@@ -6178,6 +6211,10 @@ class Game:
         elif effect == "Visions of Agony":
             if not self.discard_fully_prevented:
                 self.choices_available = secondary_player.cards
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.choice_context = "Visions of Agony Discard:"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
@@ -7289,7 +7326,7 @@ class Game:
                                             if self.maksim_squadron_enabled and not primary_player.hit_by_gorgul:
                                                 self.last_shield_string = game_update_string
                                                 self.choice_context = "Use Maksim's Squadron?"
-                                                self.choices_available = ["Yes", "No"]
+                                                self.create_choices(["Yes", "No"])
                                                 self.name_player_making_choices = primary_player.name_player
                                                 can_continue = False
                                 if can_continue:
@@ -7539,6 +7576,7 @@ class Game:
                                             i = i - 1
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
+                                    self.create_choices(self.choices_available)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Ghosts of Cegorach":
                             if primary_player.get_ready_given_pos(-2, hq_pos):
                                 if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Harlequin"):
@@ -7792,6 +7830,7 @@ class Game:
                                             i = i - 1
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
+                                    self.create_choices(self.choices_available)
                         elif primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Old One Eye":
                             if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
                                 if self.damage_moved_to_old_one_eye == 0:

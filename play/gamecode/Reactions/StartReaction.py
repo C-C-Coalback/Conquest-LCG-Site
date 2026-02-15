@@ -210,6 +210,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(self.eldritch_council_value):
                 if len(primary_player.deck) > i:
                     self.choices_available.append(primary_player.deck[i])
+            self.create_choices(
+                self.choices_available,
+                general_imaging_format="All But Last"
+            )
             self.choice_context = "Eldritch Council: Choose Card"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
@@ -398,9 +402,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             self.chosen_first_card = False
             self.misc_target_unit = (-1, -1)
-            self.choices_available = []
-            self.choice_context = ""
-            self.name_player_making_choices = ""
+            self.reset_choices_available()
         elif current_reaction == "Repulsor Impact Field" or current_reaction == "Solarite Avetys":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
             if num == 1:
@@ -432,6 +434,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choice_context = "Discard card (CotS)"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
             else:
                 await self.send_update_message("Not enough cards in deck for Court of the Stormlord")
                 self.delete_reaction()
@@ -505,6 +511,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.action_chosen = "Visions of Agony"
                 self.player_with_action = primary_player.name_player
                 self.choices_available = secondary_player.cards
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.choice_context = "Visions of Agony Discard:"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
@@ -1042,6 +1052,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                         if not card.check_for_a_trait("Elite"):
                             self.choices_available.append(card.get_name())
             if self.choices_available:
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.choice_context = "Target Doom Scythe Invader:"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
@@ -1176,6 +1190,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                     if card_name not in self.choices_available:
                         self.choices_available.append(card_name)
             if self.choices_available:
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.choice_context = "Bork'an Sept Rally"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
@@ -1644,6 +1662,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
             else:
                 self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.choice_context = "Support Fleet Rally"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
@@ -1719,6 +1741,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             else:
                 await self.send_update_message("Multiple possible hardpoints; please indicate which.")
                 self.choices_available = name_targets
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.choice_context = "War Walker Attach Exhaust"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
@@ -2040,6 +2066,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             if 3 > len(primary_player.deck):
                 primary_player.number_cards_to_search = len(primary_player.deck)
             self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+            self.create_choices(
+                self.choices_available,
+                general_imaging_format="All"
+            )
             self.choice_context = "Scheming Warlock Rally"
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
@@ -2099,8 +2129,16 @@ async def start_resolving_reaction(self, name, game_update_string):
                     pass
                 if len(primary_player.deck) > 5:
                     self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                    self.create_choices(
+                        self.choices_available,
+                        general_imaging_format="All"
+                    )
                 else:
                     self.choices_available = primary_player.deck[:len(primary_player.deck)]
+                    self.create_choices(
+                        self.choices_available,
+                        general_imaging_format="All"
+                    )
                 self.choice_context = "Krieg Armoured Regiment result:"
                 self.name_player_making_choices = primary_player.name_player
             else:
@@ -2521,6 +2559,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Prophetic Farseer":
             if len(secondary_player.deck) > 2:
                 self.choices_available = secondary_player.deck[:3]
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.name_player_making_choices = primary_player.name_player
                 self.choice_context = "Prophetic Farseer Discard"
                 self.resolving_search_box = True
@@ -2769,6 +2811,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                             allowed_cards.append(card.get_name())
             if allowed_cards:
                 self.choices_available = allowed_cards
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.name_player_making_choices = primary_player.name_player
                 self.choice_context = "Choose target for Canoptek Scarab Swarm:"
                 self.resolving_search_box = True
@@ -2847,6 +2893,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.nullify_context = "The Emperor Protects"
             else:
                 self.choices_available = primary_player.stored_targets_the_emperor_protects
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.choice_context = "Target The Emperor Protects:"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
@@ -3306,6 +3356,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
             else:
                 self.choices_available = [primary_player.deck[0], "Do Nothing"]
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All But Last"
+                )
                 self.choice_context = "Munos Topdeck"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True

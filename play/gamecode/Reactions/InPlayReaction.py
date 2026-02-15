@@ -1371,6 +1371,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.choice_context = "Morkanaut Rekuperator Rally"
                         self.name_player_making_choices = primary_player.name_player
                         self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+                        self.create_choices(
+                            self.choices_available,
+                            general_imaging_format="All"
+                        )
                 else:
                     self.delete_reaction()
         elif current_reaction == "Runts to the Front":

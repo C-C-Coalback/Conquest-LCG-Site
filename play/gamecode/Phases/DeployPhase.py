@@ -226,6 +226,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     self.choices_available = []
                                     for i in range(len(attachments)):
                                         self.choices_available.append(attachments[i].get_name())
+                                    self.create_choices(
+                                        self.choices_available,
+                                        general_imaging_format="All"
+                                    )
                                     self.choice_context = "Munitorum Support Take"
                                     self.name_player_making_choices = player.name_player
                                     self.position_of_actioned_card = (-2, int(game_update_string[2]))
@@ -292,6 +296,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     await self.send_update_message("Not enough units to satisfy Raving Cryptek.")
                                     self.choices_available = []
                                 else:
+                                    self.create_choices(
+                                        self.choices_available,
+                                        general_imaging_format="All"
+                                    )
                                     self.choice_context = "Raving Cryptek: Choose first card"
                                     self.name_player_making_choices = player.name_player
                                     self.resolving_search_box = True

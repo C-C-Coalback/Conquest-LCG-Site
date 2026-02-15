@@ -242,6 +242,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     if not card.check_for_a_trait("Vehicle", primary_player.etekh_trait):
                                         self.choices_available.append(card.get_name())
                             if self.choices_available:
+                                self.create_choices(
+                                    self.choices_available,
+                                    general_imaging_format="All"
+                                )
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.choice_context = "Target Dread Monolith:"
                                 self.name_player_making_choices = primary_player.name_player
@@ -1880,6 +1884,10 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.choices_available.remove(name_synapse)
                 except ValueError:
                     pass
+                self.create_choices(
+                    self.choices_available,
+                    general_imaging_format="All"
+                )
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
     elif self.action_chosen == "Replicating Scarabs":

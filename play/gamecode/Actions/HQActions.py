@@ -99,6 +99,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                 self.choices_available = []
                                 for i in range(len(card.attachments)):
                                     self.choices_available.append(card.attachments[i].get_name())
+                                self.create_choices(
+                                    self.choices_available,
+                                    general_imaging_format="All"
+                                )
                                 self.choice_context = "Munitorum Support Take"
                                 self.name_player_making_choices = primary_player.name_player
                                 self.position_of_actioned_card = (planet_pos, unit_pos)

@@ -90,8 +90,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.number_cards_to_search = 12
                         if primary_player.number_cards_to_search > len(primary_player.deck):
                             primary_player.number_cards_to_search = len(primary_player.deck)
-                        self.choices_available = \
-                            primary_player.deck[:primary_player.number_cards_to_search]
+                        self.create_choices(
+                            primary_player.deck[:primary_player.number_cards_to_search],
+                            general_imaging_format="All"
+                        )
                         if self.choices_available:
                             self.choice_context = "Putrescent Corpulence 1"
                             self.misc_target_choice = ""
@@ -103,8 +105,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.number_cards_to_search = 12
                         if primary_player.number_cards_to_search > len(primary_player.deck):
                             primary_player.number_cards_to_search = len(primary_player.deck)
-                        self.choices_available = \
-                            primary_player.deck[:primary_player.number_cards_to_search]
+                        self.create_choices(
+                            primary_player.deck[:primary_player.number_cards_to_search],
+                            general_imaging_format="All"
+                        )
                         if self.choices_available:
                             self.choice_context = "The Orgiastic Feast Rally 1"
                             self.misc_target_choice = ""
@@ -174,6 +178,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
                         else:
+                            self.create_choices(
+                                self.choices_available,
+                                general_imaging_format="All"
+                            )
                             self.choice_context = "Access to the Black Library"
                             self.name_player_making_choices = primary_player.name_player
                             self.chosen_first_card = False
@@ -1058,7 +1066,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Reinforced Synaptic Network":
                         primary_player.discard_card_from_hand(hand_pos)
                         primary_player.reinforced_synaptic_network_played = True
-                        self.choices_available = copy.copy(primary_player.allowed_units_rsn)
+                        self.create_choices(
+                            copy.copy(primary_player.allowed_units_rsn),
+                            general_imaging_format="All"
+                        )
                         self.choice_context = "Select new synapse (RSN):"
                         self.name_player_making_choices = primary_player.name_player
                         self.resolving_search_box = True
@@ -1079,7 +1090,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             else:
                                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                                 primary_player.aiming_reticle_coords_hand = None
-                                self.choices_available = secondary_player.cards
+                                self.create_choices(
+                                    secondary_player.cards,
+                                    general_imaging_format="All"
+                                )
                                 self.choice_context = "Visions of Agony Discard:"
                                 self.name_player_making_choices = primary_player.name_player
                                 self.resolving_search_box = True
