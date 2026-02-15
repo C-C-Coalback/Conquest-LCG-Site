@@ -4901,7 +4901,6 @@ class Game:
                         for i in range(len(target_player.cards)):
                             if len(self.choices_available) < 4:
                                 self.choices_available.append(str(i + 1))
-                                "Drivin' Ambishin"
                         self.choice_context = "How Many Cards? (Slake the Thirst):"
                     elif self.choice_context == "Overrun: Followup Rout?":
                         self.reset_choices_available()
