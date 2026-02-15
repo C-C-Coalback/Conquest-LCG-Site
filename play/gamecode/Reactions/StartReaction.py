@@ -2606,10 +2606,18 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Shrine of Warpflame":
-            self.resolving_search_box = True
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Shrine of Warpflame?"
-            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+            last_card_position = -1
+            primary_player.exhaust_card_in_hq_given_name("Shrine of Warpflame")
+            for i in range(len(primary_player.discard)):
+                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
+                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                if card.check_for_a_trait("Tzeentch", primary_player.etekh_trait):
+                    last_card_position = i
+            if last_card_position == -1:
+                await self.send_update_message("No valid targets for Shrine of Warpflame")
+            else:
+                primary_player.cards.append(primary_player.discard[last_card_position])
+                del primary_player.discard[last_card_position]
             self.delete_reaction()
         elif current_reaction == "Acquisition Phalanx":
             num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]

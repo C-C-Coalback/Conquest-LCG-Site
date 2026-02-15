@@ -5549,15 +5549,6 @@ class Game:
                             self.resolving_search_box = False
                             self.reset_choices_available()
                             self.delete_reaction()
-                    elif self.choice_context == "Target Shrine of Warpflame:":
-                        target = self.choices_available[int(game_update_string[1])]
-                        primary_player.cards.append(target)
-                        primary_player.discard.remove(target)
-                        primary_player.exhaust_card_in_hq_given_name("Shrine of Warpflame")
-                        self.choices_available = []
-                        self.choice_context = ""
-                        self.name_player_making_choices = ""
-                        self.resolving_search_box = False
                     elif self.choice_context == "Choose target for Canoptek Scarab Swarm:":
                         target = self.choices_available[int(game_update_string[1])]
                         primary_player.cards.append(target)
@@ -5630,25 +5621,6 @@ class Game:
                         if self.amount_that_can_be_removed_by_shield[0] < 1:
                             primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                             await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                    elif self.choice_context == "Use Shrine of Warpflame?":
-                        if game_update_string[1] == "0":
-                            self.choices_available = []
-                            self.choice_context = "Target Shrine of Warpflame:"
-                            print("\n---IN DISCARD---\n")
-                            await self.send_update_message("Shrine of Warpflame triggered")
-                            print(primary_player.discard)
-                            for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                                if card.check_for_a_trait("Tzeentch", primary_player.etekh_trait):
-                                    self.choices_available.append(card.get_name())
-                            if not self.choices_available:
-                                await self.send_update_message(
-                                    "No valid targets for Shrine of Warpflame")
-                                self.resolving_search_box = False
-                        elif game_update_string[1] == "1":
-                            self.reset_choices_available()
-                            self.resolving_search_box = False
                     elif self.choice_context == "Dark Allegiance Rally":
                         card = self.preloaded_find_card(chosen_choice)
                         if card.get_card_type() == "Attachment" or card.get_card_type() == "Army":
@@ -6590,24 +6562,6 @@ class Game:
                             already_sepulchre = True
                 if not already_sepulchre:
                     self.create_reaction("Holy Sepulchre", self.name_2, (2, -1, -1))
-            if self.p2.stored_cards_recently_destroyed:
-                if self.p1.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
-                    already_warp_flame = False
-                    for i in range(len(self.reactions_needing_resolving)):
-                        if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
-                            if self.player_who_resolves_reaction[i] == self.name_1:
-                                already_warp_flame = True
-                    if not already_warp_flame:
-                        self.create_reaction("Shrine of Warpflame", self.name_1, (1, -1, -1))
-            if self.p1.stored_cards_recently_destroyed:
-                if self.p2.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
-                    already_warp_flame = False
-                    for i in range(len(self.reactions_needing_resolving)):
-                        if self.reactions_needing_resolving[i] == "Shrine of Warpflame":
-                            if self.player_who_resolves_reaction[i] == self.name_2:
-                                already_warp_flame = True
-                    if not already_warp_flame:
-                        self.create_reaction("Shrine of Warpflame", self.name_2, (2, -1, -1))
             self.emp_protecc()
             self.made_ta_fight()
         if self.p1.warlord_just_got_destroyed and not self.p2.warlord_just_got_destroyed:

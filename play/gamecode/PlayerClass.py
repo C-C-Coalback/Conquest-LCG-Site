@@ -6854,6 +6854,10 @@ class Player:
                                           (int(self.number), -1, -1))
             if self.get_ability_given_pos(-2, card_pos) == "Mucolid Spores":
                 self.game.create_interrupt("Mucolid Spores", self.name_player, (int(self.number), -1, -1))
+            if other_player.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
+                if not other_player.check_if_already_have_reaction("Shrine of Warpflame"):
+                    self.game.create_reaction("Shrine of Warpflame", other_player.name_player,
+                                              (int(other_player.number), -1, -1))
             if self.get_faction_given_pos(-2, card_pos) == "Space Marines" \
                     and self.check_is_unit_at_pos(-2, card_pos):
                 already_apoth = False
@@ -7377,6 +7381,10 @@ class Player:
                     self.game.create_reaction("Cato's Stronghold", other_player.name_player,
                                               (int(other_player.number), -1, -1))
                 other_player.allowed_planets_cato_stronghold.append(planet_num)
+            if other_player.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
+                if not other_player.check_if_already_have_reaction("Shrine of Warpflame"):
+                    self.game.create_reaction("Shrine of Warpflame", other_player.name_player,
+                                              (int(other_player.number), -1, -1))
             if self.cards_in_play[planet_num + 1][card_pos].get_has_deepstrike():
                 if self.search_card_in_hq("Klan Totem", ready_relevant=True):
                     if not self.check_if_already_have_reaction("Klan Totem"):
