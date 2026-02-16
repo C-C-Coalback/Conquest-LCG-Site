@@ -3,23 +3,23 @@ from ..Phases import DeployPhase
 
 
 async def resolve_hand_reaction(self, name, game_update_string, primary_player, secondary_player):
-    current_reaction = self.reactions_needing_resolving[0]
+    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
     hand_pos = int(game_update_string[2])
     if game_update_string[1] == primary_player.get_number():
         print("hand reaction num ok")
-        if self.reactions_needing_resolving[0] == "Wailing Wraithfighter":
+        if current_reaction == "Wailing Wraithfighter":
             hand_pos = int(game_update_string[2])
             primary_player.discard_card_from_hand(hand_pos)
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if primary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", primary_player.name_player,
                                      (int(secondary_player.number), planet_pos, unit_pos))
             self.delete_reaction()
-        elif self.reactions_needing_resolving[0] == "Banshee Power Sword":
+        elif current_reaction == "Banshee Power Sword":
             hand_pos = int(game_update_string[2])
             primary_player.discard_card_from_hand(hand_pos)
             self.banshee_power_sword_extra_attack += 1
-        elif self.reactions_needing_resolving[0] == "Commander Shadowsun hand":
+        elif current_reaction == "Commander Shadowsun hand":
             if self.location_hand_attachment_shadowsun == -1:
                 hand_pos = int(game_update_string[2])
                 card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array,
@@ -80,7 +80,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "The Dance Without End":
-            chosen_planet = self.positions_of_unit_triggering_reaction[0][1]
+            chosen_planet = self.reactions_needing_resolving[0].get_planet_pos()
             if self.chosen_first_card:
                 card = primary_player.get_card_in_hand(hand_pos)
                 if card.get_name() != self.misc_target_choice and card.get_card_type() == "Army" and \
@@ -102,7 +102,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     else:
                         await DeployPhase.deploy_card_routine(self, name, chosen_planet,
                                                               discounts=self.discounts_applied)
-        elif self.reactions_needing_resolving[0] == "Inquisitor Caius Wroth":
+        elif current_reaction == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
         elif current_reaction == "Cegorach's Jesters":
             if hand_pos not in self.misc_misc:
@@ -111,7 +111,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                 self.misc_misc.remove(hand_pos)
             await self.send_update_message("Currently revealing " + str(len(self.misc_misc)) + " cards.")
         elif current_reaction == "Elusive Escort":
-            _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if planet_pos == -2:
                 primary_player.headquarters[unit_pos].misc_string = primary_player.cards[hand_pos]
             else:
@@ -144,7 +144,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
         elif current_reaction == "Shard of the Deceiver":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             if not primary_player.cards:
-                num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
             self.delete_reaction()
         elif current_reaction == "Avatar of Khaine":
@@ -157,11 +157,11 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     primary_player.aiming_reticle_color = "blue"
                     self.chosen_first_card = True
-        elif self.reactions_needing_resolving[0] == "Blood Claw Pack":
+        elif current_reaction == "Blood Claw Pack":
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card.check_for_a_trait("Space Wolves", primary_player.etekh_trait):
                 if card.get_is_unit():
-                    num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                    num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     primary_player.add_card_to_planet(card, planet_pos)
                     primary_player.remove_card_from_hand(int(game_update_string[2]))
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)

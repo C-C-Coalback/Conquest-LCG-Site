@@ -5,7 +5,7 @@ from ..Phases import DeployPhase
 async def resolve_hq_reaction(self, name, game_update_string, primary_player, secondary_player):
     planet_pos = -2
     unit_pos = int(game_update_string[2])
-    current_reaction = self.reactions_needing_resolving[0]
+    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
     player_owning_card = self.p1
     if game_update_string[1] == "2":
         player_owning_card = self.p2
@@ -230,7 +230,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
     elif current_reaction == "Vengeful Seraphim":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 primary_player.ready_given_pos(pla, pos)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
@@ -241,7 +241,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 await self.send_update_message("Select card in discard to bring back.")
     elif current_reaction == "Hydra Flak Tank":
         if player_owning_card.headquarters[unit_pos].valid_defense_battery_target:
-            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             primary_player.set_once_per_phase_used_given_pos(og_pla, og_pos, True)
             damage = 1
             if player_owning_card.get_flying_given_pos(planet_pos, unit_pos):
@@ -334,7 +334,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     not_own_attachment = True
                 if player_owning_card.attach_card(card, planet_pos, unit_pos,
                                                   not_own_attachment=not_own_attachment):
-                    _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                    _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     primary_player.discard.remove(card_name)
                     self.delete_reaction()
     elif current_reaction == "Cult of Khorne Attachment":
@@ -346,18 +346,18 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if player_owning_card.get_number() != primary_player.get_number():
             not_own_attachment = True
         if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
-            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             del primary_player.headquarters[og_pos]
             primary_player.adjust_own_reactions(og_pla, og_pos)
             self.delete_reaction()
     elif current_reaction == "Cult of Khorne":
         if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1)
-            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if og_pla == -2:
                 primary_player.headquarters[og_pos].increase_damage(1)
                 if primary_player.headquarters[og_pos].get_damage() > 1:
-                    self.reactions_needing_resolving[0] = "Cult of Khorne Attachment"
+                    self.reactions_needing_resolving[0].set_reaction_name("Cult of Khorne Attachment")
                 else:
                     self.delete_reaction()
             else:
@@ -411,7 +411,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 planet_pos, unit_pos) == "Chaos") or player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos,
                                                                                                   "Khorne"):
             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1)
-            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             damage = primary_player.get_damage_given_pos(og_pla, og_pos)
             primary_player.set_damage_given_pos(og_pla, og_pos, damage + 1)
             self.misc_counter += 1
@@ -433,8 +433,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                             primary_player.set_aiming_reticle_in_play(-2, unit_pos)
     elif current_reaction == "Steadfast Sword Brethren":
         if game_update_string[1] == primary_player.number:
-            if planet_pos != self.positions_of_unit_triggering_reaction[0][1] or unit_pos != \
-                    self.positions_of_unit_triggering_reaction[0][2]:
+            if planet_pos != self.reactions_needing_resolving[0].get_planet_pos() or unit_pos != \
+                    self.reactions_needing_resolving[0].get_unit_pos():
                 if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Black Templars"):
                     primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOP")
                     self.delete_reaction()
@@ -449,7 +449,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                         self.chosen_second_card = False
                     else:
                         self.chosen_second_card = True
-                        self.player_who_resolves_reaction[0] = secondary_player.name_player
+                        self.reactions_needing_resolving[0].set_player_resolving_reaction(secondary_player.name_player)
                         primary_player.draw_card()
                         await self.send_update_message(secondary_player.name_player +
                                                        " may now choose a unit to damage.")
@@ -466,7 +466,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             if not secondary_player.check_for_trait_given_pos(-2, unit_pos, "Elite"):
                 print('not elite')
                 if not secondary_player.get_immune_to_enemy_events(-2, unit_pos):
-                    dest = self.positions_of_unit_triggering_reaction[0][1]
+                    dest = self.reactions_needing_resolving[0].get_planet_pos()
                     secondary_player.move_unit_to_planet(-2, unit_pos, dest)
                     self.delete_reaction()
     elif current_reaction == "Deathskull Lootas":

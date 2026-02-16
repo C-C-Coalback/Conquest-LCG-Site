@@ -9,13 +9,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
     player_owning_card = self.p1
     if game_update_string[1] == "2":
         player_owning_card = self.p2
-    print("Check what player")
-    print(self.player_who_resolves_reaction)
-    current_reaction = self.reactions_needing_resolving[0]
-    if name == self.player_who_resolves_reaction[0]:
+    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+    og_num, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
+    if name == self.reactions_needing_resolving[0].get_player_resolving_reaction():
         if current_reaction == "Power from Pain":
-            if int(primary_player.get_number()) == int(
-                    self.positions_of_unit_triggering_reaction[0][0]):
+            if int(primary_player.get_number()) == int(og_num):
                 planet_pos = int(game_update_string[2])
                 unit_pos = int(game_update_string[3])
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
@@ -93,25 +91,24 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         await self.send_update_message("Invalid target")
         elif current_reaction == "Ku'gath Plaguefather":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if primary_player.number == game_update_string[1]:
-                    if unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
-                        primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
-                                                              self.positions_of_unit_triggering_reaction[0][2], 1)
+                    if unit_pos != og_pos:
+                        primary_player.remove_damage_from_pos(self.reactions_needing_resolving[0].get_planet_pos(),
+                                                              self.reactions_needing_resolving[0].get_unit_pos(), 1)
                         primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True,
                                                             rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
                 else:
-                    primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
-                                                          self.positions_of_unit_triggering_reaction[0][2], 1)
+                    primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True,
                                                           rickety_warbuggy=True)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Dark Lance Raider":
             if secondary_player.number == game_update_string[1]:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if self.misc_target_choice == "1 dmg to 2":
                         if (planet_pos, unit_pos) not in self.misc_misc:
                             self.misc_misc.append((planet_pos, unit_pos))
@@ -127,16 +124,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "The Plaguefather's Banner":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if primary_player.number == game_update_string[1]:
-                    if unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
-                        primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
-                                                              self.positions_of_unit_triggering_reaction[0][2], 1)
+                    if unit_pos != og_pos:
+                        primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
                         primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
                         self.delete_reaction()
                 else:
-                    primary_player.remove_damage_from_pos(self.positions_of_unit_triggering_reaction[0][1],
-                                                          self.positions_of_unit_triggering_reaction[0][2], 1)
+                    primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
                     self.delete_reaction()
         elif current_reaction == "Charging Juggernaut":
@@ -157,7 +152,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         elif current_reaction == "Beckel Commit":
             if game_update_string[1] == primary_player.number:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
         elif current_reaction == "The Blood Pits":
@@ -184,7 +179,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     self.delete_reaction()
         elif current_reaction == "Patient Infiltrator":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 can_continue = True
                 possible_interrupts = []
                 if player_owning_card.name_player == primary_player.name_player:
@@ -209,7 +204,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.nullify_context = "Reaction"
                 if can_continue:
                     player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
-                    _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                     primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
@@ -268,14 +262,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if self.misc_counter < 1:
                         self.delete_reaction()
         elif current_reaction == "Siege Regiment Manticore":
-            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if abs(planet_pos - og_pla) == 1:
                 if game_update_string[1] == secondary_player.number:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3)
                         self.delete_reaction()
         elif current_reaction == "Klaivex Warleader":
-            att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+            att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if att_pla == planet_pos:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
@@ -318,7 +311,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif current_reaction == "Prodigal Sons Disciple":
             if game_update_string[1] == secondary_player.number:
-                att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+                att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if att_pla == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
@@ -351,7 +344,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif current_reaction == "Vezuel's Hunters":
             if game_update_string[1] == secondary_player.number:
-                att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+                att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if att_pla == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
@@ -381,7 +374,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Mandrake Cutthroat":
-            att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+            att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if att_pla == planet_pos:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
@@ -421,14 +414,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
         elif current_reaction == "Deathstorm Drop Pod":
             if game_update_string[1] == secondary_player.number:
-                att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+                att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if att_pla == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
         elif current_reaction == "Crush of Sky-Slashers":
             if game_update_string[1] == secondary_player.number:
-                att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+                att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if att_pla == planet_pos:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if secondary_player.get_cost_given_pos(planet_pos, unit_pos) < 3:
@@ -460,7 +453,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
         elif current_reaction == "Fenrisian Wolf":
-            att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+            att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if att_pla == planet_pos:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
@@ -495,7 +488,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.advance_damage_aiming_reticle()
                         self.delete_reaction()
         elif current_reaction == "Vengeance!":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if primary_player.number == game_update_string[1]:
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines" \
                             and primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -529,21 +522,21 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Commander Starblaze":
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
-                    war_num, war_pla, war_pos = self.positions_of_unit_triggering_reaction[0]
+                    war_num, war_pla, war_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     if abs(war_pla - planet_pos) == 1:
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, war_pla)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Ravening Psychopath":
             if game_update_string[1] == secondary_player.number:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
                                                               rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Deathly Web Shrine":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
                 else:
@@ -623,7 +616,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_being_hit = self.p1
             else:
                 player_being_hit = self.p2
-            og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if og_pla != planet_pos:
                 if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
@@ -632,7 +624,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Staff of Change":
             if secondary_player.get_number() == game_update_string[1]:
-                if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                if og_pla == planet_pos:
                     can_continue = True
                     possible_interrupts = []
                     if player_owning_card.name_player == primary_player.name_player:
@@ -676,7 +668,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                          (int(primary_player.number), -1, -1))
                 self.delete_reaction()
         elif current_reaction == "Kabalite Harriers":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
                 else:
@@ -709,7 +701,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Veteran Barbrus":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
                 else:
@@ -748,7 +740,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.send_update_message(
                         "Forbidden faction for Veteran Barbrus.")
         elif current_reaction == "Thundering Wraith":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     if secondary_player.get_number() == game_update_string[1]:
                         can_continue = True
@@ -781,10 +773,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.name_player_making_choices = secondary_player.name_player
                             self.resolving_search_box = True
         elif current_reaction == "Flayer Affliction":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if primary_player.get_number() == game_update_string[1]:
-                    if unit_pos != self.positions_of_unit_triggering_reaction[0][1]:
-                        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                    if unit_pos != og_pos:
                         atk = primary_player.get_attack_given_pos(og_pla, og_pos)
                         primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
                         self.delete_reaction()
@@ -823,7 +814,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Beastmaster's Whip":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if primary_player.get_number() == game_update_string[1]:
                     if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Creature"):
                         if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
@@ -859,15 +850,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
                     self.delete_reaction()
         elif current_reaction == "Explosive Scarabs":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
-                if unit_pos != self.positions_of_unit_triggering_reaction[0][1] or primary_player.get_number() != game_update_string[1]:
-                    _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+            if planet_pos == og_pla:
+                if unit_pos != og_pos or primary_player.get_number() != game_update_string[1]:
                     atk = primary_player.get_health_given_pos(og_pla, og_pos) - primary_player.get_damage_given_pos(og_pla, og_pos)
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, atk)
                     primary_player.sacrifice_card_in_play(og_pla, og_pos)
                     self.delete_reaction()
         elif current_reaction == "Blazing Zoanthrope":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
@@ -900,7 +890,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Fire Prism":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
@@ -930,7 +920,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Devourer Venomthrope":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
@@ -968,7 +958,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
         elif current_reaction == "8th Company Assault Squad":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == "1":
                     target_player = self.p1
                 else:
@@ -1003,7 +993,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
         elif current_reaction == "Kommando Sneakaz":
             if game_update_string[1] == primary_player.get_number():
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
                         can_continue = True
                         possible_interrupts = []
@@ -1034,7 +1024,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif current_reaction == "Invasive Genestealers":
             if game_update_string[1] == secondary_player.get_number():
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
                         possible_interrupts = []
@@ -1060,13 +1050,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_context = "Reaction"
                         if can_continue:
                             secondary_player.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop += 1
-                            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                             primary_player.cards_in_play[og_pla + 1][og_pos].positive_hp_until_eop += 1
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Soul Grinder":
             if primary_player.get_number() == game_update_string[1]:
-                planet_pos_sg = self.positions_of_unit_triggering_reaction[0][1]
+                planet_pos_sg = self.reactions_needing_resolving[0].get_planet_pos()
                 if planet_pos == planet_pos_sg:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
@@ -1101,7 +1090,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Reclamation Pool":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if primary_player.get_number() == game_update_string[1]:
                     if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
                         primary_player.add_resources(2)
@@ -1137,14 +1126,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
         elif current_reaction == "Trapped Objective":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or\
                         primary_player.name_player in\
                         player_owning_card.cards_in_play[planet_pos + 1][unit_pos].hit_by_frenzied_wulfen_names:
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                     self.delete_reaction()
         elif current_reaction == "Thunderwolf Cavalry":
-            og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if abs(og_pla - planet_pos) == 1:
                 if game_update_string[1] == primary_player.get_number():
                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Thunderwolf Cavalry":
@@ -1165,7 +1153,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Fire Warrior Elite":
             if game_update_string[1] == primary_player.get_number():
                 _, current_planet, current_unit = self.last_defender_position
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if primary_player.get_ability_given_pos(
                             planet_pos, unit_pos) == "Fire Warrior Elite":
                         primary_player.reset_aiming_reticle_in_play(current_planet, current_unit)
@@ -1283,7 +1271,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                 by_enemy_unit=False)
                         self.delete_reaction()
         elif current_reaction == "Eldorath Starbane":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 can_continue = True
                 possible_interrupts = []
                 if player_owning_card.name_player == primary_player.name_player:
@@ -1307,22 +1295,21 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
                 if can_continue:
-                    if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                    if og_pla == planet_pos:
                         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                             player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "The Blinded Princess":
             if primary_player.get_number() == game_update_string[1]:
-                if planet_pos != self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos != og_pla:
                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                         secondary_player.move_unit_to_planet(og_pla, og_pos, planet_pos)
                         self.delete_reaction()
         elif current_reaction == "Yvraine's Entourage":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if not self.chosen_first_card:
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
                         self.chosen_first_card = True
@@ -1349,7 +1336,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.delete_reaction()
         elif current_reaction == "Yvraine":
-            if abs(self.positions_of_unit_triggering_reaction[0][1] - planet_pos) == 1:
+            if abs(og_pla - planet_pos) == 1:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
@@ -1358,7 +1345,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Morkanaut Rekuperator":
-            if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+            if og_pla == planet_pos:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1,
                                                         preventable=False, rickety_warbuggy=True)
                 if player_owning_card.check_if_card_is_destroyed(planet_pos, unit_pos):
@@ -1418,7 +1405,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, warlord_pla)
                         self.delete_reaction()
         elif current_reaction == "Ragnar Blackmane":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == secondary_player.get_number():
                     can_continue = True
                     possible_interrupts = []
@@ -1448,7 +1435,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Scorpion Striker":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
                 else:
@@ -1496,7 +1483,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.infest_planet(self.misc_target_planet, primary_player)
                     self.delete_reaction()
         elif current_reaction == "Fusion Cascade Defiance":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
                 self.delete_reaction()
         elif current_reaction == "Erupting Aberrants":
@@ -1546,7 +1533,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       (int(primary_player.number), -1, -1))
                     self.delete_reaction()
         elif current_reaction == "Death Guard Preachers":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if not self.chosen_first_card:
                     if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
                         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1572,18 +1559,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.delete_reaction()
         elif current_reaction == "Kroot Hounds":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == primary_player.get_number():
                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Kroot Hounds":
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                            _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                             secondary_player.assign_damage_to_pos(og_pla, og_pos, 2, shadow_field_possible=True,
                                                                   rickety_warbuggy=True)
                             self.delete_reaction()
         elif current_reaction == "Luring Troupe":
             if not self.chosen_first_card:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
                         possible_interrupts = []
@@ -1638,7 +1624,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if self.misc_counter < 1:
                         self.delete_reaction()
         elif current_reaction == "Gue'vesa Overseer":
-            if abs(planet_pos - self.positions_of_unit_triggering_reaction[0][1]) == 1:
+            if abs(planet_pos - og_pla) == 1:
                 if not self.chosen_first_card:
                     if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) != "Tau":
                         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1660,13 +1646,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Farsight Vanguard":
             if not self.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:
-                    _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                     if og_pla != planet_pos or og_pos != unit_pos:
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         elif current_reaction == "Hydrae Stalker":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
                 else:
@@ -1700,7 +1685,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Mars Alpha Exterminator":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == secondary_player.get_number():
                     card_type = secondary_player.get_card_type_given_pos(planet_pos, unit_pos)
                     cost = secondary_player.get_cost_given_pos(planet_pos, unit_pos)
@@ -1737,7 +1722,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Voidscarred Corsair":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                     can_continue = True
                     possible_interrupts = []
@@ -1766,11 +1751,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Rapid Ingress":
-            if abs(planet_pos - self.positions_of_unit_triggering_reaction[0][1]) == 1:
+            if abs(planet_pos - og_pla) == 1:
                 if game_update_string[1] == primary_player.get_number():
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.move_unit_to_planet(
-                            planet_pos, unit_pos, self.positions_of_unit_triggering_reaction[0][1])
+                            planet_pos, unit_pos, og_pla)
                         self.delete_reaction()
         elif current_reaction == "Dynastic Weaponry":
             if "Dynastic Weaponry" not in primary_player.discard:
@@ -1784,7 +1769,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                              (int(primary_player.get_number()), planet_pos, unit_pos))
                     self.delete_reaction()
         elif current_reaction == "Howling Exarch":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if (int(game_update_string[1]), planet_pos, unit_pos) not in self.misc_misc:
                     self.misc_misc.append((int(game_update_string[1]), planet_pos, unit_pos))
                     player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -1802,7 +1787,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
                         self.misc_misc = None
         elif current_reaction == "Arrogant Haemonculus":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                     can_continue = True
                     possible_interrupts = []
@@ -1857,7 +1842,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         not_own_attachment = True
                     if player_owning_card.attach_card(card, planet_pos, unit_pos,
                                                       not_own_attachment=not_own_attachment):
-                        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                         primary_player.discard.remove(card_name)
                         self.delete_reaction()
         elif current_reaction == "Cult of Khorne Attachment":
@@ -1869,25 +1853,23 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if player_owning_card.get_number() != primary_player.get_number():
                 not_own_attachment = True
             if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
-                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                 del primary_player.headquarters[og_pos]
                 primary_player.adjust_own_reactions(og_pla, og_pos)
                 self.delete_reaction()
         elif current_reaction == "Cult of Khorne":
             if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
                 player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                 if og_pla == -2:
                     primary_player.headquarters[og_pos].increase_damage(1)
                     if primary_player.headquarters[og_pos].get_damage() > 1:
-                        self.reactions_needing_resolving[0] = "Cult of Khorne Attachment"
+                        self.reactions_needing_resolving[0].set_reaction_name("Cult of Khorne Attachment")
                     else:
                         self.delete_reaction()
                 else:
                     self.delete_reaction()
         elif current_reaction == "Heavy Flamer Retributor":
             if secondary_player.get_number() == game_update_string[1]:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if (planet_pos, unit_pos) not in self.misc_misc:
                         self.misc_misc.append((planet_pos, unit_pos))
                         secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -1938,7 +1920,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Vengeful Seraphim":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                    num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                    num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     primary_player.ready_given_pos(pla, pos)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
@@ -1954,7 +1936,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.send_update_message("Select card in discard to bring back.")
         elif current_reaction == "Hydra Flak Tank":
             if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
-                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                 primary_player.set_once_per_phase_used_given_pos(og_pla, og_pos, True)
                 damage = 1
                 if player_owning_card.get_flying_given_pos(planet_pos, unit_pos):
@@ -1965,7 +1946,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
         elif current_reaction == "Nahumekh":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == "1":
                     player_being_hit = self.p1
                 else:
@@ -2005,13 +1986,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Tactical Withdrawal":
             if self.chosen_first_card:
                 if game_update_string[1] == primary_player.get_number():
-                    _, og_pla, _ = self.positions_of_unit_triggering_reaction[0]
                     dest = self.misc_target_planet
                     if planet_pos == og_pla:
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest)
         elif current_reaction == "Phoenix Attack Fighter":
             if game_update_string[1] == secondary_player.number:
-                if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+                if og_pla == planet_pos:
                     if not secondary_player.get_ready_given_pos(planet_pos, unit_pos):
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -2051,9 +2031,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         elif current_reaction == "Sweep":
             if game_update_string[1] == secondary_player.number:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_sweep_target:
-                        og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                         shadow = True
                         if primary_player.get_card_type_given_pos(og_pla, og_pos) != "Army":
                             shadow = False
@@ -2071,7 +2050,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_being_hit = self.p1
             else:
                 player_being_hit = self.p2
-            if self.positions_of_unit_triggering_reaction[0][1] == planet_pos:
+            if og_pla == planet_pos:
                 if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
                         "Ally", player_being_hit.etekh_trait):
                     can_continue = True
@@ -2139,12 +2118,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if game_update_string[1] == primary_player.number:
                 if primary_player.check_for_warlord(planet_pos):
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
-                        dest_planet = self.positions_of_unit_triggering_reaction[0][1]
+                        dest_planet = self.reactions_needing_resolving[0].get_planet_pos()
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Commissarial Bolt Pistol":
-            og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
             if planet_pos == og_pla:
                 can_continue = True
                 if og_num == int(game_update_string[1]):
@@ -2178,8 +2156,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
         elif current_reaction == "Alaitoc Shrine":
-            if int(primary_player.get_number()) == int(
-                    self.positions_of_unit_triggering_reaction[0][0]):
+            if int(primary_player.get_number()) == int(og_num):
                 player_num = int(primary_player.get_number())
                 full_position = (player_num, planet_pos, unit_pos)
                 if full_position in primary_player.allowed_units_alaitoc_shrine:
@@ -2190,8 +2167,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         await self.send_update_message("Unit already ready")
         elif current_reaction == "Cato's Stronghold":
-            if int(primary_player.get_number()) == int(
-                    self.positions_of_unit_triggering_reaction[0][0]):
+            if int(primary_player.get_number()) == int(og_num):
                 if planet_pos in primary_player.allowed_planets_cato_stronghold:
                     if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         can_continue = True
@@ -2223,8 +2199,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         await self.send_update_message("Unit already ready")
         elif current_reaction == "Beasthunter Wyches":
-            if int(primary_player.get_number()) == int(
-                    self.positions_of_unit_triggering_reaction[0][0]):
+            if int(primary_player.get_number()) == int(og_num):
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Beasthunter Wyches":
                     if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_reaction_available():
                         if primary_player.spend_resources(1):
@@ -2234,14 +2209,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Bladeguard Veteran Squad":
-            if int(primary_player.get_number()) == int(self.positions_of_unit_triggering_reaction[0][0]):
+            if int(primary_player.get_number()) == int(og_num):
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
                     if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Devoted Enginseer":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \
                         player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Tech-Priest"):
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
@@ -2251,7 +2226,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
         elif current_reaction == "Spiritseer Erathal":
             if primary_player.get_number() == game_update_string[1]:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     can_continue = True
                     possible_interrupts = []
                     if player_owning_card.name_player == primary_player.name_player:
@@ -2286,7 +2261,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Draining Cronos":
             if primary_player.get_number() == game_update_string[1]:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     can_continue = True
                     possible_interrupts = []
                     if player_owning_card.name_player == primary_player.name_player:
@@ -2309,7 +2284,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Tenacious Novice Squad":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -2317,14 +2292,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Eloquent Confessor":
             if primary_player.get_number() == game_update_string[1]:
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                    og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                     if og_num == 1:
                         self.p1.exhaust_given_pos(og_pla, og_pos, card_effect=True)
                     else:
                         self.p2.exhaust_given_pos(og_pla, og_pos, card_effect=True)
                     self.delete_reaction()
         elif current_reaction == "Revered Heavy Flamer":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
@@ -2337,7 +2311,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.chosen_first_card = True
             else:
                 if secondary_player.get_number() == game_update_string[1]:
-                    og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                     if og_pla == planet_pos:
                         if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                             if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
@@ -2347,14 +2320,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                     primary_player.assign_damage_to_pos(og_pla, og_pos, atk, by_enemy_unit=False)
                                     self.delete_reaction()
         elif current_reaction == "Sanctified Bolter":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.misc_counter += 1
                     if self.misc_counter > 1:
                         self.delete_reaction()
         elif current_reaction == "Sacred Rose Immolator":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if primary_player.get_number() != game_update_string[1]:
                     if (planet_pos, unit_pos) not in self.misc_misc:
                         self.misc_misc.append((planet_pos, unit_pos))
@@ -2369,7 +2342,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif current_reaction == "Masked Hunter":
             if primary_player.get_number() == game_update_string[1]:
-                dest = self.positions_of_unit_triggering_reaction[0][1]
+                dest = og_pla
                 if abs(dest - planet_pos) == 1:
                     if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Khymera":
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest)
@@ -2412,7 +2385,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Standard Bearer":
             if primary_player.get_number() == game_update_string[1]:
-                if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+                if planet_pos == og_pla:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -2422,8 +2395,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_being_hit = self.p1
             else:
                 player_being_hit = self.p2
-            origin_planet = self.positions_of_unit_triggering_reaction[0][1]
-            origin_pos = self.positions_of_unit_triggering_reaction[0][2]
+            origin_planet = og_pla
+            origin_pos = og_pos
             if int(game_update_string[2]) == origin_planet:
                 num, prev_def_planet, prev_def_pos = self.last_defender_position
                 target_unit_pos = int(game_update_string[3])
@@ -2459,7 +2432,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
         elif current_reaction == "Burna Boyz":
             if primary_player.get_number() != game_update_string[1]:
-                origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+                origin_planet = og_pla
                 if int(game_update_string[2]) == origin_planet:
                     _, prev_def_planet, prev_def_pos = self.last_defender_position
                     target_unit_pos = int(game_update_string[3])
@@ -2473,7 +2446,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Blessing of Mork":
-            _, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+            _, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if planet_pos == origin_planet:
                 can_continue = True
                 possible_interrupts = []
@@ -2504,7 +2477,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Goff Shokboyz":
             if primary_player.get_number() != game_update_string[1]:
-                origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+                origin_planet = og_pla
                 if planet_pos == origin_planet:
                     if secondary_player.get_card_type_given_pos(origin_planet, unit_pos) == "Army":
                         can_continue = True
@@ -2535,7 +2508,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif current_reaction == "Venomous Fiend":
             if primary_player.get_number() != game_update_string[1]:
-                origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+                origin_planet = og_pla
                 if int(game_update_string[2]) == origin_planet:
                     target_unit_pos = int(game_update_string[3])
                     if secondary_player.get_card_type_given_pos(origin_planet, target_unit_pos) == "Army":
@@ -2568,7 +2541,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
         elif current_reaction == "Treacherous Lhamaean":
-            num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+            num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if primary_player.number == game_update_string[1]:
                 if origin_planet == planet_pos and origin_pos != unit_pos:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -2583,7 +2556,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
         elif current_reaction == "Parasite of Mortrex":
             if self.chosen_first_card:
-                num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+                num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if secondary_player.number == game_update_string[1]:
                     if origin_planet == planet_pos:
                         if self.misc_counter == 0:
@@ -2612,7 +2585,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.misc_target_unit = (planet_pos, unit_pos)
                             self.chosen_first_card = True
         elif current_reaction == "Dutiful Castellan":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 can_continue = True
                 possible_interrupts = []
                 if player_owning_card.name_player == primary_player.name_player:
@@ -2640,7 +2613,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                             context="Dutiful Castellan", by_enemy_unit=True)
                     self.delete_reaction()
         elif current_reaction == "Frenzied Wulfen":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     can_continue = True
                     possible_interrupts = []
@@ -2690,14 +2663,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Chaos") or \
                     player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Khorne"):
                 player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
                 damage = primary_player.get_damage_given_pos(og_pla, og_pos)
                 primary_player.set_damage_given_pos(og_pla, og_pos, damage + 1)
                 self.misc_counter += 1
                 if self.misc_counter > 1:
                     self.delete_reaction()
         elif current_reaction == "Brotherhood Justicar":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if game_update_string[1] == primary_player.get_number():
                     primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.misc_counter += 1
@@ -2728,19 +2700,19 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Steadfast Sword Brethren":
             if game_update_string[1] == primary_player.number:
-                if planet_pos != self.positions_of_unit_triggering_reaction[0][1] or unit_pos != self.positions_of_unit_triggering_reaction[0][2]:
+                if planet_pos != og_pla or unit_pos != og_pos:
                     if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Black Templars"):
                         primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOP")
                         self.delete_reaction()
         elif current_reaction == "Sanctified Aggressor":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     primary_player.add_resources(1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Inspiring Sergeant":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 can_continue = True
                 possible_interrupts = []
                 if player_owning_card.name_player == primary_player.name_player:
@@ -2789,7 +2761,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Sweep Attack":
             if self.chosen_first_card:
-                num, origin_planet, origin_pos = self.positions_of_unit_triggering_reaction[0]
+                num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if secondary_player.number == game_update_string[1]:
                     if abs(origin_planet - planet_pos) == 1:
                         if self.misc_counter == 0:
@@ -2846,7 +2818,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = True
         elif current_reaction == "Galvax the Bloated":
-            if planet_pos == self.positions_of_unit_triggering_reaction[0][1]:
+            if planet_pos == og_pla:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
@@ -2860,7 +2832,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.chosen_second_card = False
                         else:
                             self.chosen_second_card = True
-                            self.player_who_resolves_reaction[0] = secondary_player.name_player
+                            self.reactions_needing_resolving[0].set_player_resolving_reaction(secondary_player.name_player)
                             primary_player.draw_card()
                             await self.send_update_message(secondary_player.name_player +
                                                            " may now choose a unit to damage.")
@@ -2872,7 +2844,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
         elif current_reaction == "Sicarius's Chosen":
             print("Resolve Sicarius's chosen")
-            origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+            origin_planet = og_pla
             target_planet = int(game_update_string[2])
             target_pos = int(game_update_string[3])
             if int(game_update_string[1]) == int(secondary_player.get_number()):

@@ -8,8 +8,8 @@ async def resolve_attachment_hq_reaction(self, name, game_update_string, primary
     if game_update_string[1] == "2":
         player_owning_card = self.p2
     print("Check what player")
-    print(self.player_who_resolves_reaction)
-    current_reaction = self.reactions_needing_resolving[0]
+    print(self.reactions_needing_resolving[0].get_player_resolving_reaction())
+    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
     if current_reaction == "Torturer's Masks":
         if player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos].get_ability() == "Torturer's Masks":
             if player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos].name_owner == primary_player.name_player:

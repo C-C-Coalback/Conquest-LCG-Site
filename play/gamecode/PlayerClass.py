@@ -1382,16 +1382,16 @@ class Player:
 
     def check_if_already_have_reaction(self, reaction_name):
         for i in range(len(self.game.reactions_needing_resolving)):
-            if self.game.reactions_needing_resolving[i] == reaction_name:
-                if self.game.player_who_resolves_reaction[i] == self.name_player:
+            if self.game.reactions_needing_resolving[i].get_reaction_name() == reaction_name:
+                if self.game.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_player:
                     return True
         return False
 
     def check_if_already_have_reaction_of_position(self, reaction_name, pla, pos):
         for i in range(len(self.game.reactions_needing_resolving)):
-            if self.game.reactions_needing_resolving[i] == reaction_name:
-                if self.game.player_who_resolves_reaction[i] == self.name_player:
-                    num, og_pla, og_pos = self.game.positions_of_unit_triggering_reaction[i]
+            if self.game.reactions_needing_resolving[i].get_reaction_name() == reaction_name:
+                if self.game.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_player:
+                    num, og_pla, og_pos = self.game.reactions_needing_resolving[i].get_position_unit_triggering()
                     if num == int(self.number) and pla == og_pla and og_pos == pos:
                         return True
         return False
@@ -1399,17 +1399,17 @@ class Player:
     def count_reactions(self, reaction_name):
         count = 0
         for i in range(len(self.game.reactions_needing_resolving)):
-            if self.game.reactions_needing_resolving[i] == reaction_name:
-                if self.game.player_who_resolves_reaction[i] == self.name_player:
+            if self.game.reactions_needing_resolving[i].get_reaction_name() == reaction_name:
+                if self.game.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_player:
                     count += 1
         return count
 
     def count_reactions_of_position(self, reaction_name, pla, pos):
         count = 0
         for i in range(len(self.game.reactions_needing_resolving)):
-            if self.game.reactions_needing_resolving[i] == reaction_name:
-                if self.game.player_who_resolves_reaction[i] == self.name_player:
-                    num, og_pla, og_pos = self.game.positions_of_unit_triggering_reaction[i]
+            if self.game.reactions_needing_resolving[i].get_reaction_name() == reaction_name:
+                if self.game.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_player:
+                    num, og_pla, og_pos = self.game.reactions_needing_resolving[i].get_position_unit_triggering()
                     if num == int(self.number) and pla == og_pla and og_pos == pos:
                         count += 1
         return count
@@ -1824,40 +1824,31 @@ class Player:
     def adjust_own_reactions(self, planet_pos, unit_pos):
         i = 0
         while i < len(self.game.reactions_needing_resolving):
-            num, pla, pos = self.game.positions_of_unit_triggering_reaction[i]
+            num, pla, pos = self.game.reactions_needing_resolving[i].get_position_unit_triggering()
             if num == int(self.number):
                 if pla == planet_pos:
                     if pos > unit_pos:
                         pos -= 1
-                        self.game.positions_of_unit_triggering_reaction[i] = (num, pla, pos)
+                        self.game.reactions_needing_resolving[i].set_position_unit_triggering((num, pla, pos))
                     elif pos == unit_pos:
                         if i == 0:
                             if not self.game.already_resolving_reaction:
                                 del self.game.reactions_needing_resolving[i]
-                                del self.game.player_who_resolves_reaction[i]
-                                del self.game.positions_of_unit_triggering_reaction[i]
-                                del self.game.additional_reactions_info[i]
                                 i = i - 1
                         else:
                             del self.game.reactions_needing_resolving[i]
-                            del self.game.player_who_resolves_reaction[i]
-                            del self.game.positions_of_unit_triggering_reaction[i]
-                            del self.game.additional_reactions_info[i]
                             i = i - 1
             i += 1
         i = 0
         while i < len(self.game.delayed_reactions_needing_resolving):
-            num, pla, pos = self.game.delayed_positions_of_unit_triggering_reaction[i]
+            num, pla, pos = self.game.delayed_reactions_needing_resolving[i].get_position_unit_triggering()
             if num == int(self.number):
                 if pla == planet_pos:
                     if pos > unit_pos:
                         pos -= 1
-                        self.game.delayed_positions_of_unit_triggering_reaction[i] = (num, pla, pos)
+                        self.game.delayed_reactions_needing_resolving[i].set_position_unit_triggering((num, pla, pos))
                     elif pos == unit_pos:
                         del self.game.delayed_reactions_needing_resolving[i]
-                        del self.game.delayed_player_who_resolves_reaction[i]
-                        del self.game.delayed_positions_of_unit_triggering_reaction[i]
-                        del self.game.delayed_additional_reactions_info[i]
                         i = i - 1
             i += 1
 
@@ -3116,12 +3107,12 @@ class Player:
                                 for i in range(7):
                                     for j in range(len(self.cards_in_play[i + 1])):
                                         if self.cards_in_play[i + 1][j].get_ability() == "Tomb Blade Squadron":
-                                            if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
+                                            if not self.check_if_already_have_reaction("Tomb Blade Squadron"):
                                                 self.game.create_reaction("Tomb Blade Squadron", self.name_player,
                                                                           (int(self.number), -1, -1))
                                 for i in range(len(self.headquarters)):
                                     if self.headquarters[i].get_ability() == "Tomb Blade Squadron":
-                                        if "Tomb Blade Squadron" not in self.game.reactions_needing_resolving:
+                                        if not self.check_if_already_have_reaction("Tomb Blade Squadron"):
                                             self.game.create_reaction("Tomb Blade Squadron", self.name_player,
                                                                       (int(self.number), -1, -1))
                             if card.check_for_a_trait("Elite"):
@@ -3397,15 +3388,8 @@ class Player:
             for i in range(len(other_player.cards_in_play[destination + 1])):
                 if other_player.get_ability_given_pos(destination, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(destination, i):
-                        already_reacted = False
                         self.headquarters[origin_position].valid_defense_battery_target = True
-                        for j in range(len(self.game.reactions_needing_resolving)):
-                            if self.game.reactions_needing_resolving[j] == "Hydra Flak Tank":
-                                if self.game.positions_of_unit_triggering_reaction[j] == (int(other_player.number),
-                                                                                          destination, i):
-                                    if self.game.player_who_resolves_reaction[j] == other_player.name_player:
-                                        already_reacted = True
-                        if not already_reacted:
+                        if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", destination, i):
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), destination, i))
             if destination != 0:
@@ -3503,15 +3487,8 @@ class Player:
             for i in range(len(other_player.cards_in_play[destination + 1])):
                 if other_player.get_ability_given_pos(destination, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(destination, i):
-                        already_reacted = False
                         self.cards_in_play[origin_planet + 1][origin_position].valid_defense_battery_target = True
-                        for j in range(len(self.game.reactions_needing_resolving)):
-                            if self.game.reactions_needing_resolving[j] == "Hydra Flak Tank":
-                                if self.game.positions_of_unit_triggering_reaction[j] == (int(other_player.number),
-                                                                                          destination, i):
-                                    if self.game.player_who_resolves_reaction[j] == other_player.name_player:
-                                        already_reacted = True
-                        if not already_reacted:
+                        if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", destination, i):
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), destination, i))
             if destination != 0:
@@ -3531,15 +3508,8 @@ class Player:
             for i in range(len(other_player.cards_in_play[origin_planet + 1])):
                 if other_player.get_ability_given_pos(origin_planet, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(origin_planet, i):
-                        already_reacted = False
                         self.headquarters[origin_position].valid_defense_battery_target = True
-                        for j in range(len(self.game.reactions_needing_resolving)):
-                            if self.game.reactions_needing_resolving[j] == "Hydra Flak Tank":
-                                if self.game.positions_of_unit_triggering_reaction[j] == (int(other_player.number),
-                                                                                          origin_planet, i):
-                                    if self.game.player_who_resolves_reaction[j] == other_player.name_player:
-                                        already_reacted = True
-                        if not already_reacted:
+                        if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", origin_planet, i):
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), origin_planet, i))
             if self.cards_in_play[origin_planet + 1][origin_position].get_card_type() != "Warlord":
@@ -3597,13 +3567,8 @@ class Player:
                                 self.game.create_reaction("Calibration Error", other_player.name_player,
                                                           (int(other_player.number), destination, new_pos))
             if self.search_hand_for_card("Cry of the Wind"):
-                already_cry = False
                 self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
-                for i in range(len(self.game.reactions_needing_resolving)):
-                    if self.game.reactions_needing_resolving[i] == "Cry of the Wind":
-                        if self.game.player_who_resolves_reaction[i] == self.name_player:
-                            already_cry = True
-                if not already_cry:
+                if not self.check_if_already_have_reaction("Cry of the Wind"):
                     self.game.create_reaction("Cry of the Wind", self.name_player, (int(self.number), -1, -1))
             for i in range(len(self.cards_in_play[destination + 1])):
                 if self.get_ability_given_pos(destination, i) == "Acquisition Phalanx":
@@ -3622,12 +3587,7 @@ class Player:
                                                   (int(other_player.number), destination, new_pos))
             self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
             if self.search_card_in_hq("Banner of the Ashen Sky", ready_relevant=True):
-                already_banner = False
-                for i in range(len(self.game.reactions_needing_resolving)):
-                    if self.game.reactions_needing_resolving[i] == "Banner of the Ashen Sky":
-                        if self.game.player_who_resolves_reaction[i] == self.name_player:
-                            already_banner = True
-                if not already_banner:
+                if not self.check_if_already_have_reaction("Banner of the Ashen Sky"):
                     self.game.create_reaction("Banner of the Ashen Sky", self.name_player,
                                               (int(self.number), -1, -1))
             if self.cards_in_play[destination + 1][new_pos].get_ability() == "Piranha Hunter":
@@ -3873,7 +3833,6 @@ class Player:
                         if headquarters_list[i].get_ability() == "Experimental Devilfish":
                             self.game.create_reaction("Experimental Devilfish", self.name_player,
                                                       (int(self.number), planet_pos - 1, -1))
-                            self.game.player_who_resolves_reaction.append(self.name_player)
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Old Zogwort":
                         self.game.create_reaction("Old Zogwort", self.name_player,
                                                   (int(self.number), planet_pos - 1, -1))
@@ -5303,16 +5262,16 @@ class Player:
 
     def does_own_positioned_reaction_exist(self, reaction_name, planet_pos, unit_pos):
         for i in range(len(self.game.reactions_needing_resolving)):
-            if self.game.reactions_needing_resolving[i] == reaction_name:
-                if self.game.player_who_resolves_reaction[i] == self.name_player:
-                    if self.game.positions_of_unit_triggering_reaction[i] == (int(self.number), planet_pos, unit_pos):
+            if self.game.reactions_needing_resolving[i].get_reaction_name() == reaction_name:
+                if self.game.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_player:
+                    if self.game.reactions_needing_resolving[i].check_position_unit((int(self.number), planet_pos, unit_pos)):
                         return True
         return False
 
     def does_own_reaction_exist(self, reaction_name):
         for i in range(len(self.game.reactions_needing_resolving)):
-            if self.game.reactions_needing_resolving[i] == reaction_name:
-                if self.game.player_who_resolves_reaction[i] == self.name_player:
+            if self.game.reactions_needing_resolving[i].get_reaction_name() == reaction_name:
+                if self.game.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_player:
                     return True
         return False
 
@@ -6858,12 +6817,7 @@ class Player:
                                               (int(other_player.number), -1, -1))
             if self.get_faction_given_pos(-2, card_pos) == "Space Marines" \
                     and self.check_is_unit_at_pos(-2, card_pos):
-                already_apoth = False
-                for i in range(len(self.game.reactions_needing_resolving)):
-                    if self.game.reactions_needing_resolving[i] == "Secluded Apothecarion":
-                        if self.game.player_who_resolves_reaction[i] == self.name_player:
-                            already_apoth = True
-                if not already_apoth:
+                if not self.check_if_already_have_reaction("Secluded Apothecarion"):
                     for i in range(len(self.headquarters)):
                         if self.get_ability_given_pos(-2, i) == "Secluded Apothecarion":
                             if self.get_ready_given_pos(-2, i):
@@ -7314,14 +7268,9 @@ class Player:
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
                 for i in range(len(self.cards_in_play[planet_num + 1])):
                     if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Sentry":
-                        already_termagant_sentry = False
-                        for j in range(len(self.game.reactions_needing_resolving)):
-                            if self.game.reactions_needing_resolving[j] == "Termagant Sentry":
-                                if self.game.player_who_resolves_reaction[j] == self.name_player:
-                                    already_termagant_sentry = True
-                        if not already_termagant_sentry:
+                        if not self.check_if_already_have_reaction_of_position("Termagant Sentry", planet_num, i):
                             self.game.create_reaction("Termagant Sentry", self.name_player,
-                                                      (int(self.number), planet_num, -1))
+                                                      (int(self.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Snotlings":
                 self.enemy_has_wyrdboy_stikk = False
                 if self.search_for_card_everywhere("Wyrdboy Stikk", ready_relevant=True):
@@ -7489,12 +7438,7 @@ class Player:
                         self.game.create_interrupt("Surrogate Host", self.name_player,
                                                    (int(self.number), -1, -1))
             if self.get_faction_given_pos(planet_num, card_pos) == "Space Marines":
-                already_apoth = False
-                for i in range(len(self.game.reactions_needing_resolving)):
-                    if self.game.reactions_needing_resolving[i] == "Secluded Apothecarion":
-                        if self.game.player_who_resolves_reaction[i] == self.name_player:
-                            already_apoth = True
-                if not already_apoth:
+                if not self.check_if_already_have_reaction("Secluded Apothecarion"):
                     for i in range(len(self.headquarters)):
                         if self.get_ability_given_pos(-2, i) == "Secluded Apothecarion":
                             if self.get_ready_given_pos(-2, i):
@@ -7695,12 +7639,7 @@ class Player:
         if card.check_for_a_trait("Warrior") or card.check_for_a_trait("Soldier"):
             for i in range(len(self.cards)):
                 if self.cards[i] == "Elysian Assault Team":
-                    already_queued_elysian_assault_team = False
-                    for j in range(len(self.game.reactions_needing_resolving)):
-                        if self.game.reactions_needing_resolving[j] == "Elysian Assault Team":
-                            if self.game.player_who_resolves_reaction[j] == self.name_player:
-                                already_queued_elysian_assault_team = True
-                    if not already_queued_elysian_assault_team:
+                    if not self.check_if_already_have_reaction("Elysian Assault Team"):
                         self.game.create_reaction("Elysian Assault Team", self.name_player,
                                                   (int(self.number), planet_num, -1))
         if card.check_for_a_trait("Vehicle"):
@@ -7719,12 +7658,7 @@ class Player:
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Murder Cogitator":
                     if self.headquarters[i].get_ready():
-                        already_using_murder_cogitator = False
-                        for j in range(len(self.game.reactions_needing_resolving)):
-                            if self.game.reactions_needing_resolving[j] == "Murder Cogitator":
-                                if self.game.player_who_resolves_reaction[j] == self.name_player:
-                                    already_using_murder_cogitator = True
-                        if not already_using_murder_cogitator:
+                        if not self.check_if_already_have_reaction("Murder Cogitator"):
                             self.game.create_reaction("Murder Cogitator", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Enginseer Augur":
             self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
@@ -7772,11 +7706,7 @@ class Player:
                 for i in range(len(self.headquarters)):
                     if self.headquarters[i].get_ability() == "Murder Cogitator":
                         if self.headquarters[i].get_ready():
-                            already_using_murder_cogitator = False
-                            for j in range(len(self.game.reactions_needing_resolving)):
-                                if self.game.reactions_needing_resolving[j] == "Murder Cogitator":
-                                    already_using_murder_cogitator = True
-                            if not already_using_murder_cogitator:
+                            if not self.check_if_already_have_reaction("Murder Cogitator"):
                                 self.game.create_reaction("Murder Cogitator", self.name_player,
                                                           (int(self.number), -2, -1))
             if self.check_for_trait_given_pos(-2, card_pos, "Transport"):
@@ -7874,23 +7804,11 @@ class Player:
         for i in range(len(other_player.cards_in_play[planet_id + 1])):
             if other_player.get_ability_given_pos(planet_id, i) == "Hydra Flak Tank":
                 if not other_player.get_once_per_phase_used_given_pos(planet_id, i):
-                    already_reacted = False
                     self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
-                    for j in range(len(self.game.reactions_needing_resolving)):
-                        if self.game.reactions_needing_resolving[j] == "Hydra Flak Tank":
-                            if self.game.positions_of_unit_triggering_reaction[j] == (int(other_player.number),
-                                                                                      planet_id, i):
-                                if self.game.player_who_resolves_reaction[j] == other_player.name_player:
-                                    already_reacted = True
-                    if not already_reacted:
+                    if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", planet_id, i):
                         self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                   (int(other_player.number), planet_id, i))
-        already_homing_beacon = False
-        for i in range(len(self.game.reactions_needing_resolving)):
-            if self.game.reactions_needing_resolving[0] == "Homing Beacon":
-                if self.game.player_who_resolves_reaction[0] == self.name_player:
-                    already_homing_beacon = True
-        if not already_homing_beacon:
+        if not self.check_if_already_have_reaction("Homing Beacon"):
             for i in range(len(self.headquarters)):
                 if self.get_ability_given_pos(-2, i) == "Homing Beacon":
                     if self.get_ready_given_pos(-2, i):
@@ -8078,8 +7996,8 @@ class Player:
                     enemy_player.attachments_at_planet[planet_id][i].defense_battery_activated = True
                     already_defense_battery = False
                     for k in range(len(self.game.reactions_needing_resolving)):
-                        if self.game.reactions_needing_resolving[k] == "Defense Battery":
-                            if self.game.player_who_resolves_reaction[k] == enemy_player.name_player:
+                        if self.game.reactions_needing_resolving[k].get_reaction_name() == "Defense Battery":
+                            if self.game.reactions_needing_resolving[k].get_player_resolving_reaction() == enemy_player.name_player:
                                 already_defense_battery = True
                     if not already_defense_battery:
                         self.game.create_reaction("Defense Battery", enemy_player.name_player,

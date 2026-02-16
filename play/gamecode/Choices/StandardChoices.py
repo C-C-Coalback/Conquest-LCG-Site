@@ -76,7 +76,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Support Fleet Rally":
         card = self.preloaded_find_card(chosen_choice)
         if card.get_card_type() == "Attachment":
-            _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             primary_player.headquarters[unit_pos].attachments.append(card)
             del primary_player.deck[int(game_update_string[1])]
             primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
@@ -93,7 +93,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
     elif self.choice_context == "Support Fleet Transfer Target":
         primary_player.cards.append(chosen_choice)
-        _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         del primary_player.headquarters[unit_pos].attachments[int(game_update_string[1])]
         self.reset_choices_available()
         self.resolving_search_box = False
@@ -265,7 +265,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.resolving_search_box = False
     elif self.choice_context == "Choice Sacaellum Infestors":
         chosen_choice = self.choices_available[int(game_update_string[1])]
-        planet_pos = self.positions_of_unit_triggering_reaction[0][1]
+        planet_pos = self.reactions_needing_resolving[0].get_planet_pos()
         planet_name = self.planet_array[planet_pos]
         if chosen_choice == "Cards":
             planet_card = FindCard.find_planet_card(planet_name, self.planet_cards_array)
@@ -302,7 +302,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         else:
             self.reset_choices_available()
             self.resolving_search_box = False
-            num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+            num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             self.vamii_complex_discount = primary_player.headquarters[pos].counter
             primary_player.sacrifice_card_in_hq(pos)
     elif self.choice_context == "Raving Cryptek: Increase cost":
@@ -583,14 +583,14 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
         self.resolving_search_box = False
     elif self.choice_context == "MtC Choose Trait:":
-        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+        num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         primary_player.headquarters[pos].misc_string = chosen_choice
         await self.send_update_message("Mobilize the Chapter: Chose " + chosen_choice + " trait.")
         self.reset_choices_available()
         self.resolving_search_box = False
         self.delete_reaction()
     elif self.choice_context == "DA Choose Trait:":
-        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+        num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         primary_player.headquarters[pos].misc_string = chosen_choice
         await self.send_update_message("Dark Allegiance: Chose " + chosen_choice + " trait.")
         self.reset_choices_available()
@@ -638,7 +638,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if chosen_choice == "Give 1 resource":
             primary_player.spend_resources(1)
             secondary_player.add_resources(1)
-            target_planet = self.positions_of_unit_triggering_reaction[0][1]
+            target_planet = self.reactions_needing_resolving[0].get_planet_pos()
             i = 0
             while i < len(secondary_player.attachments_at_planet[target_planet]):
                 if secondary_player.attachments_at_planet[target_planet][i].get_ability() == \
@@ -817,7 +817,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 self.delete_reaction()
                 self.reset_choices_available()
         else:
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             primary_player.retreat_unit(planet_pos, unit_pos)
             self.reset_choices_available()
             self.delete_reaction()
@@ -1349,7 +1349,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "WillSub: Draw Card for Damage?":
         if chosen_choice == "Yes":
             self.chosen_first_card = False
-            self.player_who_resolves_reaction[0] = primary_player.name_player
+            self.reactions_needing_resolving[0].set_player_resolving_reaction(primary_player.name_player)
         else:
             self.delete_reaction()
         self.reset_choices_available()
@@ -1358,7 +1358,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         card = self.preloaded_find_card(chosen_choice)
         if card.get_card_type() == "Attachment":
             if not card.planet_attachment:
-                _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if primary_player.attach_card(card, planet_pos, unit_pos):
                     del primary_player.deck[int(game_update_string[1])]
                     primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
@@ -1469,7 +1469,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             if card.check_for_a_trait("Tank") or card.check_for_a_trait("Vehicle") or \
                     card.check_for_a_trait("Krieg"):
                 if card_name != "Krieg Armoured Regiment":
-                    num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                    num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     primary_player.add_card_to_planet(card, planet_pos)
                     del primary_player.deck[int(game_update_string[1])]
                     self.reset_choices_available()
@@ -1495,16 +1495,13 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Sacrifice Convent Prioris Advisor?":
         if self.choices_available[int(game_update_string[1])] == "Yes":
             i = 0
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
             while i < len(self.reactions_needing_resolving):
                 if i != 0:
-                    if self.reactions_needing_resolving[i] == "Convent Prioris Advisor":
-                        if self.player_who_resolves_reaction[i] == primary_player.name_player:
+                    if self.reactions_needing_resolving[i].get_reaction_name() == "Convent Prioris Advisor":
+                        if self.reactions_needing_resolving[i].get_player_resolving_reaction() == primary_player.name_player:
                             del self.reactions_needing_resolving[i]
-                            del self.player_who_resolves_reaction[i]
-                            del self.positions_of_unit_triggering_reaction[i]
-                            del self.additional_reactions_info[i]
                             i = i - 1
                 i = i + 1
             primary_player.sacrifice_card_in_hq_given_name("Convent Prioris Advisor")
@@ -1572,7 +1569,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
         self.chosen_first_card = False
         if game_update_string[1] == "0":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             self.misc_counter = primary_player.headquarters[unit_pos].counter
             primary_player.sacrifice_card_in_hq(unit_pos)
         else:
@@ -1751,20 +1748,20 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if game_update_string[1] == "0":
             self.has_chosen_to_resolve = True
         elif game_update_string[1] == "1":
-            if self.reactions_needing_resolving[0] == "Shadowed Thorns Bodysuit" or \
-                    self.reactions_needing_resolving[0] == "War Walker Squadron" or \
-                    self.reactions_needing_resolving[0] == "Fake Ooman Base" or \
-                    self.reactions_needing_resolving[0] == "Kaptin's Hook" or \
-                    self.reactions_needing_resolving[0] == "Dripping Scythes":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "Shadowed Thorns Bodysuit" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "War Walker Squadron" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Fake Ooman Base" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Kaptin's Hook" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Dripping Scythes":
                 self.shadow_thorns_body_allowed = False
                 _, current_planet, current_unit = self.last_defender_position
                 last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
                                            str(current_unit)]
                 await CombatPhase.update_game_event_combat_section(
                     self, secondary_player.name_player, last_game_update_string)
-            elif self.reactions_needing_resolving[0] == "Firedrake Terminators" or \
-                    self.reactions_needing_resolving[0] == "Rampaging Knarloc" or \
-                    self.reactions_needing_resolving[0] == "Neurotic Obliterator":
+            elif self.reactions_needing_resolving[0].get_reaction_name() == "Firedrake Terminators" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Rampaging Knarloc" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Neurotic Obliterator":
                 self.allow_damage_abilities_defender = False
                 self.shadow_thorns_body_allowed = False
                 _, current_planet, current_unit = self.last_defender_position
@@ -1860,7 +1857,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
     elif self.choice_context == "RT: Amount to Remove":
         damage = int(chosen_choice)
-        _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage, healing=True)
         self.reset_choices_available()
         self.resolving_search_box = False
@@ -1910,7 +1907,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
         self.resolving_search_box = False
         if game_update_string[1] == "0":
-            num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+            num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
             self.delete_reaction()
     elif self.choice_context == "Use Reanimating Warriors?":
@@ -2026,7 +2023,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
             self.resolving_search_box = False
     elif self.choice_context == "Prototype Crisis Suit choices":
-        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         card_name = primary_player.deck[int(game_update_string[1])]
         card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
@@ -2110,7 +2107,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
     elif self.choice_context == "Target Doom Scythe Invader:":
         target_choice = self.choices_available[int(game_update_string[1])]
-        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+        num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         self.resolving_search_box = False
         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
@@ -2159,7 +2156,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         primary_player.torture_event_played("Visions of Agony")
     elif self.choice_context == "War Walker Attach Exhaust":
         target_attachment_name = self.choices_available[int(game_update_string[1])]
-        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, target_attachment_name)
         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
         secondary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
@@ -2196,7 +2193,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                 can_no_mercy=False)
     elif self.choice_context == "First Line Rhinos Rally":
-        _, pla, pos = self.positions_of_unit_triggering_reaction[0]
+        _, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         card_name = self.choices_available[int(game_update_string[1])]
         card = self.preloaded_find_card(card_name)
         if card.get_faction() == "Space Marines" and card.get_card_type() == "Army" and not \
@@ -2370,7 +2367,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.flayed_mask_active = True
             self.delete_reaction()
         elif chosen_choice == "Sacrifice Unit":
-            self.player_who_resolves_reaction[0] = primary_player.name_player
+            self.reactions_needing_resolving[0].set_player_resolving_reaction(primary_player.name_player)
         else:
             self.delete_reaction()
             self.location_of_indirect = "ALL"
@@ -2902,7 +2899,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Warlock Destructor: pay fee or discard?":
         self.reset_choices_available()
         self.resolving_search_box = False
-        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         if game_update_string[1] == "0":
             primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
         else:
@@ -2921,12 +2918,12 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
         if game_update_string[1] == "0":
             self.shadowsun_chose_hand = True
-            self.reactions_needing_resolving[0] = "Commander Shadowsun hand"
+            self.reactions_needing_resolving[0].set_reaction_name("Commander Shadowsun hand")
             self.location_hand_attachment_shadowsun = -1
             self.resolving_search_box = False
             await self.send_update_message("Choose card in hand")
         else:
-            self.reactions_needing_resolving[0] = "Commander Shadowsun discard"
+            self.reactions_needing_resolving[0].set_reaction_name("Commander Shadowsun discard")
             self.shadowsun_chose_hand = False
             self.location_attachment_discard_shadowsun = -1
             self.name_player_making_choices = name

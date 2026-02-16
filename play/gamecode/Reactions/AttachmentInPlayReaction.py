@@ -4,17 +4,17 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
     planet_pos = int(game_update_string[3])
     unit_pos = int(game_update_string[4])
     attachment_pos = int(game_update_string[5])
-    extra_info = self.additional_reactions_info[0]
+    extra_info = self.reactions_needing_resolving[0].get_additional_reaction_info()
     player_owning_card = self.p1
     if game_update_string[2] == "2":
         player_owning_card = self.p2
     print("Check what player")
-    print(self.player_who_resolves_reaction)
-    current_reaction = self.reactions_needing_resolving[0]
+    print(self.reactions_needing_resolving[0].get_player_resolving_reaction())
+    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
     if current_reaction == "Junk Chucka Kommando":
         if not self.chosen_first_card:
             if game_update_string[2] == primary_player.get_number():
-                og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                og_num, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if og_pla == planet_pos and og_pos == unit_pos:
                     primary_player.set_aiming_reticle_in_play(og_pla, og_pos)
                     attachment_name = primary_player.cards_in_play[
@@ -23,7 +23,7 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     self.chosen_first_card = True
                     self.misc_target_attachment = (og_pla, og_pos, attachment_pos)
     elif current_reaction == "Neurotic Obliterator":
-        og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        og_num, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         if primary_player.get_number() == game_update_string[2]:
             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Neurotic Obliterator":
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].check_for_a_trait("Weapon") and \
@@ -32,13 +32,13 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
                     self.delete_reaction()
     elif current_reaction == "Acidic Venom Cannon":
-        og_num, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        og_num, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         if secondary_player.get_number() == game_update_string[2]:
             if planet_pos == og_pla and og_pos == unit_pos:
                 secondary_player.discard_attachment_at_pos(planet_pos, unit_pos, attachment_pos)
                 self.delete_reaction()
     elif current_reaction == "Shadowseer":
-        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         if game_update_string[2] == primary_player.get_number():
             if og_pla == planet_pos and og_pos == unit_pos:
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ready():
@@ -50,7 +50,7 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
     elif current_reaction == "Farsight Vanguard":
         if game_update_string[2] == primary_player.get_number():
             if self.chosen_first_card:
-                _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+                _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 second_pla, second_pos = self.misc_target_unit
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner == primary_player.name_player:
                     if not primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].check_for_a_trait("Drone"):

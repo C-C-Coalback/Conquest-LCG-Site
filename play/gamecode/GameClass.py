@@ -8,7 +8,7 @@ from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, 
     InPlayActions, PlanetActions, DiscardActions
 from .Choices import StandardChoices
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction, \
-    AttachmentInPlayReaction, AttachmentHQReaction
+    AttachmentInPlayReaction, AttachmentHQReaction, ReactionsClass
 from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts, \
     AttachmentHQInterrupts, AttachmentInPlayInterrupts
 from .Intercept import InPlayIntercept, HQIntercept
@@ -235,13 +235,7 @@ class Game:
         self.damage_from_attack = False
         self.attacker_location = [-1, -1, -1]
         self.reactions_needing_resolving = []
-        self.positions_of_unit_triggering_reaction = []
-        self.player_who_resolves_reaction = []
-        self.additional_reactions_info = []
         self.delayed_reactions_needing_resolving = []
-        self.delayed_positions_of_unit_triggering_reaction = []
-        self.delayed_player_who_resolves_reaction = []
-        self.delayed_additional_reactions_info = []
         self.misc_counter = 0
         self.wounded_scream_blanked = False
         self.khymera_to_move_positions = []
@@ -490,7 +484,6 @@ class Game:
         self.reactions_on_winning_combat_being_executed = False
         self.reactions_on_winning_combat_permitted = True
         self.name_player_who_won_combat = ""
-        self.damage_amounts_baarzul = []
         self.omega_ambush_active = False
         self.sanguinary_ambush_active = False
         self.shadow_thorns_body_allowed = True
@@ -676,9 +669,6 @@ class Game:
 
     def reset_reactions_data(self):
         self.reactions_needing_resolving = []
-        self.player_who_resolves_reaction = []
-        self.positions_of_unit_triggering_reaction = []
-        self.additional_reactions_info = []
         self.already_resolving_reaction = False
 
     def get_actions_allowed(self):
@@ -863,7 +853,7 @@ class Game:
             else:
                 info_string += self.name_2 + "/"
         elif self.reactions_needing_resolving:
-            info_string += self.player_who_resolves_reaction[0] + "/"
+            info_string += self.reactions_needing_resolving[0].get_player_resolving_reaction()[0] + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
             info_string += "Unspecified/" + "Mobile/"
         elif self.battle_ability_to_resolve:
@@ -927,8 +917,8 @@ class Game:
         elif self.resolving_kugath_nurglings:
             info_string += "Ku'gath Nurglings resolution/"
         elif self.reactions_needing_resolving:
-            info_string += "Reaction: " + self.reactions_needing_resolving[0] + "/"
-            info_string += "User: " + self.player_who_resolves_reaction[0] + "/"
+            info_string += "Reaction: " + self.reactions_needing_resolving[0].get_reaction_name() + "/"
+            info_string += "User: " + self.reactions_needing_resolving[0].get_player_resolving_reaction() + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
             info_string += "Mobile window/"
         elif self.battle_ability_to_resolve:
@@ -1818,7 +1808,7 @@ class Game:
                             self.action_cleanup()
                         if self.faction_of_searched_card == "Necrons":
                             if self.reactions_needing_resolving:
-                                if self.reactions_needing_resolving[0] == "Endless Legions":
+                                if self.reactions_needing_resolving[0].get_reaction_name() == "Endless Legions":
                                     if self.p1.search_card_in_hq("Endless Legions", ready_relevant=True):
                                         self.create_reaction("Endless Legions", self.name_1, (1, -1, -1))
                                     self.delete_reaction()
@@ -1829,7 +1819,7 @@ class Game:
                             self.action_cleanup()
                         if self.faction_of_searched_card == "Necrons":
                             if self.reactions_needing_resolving:
-                                if self.reactions_needing_resolving[0] == "Endless Legions":
+                                if self.reactions_needing_resolving[0].get_reaction_name() == "Endless Legions":
                                     if self.p2.search_card_in_hq("Endless Legions", ready_relevant=True):
                                         self.create_reaction("Endless Legions", self.name_2, (1, -1, -1))
                                     self.delete_reaction()
@@ -2485,8 +2475,8 @@ class Game:
             self.position_of_actioned_card = (-1, -1)
         elif self.nullify_context == "Reaction":
             if self.nullified_card_name in self.dies_to_backlash:
-                secondary_player.destroy_card_in_play(self.positions_of_unit_triggering_reaction[0][1],
-                                                      self.positions_of_unit_triggering_reaction[0][2])
+                secondary_player.destroy_card_in_play(self.reactions_needing_resolving[0].get_planet_pos(),
+                                                      self.reactions_needing_resolving[0].get_unit_pos())
             self.delete_reaction()
         elif self.nullify_context == "Reaction Event":
             self.delete_reaction()
@@ -2511,7 +2501,7 @@ class Game:
                                      (int(primary_player.number), planet_pos, unit_pos))
 
     def mask_jain_zar_check_reactions(self, primary_player, secondary_player):
-        num, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+        num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         if planet_pos != -1 and planet_pos != -2 and unit_pos != -1:
             if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
@@ -2791,28 +2781,9 @@ class Game:
         self.asking_if_interrupt = True
 
     def move_reaction_to_front(self, reaction_pos):
-        if self.reactions_needing_resolving[reaction_pos] == "Ba'ar Zul the Hate-Bound":
-            count_baar = 0
-            i = 0
-            while i < reaction_pos:
-                if self.reactions_needing_resolving[i] == "Ba'ar Zul the Hate-Bound":
-                    count_baar += 1
-                i = i + 1
-            self.damage_amounts_baarzul.insert(0, self.damage_amounts_baarzul.pop(count_baar))
         self.reactions_needing_resolving.insert(
             0, self.reactions_needing_resolving.pop(reaction_pos)
         )
-        self.player_who_resolves_reaction.insert(
-            0, self.player_who_resolves_reaction.pop(reaction_pos)
-        )
-        self.positions_of_unit_triggering_reaction.insert(
-            0, self.positions_of_unit_triggering_reaction.pop(reaction_pos)
-        )
-        self.additional_reactions_info.insert(
-            0, self.additional_reactions_info.pop(reaction_pos)
-        )
-
-        print(self.reactions_needing_resolving)
         self.asking_if_reaction = True
 
     async def create_necrons_wheel_choice(self, player):
@@ -3597,16 +3568,16 @@ class Game:
             if self.holy_sepulchre_check(self.p1):
                 already_sepulchre = False
                 for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "Holy Sepulchre":
-                        if self.player_who_resolves_reaction[i] == self.name_1:
+                    if self.reactions_needing_resolving[i].get_reaction_name() == "Holy Sepulchre":
+                        if self.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_1:
                             already_sepulchre = True
                 if not already_sepulchre:
                     self.create_reaction("Holy Sepulchre", self.name_1, (1, -1, -1))
             if self.holy_sepulchre_check(self.p2):
                 already_sepulchre = False
                 for i in range(len(self.reactions_needing_resolving)):
-                    if self.reactions_needing_resolving[i] == "Holy Sepulchre":
-                        if self.player_who_resolves_reaction[i] == self.name_2:
+                    if self.reactions_needing_resolving[i].get_reaction_name() == "Holy Sepulchre":
+                        if self.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_2:
                             already_sepulchre = True
                 if not already_sepulchre:
                     self.create_reaction("Holy Sepulchre", self.name_2, (2, -1, -1))
@@ -5196,7 +5167,7 @@ class Game:
         self.p2.reset_eocr_values()
 
     async def resolve_reaction(self, name, game_update_string):
-        if name == self.player_who_resolves_reaction[0]:
+        if name == self.reactions_needing_resolving[0].get_player_resolving_reaction():
             print("player reacting:", name)
             if name == self.name_1:
                 primary_player = self.p1
@@ -5206,32 +5177,33 @@ class Game:
                 secondary_player = self.p1
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    if self.reactions_needing_resolving[0] == "Power from Pain":
+                    reaction_name = self.reactions_needing_resolving[0].get_reaction_name()
+                    if reaction_name == "Power from Pain":
                         await self.send_update_message("No sacrifice for Power from Pain")
-                    if self.reactions_needing_resolving[0] == "Cato's Stronghold":
+                    if reaction_name == "Cato's Stronghold":
                         primary_player.allowed_planets_cato_stronghold = []
-                    if self.reactions_needing_resolving[0] == "Foresight":
+                    if reaction_name == "Foresight":
                         primary_player.aiming_reticle_coords_hand = None
-                    if self.reactions_needing_resolving[0] == "Alaitoc Shrine":
+                    if reaction_name == "Alaitoc Shrine":
                         primary_player.allowed_units_alaitoc_shrine = []
-                    if self.reactions_needing_resolving[0] == "The Blood Pits":
+                    if reaction_name == "The Blood Pits":
                         if self.misc_misc:
                             for i in range(len(self.misc_misc)):
                                 pla, pos = self.misc_misc[i]
                                 secondary_player.assign_damage_to_pos(pla, pos, 2)
                         self.misc_misc = None
                         primary_player.drammask_nane_check()
-                    if self.reactions_needing_resolving[0] == "The Inevitable Decay":
+                    if reaction_name == "The Inevitable Decay":
                         primary_player.drammask_nane_check()
-                    if self.reactions_needing_resolving[0] == "Drammask Nane":
+                    if reaction_name == "Drammask Nane":
                         primary_player.reset_all_aiming_reticles_play_hq()
-                    if self.reactions_needing_resolving[0] == "Castellan Crowe":
-                        num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                    if reaction_name == "Castellan Crowe":
+                        num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                         if self.misc_counter > 0:
                             secondary_player.assign_damage_to_pos(pla, pos, self.misc_counter)
-                    if self.reactions_needing_resolving[0] == "Fire Warrior Elite" or \
-                            self.reactions_needing_resolving[0] == "Deathwing Interceders" or \
-                            self.reactions_needing_resolving[0] == "Runts to the Front":
+                    if reaction_name == "Fire Warrior Elite" or \
+                            reaction_name == "Deathwing Interceders" or \
+                            reaction_name == "Runts to the Front":
                         self.may_move_defender = False
                         self.additional_attack_effects_allowed = False
                         _, current_planet, current_unit = self.last_defender_position
@@ -5239,10 +5211,10 @@ class Game:
                                                    str(current_unit)]
                         await CombatPhase.update_game_event_combat_section(
                             self, secondary_player.name_player, last_game_update_string)
-                    if self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+                    if reaction_name == "Tomb Blade Squadron":
                         planet_pos, unit_pos = self.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                    if self.reactions_needing_resolving[0] == "Adaptative Thorax Swarm":
+                    if reaction_name == "Adaptative Thorax Swarm":
                         i = 0
                         names_list = []
                         while i < len(self.misc_player_storage):
@@ -5264,14 +5236,14 @@ class Game:
                         if primary_player.search_hand_for_card("Adaptative Thorax Swarm"):
                             self.create_reaction("Adaptative Thorax Swarm", primary_player.name_player,
                                                  (int(primary_player.number), -1, -1))
-                    if self.reactions_needing_resolving[0] == "Commander Shadowsun hand":
+                    if reaction_name == "Commander Shadowsun hand":
                         primary_player.aiming_reticle_coords_hand = None
                         self.reset_choices_available()
                         self.resolving_search_box = False
-                    if self.reactions_needing_resolving[0] == "Willing Submission":
+                    if reaction_name == "Willing Submission":
                         primary_player.reset_all_aiming_reticles_play_hq()
                         secondary_player.reset_all_aiming_reticles_play_hq()
-                    if self.reactions_needing_resolving[0] == "Cegorach's Jesters":
+                    if reaction_name == "Cegorach's Jesters":
                         primary_player.cegorach_jesters_permitted = []
                         for i in range(len(self.misc_misc)):
                             primary_player.cegorach_jesters_permitted.append(primary_player.cards[self.misc_misc[i]])
@@ -5282,24 +5254,24 @@ class Game:
                         total_string += "."
                         await self.send_update_message(total_string)
                         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
-                    if self.reactions_needing_resolving[0] == "Tunneling Mawloc":
+                    if reaction_name == "Tunneling Mawloc":
                         self.infest_planet(self.misc_target_planet, primary_player)
-                    if self.reactions_needing_resolving[0] == "Awakened Geomancer":
+                    if reaction_name == "Awakened Geomancer":
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                    if self.reactions_needing_resolving[0] == "Dark Lance Raider":
+                    if reaction_name == "Dark Lance Raider":
                         if self.misc_misc is not None:
                             for i in range(len(self.misc_misc)):
                                 og_pla, og_pos = self.misc_misc[i]
                                 secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                                 secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                    if self.reactions_needing_resolving[0] == "Sautekh Royal Crypt Damage":
+                    if reaction_name == "Sautekh Royal Crypt Damage":
                         for i in range(len(self.misc_misc_2)):
                             planet_pos, unit_pos = self.misc_misc_2[i]
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.misc_misc = None
                         self.misc_misc_2 = None
-                    if self.reactions_needing_resolving[0] == "Sacred Rose Immolator":
+                    if reaction_name == "Sacred Rose Immolator":
                         if self.misc_misc is not None:
                             for i in range(len(self.misc_misc)):
                                 current_pla, current_pos = self.misc_misc[i]
@@ -5308,7 +5280,7 @@ class Game:
                         self.misc_misc = None
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         primary_player.reset_all_aiming_reticles_play_hq()
-                    if self.reactions_needing_resolving[0] == "Fierce Purgator":
+                    if reaction_name == "Fierce Purgator":
                         if self.misc_misc_2 is not None:
                             for i in range(len(self.misc_misc_2)):
                                 current_num, current_pla, current_pos = self.misc_misc_2[i]
@@ -5322,14 +5294,14 @@ class Game:
                         self.misc_misc_2 = None
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         primary_player.reset_all_aiming_reticles_play_hq()
-                    if self.reactions_needing_resolving[0] == "Heavy Flamer Retributor":
+                    if reaction_name == "Heavy Flamer Retributor":
                         for i in range(len(self.misc_misc)):
                             current_pla, current_pos = self.misc_misc[i]
                             secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
                                                                   rickety_warbuggy=True)
                         self.misc_misc = None
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                    if self.reactions_needing_resolving[0] == "Howling Exarch":
+                    if reaction_name == "Howling Exarch":
                         primary_player.reset_all_aiming_reticles_play_hq()
                         if self.misc_misc is not None:
                             for i in range(len(self.misc_misc)):
@@ -5340,24 +5312,24 @@ class Game:
                                 else:
                                     self.p2.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1)
-                    if self.reactions_needing_resolving[0] == "Nullify":
+                    if reaction_name == "Nullify":
                         await self.complete_nullify()
 
                     # Decide whether to delete the reaction.
-                    if self.reactions_needing_resolving[0] == "Patron Saint" and not self.chosen_first_card:
+                    if reaction_name == "Patron Saint" and not self.chosen_first_card:
                         self.chosen_first_card = True
                         self.misc_counter = 3 - self.misc_counter
                         if self.misc_counter < 1:
                             self.delete_reaction()
                         else:
                             await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
-                    elif self.reactions_needing_resolving[0] == "Scavenging Kroot Rider":
+                    elif reaction_name == "Scavenging Kroot Rider":
                         if not self.chosen_first_card:
                             self.chosen_first_card = True
                             await self.send_update_message("Skipping enemy support exhaustion.")
                         else:
                             self.delete_reaction()
-                    elif self.reactions_needing_resolving[0] != "Warlock Destructor":
+                    elif reaction_name != "Warlock Destructor":
                         self.delete_reaction()
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
@@ -5379,8 +5351,8 @@ class Game:
                     chosen_removed = int(game_update_string[1])
                     pos_removed = int(game_update_string[2])
                     print("Check what player")
-                    print(self.player_who_resolves_reaction)
-                    current_reaction = self.reactions_needing_resolving[0]
+                    print(self.reactions_needing_resolving[0].get_player_resolving_reaction())
+                    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
                     if current_reaction == "Shadow Hunt":
                         if not self.chosen_first_card:
                             if chosen_removed == int(primary_player.get_number()):
@@ -5421,7 +5393,8 @@ class Game:
                     await InPlayReaction.resolve_in_play_reaction(self, name, game_update_string,
                                                                   primary_player, secondary_player)
                 elif game_update_string[0] == "RESERVE":
-                    if self.reactions_needing_resolving[0] == "Seer Adept":
+                    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+                    if current_reaction == "Seer Adept":
                         if game_update_string[1] == secondary_player.number:
                             name_card = secondary_player.cards_in_reserve[
                                 int(game_update_string[2])][int(game_update_string[3])].get_name()
@@ -5429,7 +5402,7 @@ class Game:
                                                            " at that position")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
-                    elif self.reactions_needing_resolving[0] == "Snagbrat's Scouts":
+                    elif current_reaction == "Snagbrat's Scouts":
                         if game_update_string[1] == primary_player.number:
                             if primary_player.cards_in_reserve[
                                 int(game_update_string[2])][
@@ -5454,9 +5427,9 @@ class Game:
                                                                              primary_player.name_player,
                                                                              (int(primary_player.number), -1, -1))
                                     self.delete_reaction()
-                    elif self.reactions_needing_resolving[0] == "Kamouflage Expert":
+                    elif current_reaction == "Kamouflage Expert":
                         if game_update_string[1] == primary_player.number:
-                            og_pla = self.positions_of_unit_triggering_reaction[0][1]
+                            og_pla = self.reactions_needing_resolving[0].get_planet_pos()
                             planet_pos = int(game_update_string[2])
                             unit_pos = int(game_update_string[3])
                             if og_pla == planet_pos or (og_pla - unit_pos) == 1:
@@ -5471,7 +5444,7 @@ class Game:
                                 del primary_player.cards_in_reserve[planet_pos][unit_pos]
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
-                    elif self.reactions_needing_resolving[0] == "Impulsive Loota Reserve":
+                    elif current_reaction == "Impulsive Loota Reserve":
                         if not self.chosen_first_card:
                             if game_update_string[1] == primary_player.number:
                                 if primary_player.cards_in_reserve[int(game_update_string[2])][
@@ -5500,7 +5473,7 @@ class Game:
                         planet_pos = int(game_update_string[3])
                         attachment_pos = int(game_update_string[4])
                         if int(primary_player.number) == player_num:
-                            if self.reactions_needing_resolving[0] == "Defense Battery":
+                            if self.reactions_needing_resolving[0].get_reaction_name() == "Defense Battery":
                                 if not self.chosen_first_card:
                                     if primary_player.attachments_at_planet[planet_pos][attachment_pos].get_ability() \
                                             == "Defense Battery":
@@ -5775,23 +5748,21 @@ class Game:
 
     def delete_reaction(self):
         if self.reactions_needing_resolving:
-            if self.reactions_needing_resolving[0] == "Ba'ar Zul the Hate-Bound":
-                if self.damage_amounts_baarzul:
-                    del self.damage_amounts_baarzul[0]
-            if self.reactions_needing_resolving[0] == "Tomb Blade Squadron":
+            reaction_name = self.reactions_needing_resolving[0].get_reaction_name()
+            if reaction_name == "Tomb Blade Squadron":
                 self.need_to_reset_tomb_blade_squadron = True
-            if self.reactions_needing_resolving[0] == "Dynastic Weaponry":
+            if reaction_name == "Dynastic Weaponry":
                 self.need_to_reset_tomb_blade_squadron = True
-            if self.reactions_needing_resolving[0] == "Wrathful Retribution":
-                if self.player_who_resolves_reaction[0] == self.name_1:
+            if reaction_name == "Wrathful Retribution":
+                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_1:
                     self.p1.wrathful_retribution_value = 0
                 else:
                     self.p2.wrathful_retribution_value = 0
-            if self.reactions_needing_resolving[0] == "Storming Librarian":
+            if reaction_name == "Storming Librarian":
                 player = self.p1
-                if self.player_who_resolves_reaction[0] == self.name_2:
+                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
                     player = self.p2
-                num, pla, pos = self.positions_of_unit_triggering_reaction[0]
+                num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 id_storm_lib = -1
                 if pla == -2:
                     id_storm_lib = player.headquarters[pos].card_id
@@ -5813,11 +5784,8 @@ class Game:
             self.asking_which_reaction = True
             self.already_resolving_reaction = False
             self.asking_if_reaction = False
-            self.last_player_who_resolved_reaction = self.player_who_resolves_reaction[0]
+            self.last_player_who_resolved_reaction = self.reactions_needing_resolving[0].get_player_resolving_reaction()
             del self.reactions_needing_resolving[0]
-            del self.player_who_resolves_reaction[0]
-            del self.positions_of_unit_triggering_reaction[0]
-            del self.additional_reactions_info[0]
         if not self.reactions_needing_resolving:
             for i in range(len(self.p1.headquarters)):
                 if self.p1.check_is_unit_at_pos(-2, i):
@@ -5953,8 +5921,8 @@ class Game:
                                                                 bloodied_relevant=True):
                             if not primary_player.hit_by_gorgul:
                                 self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                                     (int(primary_player.number), def_pla, def_pos))
-                                self.damage_amounts_baarzul.append(self.amount_that_can_be_removed_by_shield[0])
+                                                     (int(primary_player.number), def_pla, def_pos),
+                                                     additional_info=self.amount_that_can_be_removed_by_shield[0])
                     if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh") and def_pla != -2:
                         for i in range(7):
                             if i != def_pla:
@@ -6208,13 +6176,7 @@ class Game:
     def convert_delayed(self):
         for i in range(len(self.delayed_reactions_needing_resolving)):
             self.reactions_needing_resolving.append(self.delayed_reactions_needing_resolving[i])
-            self.player_who_resolves_reaction.append(self.delayed_player_who_resolves_reaction[i])
-            self.positions_of_unit_triggering_reaction.append(self.delayed_positions_of_unit_triggering_reaction[i])
-            self.additional_reactions_info.append(self.delayed_additional_reactions_info[i])
-        self.delayed_player_who_resolves_reaction = []
         self.delayed_reactions_needing_resolving = []
-        self.delayed_positions_of_unit_triggering_reaction = []
-        self.delayed_additional_reactions_info = []
 
     async def update_reactions(self, name, game_update_string, count=0):
         if count < 10:
@@ -6236,10 +6198,10 @@ class Game:
                             self.name_player_making_choices = self.name_1
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] in self.forced_reactions:
+                            if self.reactions_needing_resolving[0].get_reaction_name() in self.forced_reactions:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.reactions_needing_resolving[0]
-                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.choice_context = self.reactions_needing_resolving[0].get_reaction_name()
+                            self.name_player_making_choices = self.reactions_needing_resolving[0].get_player_resolving_reaction()
                             self.asking_if_reaction = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -6251,10 +6213,10 @@ class Game:
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] in self.forced_reactions:
+                            if self.reactions_needing_resolving[0].get_reaction_name() in self.forced_reactions:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.reactions_needing_resolving[0]
-                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.choice_context = self.reactions_needing_resolving[0].get_reaction_name()
+                            self.name_player_making_choices = self.reactions_needing_resolving[0].get_player_resolving_reaction()
                             self.asking_if_reaction = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -6269,10 +6231,10 @@ class Game:
                             self.name_player_making_choices = self.name_2
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] in self.forced_reactions:
+                            if self.reactions_needing_resolving[0].get_reaction_name() in self.forced_reactions:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.reactions_needing_resolving[0]
-                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.choice_context = self.reactions_needing_resolving[0].get_reaction_name()
+                            self.name_player_making_choices = self.reactions_needing_resolving[0].get_player_resolving_reaction()
                             self.asking_if_reaction = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -6284,10 +6246,10 @@ class Game:
                         self.asking_which_reaction = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.reactions_needing_resolving[0] in self.forced_reactions:
+                            if self.reactions_needing_resolving[0].get_reaction_name() in self.forced_reactions:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.reactions_needing_resolving[0]
-                            self.name_player_making_choices = self.player_who_resolves_reaction[0]
+                            self.choice_context = self.reactions_needing_resolving[0].get_reaction_name()
+                            self.name_player_making_choices = self.reactions_needing_resolving[0].get_player_resolving_reaction()
                             self.asking_if_reaction = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -6548,23 +6510,13 @@ class Game:
             if self.p1.stored_targets_the_emperor_protects:
                 print("units valid")
                 if self.p1.search_hand_for_card("Made Ta Fight") and self.p1.resources > 1:
-                    already_present = False
-                    for i in range(len(self.reactions_needing_resolving)):
-                        if self.reactions_needing_resolving[i] == "Made Ta Fight":
-                            if self.player_who_resolves_reaction[i] == self.name_1:
-                                already_present = True
-                    if not already_present:
+                    if not self.p1.check_if_already_have_reaction("Made Ta Fight"):
                         self.create_reaction("Made Ta Fight", self.name_1, (1, -1, -1))
         warlord_planet, warlord_pos = self.p2.get_location_of_warlord()
         if warlord_planet != -2:
             if self.p2.stored_targets_the_emperor_protects:
                 if self.p2.search_hand_for_card("Made Ta Fight") and self.p2.resources > 1:
-                    already_present = False
-                    for i in range(len(self.reactions_needing_resolving)):
-                        if self.reactions_needing_resolving[i] == "Made Ta Fight":
-                            if self.player_who_resolves_reaction[i] == self.name_2:
-                                already_present = True
-                    if not already_present:
+                    if not self.p2.check_if_already_have_reaction("Made Ta Fight"):
                         self.create_reaction("Made Ta Fight", self.name_2, (2, -1, -1))
 
     def emp_protecc(self):
@@ -7029,14 +6981,14 @@ class Game:
             else:
                 self.reset_all_valid_targets_kugath_nurglings()
         if self.p1.discard_inquis_caius_wroth or self.p2.discard_inquis_caius_wroth:
-            if self.player_who_resolves_reaction[0] == self.name_1:
+            if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_1:
                 if len(self.p1.cards) < 5:
                     self.p1.discard_inquis_caius_wroth = False
-                    self.player_who_resolves_reaction[0] = self.name_2
+                    self.reactions_needing_resolving[0].set_player_resolving_reaction(self.name_2)
             else:
                 if len(self.p2.cards) < 5:
                     self.p2.discard_inquis_caius_wroth = False
-                    self.player_who_resolves_reaction[0] = self.name_1
+                    self.reactions_needing_resolving[0].set_player_resolving_reaction(self.name_1)
             if not self.p1.discard_inquis_caius_wroth and not self.p2.discard_inquis_caius_wroth:
                 self.delete_reaction()
         await self.update_interrupts(name, game_update_string)
@@ -7412,7 +7364,6 @@ class Game:
             self.p2.already_lost_due_to_deck = True
         print("---\nDEBUG INFO\n---")
         print(self.interrupts_waiting_on_resolution)
-        print(self.reactions_needing_resolving)
         print(self.choices_available)
         if self.phase == "DEPLOY":
             if self.number_with_deploy_turn == "1":
@@ -7473,14 +7424,14 @@ class Game:
     def get_name_reactions_of_players_reactions(self, name):
         reaction_positions_list = []
         for i in range(len(self.reactions_needing_resolving)):
-            if self.player_who_resolves_reaction[i] == name:
-                reaction_positions_list.append(self.reactions_needing_resolving[i])
+            if self.reactions_needing_resolving[i].get_player_resolving_reaction() == name:
+                reaction_positions_list.append(self.reactions_needing_resolving[i].get_reaction_name())
         return reaction_positions_list
 
     def get_positions_of_players_reactions(self, name):
         reaction_positions_list = []
         for i in range(len(self.reactions_needing_resolving)):
-            if self.player_who_resolves_reaction[i] == name:
+            if self.reactions_needing_resolving[i].get_player_resolving_reaction() == name:
                 reaction_positions_list.append(i)
         return reaction_positions_list
 
@@ -7495,7 +7446,7 @@ class Game:
         count_1 = 0
         count_2 = 0
         for i in range(len(self.reactions_needing_resolving)):
-            if self.player_who_resolves_reaction[i] == self.name_1:
+            if self.reactions_needing_resolving[i].get_player_resolving_reaction() == self.name_1:
                 count_1 += 1
             else:
                 count_2 += 1
@@ -7826,10 +7777,8 @@ class Game:
         else:
             player = self.p2
         if not player.hit_by_gorgul:
-            self.delayed_reactions_needing_resolving.append(reaction_name)
-            self.delayed_player_who_resolves_reaction.append(player_name)
-            self.delayed_positions_of_unit_triggering_reaction.append(unit_tuple)
-            self.delayed_additional_reactions_info.append(additional_info)
+            self.delayed_reactions_needing_resolving.append(
+                ReactionsClass.Reaction(reaction_name, player_name, unit_tuple, additional_info))
 
     def create_reaction(self, reaction_name, player_name, unit_tuple, additional_info=None):
         if player_name == self.name_1:
@@ -7837,10 +7786,8 @@ class Game:
         else:
             player = self.p2
         if not player.hit_by_gorgul:
-            self.reactions_needing_resolving.append(reaction_name)
-            self.player_who_resolves_reaction.append(player_name)
-            self.positions_of_unit_triggering_reaction.append(unit_tuple)
-            self.additional_reactions_info.append(additional_info)
+            self.reactions_needing_resolving.append(
+                ReactionsClass.Reaction(reaction_name, player_name, unit_tuple, additional_info))
 
     def begin_combat_round(self):
         self.bloodthirst_active = [False, False, False, False, False, False, False]

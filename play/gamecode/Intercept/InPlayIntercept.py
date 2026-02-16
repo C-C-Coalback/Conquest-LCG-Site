@@ -22,7 +22,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Sicarius's Chosen":
-        origin_planet = self.positions_of_unit_triggering_reaction[0][1]
+        origin_planet = self.reactions_needing_resolving[0].get_planet_pos()
         primary_player.move_unit_to_planet(target_planet,
                                            int(game_update_string[3]),
                                            origin_planet)
@@ -185,7 +185,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Fenrisian Wolf":
-        att_num, att_pla, att_pos = self.positions_of_unit_triggering_reaction[0]
+        att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         att_value = secondary_player.get_attack_given_pos(att_pla, att_pos)
         primary_player.assign_damage_to_pos(planet_pos, unit_pos, att_value, by_enemy_unit=False)
         self.advance_damage_aiming_reticle()
@@ -227,8 +227,8 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Nocturne-Ultima Storm Bolter":
-        origin_planet = self.positions_of_unit_triggering_reaction[0][1]
-        origin_pos = self.positions_of_unit_triggering_reaction[0][2]
+        origin_planet = self.reactions_needing_resolving[0].get_planet_pos()
+        origin_pos = self.reactions_needing_resolving[0].get_unit_pos()
         attack = secondary_player.get_attack_given_pos(origin_planet, origin_pos)
         primary_player.assign_damage_to_pos(origin_planet, target_unit_pos, attack, by_enemy_unit=False)
         primary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
@@ -279,7 +279,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Invasive Genestealers":
         primary_player.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop += 1
-        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         secondary_player.cards_in_play[og_pla + 1][og_pos].positive_hp_until_eop += 1
         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
         self.delete_reaction()
@@ -412,7 +412,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Junk Chucka Kommando":
         og_player = primary_player
-        if self.player_who_resolves_reaction[0] != og_player.name_player:
+        if self.reactions_needing_resolving[0].get_player_resolving_reaction() != og_player.name_player:
             og_player = secondary_player
         og_pla, og_pos, og_attachment = self.misc_target_attachment
         attachment = og_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
@@ -433,10 +433,10 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Patient Infiltrator":
         og_player = primary_player
-        if self.player_who_resolves_reaction[0] != og_player.name_player:
+        if self.reactions_needing_resolving[0].get_player_resolving_reaction() != og_player.name_player:
             og_player = secondary_player
         primary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
-        _, og_pla, og_pos = self.positions_of_unit_triggering_reaction[0]
+        _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         og_player.remove_damage_from_pos(og_pla, og_pos, 1)
         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
         self.delete_reaction()
@@ -604,7 +604,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Run Down":
-        dest = self.positions_of_unit_triggering_reaction[0][1]
+        dest = self.reactions_needing_resolving[0].get_planet_pos()
         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest)
         self.delete_reaction()
         self.complete_intercept()

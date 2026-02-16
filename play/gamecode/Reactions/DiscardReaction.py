@@ -6,9 +6,9 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
     chosen_discard = int(game_update_string[1])
     pos_discard = int(game_update_string[2])
     print("Check what player")
-    print(self.player_who_resolves_reaction)
-    current_reaction = self.reactions_needing_resolving[0]
-    if name == self.player_who_resolves_reaction[0]:
+    print(self.reactions_needing_resolving[0].get_player_resolving_reaction())
+    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+    if name == self.reactions_needing_resolving[0].get_player_resolving_reaction():
         if current_reaction == "Sathariel the Invokator":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
@@ -71,7 +71,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         (card.check_for_a_trait("Warrior", primary_player.etekh_trait) or
                          card.check_for_a_trait("Soldier", primary_player.etekh_trait)):
                     if card.get_cost() < self.ghost_ark_of_orikan:
-                        num, planet, unit = self.positions_of_unit_triggering_reaction[0]
+                        num, planet, unit = self.reactions_needing_resolving[0].get_position_unit_triggering()
                         if primary_player.add_card_to_planet(card, planet) != -1:
                             position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
                             primary_player.cards_in_play[planet + 1][position_of_unit]. \
@@ -134,7 +134,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Attachment":
                         if not card.planet_attachment:
-                            _, planet_pos, unit_pos = self.positions_of_unit_triggering_reaction[0]
+                            _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                             if primary_player.attach_card(card, planet_pos, unit_pos):
                                 primary_player.remove_card_from_discard(pos_discard)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -161,7 +161,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
                 if card.get_faction() == "Necrons" and card.get_cost() < 4 and card.get_is_unit():
-                    num, planet, unit = self.positions_of_unit_triggering_reaction[0]
+                    num, planet, unit = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     if primary_player.add_card_to_planet(card, planet) != -1:
                         primary_player.used_optimized_protocol = True
                         position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
@@ -199,7 +199,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
                 if card.get_is_unit() and card.check_for_a_trait("Brood", primary_player.etekh_trait):
-                    primary_player.add_card_to_planet(card, self.positions_of_unit_triggering_reaction[0][1])
+                    primary_player.add_card_to_planet(card, self.reactions_needing_resolving[0].get_planet_pos())
                     primary_player.remove_card_from_discard(pos_discard)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()

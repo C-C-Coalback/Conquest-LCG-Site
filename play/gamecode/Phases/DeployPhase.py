@@ -403,26 +403,26 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 secondary_player = self.p1
     if not is_an_interrupt:
         if self.reactions_needing_resolving and self.already_resolving_reaction:
-            if self.reactions_needing_resolving[0] == "Vamii Industrial Complex" or \
-                    self.reactions_needing_resolving[0] == "Dark Allegiance":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "Vamii Industrial Complex" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance":
                 is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
-                if self.player_who_resolves_reaction[0] == self.name_2:
+                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
                     primary_player = self.p2
                     secondary_player = self.p1
-            if self.reactions_needing_resolving[0] == "The Dance Without End":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "The Dance Without End":
                 is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
-                if self.player_who_resolves_reaction[0] == self.name_2:
+                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
                     primary_player = self.p2
                     secondary_player = self.p1
-            if self.reactions_needing_resolving[0] == "Dark Allegiance":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance":
                 is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
-                if self.player_who_resolves_reaction[0] == self.name_2:
+                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
                     primary_player = self.p2
                     secondary_player = self.p1
     if not is_an_interrupt and not is_a_reaction:
@@ -581,7 +581,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.name_player_making_choices = secondary_player.get_name_player()
             self.resolving_search_box = True
     if self.reactions_needing_resolving and self.already_resolving_reaction:
-        if self.reactions_needing_resolving[0] == "Vamii Industrial Complex":
+        if self.reactions_needing_resolving[0].get_reaction_name() == "Vamii Industrial Complex":
             self.delete_reaction()
     if is_battle_ability:
         pass
@@ -641,19 +641,19 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
     impulsive_loota = False
     extra_discounts = 0
     if self.reactions_needing_resolving:
-        if self.reactions_needing_resolving[0] == "Impulsive Loota Reserve"\
-                or self.reactions_needing_resolving[0] == "Impulsive Loota In Play" or \
-                self.reactions_needing_resolving[0] == "Dark Allegiance":
+        if self.reactions_needing_resolving[0].get_reaction_name() == "Impulsive Loota Reserve"\
+                or self.reactions_needing_resolving[0].get_reaction_name() == "Impulsive Loota In Play" or \
+                self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance":
             card = self.card_to_deploy
             is_reaction = True
-            if self.reactions_needing_resolving[0] == "Impulsive Loota Reserve" \
-                    or self.reactions_needing_resolving[0] == "Impulsive Loota In Play":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "Impulsive Loota Reserve" \
+                    or self.reactions_needing_resolving[0].get_reaction_name() == "Impulsive Loota In Play":
                 impulsive_loota = True
-            if self.reactions_needing_resolving[0] == "Dark Allegiance":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance":
                 extra_discounts = 1
             primary_player = self.p1
             secondary_player = self.p2
-            if self.player_who_resolves_reaction[0] == self.name_2:
+            if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
                 primary_player = self.p2
                 secondary_player = self.p1
     if self.interrupts_waiting_on_resolution:
