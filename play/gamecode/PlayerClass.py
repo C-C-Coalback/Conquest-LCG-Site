@@ -7267,7 +7267,7 @@ class Player:
                                                   (int(other_player.number), planet_num, i))
             if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Termagant":
                 for i in range(len(self.cards_in_play[planet_num + 1])):
-                    if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Sentry":
+                    if self.get_ability_given_pos(planet_num, i) == "Termagant Sentry":
                         if not self.check_if_already_have_reaction_of_position("Termagant Sentry", planet_num, i):
                             self.game.create_reaction("Termagant Sentry", self.name_player,
                                                       (int(self.number), planet_num, i))
