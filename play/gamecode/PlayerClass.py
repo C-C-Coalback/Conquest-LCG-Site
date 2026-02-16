@@ -210,7 +210,6 @@ class Player:
         self.valid_prey_on_the_weak = [False, False, False, False, False, False, False]
         self.valid_surrogate_host = [False, False, False, False, False, False, False]
         self.contaminated_convoys = False
-        self.magus_harid_waiting_cards = []
         self.planet_absorption_played = False
         self.reinforced_synaptic_network_played = False
         self.allowed_units_rsn = copy.copy(self.synapse_list)
@@ -1416,17 +1415,17 @@ class Player:
 
     def check_if_already_have_interrupt_of_position(self, interrupt_name, pla, pos):
         for i in range(len(self.game.interrupts_waiting_on_resolution)):
-            if self.game.interrupts_waiting_on_resolution[i] == interrupt_name:
-                if self.game.player_resolving_interrupts[i] == self.name_player:
-                    num, og_pla, og_pos = self.game.positions_of_units_interrupting[i]
+            if self.game.interrupts_waiting_on_resolution[i].get_interrupt_name() == interrupt_name:
+                if self.game.interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() == self.name_player:
+                    num, og_pla, og_pos = self.game.interrupts_waiting_on_resolution[i].get_position_unit_triggering()
                     if num == int(self.number) and pla == og_pla and og_pos == pos:
                         return True
         return False
 
     def check_if_already_have_interrupt(self, interrupt_name):
         for i in range(len(self.game.interrupts_waiting_on_resolution)):
-            if self.game.interrupts_waiting_on_resolution[i] == interrupt_name:
-                if self.game.player_resolving_interrupts[i] == self.name_player:
+            if self.game.interrupts_waiting_on_resolution[i].get_interrupt_name() == interrupt_name:
+                if self.game.interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() == self.name_player:
                     return True
         return False
 
@@ -1855,20 +1854,17 @@ class Player:
     def adjust_own_interrupts(self, planet_pos, unit_pos):
         i = 0
         while i < len(self.game.interrupts_waiting_on_resolution):
-            num, pla, pos = self.game.positions_of_units_interrupting[i]
+            num, pla, pos = self.game.interrupts_waiting_on_resolution[i].get_position_unit_triggering()
             if num == int(self.number):
                 if pla == planet_pos:
                     if pos > unit_pos:
                         pos -= 1
-                        self.game.positions_of_units_interrupting[i] = (num, pla, pos)
+                        self.game.interrupts_waiting_on_resolution[i].set_position_unit_triggering((num, pla, pos))
                     elif pos == unit_pos:
                         if i == 0:
                             pass
                         else:
                             del self.game.interrupts_waiting_on_resolution[i]
-                            del self.game.positions_of_units_interrupting[i]
-                            del self.game.player_resolving_interrupts[i]
-                            del self.game.extra_interrupt_info[i]
                             i = i - 1
             i += 1
 
@@ -5255,8 +5251,8 @@ class Player:
 
     def does_own_interrupt_exist(self, reaction_name):
         for i in range(len(self.game.interrupts_waiting_on_resolution)):
-            if self.game.interrupts_waiting_on_resolution[i] == reaction_name:
-                if self.game.player_resolving_interrupts[i] == self.name_player:
+            if self.game.interrupts_waiting_on_resolution[i].get_interrupt_name() == reaction_name:
+                if self.game.interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() == self.name_player:
                     return True
         return False
 
@@ -7587,13 +7583,13 @@ class Player:
                 att_card_type = card.get_attachments()[i].get_card_type()
                 if att_card_type == "Army" or att_card_type == "Attachment":
                     if owner == other_player.name_player:
-                        other_player.magus_harid_waiting_cards.append(card.get_attachments()[i].get_name())
                         self.game.create_interrupt("Magus Harid", other_player.name_player,
-                                                   (int(other_player.number), planet_num, -1))
+                                                   (int(other_player.number), planet_num, -1),
+                                                   extra_info=card.get_attachments()[i].get_name())
                     else:
-                        self.magus_harid_waiting_cards.append(card.get_attachments()[i].get_name())
                         self.game.create_interrupt("Magus Harid", self.name_player,
-                                                   (int(self.number), planet_num, -1))
+                                                   (int(self.number), planet_num, -1),
+                                                   extra_info=card.get_attachments()[i].get_name())
         if self.cards_in_play[planet_num + 1][card_pos].get_ability() == "Straken's Command Squad":
             self.game.create_reaction("Straken's Command Squad", self.name_player, (int(self.number), planet_num, -1))
         if self.get_ability_given_pos(planet_num, card_pos) == "Krieg Armoured Regiment":

@@ -5,16 +5,16 @@ import copy
 
 
 async def start_resolving_interrupt(self, name, game_update_string):
-    if self.player_resolving_interrupts[0] == self.name_1:
+    if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_1:
         primary_player = self.p1
         secondary_player = self.p2
     else:
         primary_player = self.p2
         secondary_player = self.p1
-    num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
-    current_interrupt = self.interrupts_waiting_on_resolution[0]
+    num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
+    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
     if not self.resolving_search_box:
-        if self.interrupts_waiting_on_resolution[0] == "Interrogator Acolyte":
+        if current_interrupt == "Interrogator Acolyte":
             primary_player.draw_card()
             primary_player.draw_card()
             self.delete_interrupt()
@@ -38,7 +38,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.name_player_who_is_searching = primary_player.name_player
             self.number_who_is_searching = primary_player.number
             self.delete_interrupt()
-        elif self.interrupts_waiting_on_resolution[0] == "M35 Galaxy Lasgun":
+        elif current_interrupt == "M35 Galaxy Lasgun":
             if "M35 Galaxy Lasgun" in primary_player.discard:
                 primary_player.discard.remove("M35 Galaxy Lasgun")
                 primary_player.cards.append("M35 Galaxy Lasgun")
@@ -68,13 +68,13 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.ready_given_pos(planet_pos, unit_pos)
                 self.delete_interrupt()
         elif current_interrupt == "Frontline Counsellor":
-            destination = int(self.extra_interrupt_info[0])
+            destination = int(self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info())
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             primary_player.move_unit_to_planet(planet_pos, unit_pos, destination)
             self.delete_interrupt()
         elif current_interrupt == "The Sun Prince":
-            self.player_resolving_interrupts[0] = secondary_player.name_player
-        elif self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
+            self.interrupts_waiting_on_resolution[0].set_player_resolving_interrupt(secondary_player.name_player)
+        elif current_interrupt == "Berzerker Warriors":
             if "Berzerker Warriors" not in primary_player.cards:
                 self.delete_interrupt()
             else:
@@ -83,7 +83,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "Mucolid Spores":
             self.misc_counter = 0
         elif current_interrupt == "Fairly 'Quipped Kommando":
-            attachment_name = self.extra_interrupt_info[0]
+            attachment_name = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             if attachment_name in primary_player.discard:
                 primary_player.cards.append(attachment_name)
                 primary_player.discard.remove(attachment_name)
@@ -99,7 +99,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "The Shadow Suit":
             self.chosen_first_card = False
         elif current_interrupt == "First Line Rhinos":
-            extra_info = self.extra_interrupt_info[0]
+            extra_info = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             if extra_info is not None:
                 card = self.preloaded_find_card(extra_info)
                 primary_player.add_card_to_planet(card, planet_pos, already_exhausted=True)
@@ -218,7 +218,6 @@ async def start_resolving_interrupt(self, name, game_update_string):
                     await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                           discounts=self.discounts_applied)
         elif current_interrupt == "Ulthwe Spirit Stone":
-            num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
             primary_player.return_card_to_hand(planet_pos, unit_pos)
             self.reset_choices_available()
             self.delete_interrupt()
@@ -393,7 +392,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.delete_interrupt()
         elif current_interrupt == "Magus Harid":
             self.misc_player_storage = "RESOLVING MAGUS HARID"
-            card_name = primary_player.magus_harid_waiting_cards[0]
+            card_name = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             await self.send_update_message("Magus is deploying a " + card_name)
             card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)

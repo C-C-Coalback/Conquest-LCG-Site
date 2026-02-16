@@ -10,13 +10,13 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
         player_owning_card = primary_player
     else:
         player_owning_card = secondary_player
-    current_interrupt = self.interrupts_waiting_on_resolution[0]
+    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
     if current_interrupt == "Vanguard Soldiers":
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 primary_player.ready_given_pos(planet_pos, unit_pos)
                 self.delete_interrupt()
-    elif self.interrupts_waiting_on_resolution[0] == "No Mercy":
+    elif current_interrupt == "No Mercy":
         if game_update_string[1] == primary_player.number:
             hq_pos = int(game_update_string[2])
             if primary_player.headquarters[hq_pos].get_is_unit() and \
@@ -34,7 +34,7 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
     elif current_interrupt == "Chapter Champion Varn":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
-                _, og_pla, og_pos = self.positions_of_units_interrupting[0]
+                _, og_pla, og_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
                 primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
                 primary_player.headquarters[unit_pos].increase_damage(1)
                 if primary_player.get_cost_given_pos(-2, unit_pos) < primary_player.headquarters[unit_pos].get_damage():

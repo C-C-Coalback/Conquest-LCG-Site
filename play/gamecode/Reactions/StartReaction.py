@@ -2574,7 +2574,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.name_player_making_choices = secondary_player.name_player
                     self.choice_context = "Use Nullify?"
                     self.nullified_card_pos = -1
-                    self.nullified_card_name = "Accept Any Challenge"
+                    self.nullified_card_name = current_reaction
                     self.cost_card_nullified = 1
                     self.nullify_string = "/".join(game_update_string)
                     self.first_player_nullified = primary_player.name_player

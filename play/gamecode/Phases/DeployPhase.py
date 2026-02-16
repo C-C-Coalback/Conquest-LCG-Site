@@ -392,13 +392,13 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     is_a_reaction = False
     is_battle_ability = False
     if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
-        if self.interrupts_waiting_on_resolution[0] == "Magus Harid" or \
-                self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors" or \
-                self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+        if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Magus Harid" or \
+                self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Berzerker Warriors" or \
+                self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Catachan Devils Patrol":
             is_an_interrupt = True
             primary_player = self.p1
             secondary_player = self.p2
-            if self.player_resolving_interrupts[0] == self.name_2:
+            if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_2:
                 primary_player = self.p2
                 secondary_player = self.p1
     if not is_an_interrupt:
@@ -567,14 +567,14 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         if self.action_chosen:
             self.action_cleanup()
     if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
-        if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
+        if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Berzerker Warriors":
             self.delete_interrupt()
-        if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
+        elif self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Magus Harid":
             primary_player.discard.remove(self.card_to_deploy.get_name())
             self.misc_player_storage = ""
             self.delete_interrupt()
             self.action_cleanup()
-        elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
+        elif self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Catachan Devils Patrol":
             self.delete_interrupt()
             self.choices_available = ["Take Damage", "Cancel Attack"]
             self.choice_context = "Catachan Devils Patrol: make a choice"
@@ -657,12 +657,12 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 primary_player = self.p2
                 secondary_player = self.p1
     if self.interrupts_waiting_on_resolution:
-        if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
+        if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Magus Harid":
             card = self.card_to_deploy
             magus_harid = True
             primary_player = self.p1
             secondary_player = self.p2
-            if self.player_resolving_interrupts[0] == self.name_2:
+            if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_2:
                 primary_player = self.p2
                 secondary_player = self.p1
     if card is None:
@@ -751,7 +751,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 self.faction_of_card_to_play = ""
                 self.name_of_card_to_play = ""
                 if magus_harid:
-                    primary_player.discard.remove(primary_player.magus_harid_waiting_cards[0])
+                    primary_player.discard.remove(self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info())
                     self.misc_player_storage = ""
                     self.delete_interrupt()
                     self.action_cleanup()

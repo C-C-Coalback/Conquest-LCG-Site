@@ -738,21 +738,21 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if game_update_string[1] == "0":
             self.has_chosen_to_resolve = True
         elif game_update_string[1] == "1":
-            if self.interrupts_waiting_on_resolution[0] == "Ulthwe Spirit Stone":
-                num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+            interrupt_name = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+            if interrupt_name == "Ulthwe Spirit Stone":
+                num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
                 primary_player.discard_attachment_name_from_card(planet_pos, unit_pos,
                                                                  "Ulthwe Spirit Stone")
-            elif self.interrupts_waiting_on_resolution[0] == "Slumbering Gardens Special":
-                num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+            elif interrupt_name == "Slumbering Gardens Special":
+                num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
                 primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
-            elif self.interrupts_waiting_on_resolution[0] == "Trazyn the Infinite":
-                num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+            elif interrupt_name == "Trazyn the Infinite":
+                num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
                 if planet_pos == -2:
                     primary_player.headquarters[unit_pos].misc_ability_used = True
                 else:
                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
-            elif self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol" or \
-                    self.interrupts_waiting_on_resolution[0] == "Dodging Land Speeder":
+            elif interrupt_name == "Catachan Devils Patrol" or interrupt_name == "Dodging Land Speeder":
                 self.shadow_thorns_body_allowed = False
                 _, current_planet, current_unit = self.last_defender_position
                 last_game_update_string = ["IN_PLAY", primary_player.get_number(),
@@ -761,8 +761,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 self.resolving_search_box = False
                 await CombatPhase.update_game_event_combat_section(
                     self, secondary_player.name_player, last_game_update_string)
-            elif self.interrupts_waiting_on_resolution[0] == "Counterblow" or \
-                    self.interrupts_waiting_on_resolution[0] == "Trap Laying Hunter":
+            elif interrupt_name == "Counterblow" or interrupt_name == "Trap Laying Hunter":
                 self.allow_damage_abilities_defender = False
                 self.shadow_thorns_body_allowed = False
                 _, current_planet, current_unit = self.last_defender_position
@@ -1082,7 +1081,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         else:
             self.reset_choices_available()
             self.resolving_search_box = False
-            self.player_resolving_interrupts[0] = primary_player.name_player
+            self.interrupts_waiting_on_resolution[0].set_player_resolving_interrupt(primary_player.name_player)
     elif self.choice_context == "SD: Change Enslavement?":
         self.reset_choices_available()
         self.resolving_search_box = False
@@ -1263,7 +1262,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.remove_card_from_game("Necrodermis")
         else:
             primary_player.remove_card_name_from_hand("Necrodermis")
-        num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+        num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
         if primary_player.played_necrodermis:
             await self.send_update_message(

@@ -692,17 +692,17 @@ class GameConsumer(AsyncWebsocketConsumer):
                         sent_string += active_games[self.game_position].name_1
                         sent_string += ": "
                         for i in range(len(active_games[self.game_position].interrupts_waiting_on_resolution)):
-                            if active_games[self.game_position].player_resolving_interrupts[i] \
+                            if active_games[self.game_position].interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() \
                                     == active_games[self.game_position].name_1:
-                                sent_string += active_games[self.game_position].interrupts_waiting_on_resolution[i]
+                                sent_string += active_games[self.game_position].interrupts_waiting_on_resolution[i].get_interrupt_name()
                                 sent_string += ", "
                         sent_string += ". "
                         sent_string += active_games[self.game_position].name_2
                         sent_string += ": "
                         for i in range(len(active_games[self.game_position].interrupts_waiting_on_resolution)):
-                            if active_games[self.game_position].player_resolving_interrupts[i] \
+                            if active_games[self.game_position].interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() \
                                     == active_games[self.game_position].name_2:
-                                sent_string += active_games[self.game_position].interrupts_waiting_on_resolution[i]
+                                sent_string += active_games[self.game_position].interrupts_waiting_on_resolution[i].get_interrupt_name()
                                 sent_string += ", "
                         sent_string += "."
                         await self.receive_game_update(

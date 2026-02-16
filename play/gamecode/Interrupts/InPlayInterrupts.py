@@ -12,9 +12,9 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         player_owning_card = primary_player
     else:
         player_owning_card = secondary_player
-    current_interrupt = self.interrupts_waiting_on_resolution[0]
+    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
     if current_interrupt == "Prudent Fire Warriors":
-        og_num, og_pla, og_pos = self.positions_of_units_interrupting[0]
+        og_num, og_pla, og_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
         if og_pla == planet_pos and og_pos != unit_pos:
             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                 attachments = primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()
@@ -56,7 +56,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                         self.delete_interrupt()
     elif current_interrupt == "Mark of Slaanesh":
         if game_update_string[1] == primary_player.number:
-            dest_planet = self.positions_of_units_interrupting[0][1]
+            dest_planet = self.interrupts_waiting_on_resolution[0].get_planet_pos()
             if dest_planet != planet_pos:
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
@@ -65,7 +65,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
         self.delete_interrupt()
     elif current_interrupt == "Raging Daemonhost":
-        if self.positions_of_units_interrupting[0][1] == planet_pos:
+        if self.interrupts_waiting_on_resolution[0].get_planet_pos() == planet_pos:
             card = CardClasses.AttachmentCard(
                 "Raging Daemonhost", "Attach to a non-Daemon, non-Vehicle army unit. \n"
                                      "Attached unit gets +3 ATK, +3 HP and the Khorne trait.",
@@ -80,7 +80,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 if "Raging Daemonhost" in primary_player.discard:
                     primary_player.discard.remove("Raging Daemonhost")
     elif current_interrupt == "Trap Laying Hunter":
-        if self.positions_of_units_interrupting[0][1] == planet_pos:
+        if self.interrupts_waiting_on_resolution[0].get_planet_pos() == planet_pos:
             if primary_player.get_number() == game_update_string[1]:
                 if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -89,7 +89,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
     elif current_interrupt == "Truck Wreck Launcha":
         if game_update_string[1] == secondary_player.get_number():
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
-                if planet_pos == self.extra_interrupt_info[0]:
+                if planet_pos == self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info():
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     self.delete_interrupt()
     elif current_interrupt == "The Broken Sigil Sacrifice Unit":
@@ -99,7 +99,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     self.delete_interrupt()
     elif current_interrupt == "Data Analyzer Aggressive":
         if game_update_string[1] == secondary_player.get_number():
-            _, og_pla, og_pos = self.positions_of_units_interrupting[0]
+            _, og_pla, og_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
             if og_pla == planet_pos:
                 if (og_pla, og_pos) != (planet_pos, unit_pos):
                     secondary_player.remove_damage_from_pos(og_pla, og_pos, 1)
@@ -136,7 +136,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     primary_player.move_unit_to_planet(planet_pos, unit_pos, last_planet)
                     self.delete_interrupt()
     elif current_interrupt == "The Sun Prince":
-        if planet_pos == self.positions_of_units_interrupting[0][1]:
+        if planet_pos == self.interrupts_waiting_on_resolution[0].get_planet_pos():
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -165,7 +165,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 primary_player.ready_given_pos(planet_pos, unit_pos)
                 self.delete_interrupt()
     elif current_interrupt == "Incubus Cleavers":
-        if self.positions_of_units_interrupting[0][1] == planet_pos:
+        if self.interrupts_waiting_on_resolution[0].get_planet_pos() == planet_pos:
             can_continue = True
             possible_interrupts = []
             if game_update_string[1] == primary_player.number:
@@ -189,8 +189,8 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Interrupt"
             if can_continue:
-                dmg = primary_player.cards_in_play[self.positions_of_units_interrupting[0][1] + 1][
-                    self.positions_of_units_interrupting[0][2]].counter
+                dmg = primary_player.cards_in_play[self.interrupts_waiting_on_resolution[0].get_planet_pos() + 1][
+                    interrupts_waiting_on_resolution[0].get_unit_pos()].counter
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, dmg, rickety_warbuggy=True)
                 self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
                 self.delete_interrupt()
@@ -259,7 +259,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
     elif current_interrupt == "Zen Xi Aonia":
         if game_update_string[1] == primary_player.get_number():
             _, current_planet, current_unit = self.last_defender_position
-            if planet_pos == self.positions_of_units_interrupting[0][1]:
+            if planet_pos == self.interrupts_waiting_on_resolution[0].get_planet_pos():
                 if current_unit != unit_pos:
                     primary_player.reset_aiming_reticle_in_play(current_planet, current_unit)
                     self.may_move_defender = False
@@ -270,7 +270,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
     elif current_interrupt == "Banner of the Cult":
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                if planet_pos == self.positions_of_units_interrupting[0][1]:
+                if planet_pos == self.interrupts_waiting_on_resolution[0].get_planet_pos():
                     can_continue = True
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
                         planet_pos, unit_pos, intercept_possible=True)
@@ -331,7 +331,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     primary_player.discard.remove("Transcendent Blessing")
                 self.delete_interrupt()
     elif current_interrupt == "Armored Fist Squad":
-        if planet_pos == self.positions_of_units_interrupting[0][1]:
+        if planet_pos == self.interrupts_waiting_on_resolution[0].get_planet_pos():
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                 player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                 self.delete_interrupt()

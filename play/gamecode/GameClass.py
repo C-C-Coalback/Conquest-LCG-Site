@@ -10,7 +10,7 @@ from .Choices import StandardChoices
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction, \
     AttachmentInPlayReaction, AttachmentHQReaction, ReactionsClass
 from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQInterrupts, HandInterrupts, \
-    AttachmentHQInterrupts, AttachmentInPlayInterrupts
+    AttachmentHQInterrupts, AttachmentInPlayInterrupts, InterruptsClass
 from .Intercept import InPlayIntercept, HQIntercept
 from . import CardClasses
 import os
@@ -277,9 +277,6 @@ class Game:
         self.deck_part_being_rearranged = []
         self.number_cards_to_rearrange = 0
         self.interrupts_waiting_on_resolution = []
-        self.player_resolving_interrupts = []
-        self.positions_of_units_interrupting = []
-        self.extra_interrupt_info = []
         self.location_hand_attachment_shadowsun = -1
         self.location_attachment_discard_shadowsun = -1
         self.units_damaged_by_attack = []
@@ -662,10 +659,6 @@ class Game:
     def reset_effects_data(self):
         self.already_resolving_interrupt = False
         self.interrupts_waiting_on_resolution = []
-        self.player_resolving_interrupts = []
-        self.positions_of_units_interrupting = []
-        self.extra_interrupt_info = []
-        self.active_effects = []
 
     def reset_reactions_data(self):
         self.reactions_needing_resolving = []
@@ -841,7 +834,7 @@ class Game:
         elif self.resolving_nurgling_bomb:
             info_string += self.player_resolving_nurgling_bomb + "/"
         elif self.interrupts_waiting_on_resolution:
-            info_string += self.player_resolving_interrupts[0] + "/"
+            info_string += self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() + "/"
         elif self.positions_of_units_to_take_damage:
             if self.positions_of_units_to_take_damage[0][0] == 1:
                 info_string += self.name_1 + "/"
@@ -907,8 +900,8 @@ class Game:
             info_string += "Nurgling Bomb Resolution/"
             info_string += self.player_resolving_nurgling_bomb + "/"
         elif self.interrupts_waiting_on_resolution:
-            info_string += "Effect: " + self.interrupts_waiting_on_resolution[0] + "/"
-            info_string += "User: " + self.player_resolving_interrupts[0] + "/"
+            info_string += "Effect: " + self.interrupts_waiting_on_resolution[0].get_interrupt_name() + "/"
+            info_string += "User: " + self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() + "/"
         elif self.positions_of_units_to_take_damage:
             if self.positions_of_units_to_take_damage[0][0] == 1:
                 info_string += "Shield: " + self.name_1 + "/"
@@ -1059,8 +1052,8 @@ class Game:
                     player = self.p2
                     secondary_player = self.p1
             if self.interrupts_waiting_on_resolution:
-                if self.interrupts_waiting_on_resolution[0] == "Catachan Devils Patrol":
-                    if self.player_resolving_interrupts[0] == self.name_1:
+                if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Catachan Devils Patrol":
+                    if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_1:
                         player = self.p1
                         secondary_player = self.p2
                     else:
@@ -2494,7 +2487,7 @@ class Game:
                                      (int(primary_player.number), planet_pos, unit_pos))
 
     def mask_jain_zar_check_interrupts(self, primary_player, secondary_player):
-        num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+        num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
         if planet_pos != -1 and planet_pos != -2 and unit_pos != -1:
             if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
@@ -2752,31 +2745,8 @@ class Game:
                 self.p2.can_play_pledge = False
 
     def move_interrupt_to_front(self, interrupt_pos):
-        if self.interrupts_waiting_on_resolution[interrupt_pos] == "Magus Harid":
-            count_harid = -1
-            i = 0
-            while i < interrupt_pos:
-                if self.interrupts_waiting_on_resolution[i] == "Magus Harid" \
-                        and self.player_resolving_interrupts[0] == self.player_resolving_interrupts[i]:
-                    count_harid += 1
-                i += 1
-            if count_harid < 0:
-                count_harid = 0
-            player = self.p1
-            if self.player_resolving_interrupts[0] == self.name_2:
-                player = self.p2
-            player.magus_harid_waiting_cards.insert(0, player.magus_harid_waiting_cards.pop(count_harid))
         self.interrupts_waiting_on_resolution.insert(
             0, self.interrupts_waiting_on_resolution.pop(interrupt_pos)
-        )
-        self.player_resolving_interrupts.insert(
-            0, self.player_resolving_interrupts.pop(interrupt_pos)
-        )
-        self.positions_of_units_interrupting.insert(
-            0, self.positions_of_units_interrupting.pop(interrupt_pos)
-        )
-        self.extra_interrupt_info.insert(
-            0, self.extra_interrupt_info.pop(interrupt_pos)
         )
         self.asking_if_interrupt = True
 
@@ -4094,10 +4064,8 @@ class Game:
         else:
             player = self.p2
         if not player.hit_by_gorgul:
-            self.interrupts_waiting_on_resolution.append(name_interrupt)
-            self.player_resolving_interrupts.append(name_player)
-            self.positions_of_units_interrupting.append(pos_interrupter)
-            self.extra_interrupt_info.append(extra_info)
+            self.interrupts_waiting_on_resolution.append(
+                InterruptsClass.Interrupt(name_interrupt, name_player, pos_interrupter, extra_info))
 
     async def better_shield_card_resolution(self, name, game_update_string,
                                             alt_shields=True, can_no_mercy=True, liatha_called=False):
@@ -5636,13 +5604,13 @@ class Game:
             primary_player = self.p2
             secondary_player = self.p1
         print("Resolving effect")
-        if name == self.player_resolving_interrupts[0]:
+        if name == self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt():
             print("name check ok")
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    current_interrupt = self.interrupts_waiting_on_resolution[0]
+                    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
                     if current_interrupt == "Flayed Ones Revenants":
-                        num, planet_pos, unit_pos = self.positions_of_units_interrupting[0]
+                        num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
                         primary_player.add_card_in_play_to_discard(planet_pos, unit_pos)
                         await self.send_update_message("Did not pay the additional cost; "
                                                        "card added to discard.")
@@ -5701,9 +5669,9 @@ class Game:
                         player_owning_card = primary_player
                     else:
                         player_owning_card = secondary_player
-                    current_interrupt = self.interrupts_waiting_on_resolution[0]
+                    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
                     if current_interrupt == "Dark Angels Purifier":
-                        if self.positions_of_units_interrupting[0][1] == planet_pos:
+                        if self.interrupts_waiting_on_resolution[0].get_planet_pos() == planet_pos:
                             if game_update_string[1] == primary_player.number:
                                 card_in_reserve = primary_player.cards_in_reserve[planet_pos][unit_pos]
                                 if card_in_reserve.check_for_a_trait(
@@ -5728,7 +5696,7 @@ class Game:
                         player_num = int(game_update_string[2])
                         planet_pos = int(game_update_string[3])
                         attachment_pos = int(game_update_string[4])
-                        current_interrupt = self.interrupts_waiting_on_resolution[0]
+                        current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
                         if player_num == 1:
                             player_with_attach = self.p1
                         else:
@@ -5806,23 +5774,17 @@ class Game:
 
     def delete_interrupt(self):
         if self.interrupts_waiting_on_resolution:
-            if self.interrupts_waiting_on_resolution[0] == "Magus Harid":
+            if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Magus Harid: Final Form" or \
+                    self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Grand Master Belial":
                 player = self.p1
-                if self.player_resolving_interrupts[0] == self.name_2:
-                    player = self.p2
-                if player.magus_harid_waiting_cards:
-                    del player.magus_harid_waiting_cards[0]
-            if self.interrupts_waiting_on_resolution[0] == "Magus Harid: Final Form" or \
-                    self.interrupts_waiting_on_resolution[0] == "Grand Master Belial":
-                player = self.p1
-                if self.player_resolving_interrupts[0] == self.name_2:
+                if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_2:
                     player = self.p2
                 warlord_pla, warlord_pos = player.get_location_of_warlord()
                 if warlord_pla == -1 or warlord_pos == -1:
                     player.warlord_just_got_destroyed = True
-            if self.interrupts_waiting_on_resolution[0] == "Saint Celestine: Rebirth":
+            if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Saint Celestine: Rebirth":
                 player = self.p1
-                if self.player_resolving_interrupts[0] == self.name_2:
+                if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_2:
                     player = self.p2
                 warlord_pla, warlord_pos = player.get_location_of_warlord()
                 if warlord_pla == -1 or warlord_pos == -1:
@@ -5831,11 +5793,8 @@ class Game:
                     player.set_once_per_game_used_given_pos(warlord_pla, warlord_pos, True)
             self.asking_which_interrupt = True
             self.asking_if_interrupt = False
-            self.last_player_who_resolved_interrupt = self.player_resolving_interrupts[0]
+            self.last_player_who_resolved_interrupt = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
             del self.interrupts_waiting_on_resolution[0]
-            del self.player_resolving_interrupts[0]
-            del self.positions_of_units_interrupting[0]
-            del self.extra_interrupt_info[0]
         self.already_resolving_interrupt = False
 
     def start_ranged_skirmish(self, planet_pos):
@@ -6111,10 +6070,10 @@ class Game:
                             self.name_player_making_choices = self.name_1
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                            if self.interrupts_waiting_on_resolution[0].get_interrupt_name() in self.forced_interrupts:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+                            self.name_player_making_choices = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
                             self.asking_if_interrupt = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -6127,10 +6086,10 @@ class Game:
                         self.asking_which_interrupt = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                            if self.interrupts_waiting_on_resolution[0].get_interrupt_name() in self.forced_interrupts:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+                            self.name_player_making_choices = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
                             self.asking_if_interrupt = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -6146,10 +6105,10 @@ class Game:
                             self.name_player_making_choices = self.name_2
                         elif not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                            if self.interrupts_waiting_on_resolution[0].get_interrupt_name() in self.forced_interrupts:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+                            self.name_player_making_choices = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
                             self.asking_if_interrupt = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -6162,10 +6121,10 @@ class Game:
                         self.asking_which_interrupt = False
                         if not self.has_chosen_to_resolve:
                             self.choices_available = ["Yes", "No"]
-                            if self.interrupts_waiting_on_resolution[0] in self.forced_interrupts:
+                            if self.interrupts_waiting_on_resolution[0].get_interrupt_name() in self.forced_interrupts:
                                 self.choices_available = ["Yes"]
-                            self.choice_context = self.interrupts_waiting_on_resolution[0]
-                            self.name_player_making_choices = self.player_resolving_interrupts[0]
+                            self.choice_context = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+                            self.name_player_making_choices = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
                             self.asking_if_interrupt = True
                         elif self.has_chosen_to_resolve:
                             self.has_chosen_to_resolve = False
@@ -7363,7 +7322,6 @@ class Game:
             await self.send_victory_proper(self.name_1, "deck out")
             self.p2.already_lost_due_to_deck = True
         print("---\nDEBUG INFO\n---")
-        print(self.interrupts_waiting_on_resolution)
         print(self.choices_available)
         if self.phase == "DEPLOY":
             if self.number_with_deploy_turn == "1":
@@ -7417,8 +7375,8 @@ class Game:
     def get_name_interrupts_of_players_interrupts(self, name):
         interrupts_positions_list = []
         for i in range(len(self.interrupts_waiting_on_resolution)):
-            if self.player_resolving_interrupts[i] == name:
-                interrupts_positions_list.append(self.interrupts_waiting_on_resolution[i])
+            if self.interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() == name:
+                interrupts_positions_list.append(self.interrupts_waiting_on_resolution[i].get_interrupt_name())
         return interrupts_positions_list
 
     def get_name_reactions_of_players_reactions(self, name):
@@ -7438,7 +7396,7 @@ class Game:
     def get_positions_of_players_interrupts(self, name):
         interrupts_positions_list = []
         for i in range(len(self.interrupts_waiting_on_resolution)):
-            if self.player_resolving_interrupts[i] == name:
+            if self.interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() == name:
                 interrupts_positions_list.append(i)
         return interrupts_positions_list
 
@@ -7456,7 +7414,7 @@ class Game:
         count_1 = 0
         count_2 = 0
         for i in range(len(self.interrupts_waiting_on_resolution)):
-            if self.player_resolving_interrupts[i] == self.name_1:
+            if self.interrupts_waiting_on_resolution[i].get_player_resolving_interrupt() == self.name_1:
                 count_1 += 1
             else:
                 count_2 += 1

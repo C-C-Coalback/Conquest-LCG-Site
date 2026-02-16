@@ -8,8 +8,8 @@ from .. import CardClasses
 async def resolve_planet_interrupt(self, name, game_update_string, primary_player, secondary_player):
     print("planets interrupt")
     chosen_planet = int(game_update_string[1])
-    current_interrupt = self.interrupts_waiting_on_resolution[0]
-    if self.interrupts_waiting_on_resolution[0] == "Berzerker Warriors":
+    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+    if current_interrupt == "Berzerker Warriors":
         print("check planet")
         if primary_player.valid_planets_berzerker_warriors[chosen_planet]:
             card = FindCard.find_card("Berzerker Warriors", self.card_array, self.cards_dict,
@@ -49,7 +49,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
                                       (int(primary_player.number), -1, -1))
         self.delete_interrupt()
     elif current_interrupt == "Dodging Land Speeder":
-        _, og_planet, og_pos = self.positions_of_units_interrupting[0]
+        _, og_planet, og_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
         if abs(chosen_planet - og_planet) == 1:
             primary_player.reset_aiming_reticle_in_play(og_planet, og_pos)
             primary_player.move_unit_to_planet(og_planet, og_pos, chosen_planet)
@@ -80,7 +80,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
                                                                             "reserve at " +
                                                self.planet_array[chosen_planet] + ". You may exhaust a " +
                                                "unit at that planet to cancel this effect.")
-                self.player_resolving_interrupts[0] = secondary_player.name_player
+                self.interrupts_waiting_on_resolution[0].set_player_resolving_interrupt(secondary_player.name_player)
                 self.chosen_first_card = True
                 self.misc_target_planet = chosen_planet
     elif current_interrupt == "Trazyn the Infinite":
@@ -105,7 +105,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
         if primary_player.valid_surrogate_host[chosen_planet]:
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             self.delete_interrupt()
-    elif self.interrupts_waiting_on_resolution[0] == "Reanimating Warriors":
+    elif current_interrupt == "Reanimating Warriors":
         print("reanimating warriors")
         if not self.asked_if_resolve_effect:
             self.choices_available = ["Yes", "No"]
