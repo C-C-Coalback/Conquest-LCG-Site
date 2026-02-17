@@ -358,7 +358,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Ardent Auxiliaries":
             am_present = False
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-                if primary_player.get_faction_given_pos(planet_pos, i) == "Astra Militarum":
+                if primary_player.check_if_faction_given_pos(planet_pos, i, "Astra Militarum"):
                     am_present = True
             if am_present:
                 primary_player.ready_given_pos(planet_pos, unit_pos)
