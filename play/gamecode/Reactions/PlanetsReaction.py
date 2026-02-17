@@ -109,10 +109,8 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
     elif current_reaction == "Vamii Industrial Complex":
         if self.chosen_first_card:
             if chosen_planet != self.round_number:
-                self.discounts_applied = 0
                 card = self.card_to_deploy
-                await self.calculate_available_discounts_unit(chosen_planet, card, primary_player)
-                await self.calculate_automatic_discounts_unit(chosen_planet, card, primary_player)
+                await self.discount_begin_routine(chosen_planet, card, primary_player)
                 if card.check_for_a_trait("Elite"):
                     primary_player.master_warpsmith_count = 0
                 self.card_to_deploy = card

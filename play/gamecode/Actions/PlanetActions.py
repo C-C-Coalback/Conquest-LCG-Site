@@ -879,9 +879,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
-            self.discounts_applied = 0
-            await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
-            await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+            await self.discount_begin_routine(planet_chosen, card, primary_player)
             if card.check_for_a_trait("Elite"):
                 primary_player.master_warpsmith_count = 0
             self.card_to_deploy = card
@@ -897,9 +895,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
-            self.discounts_applied = 0
-            await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
-            await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+            await self.discount_begin_routine(planet_chosen, card, primary_player)
             if card.check_for_a_trait("Elite"):
                 primary_player.master_warpsmith_count = 0
             self.card_to_deploy = card

@@ -346,9 +346,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if game_update_string[1] == self.misc_target_choice:
             self.discounts_applied = -2
             diff = 2
-        await self.calculate_available_discounts_unit(self.misc_target_planet, card, primary_player)
-        await self.calculate_automatic_discounts_unit(self.misc_target_planet, card, primary_player)
-        self.reset_choices_available()
+        await self.discount_begin_routine(self.misc_target_planet, card, primary_player)
         if card.check_for_a_trait("Elite"):
             primary_player.master_warpsmith_count = 0
         if self.available_discounts > (self.discounts_applied + diff):

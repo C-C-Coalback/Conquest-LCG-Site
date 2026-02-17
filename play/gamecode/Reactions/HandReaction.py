@@ -88,9 +88,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.chosen_second_card = True
                     secondary_player.aiming_reticle_coords_hand = hand_pos
                     secondary_player.aiming_reticle_color = "blue"
-                    self.discounts_applied = 0
-                    await self.calculate_available_discounts_unit(chosen_planet, card, primary_player)
-                    await self.calculate_automatic_discounts_unit(chosen_planet, card, primary_player)
+                    await self.discount_begin_routine(chosen_planet, card, primary_player)
                     if card.check_for_a_trait("Elite"):
                         primary_player.master_warpsmith_count = 0
                     self.card_to_deploy = card

@@ -309,9 +309,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     self.resolving_search_box = True
                                     self.misc_target_planet = planet_chosen
                             else:
-                                self.discounts_applied = 0
-                                await self.calculate_available_discounts_unit(planet_chosen, card, player)
-                                await self.calculate_automatic_discounts_unit(planet_chosen, card, player)
+                                await self.discount_begin_routine(planet_chosen, card, player)
                                 if card.check_for_a_trait("Elite"):
                                     player.master_warpsmith_count = 0
                                 self.card_to_deploy = card

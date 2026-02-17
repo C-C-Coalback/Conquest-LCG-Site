@@ -3777,6 +3777,16 @@ class Game:
             await self.send_victory_proper(self.name_1, "Necrodermis")
         self.create_reactions_phase_begins()
 
+    async def discount_begin_routine(self, planet_chosen, card, primary_player):
+        self.discounts_applied = 0
+        await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
+        await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+        if self.available_discounts > self.discounts_applied:
+            await self.announce_discounts()
+
+    async def announce_discounts(self):
+        await self.send_update_message(str(self.available_discounts) + " discounts are available.")
+
     async def calculate_automatic_discounts_unit(self, planet_chosen, card, player):
         other_player = self.p1
         if player.name_player == self.name_1:
