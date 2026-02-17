@@ -4417,7 +4417,7 @@ class Game:
                                                     secondary_player.get_faction_given_pos(att_pla, att_pos)
                                                 self.stored_taken_damage.append(damage_object)
                                                 self.checks_on_damage_from_attack(primary_player, secondary_player,
-                                                                                  att_pla, att_pos)
+                                                                                  planet_pos, unit_pos)
                                             else:
                                                 self.stored_taken_damage.append(self.stored_damage[0])
                                             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
