@@ -256,6 +256,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 await deploy_card_routine(self, name, self.planet_aiming_reticle_position,
                                                           discounts=self.discounts_applied)
                                 self.mode = "Normal"
+                            else:
+                                self.mode = "Normal"
+                        else:
+                            self.mode = "Normal"
 
     elif len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
