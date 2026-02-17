@@ -351,12 +351,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             get_attachments()[attachment_pos].get_ability() == "The Shining Blade" \
                             and player.cards_in_play[planet_pos + 1][unit_pos]. \
                             get_attachments()[attachment_pos].name_owner == player.name_player:
-                        if player.cards_in_play[planet_pos + 1][unit_pos]. \
-                                get_attachments()[attachment_pos].get_ready():
-                            player.cards_in_play[planet_pos + 1][unit_pos]. \
-                                get_attachments()[attachment_pos].exhaust_card()
-                            self.shining_blade_active = True
-                            await self.send_update_message("The Shining Blade activated!")
+                        self.shining_blade_active = True
+                        await self.send_update_message("The Shining Blade activated!")
     elif len(game_update_string) == 4:
         if game_update_string[0] == "RESERVE":
             if self.start_battle_deepstrike:
