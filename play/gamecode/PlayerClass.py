@@ -5,6 +5,7 @@ import copy
 import threading
 from . import CardClasses
 import os
+from .Damage import DamageClass
 
 
 def clean_received_deck(raw_deck):
@@ -1774,49 +1775,32 @@ class Player:
 
     def adjust_own_damage(self, planet_pos, unit_pos):
         i = 0
-        while i < len(self.game.recently_damaged_units):
-            num, pla, pos = self.game.recently_damaged_units[i]
+        while i < len(self.game.stored_taken_damage):
+            num, pla, pos = self.game.stored_taken_damage[i].get_position_unit()
             if num == int(self.number):
                 if pla == planet_pos:
                     if pos > unit_pos:
                         pos -= 1
-                        self.game.recently_damaged_units[i] = (num, pla, pos)
+                        self.game.stored_taken_damage[i].decrement_position_unit()
                     elif pos == unit_pos:
-                        del self.game.recently_damaged_units[i]
-                        del self.game.damage_taken_was_from_attack[i]
-                        del self.game.positions_of_attacker_of_unit_that_took_damage[i]
-                        del self.game.faction_of_attacker[i]
-                        del self.game.card_names_that_caused_damage[i]
-                        del self.game.on_kill_effects_of_attacker[i]
+                        del self.game.stored_taken_damage[i]
                         i = i - 1
             i = i + 1
         i = 0
-        while i < len(self.game.amount_that_can_be_removed_by_shield):
-            num, pla, pos = self.game.positions_of_units_to_take_damage[i]
+        while i < len(self.game.stored_damage):
+            num, pla, pos = self.game.stored_damage[i].get_position_unit()
             if num == int(self.number):
                 if pla == planet_pos:
                     if pos > unit_pos:
                         pos -= 1
-                        self.game.positions_of_units_to_take_damage[i] = (num, pla, pos)
+                        self.game.stored_damage[i].decrement_position_unit()
                     elif pos == unit_pos:
                         if i == 0:
                             if not self.game.retaliate_used:
-                                del self.game.damage_on_units_list_before_new_damage[i]
-                                del self.game.damage_is_preventable[i]
-                                del self.game.positions_of_units_to_take_damage[i]
-                                del self.game.damage_can_be_shielded[i]
-                                del self.game.positions_attackers_of_units_to_take_damage[i]
-                                del self.game.card_names_triggering_damage[i]
-                                del self.game.amount_that_can_be_removed_by_shield[i]
+                                del self.game.stored_damage[i]
                                 i = i - 1
                         else:
-                            del self.game.damage_on_units_list_before_new_damage[i]
-                            del self.game.damage_is_preventable[i]
-                            del self.game.positions_of_units_to_take_damage[i]
-                            del self.game.damage_can_be_shielded[i]
-                            del self.game.positions_attackers_of_units_to_take_damage[i]
-                            del self.game.card_names_triggering_damage[i]
-                            del self.game.amount_that_can_be_removed_by_shield[i]
+                            del self.game.stored_damage[i]
                             i = i - 1
             i += 1
 
@@ -5878,17 +5862,13 @@ class Player:
                         if i != unit_id:
                             self.game.create_reaction("Avenging Squad", self.name_player,
                                                       (int(self.number), planet_id, i))
-            if not self.game.positions_of_units_to_take_damage:
+            if not self.game.stored_damage:
                 self.set_aiming_reticle_in_play(planet_id, unit_id, "red")
             else:
                 self.set_aiming_reticle_in_play(planet_id, unit_id, "blue")
-            self.game.damage_on_units_list_before_new_damage.append(prior_damage)
-            self.game.damage_is_preventable.append(preventable)
-            self.game.positions_of_units_to_take_damage.append((int(self.number), planet_id, unit_id))
-            self.game.damage_can_be_shielded.append(can_shield)
-            self.game.positions_attackers_of_units_to_take_damage.append(att_pos)
-            self.game.card_names_triggering_damage.append(context)
-            self.game.amount_that_can_be_removed_by_shield.append(total_damage_that_can_be_blocked)
+            self.game.stored_damage.append(DamageClass.Damage(
+                total_damage_that_can_be_blocked, preventable,
+                (int(self.number), planet_id, unit_id), can_shield, att_pos, context))
             return True, len(bodyguard_damage_list)
         return False, len(bodyguard_damage_list)
 
@@ -6053,17 +6033,13 @@ class Player:
                         if self.search_hand_for_card("Cajivak the Hateful"):
                             self.game.create_interrupt("Cajivak the Hateful", self.name_player,
                                                        (int(self.number), -1, -1))
-            if not self.game.positions_of_units_to_take_damage:
+            if not self.game.stored_damage:
                 self.set_aiming_reticle_in_play(-2, unit_id, "red")
             else:
                 self.set_aiming_reticle_in_play(-2, unit_id, "blue")
-            self.game.damage_on_units_list_before_new_damage.append(prior_damage)
-            self.game.damage_is_preventable.append(preventable)
-            self.game.positions_of_units_to_take_damage.append((int(self.number), -2, unit_id))
-            self.game.damage_can_be_shielded.append(can_shield)
-            self.game.positions_attackers_of_units_to_take_damage.append(None)
-            self.game.card_names_triggering_damage.append(context)
-            self.game.amount_that_can_be_removed_by_shield.append(total_that_can_be_blocked)
+            self.game.stored_damage.append(DamageClass.Damage(
+                total_that_can_be_blocked, preventable,
+                (int(self.number), -2, unit_id), can_shield, None, context))
         return damage_too_great
 
     def search_discard_for_card(self, card_name):

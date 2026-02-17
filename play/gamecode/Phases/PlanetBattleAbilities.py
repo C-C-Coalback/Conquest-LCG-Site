@@ -36,7 +36,7 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
             self.damage_from_atrox = True
-            if not self.positions_of_units_to_take_damage:
+            if not self.stored_damage:
                 self.damage_from_atrox = False
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                      game_update_string)
@@ -50,7 +50,7 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
             for i in range(len(player.headquarters)):
                 if player.check_is_unit_at_pos(-2, i):
                     player.assign_damage_to_pos(-2, i, 1, by_enemy_unit=False)
-            if not self.positions_of_units_to_take_damage:
+            if not self.stored_damage:
                 self.damage_from_atrox = False
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                      game_update_string)

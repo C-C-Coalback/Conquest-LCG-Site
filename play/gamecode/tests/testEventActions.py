@@ -206,7 +206,7 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p2.get_ready_given_pos(0, 0), False)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 4)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 3)
-        self.assertEqual(len(test_game.positions_of_units_to_take_damage), 2)
+        self.assertEqual(len(test_game.stored_damage), 2)
 
     async def test_the_siege_masters(self):
         random.seed(42)
@@ -333,7 +333,7 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
         self.assertEqual(len(test_game.p2.cards_in_play[1]), 1)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 1)
-        self.assertEqual(test_game.amount_that_can_be_removed_by_shield[0], 1)
+        self.assertEqual(test_game.stored_damage[0].get_amount_that_can_be_blocked(), 1)
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
 
@@ -373,7 +373,7 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 5)
         self.assertEqual(len(test_game.p1.cards), 0)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 1), 2)
-        self.assertEqual(test_game.amount_that_can_be_removed_by_shield[0], 2)
+        self.assertEqual(test_game.stored_damage[0].get_amount_that_can_be_blocked(), 2)
         self.assertEqual(test_game.p2.get_ready_given_pos(0, 0), False)
         self.assertEqual(test_game.p2.get_ready_given_pos(0, 1), True)
 

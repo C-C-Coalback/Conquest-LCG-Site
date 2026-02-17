@@ -1622,15 +1622,15 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     print(took_damage)
                                     if primary_player.get_ability_given_pos(
                                             self.attacker_planet, self.attacker_position) == "XV8-05 Enforcer":
-                                        if self.positions_of_units_to_take_damage:
+                                        if self.stored_damage:
                                             self.xv805_enforcer_active = True
                                             self.asking_if_use_xv805_enforcer = True
                                             self.asking_amount_xv805_enforcer = False
                                             self.player_using_xv805 = primary_player.name_player
-                                            d_i = len(self.positions_of_units_to_take_damage) - 1
+                                            d_i = len(self.stored_damage) - 1
                                             self.damage_index_xv805 = d_i
                                             self.amount_xv805_enforcer = \
-                                                self.amount_that_can_be_removed_by_shield[d_i]
+                                                self.stored_damage[d_i].get_amount_that_can_be_blocked()
                                             self.og_pos_xv805_target = (chosen_planet, chosen_unit)
                                     if took_damage:
                                         if primary_player.get_ability_given_pos(

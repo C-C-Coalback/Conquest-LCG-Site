@@ -90,8 +90,8 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             last_element_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
             try:
-                if self.recently_damaged_units:
-                    self.recently_damaged_units[0] = (int(primary_player.number), chosen_planet, last_element_index)
+                if self.stored_taken_damage:
+                    self.stored_taken_damage[0].set_unit_position((int(primary_player.number), chosen_planet, last_element_index))
             except:
                 pass
             self.delete_interrupt()

@@ -54,7 +54,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
-        self.assertEqual(len(test_game.positions_of_units_to_take_damage), 1)
+        self.assertEqual(len(test_game.stored_damage), 1)
 
     async def test_armorbane(self):
         random.seed(42)
@@ -67,7 +67,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Iyanden Wraithguard"), 0)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
-        self.assertEqual(test_game.damage_can_be_shielded[0], False)
+        self.assertEqual(test_game.stored_damage[0].get_can_shield(), False)
 
     async def test_ranged(self):
         random.seed(42)
@@ -78,7 +78,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Ratling Deadeye"), 0)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
-        self.assertEqual(len(test_game.positions_of_units_to_take_damage), 1)
+        self.assertEqual(len(test_game.stored_damage), 1)
         self.assertEqual(test_game.ranged_skirmish_active, True)
 
     async def test_brutal(self):
@@ -93,8 +93,8 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.set_damage_given_pos(0, 1, 2)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
-        self.assertEqual(len(test_game.positions_of_units_to_take_damage), 1)
-        self.assertEqual(test_game.amount_that_can_be_removed_by_shield[0], 3)  # Zarathur +1
+        self.assertEqual(len(test_game.stored_damage), 1)
+        self.assertEqual(test_game.stored_damage[0].get_amount_that_can_be_blocked(), 3)  # Zarathur +1
 
     async def test_area_effect(self):
         random.seed(42)
@@ -108,7 +108,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Tactical Squad Cardinis"), 0)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["PLANETS", "0"])
-        self.assertEqual(len(test_game.positions_of_units_to_take_damage), 2)
+        self.assertEqual(len(test_game.stored_damage), 2)
 
     async def test_flying(self):
         random.seed(42)
@@ -122,8 +122,8 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Assault Valkyrie"), 0)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
-        self.assertEqual(len(test_game.positions_of_units_to_take_damage), 1)
-        self.assertEqual(test_game.amount_that_can_be_removed_by_shield[0], 2)  # Zarathur +1
+        self.assertEqual(len(test_game.stored_damage), 1)
+        self.assertEqual(test_game.stored_damage[0].get_amount_that_can_be_blocked(), 2)  # Zarathur +1
 
     async def test_lumbering(self):
         random.seed(42)

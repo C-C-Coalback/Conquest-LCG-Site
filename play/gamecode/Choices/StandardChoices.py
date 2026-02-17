@@ -954,12 +954,12 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if chosen_choice == "Reassign":
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, is_reassign=True,
                                                 by_enemy_unit=False)
-            _, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+            _, planet_pos, unit_pos = self.stored_damage[0].get_position_unit()
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
-            self.amount_that_can_be_removed_by_shield[0] += -1
+            self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
         self.reset_choices_available()
         self.resolving_search_box = False
-        if self.amount_that_can_be_removed_by_shield[0] < 1:
+        if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
     elif self.choice_context == "Access to the Black Library":
@@ -2210,7 +2210,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.woken_machine_spirit_enabled = False
         if game_update_string[1] == "0":
             self.woken_machine_spirit_active = True
-            pos_holder = self.positions_of_units_to_take_damage[0]
+            pos_holder = self.stored_damage[0].get_position_unit()
             player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
             self.reset_choices_available()
@@ -2224,10 +2224,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.distorted_talos_enabled = False
         if game_update_string[1] == "0":
             self.distorted_talos_active = True
-            pos_holder = self.positions_of_units_to_take_damage[0]
+            pos_holder = self.stored_damage[0].get_position_unit()
             player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
             damage_total = primary_player.get_damage_given_pos(planet_pos, unit_pos)
-            damage_removed = damage_total - self.amount_that_can_be_removed_by_shield[0]
+            damage_removed = damage_total - self.stored_damage[0].get_amount_that_can_be_blocked()
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_removed, healing=True)
             self.reset_choices_available()
@@ -2242,7 +2242,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if game_update_string[1] == "0":
             self.maksim_squadron_active = True
             if self.apoka or self.blackstone:
-                pos_holder = self.positions_of_units_to_take_damage[0]
+                pos_holder = self.stored_damage[0].get_position_unit()
                 player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
                 primary_player.draw_card()
@@ -2255,7 +2255,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 primary_player.name_player, self.last_shield_string, alt_shields=False)
     elif self.choice_context == "Use Guardian Mesh Armor?":
         self.guardian_mesh_armor_enabled = False
-        num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+        num, planet_pos, unit_pos = self.stored_damage[0].get_position_unit()
         primary_player.exhaust_attachment_name_pos(planet_pos, unit_pos, "Guardian Mesh Armor")
         if game_update_string[1] == "0":
             self.guardian_mesh_armor_active = True
@@ -2466,7 +2466,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                      (int(primary_player.number), hurt_planet, hurt_pos))
-            self.amount_that_can_be_removed_by_shield[0] -= 1
+            self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
         elif game_update_string[1] == "2":
             self.damage_moved_to_old_one_eye += 2
             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 2)
@@ -2475,10 +2475,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                      (int(primary_player.number), hurt_planet, hurt_pos))
-            self.amount_that_can_be_removed_by_shield[0] -= 2
+            self.stored_damage[0].decrease_amount_that_can_be_blocked(2)
         self.misc_target_planet = -1
         self.misc_target_unit = -1
-        if self.amount_that_can_be_removed_by_shield[0] < 1:
+        if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
             primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
             await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
     elif self.choice_context == "Dark Allegiance Rally":
@@ -2781,13 +2781,12 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 else:
                     await self.resolve_back_to_the_shadows(primary_player, secondary_player)
             elif primary_player.cards[self.pos_shield_card] == "Uphold His Honor":
-                pos_holder = self.positions_of_units_to_take_damage[0]
+                pos_holder = self.stored_damage[0].get_position_unit()
                 player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
                 primary_player.discard_card_from_hand(self.pos_shield_card)
                 self.pos_shield_card = -1
                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                self.amount_that_can_be_removed_by_shield[0] = \
-                    self.amount_that_can_be_removed_by_shield[0] - 1
+                self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Righteous Initiate":
                     primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
                         extra_attack_until_end_of_phase += 2
@@ -2814,7 +2813,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     primary_player.ready_given_pos(planet_pos, unit_pos)
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Brotherhood Justicar":
                     primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
-                if self.amount_that_can_be_removed_by_shield[0] < 1:
+                if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
             elif primary_player.cards[self.pos_shield_card] == "Glorious Intervention":
                 if secondary_player.nullify_check():
@@ -2854,23 +2853,22 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     self.alt_shield_mode_active = True
     elif self.choice_context == "Faith Denies Death: Amount Blocked":
         amount = int(self.choices_available[int(game_update_string[1])])
-        num, planet_pos, unit_pos = self.positions_of_units_to_take_damage[0]
+        num, planet_pos, unit_pos = self.stored_damage[0].get_position_unit()
         primary_player.remove_damage_from_pos(planet_pos, unit_pos, amount)
-        self.amount_that_can_be_removed_by_shield[0] = \
-            self.amount_that_can_be_removed_by_shield[0] - amount
+        self.stored_damage[0].decrease_amount_that_can_be_blocked(amount)
         primary_player.discard_card_from_hand(self.pos_shield_card)
         primary_player.aiming_reticle_coords_hand = None
         self.alt_shield_name = ""
         self.alt_shield_mode_active = False
         self.reset_choices_available()
         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Sororitas Command Squad":
-            if self.positions_attackers_of_units_to_take_damage[0]:
+            if self.stored_damage[0].get_position_attacker():
                 if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                     self.sororitas_command_squad_value = amount
                     primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
                     self.create_reaction("Sororitas Command Squad", primary_player.name_player,
-                                         self.positions_attackers_of_units_to_take_damage[0])
-        if self.amount_that_can_be_removed_by_shield[0] < 1:
+                                         self.stored_damage[0].get_position_attacker())
+        if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
     elif self.choice_context == "Toxic Venomthrope: Gain Card or Resource?" or \
