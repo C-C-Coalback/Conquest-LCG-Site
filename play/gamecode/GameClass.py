@@ -1045,6 +1045,8 @@ class Game:
                         print("Play card with not all discounts")
                         await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                               discounts=self.discounts_applied)
+                        if self.mode == "DISCOUNT":
+                            self.mode = "Normal"
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
                         if game_update_string[1] == player.get_number():
@@ -1057,7 +1059,8 @@ class Game:
                             if self.discounts_applied >= self.available_discounts:
                                 await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                                       discounts=self.discounts_applied)
-                                self.mode = "Normal"
+                            else:
+                                await self.send_update_message(str(self.discounts_applied) + " discounts applied.")
                     elif game_update_string[0] == "HAND":
                         if self.card_to_deploy.get_card_type() == "Army":
                             discount_received, damage = player.perform_discount_at_pos_hand(
@@ -1103,7 +1106,10 @@ class Game:
                             if self.discounts_applied >= self.available_discounts:
                                 await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                                       discounts=self.discounts_applied)
-                                self.mode = "Normal"
+                                if self.mode == "DISCOUNT":
+                                    self.mode = "Normal"
+                            else:
+                                await self.send_update_message(str(self.discounts_applied) + " discounts applied.")
                 elif len(game_update_string) == 5:
                     if game_update_string[0] == "ATTACHMENT":
                         if game_update_string[1] == "HQ":
@@ -1118,7 +1124,8 @@ class Game:
                                     await DeployPhase.deploy_card_routine(self, name,
                                                                           self.planet_pos_to_deploy,
                                                                           discounts=self.discounts_applied)
-                                    self.mode = "Normal"
+                                    if self.mode == "DISCOUNT":
+                                        self.mode = "Normal"
                 elif len(game_update_string) == 6:
                     if game_update_string[0] == "ATTACHMENT":
                         if game_update_string[1] == "IN_PLAY":
@@ -1133,7 +1140,8 @@ class Game:
                                         await DeployPhase.deploy_card_routine(self, name,
                                                                               self.planet_pos_to_deploy,
                                                                               discounts=self.discounts_applied)
-                                        self.mode = "Normal"
+                                        if self.mode == "DISCOUNT":
+                                            self.mode = "Normal"
 
     async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction="",
                           shadow_field_possible=False, rickety_warbuggy=False, actual_aoe=False):
