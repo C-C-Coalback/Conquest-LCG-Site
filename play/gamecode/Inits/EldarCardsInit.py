@@ -370,7 +370,7 @@ def eldar_cards_init():
                                                      "This unit gets +3 ATK while attacking an undamaged unit.\n"
                                                      "Reaction: After a Mobile unit you control is assigned damage at "
                                                      "this planet, reassign 1 of that damage to this unit.",
-                             "Warrior. Hero.", 4, faction, "Common", 3, 4, 2, False, mobile=True),
+                             "Warrior. Hero.", 4, faction, "Common", 0, 4, 2, False, mobile=True),
         CardClasses.AttachmentCard("Close Quarters Doctrine", "Deep Strike (0).\n"
                                                               "Attach to a planet. Limit 1 per planet.\n"
                                                               "Each unit with a printed cost 3 or higher at"
