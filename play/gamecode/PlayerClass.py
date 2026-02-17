@@ -4798,6 +4798,7 @@ class Player:
                 if self.headquarters[pos].get_ready():
                     self.exhaust_given_pos(-2, pos)
                     discount += 2
+                    self.reset_aiming_reticle_in_play(-2, pos)
                     if self.game.apoka:
                         self.game.deploy_exhausted = True
             if self.headquarters[pos].get_ability() == "Bonesinger Choir":
