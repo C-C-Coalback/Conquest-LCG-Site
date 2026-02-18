@@ -2198,7 +2198,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             attachment_card = CardClasses.AttachmentCard(
                 card_name, "", "", 0, "Space Marines", "Common", 0, False)
             attachment_card.from_front_line_rhinos = True
-            primary_player.attach_card(attachment_card, pla, pos)
+            primary_player.attach_card(attachment_card, pla, pos, relic_check_allowed=False)
             del primary_player.deck[int(game_update_string[1])]
             primary_player.bottom_remaining_cards()
             self.reset_choices_available()

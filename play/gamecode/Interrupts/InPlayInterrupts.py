@@ -31,7 +31,8 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     if attachments[i].get_name() in ["Shadowsun's Stealth Cadre", "Gun Drones", "Escort Drone"]:
                         army = True
                     if not primary_player.attach_card(attachments[i], planet_pos, unit_pos,
-                                                      not_own_attachment=not_owner, army_unit_as_attachment=army):
+                                                      not_own_attachment=not_owner, army_unit_as_attachment=army,
+                                                      relic_check_allowed=False):
                         attached_all = False
                 if not attached_all:
                     primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments = copy_attachments

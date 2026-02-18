@@ -333,7 +333,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 if player_owning_card.get_number() != primary_player.get_number():
                     not_own_attachment = True
                 if player_owning_card.attach_card(card, planet_pos, unit_pos,
-                                                  not_own_attachment=not_own_attachment):
+                                                  not_own_attachment=not_own_attachment, relic_check_allowed=False):
                     _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     primary_player.discard.remove(card_name)
                     self.delete_reaction()
@@ -345,7 +345,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         not_own_attachment = False
         if player_owning_card.get_number() != primary_player.get_number():
             not_own_attachment = True
-        if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
+        if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment,
+                                          relic_check_allowed=False):
             _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             del primary_player.headquarters[og_pos]
             primary_player.adjust_own_reactions(og_pla, og_pos)

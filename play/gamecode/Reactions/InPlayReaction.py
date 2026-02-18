@@ -249,7 +249,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if owner_attachment != player_owning_card.name_player:
                             not_own_attachment = True
                         if player_owning_card.attach_card(attachment, planet_pos, unit_pos,
-                                                          not_own_attachment=not_own_attachment):
+                                                          not_own_attachment=not_own_attachment,
+                                                          relic_check_allowed=False):
                             del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
                             player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -1841,7 +1842,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if player_owning_card.get_number() != primary_player.get_number():
                         not_own_attachment = True
                     if player_owning_card.attach_card(card, planet_pos, unit_pos,
-                                                      not_own_attachment=not_own_attachment):
+                                                      not_own_attachment=not_own_attachment,
+                                                      relic_check_allowed=False):
                         primary_player.discard.remove(card_name)
                         self.delete_reaction()
         elif current_reaction == "Cult of Khorne Attachment":
@@ -1852,7 +1854,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             not_own_attachment = False
             if player_owning_card.get_number() != primary_player.get_number():
                 not_own_attachment = True
-            if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
+            if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment,
+                                              relic_check_allowed=False):
                 del primary_player.headquarters[og_pos]
                 primary_player.adjust_own_reactions(og_pla, og_pos)
                 self.delete_reaction()

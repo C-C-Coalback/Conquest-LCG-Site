@@ -1678,9 +1678,8 @@ class Player:
                                 name_owner == self.name_player:
                             return True
         print("not own in play")
-        if self.name_player == self.game.name_1:
-            return self.game.p2.search_enemy_relic_in_own_cards()
-        return self.game.p1.search_enemy_relic_in_own_cards()
+        other_player = self.get_other_player()
+        return other_player.search_enemy_relic_in_own_cards()
 
     def search_enemy_relic_in_own_cards(self):
         name = self.game.name_1
@@ -2140,7 +2139,7 @@ class Player:
             army_unit_as_attachment = True
         if self.attach_card(card=target_attachment, planet=destination_planet, position=destination_position,
                             not_own_attachment=False,
-                            army_unit_as_attachment=army_unit_as_attachment):
+                            army_unit_as_attachment=army_unit_as_attachment, relic_check_allowed=False):
             self.remove_attachment_from_pos(origin_planet, origin_position, origin_attachment_position)
             return True
         return False
@@ -2189,7 +2188,8 @@ class Player:
                 self.add_resources(card.get_cost() - extra_discounts, refund=True)
         return False
 
-    def attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False):
+    def attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False,
+                    relic_check_allowed=True):
         if planet == -2:
             target_card = self.headquarters[position]
         else:
@@ -2198,6 +2198,10 @@ class Player:
         print(card.get_name())
         print(target_card.get_no_attachments())
         type_of_card = target_card.get_card_type()
+        if card.check_for_a_trait("Relic"):
+            if relic_check_allowed:
+                if self.search_for_existing_relic():
+                    return False
         if army_unit_as_attachment:
             if type_of_card != "Army":
                 print("Army units as attachments can only be attached to other army units")
