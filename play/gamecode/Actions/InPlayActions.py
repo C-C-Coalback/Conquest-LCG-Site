@@ -2225,6 +2225,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+    elif self.action_chosen == "For the Tau'va":
+        if primary_player.get_number() == game_update_string[1]:
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
+                    primary_player.ready_given_pos(planet_pos, unit_pos)
+                    self.action_cleanup()
     elif self.action_chosen == "Reveal The Blade":
         if self.chosen_first_card:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":

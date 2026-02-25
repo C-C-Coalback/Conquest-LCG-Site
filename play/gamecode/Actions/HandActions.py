@@ -809,19 +809,25 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
                     elif ability == "For the Tau'va":
-                        warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
-                        if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
-                            primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
+                        if not self.apoka:
+                            warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
+                            if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                                primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
+                                primary_player.discard_card_from_hand(int(game_update_string[2]))
+                                for i in range(len(primary_player.headquarters)):
+                                    if primary_player.headquarters[i].get_attachments():
+                                        primary_player.ready_given_pos(-2, i)
+                                for i in range(7):
+                                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                                        if primary_player.cards_in_play[i + 1][j].get_attachments():
+                                            primary_player.ready_given_pos(i, j)
+                                secondary_player.create_enemy_played_event_reactions()
+                                self.action_cleanup()
+                            else:
+                                primary_player.add_resources(2, refund=True)
+                        else:
+                            self.action_chosen = ability
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            for i in range(len(primary_player.headquarters)):
-                                if primary_player.headquarters[i].get_attachments():
-                                    primary_player.ready_given_pos(-2, i)
-                            for i in range(7):
-                                for j in range(len(primary_player.cards_in_play[i + 1])):
-                                    if primary_player.cards_in_play[i + 1][j].get_attachments():
-                                        primary_player.ready_given_pos(i, j)
-                            secondary_player.create_enemy_played_event_reactions()
-                            self.action_cleanup()
                     elif ability == "Consumption":
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
