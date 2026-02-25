@@ -1919,18 +1919,23 @@ async def start_resolving_reaction(self, name, game_update_string):
                     primary_player.draw_card()
                 self.delete_reaction()
         elif current_reaction == "Mighty Wraithknight":
-            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-                if not primary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait(
-                        "Spirit", primary_player.etekh_trait):
-                    if primary_player.get_ready_given_pos(planet_pos, i):
-                        primary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
-            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                if not secondary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait(
-                        "Spirit", primary_player.etekh_trait):
-                    if secondary_player.get_ready_given_pos(planet_pos, i):
-                        secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
+            if not self.apoka:
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if not primary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait(
+                            "Spirit", primary_player.etekh_trait):
+                        if primary_player.get_ready_given_pos(planet_pos, i):
+                            primary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    if not secondary_player.cards_in_play[planet_pos + 1][i].check_for_a_trait(
+                            "Spirit", primary_player.etekh_trait):
+                        if secondary_player.get_ready_given_pos(planet_pos, i):
+                            secondary_player.exhaust_given_pos(planet_pos, i, card_effect=True)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
+            else:
+                self.misc_target_planet = planet_pos
+                primary_player.misc_counter = 2
+                secondary_player.misc_counter = 2
         elif current_reaction == "Firedrake Terminators":
             self.damage_abilities_defender_active = True
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)

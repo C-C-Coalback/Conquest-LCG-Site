@@ -2762,6 +2762,22 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.misc_misc = None
                     self.misc_misc_2 = None
                     self.delete_reaction()
+        elif current_reaction == "Mighty Wraithknight":
+            if secondary_player.number == game_update_string[1]:
+                if secondary_player.misc_counter > 0:
+                    if secondary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Spirit"):
+                            secondary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            secondary_player.misc_counter = secondary_player.misc_counter - 1
+            elif primary_player.number == game_update_string[1]:
+                if primary_player.misc_counter > 0:
+                    if primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                        if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Spirit"):
+                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            primary_player.misc_counter = secondary_player.misc_counter - 1
+            if primary_player.misc_counter < 1 and secondary_player.misc_counter < 1:
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
         elif current_reaction == "Sweep Attack":
             if self.chosen_first_card:
                 num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
