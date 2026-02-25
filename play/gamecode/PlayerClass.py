@@ -1107,9 +1107,9 @@ class Player:
             if self.check_bloodthirst(planet_id):
                 retaliate += 3
         warlord_pla, warlord_pos = self.get_location_of_warlord()
-        if self.get_ability_given_pos(warlord_pla, warlord_pos) == "Mephiston":
+        if self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Mephiston":
             retaliate += 1
-        elif self.get_ability_given_pos(warlord_pla, warlord_pos) == "Mephiston BLOODIED":
+        elif self.get_ability_given_pos(warlord_pla, warlord_pos, bloodied_relevant=True) == "Mephiston BLOODIED":
             if warlord_pla == planet_id:
                 retaliate += 1
         return retaliate
