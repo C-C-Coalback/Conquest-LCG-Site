@@ -174,12 +174,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Exterminatus":
         if self.round_number != chosen_planet:
-            if self.number_with_deploy_turn == "1":
-                primary_player = self.p1
-                secondary_player = self.p2
-            else:
-                primary_player = self.p2
-                secondary_player = self.p2
             primary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=False)
             secondary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=True)
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
