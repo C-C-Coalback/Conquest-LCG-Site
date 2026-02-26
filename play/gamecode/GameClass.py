@@ -90,6 +90,8 @@ class Game:
             else:
                 self.planet_array = []
         if regular_planets_setup:
+            if sector == "Random":
+                sector = random.choice(["Traxis", "Gardis", "Veros", "The Breach", "Nepthis", "Sargos"])
             if sector == "Traxis":
                 for i in range(10):
                     self.planet_array.append(self.planet_cards_array[i].get_name())
