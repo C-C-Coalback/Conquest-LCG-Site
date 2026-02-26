@@ -557,6 +557,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                             else:
                                 current_string += "NONE"
                             current_string += "\n"
+                            current_string += "SECTOR:\t" + active_games[self.game_position].sector
+                            current_string += "\n"
                             current_string += "WINNER:\t"
                             if active_games[self.game_position].p1.is_the_winner:
                                 current_string += active_games[self.game_position].p1.name_player
@@ -566,10 +568,12 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 current_string += "N/A"
                             current_string += "\n"
                             current_string += "\n-----\nP1 DETAILS\n-----\n"
+                            current_string += "NAME:\t" + str(active_games[self.game_position].p1.name_player) + "\n"
                             current_string += "RESOURCES GAINED:\t" + str(active_games[self.game_position].p1.total_resources_gained) + "\n"
                             current_string += "CARDS DRAWN:\t" + str(active_games[self.game_position].p1.total_cards_draw) + "\n"
                             current_string += "DAMAGE DEALT (ATTACKS):\t" + str(active_games[self.game_position].p1.total_damage_dealt_by_attacks) + "\n"
                             current_string += "\n-----\nP2 DETAILS\n-----\n"
+                            current_string += "NAME:\t" + str(active_games[self.game_position].p2.name_player) + "\n"
                             current_string += "RESOURCES GAINED:\t" + str(active_games[self.game_position].p2.total_resources_gained) + "\n"
                             current_string += "CARDS DRAWN:\t" + str(active_games[self.game_position].p2.total_cards_draw) + "\n"
                             current_string += "DAMAGE DEALT (ATTACKS):\t" + str(active_games[self.game_position].p2.total_damage_dealt_by_attacks) + "\n"
@@ -578,6 +582,103 @@ class GameConsumer(AsyncWebsocketConsumer):
                             current_string += "MOVE DETAILS:\n" + active_games[self.game_position].game_events_as_mono_string + "\n"
                             f.write(current_string)
                         await self.receive_game_update("Saved the game!")
+                    elif message[1] == "request-seed":
+                        await self.receive_game_update(str(active_games[self.game_position].random_seed))
+                    elif message[1] == "Load-Game" and len(message) == 3 and active_games[self.game_position].phase == "SETUP":
+                        game_id = message[2]
+                        cwd = os.getcwd()
+                        stored_game_data_dir = os.path.join(cwd, "saved_games")
+                        if not os.path.exists(stored_game_data_dir):
+                            os.mkdir(stored_game_data_dir)
+                        target_save_file = os.path.join(stored_game_data_dir, game_id) + ".txt"
+                        if os.path.exists(target_save_file):
+                            with open(target_save_file, "r") as f:
+                                file_content = f.read()
+                                position_start_p1_deck = file_content.find("-----\nDECK P1\n-----")
+                                position_start_p2_deck = file_content.find("-----\nDECK P2\n-----")
+                                position_game_details = file_content.find("-----GAME DETAILS-----")
+                                position_p1_details = file_content.find("-----\nP1 DETAILS\n-----")
+                                position_p2_details = file_content.find("-----\nP2 DETAILS\n-----")
+                                replay_details = file_content.find("-----\nREPLAY DETAILS\n-----")
+                                # /Load-Game/hO2kl3cpykc1r7tv
+                                stored_p1_deck_text = file_content[position_start_p1_deck + len("-----\nDECK P1\n-----") + 1:position_start_p2_deck]
+                                print(stored_p1_deck_text)
+                                stored_p2_deck_text = file_content[position_start_p2_deck + len("-----\nDECK P1\n-----") + 1:position_game_details]
+                                print(stored_p2_deck_text)
+                                game_details_text = file_content[position_game_details:position_p1_details]
+                                game_details_split = game_details_text.split(sep="\n")
+                                errata = "No Errata"
+                                sector = "Traxis"
+                                for i in range(len(game_details_split)):
+                                    if "ERRATA" in game_details_split[i] and "WINNER" not in game_details_split[i]:
+                                        errata = game_details_split[i].split(sep="\t")[1].capitalize()
+                                    if "SECTOR" in game_details_split[i] and "WINNER" not in game_details_split[i]:
+                                        sector = game_details_split[i].split(sep="\t")[1]
+                                if errata == "None":
+                                    errata = "No Errata"
+                                print(errata)
+                                p1_details_text = file_content[position_p1_details:position_p2_details]
+                                p1_details_split = p1_details_text.split(sep="\n")
+                                p1_name = "Dummy"
+                                for i in range(len(p1_details_split)):
+                                    if "NAME" in p1_details_split[i]:
+                                        p1_name = p1_details_split[i].split(sep="\t")[1]
+                                p2_details_text = file_content[position_p2_details:replay_details]
+                                p2_details_split = p2_details_text.split(sep="\n")
+                                p2_name = "Dummy"
+                                for i in range(len(p2_details_split)):
+                                    if "NAME" in p2_details_split[i]:
+                                        p2_name = p2_details_split[i].split(sep="\t")[1]
+                                print(p1_name, p2_name)
+                                replay_text = file_content[replay_details:]
+                                replay_details_split = replay_text.split(sep="\n")
+                                random_seed = 11037
+                                move_details_started = False
+                                moves_list = []
+                                first_to_load_deck = ""
+                                for i in range(len(replay_details_split)):
+                                    if "RANDOM SEED" in replay_details_split[i] and "|" not in replay_details_split[i]:
+                                        random_seed = int(replay_details_split[i].split(sep="\t")[1])
+                                    if move_details_started:
+                                        if replay_details_split[i]:
+                                            moves_list.append(replay_details_split[i])
+                                    if "MOVE DETAILS:" in replay_details_split[i]:
+                                        move_details_started = True
+                                        if not first_to_load_deck:
+                                            if p1_name == replay_details_split[i].split(sep="|||")[0]:
+                                                first_to_load_deck = p1_name
+                                            else:
+                                                first_to_load_deck = p2_name
+                                print(random_seed)
+                                print(moves_list)
+                                card_errata = []
+                                if errata == "Apoka":
+                                    card_errata = apoka_errata_cards_array
+                                elif errata == "Blackstone":
+                                    card_errata = blackstone_errata_cards_array
+                                active_games[self.game_position] = GameClass.Game(
+                                    self.room_name, p1_name, p2_name, card_array, planet_array, cards_dict, errata,
+                                    card_errata, sector=sector, raw_deck_text_1=stored_p1_deck_text,
+                                    raw_deck_text_2=stored_p2_deck_text, random_seed=random_seed,
+                                    first_to_load=first_to_load_deck
+                                )
+                                active_games[self.game_position].game_sockets.append(self)
+                                active_games[self.game_position].saved_moves = moves_list
+                                active_games[self.game_position].saved_move_id = 0
+                                await active_games[self.game_position].update_game_event("", [])
+                        else:
+                            await self.receive_game_update("Game does not exist")
+                    elif message[1] == "Advance":
+                        move_id = active_games[self.game_position].saved_move_id
+                        moves_list = active_games[self.game_position].saved_moves
+                        if move_id >= len(moves_list):
+                            await self.receive_game_update("Reached end of replay")
+                        else:
+                            move_string = moves_list[move_id]
+                            active_games[self.game_position].saved_move_id = move_id + 1
+                            name_user, move_details = move_string.split(sep="|||")
+                            if move_details[0] != "/":
+                                await active_games[self.game_position].update_game_event(name_user, move_details.split(sep="/"))
                     elif message[1] == "Error":
                         raise ValueError
                     elif message[1] == "force-quit-reactions":

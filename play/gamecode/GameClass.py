@@ -18,21 +18,10 @@ import os
 import sys
 
 
-def create_planets(planet_array_objects):
-    planet_names = []
-    for i in range(10):
-        string = planet_array_objects[i].get_name()
-        planet_names.append(string)
-    random.shuffle(planet_names)
-    planets_in_play_return = []
-    for i in range(7):
-        planets_in_play_return.append(planet_names[i])
-    return planets_in_play_return
-
-
 class Game:
     def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, errata,
-                 apoka_errata_cards, sector="Traxis", deck_1="", deck_2="", forced_planet_array=None):
+                 apoka_errata_cards, sector="Traxis", deck_1="", deck_2="", forced_planet_array=None, random_seed=None,
+                 raw_deck_text_1="", raw_deck_text_2="", first_to_load=""):
         self.game_sockets = []
         self.card_array = card_array
         self.cards_dict = cards_dict
@@ -49,6 +38,8 @@ class Game:
             self.blackstone = True
         print("\n\nerrata text\n\n" + errata)
         self.battle_in_progress = False
+        self.saved_moves = []
+        self.saved_move_id = 0
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
@@ -58,8 +49,11 @@ class Game:
         self.stored_deck_1 = None
         self.stored_deck_2 = None
         self.random_seed = random.randrange(sys.maxsize)
-        random.seed(self.random_seed)
+        if random_seed is not None:
+            self.random_seed = random_seed
+        random.seed(str(self.random_seed))
         self.random_seed = str(self.random_seed)
+        self.rng = random.Random(str(self.random_seed))
         self.game_events_as_mono_string = ""
         self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder", "Sanctified Aggressor",
                                     "Incubus of the Severed", "Lurking Termagant"]
@@ -78,6 +72,7 @@ class Game:
         self.forced_battle_abilities = []
         self.atrox_origin = -1
         regular_planets_setup = True
+        self.sector = "Traxis"
         if forced_planet_array is not None:
             if len(forced_planet_array) == 7:
                 for i in range(len(forced_planet_array)):
@@ -91,7 +86,7 @@ class Game:
                 self.planet_array = []
         if regular_planets_setup:
             if sector == "Random":
-                sector = random.choice(["Traxis", "Gardis", "Veros", "The Breach", "Nepthis", "Sargos"])
+                sector = self.rng.choice(["Traxis", "Gardis", "Veros", "The Breach", "Nepthis", "Sargos"])
             if sector == "Traxis":
                 for i in range(10):
                     self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -113,13 +108,14 @@ class Game:
             else:
                 for i in range(10):
                     self.planet_array.append(self.planet_cards_array[i].get_name())
+            self.sector = sector
         for i in range(40, 50):
             self.forced_battle_abilities.append(self.planet_cards_array[i].get_name())
         self.available_breach_planets = []
         for i in range(30, 40):
             self.available_breach_planets.append(self.planet_cards_array[i].get_name())
         if not forced_planet_array:
-            random.shuffle(self.planet_array)
+            self.rng.shuffle(self.planet_array)
         self.planets_removed_from_game = copy.deepcopy(self.planet_array[-3:])
         self.planet_array = self.planet_array[:7]
         self.original_planet_array = copy.deepcopy(self.planet_array)
@@ -549,6 +545,9 @@ class Game:
                 print(deck_content)
                 self.game_events_as_mono_string += self.name_2 + "|||" + "/loaddeck/" + deck_name + "\n"
                 self.p2.setup_player_no_send(deck_content, self.planet_array)
+        if raw_deck_text_1 and raw_deck_text_2:
+            self.p1.setup_player_no_send(raw_deck_text_1, self.planet_array)
+            self.p2.setup_player_no_send(raw_deck_text_2, self.planet_array)
 
     async def send_queued_message(self):
         if self.queued_message:

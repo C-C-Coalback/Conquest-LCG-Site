@@ -1,6 +1,5 @@
 from . import FindCard
 import random
-from random import shuffle
 import copy
 import threading
 from . import CardClasses
@@ -1665,7 +1664,7 @@ class Player:
         self.retreat_warlord()
 
     def shuffle_deck(self):
-        shuffle(self.deck)
+        self.game.rng.shuffle(self.deck)
 
     def search_for_existing_relic(self):
         print("performing relic search")
@@ -3320,7 +3319,7 @@ class Player:
 
     def discard_card_at_random(self):
         if self.cards:
-            pos = random.randint(0, len(self.cards) - 1)
+            pos = self.rng.randint(0, len(self.cards) - 1)
             self.discard_card_from_hand(pos)
 
     def reset_movement_trackers(self):
