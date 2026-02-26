@@ -126,6 +126,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         self.action_chosen = ability
                         self.misc_target_choice = primary_player.get_number()
                         self.misc_target_unit = (planet_pos, unit_pos)
+                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
                         del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
                         if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) < 1:
                             self.action_cleanup()

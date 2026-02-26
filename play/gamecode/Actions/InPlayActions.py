@@ -3168,7 +3168,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     original_player = self.p1
                     if self.misc_target_choice == "2":
                         original_player = self.p2
-                    original_player.remove_damage_from_pos(self.misc_target_unit[0], self.misc_target_unit[1], 1)
                     original_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
                     self.action_cleanup()
     elif self.action_chosen == "Painboy Surjery":
