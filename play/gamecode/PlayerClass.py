@@ -1138,7 +1138,13 @@ class Player:
         joined_string = "GAME_INFO/REMOVED/" + str(self.number) + "/" + self.name_player
         if self.cards_removed_from_game:
             for i in range(len(self.cards_removed_from_game)):
-                joined_string += "/" + self.cards_removed_from_game[i] + "|" + self.cards_removed_from_game_hidden[i]
+                card_name = self.cards_removed_from_game[i]
+                if card_name in self.cards_that_have_errata:
+                    if self.game.apoka:
+                        card_name = card_name + "_apoka"
+                    elif self.game.blackstone:
+                        card_name = card_name + "_blackstone"
+                joined_string += "/" + card_name + "|" + self.cards_removed_from_game_hidden[i]
         if joined_string != self.last_removed_string or force:
             self.last_removed_string = joined_string
             await self.game.send_update_message(joined_string)
@@ -1147,7 +1153,13 @@ class Player:
         joined_string = "GAME_INFO/DISCARD/" + str(self.number)
         if self.discard:
             for i in range(len(self.discard)):
-                joined_string += "/" + self.discard[i] + "|"
+                card_name = self.discard[i]
+                if card_name in self.cards_that_have_errata:
+                    if self.game.apoka:
+                        card_name = card_name + "_apoka"
+                    elif self.game.blackstone:
+                        card_name = card_name + "_blackstone"
+                joined_string += "/" + card_name + "|"
                 if self.aiming_reticle_coords_discard == i:
                     joined_string += self.aiming_reticle_color_discard
         if joined_string != self.last_discard_string or force:
