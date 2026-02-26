@@ -110,10 +110,10 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                     need_to_cleanup_shielding = False
                     need_to_delete_shielding = False
                     position_damage = -1
-                    for i in range(len(self.stored_damage[0].get_position_attacker())):
+                    for i in range(len(self.stored_damage)):
                         if self.stored_damage[i].get_position_attacker() is not None:
-                            self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
-                            if self.stored_damage[0].get_amount_that_can_be_blocked() < 0:
+                            self.stored_damage[i].decrease_amount_that_can_be_blocked(1)
+                            if self.stored_damage[i].get_amount_that_can_be_blocked() < 0:
                                 if i == 0:
                                     need_to_cleanup_shielding = True
                                 else:
