@@ -3319,7 +3319,7 @@ class Player:
 
     def discard_card_at_random(self):
         if self.cards:
-            pos = self.rng.randint(0, len(self.cards) - 1)
+            pos = self.game.rng.randint(0, len(self.cards) - 1)
             self.discard_card_from_hand(pos)
 
     def reset_movement_trackers(self):
