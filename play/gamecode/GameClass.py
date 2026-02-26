@@ -1593,6 +1593,15 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = None
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                    elif self.action_chosen == "Smuggler's Den":
+                        if self.player_with_action == self.name_1:
+                            primary_player = self.p1
+                        else:
+                            primary_player = self.p2
+                        if player_num == int(primary_player.get_number()):
+                            primary_player.cards.append(player_with_attach.attachments_at_planet[pos_planet][pos_attachment].get_name())
+                            del player_with_attach.attachments_at_planet[pos_planet][pos_attachment]
+                            self.action_cleanup()
             elif len(game_update_string) == 6:
                 if game_update_string[0] == "ATTACHMENT" and game_update_string[1] == "IN_PLAY":
                     await AttachmentInPlayActions.update_game_event_action_attachment_in_play(self, name,
