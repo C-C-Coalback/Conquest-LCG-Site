@@ -248,6 +248,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 )
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.choice_context = "Target Dread Monolith:"
+                                self.resolving_search_box = True
                                 self.name_player_making_choices = primary_player.name_player
                             else:
                                 await self.send_update_message(

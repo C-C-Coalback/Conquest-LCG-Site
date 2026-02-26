@@ -2141,6 +2141,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                                      (int(primary_player.get_number()), planet, position_of_unit))
             primary_player.discard.remove(target_choice)
         self.reset_choices_available()
+        self.resolving_search_box = False
         self.mask_jain_zar_check_actions(primary_player, secondary_player)
         self.action_cleanup()
     elif self.choice_context == "Visions of Agony Discard:":
