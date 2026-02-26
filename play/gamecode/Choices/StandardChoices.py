@@ -2297,7 +2297,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
                                           self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_is_unit():
-                    name = card.get_name()
+                    card_name = card.get_name()
                     found_card = True
                     self.anrakyr_unit_position = i
                     if card.get_faction() == "Necrons" or card.get_faction() == "Neutral" or \
@@ -2314,7 +2314,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 card = FindCard.find_card(secondary_player.discard[i], self.card_array, self.cards_dict,
                                           self.apoka_errata_cards, self.cards_that_have_errata)
                 if card.get_is_unit():
-                    name = card.get_name()
+                    card_name = card.get_name()
                     found_card = True
                     self.anrakyr_unit_position = i
                     if card.get_faction() == "Necrons" or card.get_faction() == "Neutral" or \
@@ -2334,8 +2334,18 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 self.action_cleanup()
             else:
                 await self.send_update_message(
-                    "Anrakyr is playing: " + name
+                    "Anrakyr is playing: " + card_name
                 )
+                if card_name == "Shrieking Exarch":
+                    if len(primary_player.cards) > 1:
+                        await self.send_update_message("You must discard 2 cards for Shrieking Exarch")
+                        self.action_chosen = "Shrieking Exarch Anrakyr Discard"
+                        self.misc_counter = 2
+                    else:
+                        await self.send_update_message("Cannot play Shrieking Exarch!")
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        self.action_cleanup()
         else:
             await self.send_update_message(
                 "Did not find a valid card!"

@@ -1173,6 +1173,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 self.misc_counter[2] = self.misc_counter[2] + 1
                 primary_player.discard_card_from_hand(hand_pos)
                 primary_player.add_resources(1)
+    elif self.action_chosen == "Shrieking Exarch Anrakyr Discard":
+        primary_player.discard_card_from_hand(hand_pos)
+        self.misc_counter = self.misc_counter - 1
+        if self.misc_counter < 1:
+            self.action_chosen = "Anrakyr the Traveller"
+            await self.send_update_message("Continue with the deployment.")
     elif self.action_chosen == "Dread Command Barge":
         if not self.chosen_first_card:
             if card.get_faction() != "Necrons":
