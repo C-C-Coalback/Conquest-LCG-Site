@@ -38,7 +38,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.planet_aiming_reticle_active = True
                     self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
                     await self.send_update_message(
-                        "Battle begins at the " + self.get_planet_name(self.last_planet_checked_for_battle) +
+                        "Battle begins at " + self.get_planet_name(self.last_planet_checked_for_battle) +
                         ". Players take combat turns. Press the action button between turns to take an action.")
                 else:
                     await self.change_phase("HEADQUARTERS")
