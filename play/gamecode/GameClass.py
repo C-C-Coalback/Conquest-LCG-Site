@@ -1304,7 +1304,7 @@ class Game:
                         await self.send_update_message("Stopping Memories of Fallen Comrades early")
                         self.action_cleanup()
                     else:
-                        await self.send_update_message("Too far in; action must be concluded now")
+                        await self.send_update_message("Too far in; action must be concluded now. Use /force-quit-action to quit.")
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
                     await PlanetActions.update_game_event_action_planet(self, name, game_update_string)
