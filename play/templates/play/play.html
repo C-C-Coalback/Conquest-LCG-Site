@@ -881,7 +881,8 @@
                             }
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             if (card_data_split[6] !== "") {
-                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[6] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                                var style_string_reticle = `style="left: calc(10px + ` + (card_data_split.length - 7).toString() + `vw);"`;
+                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[6] + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
                             }
                             if (damage === "0") {
 
@@ -1001,7 +1002,8 @@
                         }
                         full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         if (card_data_split[6] !== "") {
-                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[6] + `.png" alt="bugged" class="aiming-reticle"></img>`;
+                            var style_string_reticle = `style="left: calc(10px + ` + (card_data_split.length - 7).toString() + `vw);"`;
+                            full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[6] + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
                         }
                         if (damage === "0") {
 

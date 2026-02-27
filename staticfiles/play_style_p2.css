@@ -281,7 +281,7 @@ h4 {
 .aiming-reticle {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 5px;
     height: 9vh;
     width: 6.63vh;
     pointer-events: none;
