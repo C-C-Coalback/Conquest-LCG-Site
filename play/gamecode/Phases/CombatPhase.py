@@ -1022,15 +1022,16 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     print("Sweep ok")
                             if self.may_move_defender and can_continue:
                                 if secondary_player.search_card_at_planet(self.defender_planet, "Zen Xi Aonia"):
-                                    can_continue = False
-                                    self.create_interrupt("Zen Xi Aonia", secondary_player.name_player,
-                                                          (int(secondary_player.number), self.defender_planet, -1))
-                                    self.last_defender_position = (secondary_player.number,
-                                                                   self.defender_planet,
-                                                                   self.defender_position)
-                                    secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                                self.defender_position,
-                                                                                "red")
+                                    if len(secondary_player.cards_in_play[self.defender_planet + 1]) > 1:
+                                        can_continue = False
+                                        self.create_interrupt("Zen Xi Aonia", secondary_player.name_player,
+                                                              (int(secondary_player.number), self.defender_planet, -1))
+                                        self.last_defender_position = (secondary_player.number,
+                                                                       self.defender_planet,
+                                                                       self.defender_position)
+                                        secondary_player.set_aiming_reticle_in_play(self.defender_planet,
+                                                                                    self.defender_position,
+                                                                                    "red")
                             if self.may_move_defender and can_continue:
                                 for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
                                     if i != self.defender_position:
