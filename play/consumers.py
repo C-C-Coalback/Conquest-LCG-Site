@@ -819,6 +819,19 @@ class GameConsumer(AsyncWebsocketConsumer):
                             active_games[self.game_position].p2.has_passed = False
                             active_games[self.game_position].reset_combat_positions()
                             await self.receive_game_update("Unpassed both players")
+                    elif message[1] == "toggle-command-rewards":
+                        if self.name == active_games[self.game_position].name_1:
+                            active_games[self.game_position].p1.automated_command_rewards = not active_games[self.game_position].p1.automated_command_rewards
+                            if active_games[self.game_position].p1.automated_command_rewards:
+                                await self.receive_game_update("Accepting command results")
+                            else:
+                                await self.receive_game_update("Declining command results")
+                        if self.name == active_games[self.game_position].name_2:
+                            active_games[self.game_position].p2.automated_command_rewards = not active_games[self.game_position].p2.automated_command_rewards
+                            if active_games[self.game_position].p2.automated_command_rewards:
+                                await self.receive_game_update("Accepting command results")
+                            else:
+                                await self.receive_game_update("Declining command results")
                     elif message[1] == "unpass-deploy":
                         if active_games[self.game_position].phase == "DEPLOY":
                             active_games[self.game_position].p1.has_passed = False

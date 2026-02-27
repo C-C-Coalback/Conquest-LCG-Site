@@ -83,6 +83,7 @@ class Player:
         self.synapse_commit_location = -1
         self.idden_base_active = False
         self.warlord_just_got_bloodied = False
+        self.automated_command_rewards = True
         self.cardback_name = "Cardback"
         cwd = os.getcwd()
         settings_file = os.path.join(cwd, "user_preferences_storage/" + self.name_player + ".txt")

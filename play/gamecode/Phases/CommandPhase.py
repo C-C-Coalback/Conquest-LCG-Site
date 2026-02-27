@@ -763,9 +763,9 @@ def resolve_winnings(self, winner, loser, planet_id):
     extra_resources, extra_cards = winner.get_bonus_winnings_at_planet(planet_id)
     resources_won += extra_resources
     cards_won += extra_cards
-    if self.canceled_resource_bonuses[planet_id]:
+    if self.canceled_resource_bonuses[planet_id] or not winner.automated_command_rewards:
         resources_won = 0
-    if self.canceled_card_bonuses[planet_id]:
+    if self.canceled_card_bonuses[planet_id] or not winner.automated_command_rewards:
         cards_won = 0
     ret_val = [winner.number, resources_won, cards_won]
     already_noxious = False
