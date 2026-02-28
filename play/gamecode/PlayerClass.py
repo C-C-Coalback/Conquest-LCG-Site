@@ -3867,6 +3867,8 @@ class Player:
                             if self.resources > 0:
                                 self.game.create_reaction("Tides of Chaos", self.name_player,
                                                           (int(self.number), -1, -1))
+                        if self.search_hand_for_card("Sweep Attack"):
+                            self.game.create_reaction("Sweep Attack", self.name_player, (int(self.number), -1, -1))
                         for j in range(7):
                             if j != planet_pos - 1:
                                 for k in range(len(self.cards_in_play[j + 1])):
