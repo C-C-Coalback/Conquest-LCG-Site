@@ -2870,6 +2870,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.alt_shield_name = ""
         self.alt_shield_mode_active = False
         self.reset_choices_available()
+        self.resolving_search_box = False
         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Sororitas Command Squad":
             if self.stored_damage[0].get_position_attacker():
                 if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
