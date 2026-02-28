@@ -2380,7 +2380,7 @@ class Game:
         primary_player.discard_card_from_hand(self.pos_shield_card)
         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
         self.pos_shield_card = -1
-        primary_player.remove_damage_from_pos((planet_pos, unit_pos, self.stored_damage[0].get_amount_that_can_be_blocked()))
+        primary_player.remove_damage_from_pos(planet_pos, unit_pos, self.stored_damage[0].get_amount_that_can_be_blocked())
         self.stored_damage[0].set_amount_that_can_be_blocked(0)
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
