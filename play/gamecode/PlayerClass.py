@@ -4461,7 +4461,7 @@ class Player:
                         discounts_available += 2
                         self.set_aiming_reticle_in_play(-2, i, "green")
             if "Daemon" in traits:
-                if self.headquarters[i].get_ability() == "Cultist":
+                if self.headquarters[i].get_ability() == "Cultist" and not self.search_card_in_hq("Myriad Excesses"):
                     discounts_available += 1
                     if name_of_card == "Venomcrawler":
                         discounts_available += 1
@@ -4504,7 +4504,7 @@ class Player:
                     discounts_available += icons[2] + 1
                     self.set_aiming_reticle_in_play(planet_pos, i, "green")
             if "Daemon" in traits:
-                if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist":
+                if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist" and not self.search_card_in_hq("Myriad Excesses"):
                     discounts_available += 1
                     if name_of_card == "Venomcrawler":
                         discounts_available += 1
