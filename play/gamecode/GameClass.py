@@ -170,6 +170,7 @@ class Game:
         self.damage_on_units_list_before_new_damage = []
         self.mode = "Normal"
         self.stored_mode = self.mode
+        self.preemptive_destroy_interrupts_allowed = True
         self.condition_main_game = threading.Condition()
         self.condition_sub_game = threading.Condition()
         self.condition_discounting = threading.Condition()
@@ -330,7 +331,6 @@ class Game:
         self.misc_target_choice = -1
         self.masters_of_the_webway = False
         self.misc_target_player = ""
-        self.resolve_destruction_checks_after_reactions = False
         self.ravenous_haruspex_gain = 0
         self.reset_resolving_attack_on_units = False
         self.resolving_consumption = False
@@ -422,7 +422,6 @@ class Game:
         self.kugath_nurglings_present_at_planets = [0, 0, 0, 0, 0, 0, 0]
         self.resolving_nurgling_bomb = False
         self.player_resolving_nurgling_bomb = ""
-        self.auto_card_destruction = True
         self.card_type_defender = ""
         self.defender_is_flying_or_mobile = False
         self.defender_is_also_warlord = False
@@ -635,7 +634,6 @@ class Game:
         if self.stored_mode:
             self.mode = self.stored_mode
         self.furiable_unit_position = (-1, -1)
-        self.auto_card_destruction = True
 
     def reset_effects_data(self):
         self.already_resolving_interrupt = False
@@ -3577,10 +3575,13 @@ class Game:
             self.set_targeting_icons_kugath_nurglings()
 
     async def destroy_check_all_cards(self):
-        if not self.interrupts_waiting_on_resolution:
+        if not self.interrupts_waiting_on_resolution and self.preemptive_destroy_interrupts_allowed:
             self.p1.search_for_preemptive_destroy_interrupts()
             self.p2.search_for_preemptive_destroy_interrupts()
-        if not self.reactions_needing_resolving and not self.interrupts_waiting_on_resolution:
+        if self.interrupts_waiting_on_resolution:
+            self.preemptive_destroy_interrupts_allowed = False
+        if not self.interrupts_waiting_on_resolution:
+            self.preemptive_destroy_interrupts_allowed = True
             for i in range(len(self.stored_taken_damage)):
                 await self.resolve_on_kill_effects(i)
             self.stored_taken_damage = []
@@ -3592,8 +3593,6 @@ class Game:
             await self.destroy_check_cards_in_hq(self.p1)
             await self.destroy_check_cards_in_hq(self.p2)
             await self.complete_destruction_checks()
-        else:
-            self.resolve_destruction_checks_after_reactions = True
 
     def advance_damage_aiming_reticle(self):
         if self.stored_damage:
@@ -6772,6 +6771,27 @@ class Game:
         except:
             self.debug_mode = None
 
+    def check_if_units_can_be_destroyed(self):
+        if self.interrupts_waiting_on_resolution:
+            return False
+        if self.stored_damage:
+            return False
+        if self.xv805_enforcer_active:
+            return False
+        if self.debug_mode is not None:
+            return False
+        if self.intercept_active:
+            return False
+        if self.choosing_unit_for_nullify:
+            return False
+        if self.cards_in_search_box or self.choices_available:
+            return False
+        if self.mode == "DISCOUNT":
+            return False
+        if self.resolving_nurgling_bomb:
+            return False
+        return True
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -6949,16 +6969,8 @@ class Game:
                 self.player_who_is_shielding = self.name_2
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
-        if self.resolve_destruction_checks_after_reactions:
-            if not self.reactions_needing_resolving and not self.stored_damage \
-                    and not self.xv805_enforcer_active:
-                if self.auto_card_destruction:
-                    self.resolve_destruction_checks_after_reactions = False
-                    await self.destroy_check_all_cards()
-        elif not self.stored_damage:
-            if self.auto_card_destruction:
-                self.resolve_destruction_checks_after_reactions = False
-                await self.destroy_check_all_cards()
+        if self.check_if_units_can_be_destroyed():
+            await self.destroy_check_all_cards()
         if not self.stored_damage and not self.interrupts_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal" and not self.xv805_enforcer_active and not self.queued_moves:

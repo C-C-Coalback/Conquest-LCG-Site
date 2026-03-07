@@ -2669,7 +2669,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.choice_context = "Use Crushing Blow?"
             self.choices_available = ["Yes", "No"]
         else:
-            self.auto_card_destruction = True
             self.reset_choices_available()
     elif self.choice_context == "Use Crushing Blow?":
         planet_pos, unit_pos = self.furiable_unit_position
@@ -2677,7 +2676,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
         elif game_update_string[1] == "1":
             self.reset_choices_available()
-            self.auto_card_destruction = True
     elif self.choice_context == "Brutal Cunning: amount of damage":
         if game_update_string[1] == "0":
             self.misc_counter = 1
@@ -2690,7 +2688,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
         elif game_update_string[1] == "1":
             self.reset_choices_available()
-            self.auto_card_destruction = True
     elif self.choice_context == "Use Liatha?":
         if game_update_string[1] == "0":
             self.reset_choices_available()
