@@ -1873,6 +1873,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Heavy Flamer Retributor":
             if secondary_player.get_number() == game_update_string[1]:
                 if planet_pos == og_pla:
+                    if self.misc_misc is None:
+                        self.misc_misc = []
                     if (planet_pos, unit_pos) not in self.misc_misc:
                         self.misc_misc.append((planet_pos, unit_pos))
                         secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
