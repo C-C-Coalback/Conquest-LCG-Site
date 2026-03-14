@@ -405,8 +405,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 secondary_player = self.p1
     if not is_an_interrupt:
         if self.reactions_needing_resolving and self.already_resolving_reaction:
-            if self.reactions_needing_resolving[0].get_reaction_name() == "Vamii Industrial Complex" or \
-                    self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "Vamii Industrial Complex":
                 is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -420,7 +419,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
                     primary_player = self.p2
                     secondary_player = self.p1
-            if self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance":
+            if self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance Rally":
                 is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
