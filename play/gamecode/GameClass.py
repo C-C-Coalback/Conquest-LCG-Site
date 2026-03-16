@@ -5436,8 +5436,9 @@ class Game:
                 if len(game_update_string) == 1:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         primary_player.mobile_resolved = True
+                        primary_player.reset_all_aiming_reticles_play_hq()
                         self.misc_target_unit = (-1, -1)
-                        await self.send_update_message(self.p1.name_player + " finished mobile")
+                        await self.send_update_message(primary_player.name_player + " finished mobile")
                 elif len(game_update_string) == 2:
                     if game_update_string[0] == "PLANETS":
                         planet_pos = int(game_update_string[1])
