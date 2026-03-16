@@ -827,7 +827,11 @@ class Game:
         elif self.reactions_needing_resolving:
             info_string += self.reactions_needing_resolving[0].get_player_resolving_reaction()[0] + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
-            info_string += "Unspecified/" + "Mobile/"
+            if self.player_with_initiative == self.name_1:
+                primary_player = self.p1
+            else:
+                primary_player = self.p2
+            info_string += primary_player.name_player + "/"
         elif self.battle_ability_to_resolve:
             info_string += self.player_resolving_battle_ability + "/"
         elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
@@ -892,7 +896,11 @@ class Game:
             info_string += "Reaction: " + self.reactions_needing_resolving[0].get_reaction_name() + "/"
             info_string += "User: " + self.reactions_needing_resolving[0].get_player_resolving_reaction() + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
-            info_string += "Mobile window/"
+            if self.player_with_initiative == self.name_1:
+                primary_player = self.p1
+            else:
+                primary_player = self.p2
+            info_string += "Mobile window/" + primary_player.name_player
         elif self.battle_ability_to_resolve:
             info_string += "Resolve battle ability: " + self.battle_ability_to_resolve + "/"
             info_string += self.player_resolving_battle_ability + "/"
