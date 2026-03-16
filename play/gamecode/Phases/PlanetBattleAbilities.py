@@ -54,6 +54,17 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
                 self.damage_from_atrox = False
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
                                                      game_update_string)
+    elif len(game_update_string) == 4:
+        if game_update_string[0] == "IN_PLAY":
+            planet_pos = int(game_update_string[2])
+            if abs(self.atrox_origin - planet_pos) == 1:
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    secondary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
+                self.damage_from_atrox = True
+                if not self.stored_damage:
+                    self.damage_from_atrox = False
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                         game_update_string)
 
 
 async def manual_plannum_ability(self, name, game_update_string, primary_player, secondary_player):

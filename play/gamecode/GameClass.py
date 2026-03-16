@@ -2765,6 +2765,12 @@ class Game:
         self.name_player_making_choices = player.name_player
         self.choice_context = "Choose Enslaved Faction:"
 
+    def get_planet_location(self, planet_name):
+        for i in range(len(self.planet_array)):
+            if self.planet_array[i] == planet_name:
+                return i
+        return -1
+
     async def quick_battle_ability_resolution(self, name, game_update_string, winner, loser):
         self.reset_choices_available()
         if self.battle_ability_to_resolve == "Osus IV":
@@ -2788,7 +2794,7 @@ class Game:
             self.misc_target_unit = (-1, -1)
             self.chosen_first_card = False
         elif self.battle_ability_to_resolve == "Atrox Prime":
-            self.atrox_origin = self.last_planet_checked_for_battle
+            self.atrox_origin = self.get_planet_location("Atrox Prime")
             if self.different_atrox_origin != -1:
                 self.atrox_origin = self.different_atrox_origin
         elif self.battle_ability_to_resolve == "Immortal Sorrows":
