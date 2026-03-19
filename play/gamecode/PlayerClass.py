@@ -5521,11 +5521,11 @@ class Player:
                 if card.check_for_a_trait("Soldier") or card.check_for_a_trait("Warrior"):
                     attack_value += 1
         if self.check_for_trait_given_pos(planet_id, unit_id, "Warrior"):
-            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal", bloodied_relevant=True):
                 if self.check_if_trait_at_planet(planet_id, "Psyker"):
                     attack_value += 1
         elif self.check_for_trait_given_pos(planet_id, unit_id, "Psyker"):
-            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal", bloodied_relevant=True):
                 if self.check_if_trait_at_planet(planet_id, "Warrior"):
                     attack_value += 1
         if ability == "Auxiliary Overseer":
@@ -6283,10 +6283,10 @@ class Player:
         if ability == "Shard of the Deceiver":
             health += len(self.discard)
         if self.check_for_trait_given_pos(planet_id, unit_id, "Warrior"):
-            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal", bloodied_relevant=True):
                 health += 1
         elif self.check_for_trait_given_pos(planet_id, unit_id, "Psyker"):
-            if self.search_card_at_planet(planet_id, "Talyesin Fharenal"):
+            if self.search_card_at_planet(planet_id, "Talyesin Fharenal", bloodied_relevant=True):
                 health += 1
         if card.get_card_type() == "Army":
             if self.search_card_in_hq("Reign of Solemnace"):
