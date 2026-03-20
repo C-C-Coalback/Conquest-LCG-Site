@@ -4020,12 +4020,6 @@ class Game:
             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Volatile Pyrovore":
                 self.create_reaction("Volatile Pyrovore", primary_player.name_player,
                                      (int(secondary_player.number), att_pla, att_pos))
-        if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-            if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Phantasmatic Masque":
-                if primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                    if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
-                        self.create_reaction("Phantasmatic Masque", primary_player.name_player,
-                                             (int(primary_player.number), planet_pos, unit_pos))
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Deathskull Lootas":
             self.create_reaction("Deathskull Lootas", secondary_player.name_player,
                                  (int(secondary_player.number), att_pla, att_pos))
@@ -5849,6 +5843,11 @@ class Game:
                                 self.create_interrupt("Chapter Champion Varn", primary_player.name_player,
                                                       (int(primary_player.number), def_pla, def_pos))
                 if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
+                    if primary_player.get_ability_given_pos(def_pla, def_pos) == "Phantasmatic Masque":
+                        if primary_player.get_ready_given_pos(def_pla, def_pos):
+                            if not primary_player.get_once_per_phase_used_given_pos(def_pla, def_pos):
+                                self.create_reaction("Phantasmatic Masque", primary_player.name_player,
+                                                     (int(primary_player.number), def_pla, def_pos))
                     if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
                         if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
                                                                 bloodied_relevant=True):
