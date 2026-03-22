@@ -831,6 +831,11 @@ class Game:
                 primary_player = self.p1
             else:
                 primary_player = self.p2
+            if primary_player.mobile_resolved:
+                if self.player_with_initiative == self.name_1:
+                    primary_player = self.p2
+                else:
+                    primary_player = self.p1
             info_string += primary_player.name_player + "/"
         elif self.battle_ability_to_resolve:
             info_string += self.player_resolving_battle_ability + "/"
@@ -900,6 +905,11 @@ class Game:
                 primary_player = self.p1
             else:
                 primary_player = self.p2
+            if primary_player.mobile_resolved:
+                if self.player_with_initiative == self.name_1:
+                    primary_player = self.p2
+                else:
+                    primary_player = self.p1
             info_string += "Mobile window/" + primary_player.name_player
         elif self.battle_ability_to_resolve:
             info_string += "Resolve battle ability: " + self.battle_ability_to_resolve + "/"
