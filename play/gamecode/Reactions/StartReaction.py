@@ -485,6 +485,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.player_with_action = secondary_player.name_player
                 self.mode = "ACTION"
             elif card.has_action_while_in_hand:
+                self.chosen_first_card = False
+                self.chosen_second_card = False
                 self.mode = "ACTION"
                 self.player_with_action = primary_player.name_player
                 self.action_chosen = card.get_name()
