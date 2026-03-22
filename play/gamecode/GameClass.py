@@ -5439,6 +5439,8 @@ class Game:
         else:
             primary_player = self.p2
             secondary_player = self.p1
+        if primary_player.mobile_resolved and not secondary_player.mobile_resolved:
+            primary_player, secondary_player = secondary_player, primary_player
         if not primary_player.mobile_resolved:
             if name == primary_player.name_player:
                 if len(game_update_string) == 1:
