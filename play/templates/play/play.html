@@ -1064,7 +1064,7 @@
                         mistarget_element.innerHTML = `<p style="color:red">` + mistarget_main_info + `</p><p style="color: yellow">` + mistarget_add_info + `</p>`;
                         mistarget_element.style["display"] = "block";
                         makeMistargetAppearAndSlide();
-                        setTimeout(makeMistargetDisappearAndSlide, 10000);
+                        setTimeout(makeMistargetDisappearAndSlide, 5000);
                     }
                 } else if (split_data[1] === "INITIATIVE") {
                     var e_1 = document.getElementById("initiative-player-1");
@@ -1243,7 +1243,7 @@
                     clearInterval(id);
                     clearMistarget();
                 } else {
-                    pos = pos - 0.25;
+                    pos = pos - 1;
                     elem.style.top = pos + 'vh';
                 }
             }
@@ -1254,12 +1254,12 @@
             var pos = -10;
             var id = null;
             clearInterval(id);
-            id = setInterval(frame, 10);
+            id = setInterval(frame, 1);
             function frame() {
                 if (pos >= 5) {
                     clearInterval(id);
                 } else {
-                    pos = pos + 0.25;
+                    pos = pos + 1;
                     elem.style.top = pos + 'vh';
                 }
             }
