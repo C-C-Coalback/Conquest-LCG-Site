@@ -82,6 +82,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     self.player_with_action = secondary_player.name_player
                     await self.send_update_message(secondary_player.name_player +
                                                    " must move the Evangelizing Ships to a planet.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Evangelizing Ships only puts units into play at non-strongpoint (green) planets.")
         else:
             og_pla, og_pos = self.position_of_actioned_card
             if chosen_planet != og_pla:
@@ -105,6 +108,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                     self.misc_target_planet = chosen_planet
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "That planet does not share a type with the original planet.")
     elif self.action_chosen == "Teleportarium":
         if self.chosen_first_card:
             og_pla, og_pos = self.misc_target_unit
@@ -112,6 +118,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Teleportarium only moves to adjacent planets.")
     elif self.action_chosen == "Corrupted Teleportarium":
         if self.chosen_first_card:
             og_pla, og_pos = self.misc_target_unit
@@ -183,6 +192,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.card_pos_to_deploy = -1
             secondary_player.create_enemy_played_event_reactions()
             self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Exterminatus cannot target the first planet.")
     elif self.action_chosen == "Predation":
         adj_1 = chosen_planet - 1
         adj_2 = chosen_planet + 1
@@ -200,6 +212,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
             secondary_player.create_enemy_played_event_reactions()
             self.action_cleanup()
             primary_player.aiming_reticle_coords_hand = None
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Planet is not adjacent to an infested planet.")
     elif self.action_chosen == "Hunter Gargoyles":
         if self.infested_planets[chosen_planet]:
             primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
@@ -213,6 +228,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.player_with_deploy_turn = secondary_player.name_player
                 self.number_with_deploy_turn = secondary_player.number
             self.position_of_actioned_card = (-1, -1)
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Planet is not infested.")
     elif self.action_chosen == "Infernal Gateway":
         if primary_player.aiming_reticle_coords_hand_2 is None:
             await self.send_update_message("Choose a valid unit first")
@@ -230,9 +248,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 if pos_hand < self.card_pos_to_deploy:
                     self.card_pos_to_deploy -= 1
                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-                self.mode = "Normal"
-                self.action_chosen = ""
-                self.player_with_action = ""
+                self.action_cleanup()
     elif self.action_chosen == "Khymera Den":
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                     self.position_of_actioned_card[1])
@@ -277,6 +293,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             self.action_cleanup()
             self.position_of_actioned_card = (-1, -1)
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Wildrider Squadron can only move to adjacent planets.")
     elif self.action_chosen == "Shroud Cruiser":
         if self.chosen_first_card:
             og_pla, og_pos = self.misc_target_unit
@@ -284,6 +303,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Shroud Cruiser only moves to adjacent planets.")
     elif self.action_chosen == "Searchlight":
         og_pla, og_pos = self.position_of_actioned_card
         if og_pla != chosen_planet:
@@ -294,6 +316,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if self.infested_planets[chosen_planet]:
             self.infested_planets[chosen_planet] = False
             primary_player.add_resources(1)
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Planet is not infested.")
     elif self.action_chosen == "Vivisection":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) == "Necrons":
@@ -315,10 +340,16 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.action_cleanup()
             planet_name = self.get_planet_name(chosen_planet)
             await self.send_update_message(planet_name + " was targeted for Sacrificial Altar.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Sacrifical Altar must target a non-first planet.")
     elif self.action_chosen == "Triumvirate of Ynnead":
         if self.chosen_first_card:
             if self.trium_tracker[1] != chosen_planet:
                 await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Triumvirate of Ynnead must deploy the units to different planets.")
     elif self.action_chosen == "The Orgiastic Feast":
         card_names = self.misc_target_choice.split(sep="/")
         for i in range(len(card_names)):
@@ -344,6 +375,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     secondary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "No Space Wolves unit present ath that planet.")
     elif self.action_chosen == "Terminator Armour":
         if primary_player.check_for_trait_at_planet(chosen_planet, "Scout"):
             og_pla, og_pos = self.misc_target_unit
@@ -351,6 +385,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "No Scout unit present at that planet.")
     elif self.action_chosen == "Spore Burst":
         if self.chosen_first_card:
             if self.infested_planets[chosen_planet]:
@@ -360,6 +397,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_discard = None
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Planet is not infested.")
     elif self.action_chosen == "Kaerux Erameas":
         if chosen_planet != self.round_number:
             if primary_player.check_for_warlord(chosen_planet) == 0 and \
@@ -376,6 +416,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.planet_aiming_reticle_active = True
                 self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Kaerux Erameas cannot target planets with a warlord.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Kaerux Erameas cannot target the first planet.")
     elif self.action_chosen == "Bond of Brotherhood":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_faction_given_pos(chosen_planet, i) == "Tau":
@@ -417,6 +463,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Planet is not a technological (blue) planet.")
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_second_card and self.chosen_first_card:
             self.chosen_second_card = True
@@ -484,9 +533,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 )
             else:
                 planet_name = self.planet_array[chosen_planet]
-                await self.send_update_message(
-                    "No valid targets for Vile Laboratory at " + planet_name + "!"
-                )
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "No valid targets for Vile Laboratory at " + planet_name + "!")
         elif self.chosen_first_card and self.chosen_second_card:
             if abs(chosen_planet - self.misc_target_planet) == 1:
                 primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
@@ -494,6 +542,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                                               self.position_of_actioned_card[1])
                 primary_player.move_unit_to_planet(self.misc_target_unit[0], self.misc_target_unit[1], chosen_planet)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Adjacent planet movement only.")
     elif self.action_chosen == "Empower":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
@@ -512,7 +563,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     num_genestealers += 1
             if num_genestealers > 1:
                 self.infest_planet(chosen_planet, primary_player)
-        self.action_cleanup()
+            self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Planet is already infested.")
     elif self.action_chosen == "Vanguarding Horror":
         if self.chosen_first_card:
             if abs(chosen_planet - self.misc_target_planet) == 1:
@@ -526,6 +580,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 del primary_player.cards_in_reserve[planet_pos][unit_pos]
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Adjacent planet movement only.")
     elif self.action_chosen == "Daring Assault":
         if self.chosen_first_card:
             planet_pos, unit_pos = self.misc_target_unit
@@ -560,6 +617,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Adjacent planet movement only.")
     elif self.action_chosen == "The Dawn Blade":
         if self.misc_target_choice == "Move":
             if self.chosen_first_card:
@@ -588,6 +648,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         del primary_player.cards_in_reserve[planet_pos][unit_pos]
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Adjacent planet movement only.")
             else:
                 planet_pos, unit_pos = self.misc_target_unit
                 if abs(planet_pos - chosen_planet) == 1:
@@ -598,6 +661,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Adjacent planet movement only.")
     elif self.action_chosen == "Indiscriminate Bombing":
         if not self.chosen_first_card:
             self.chosen_first_card = True
@@ -716,6 +782,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
                 primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "No Termagant tokens present at that planet.")
     elif self.action_chosen == "Anrakyr the Traveller":
         if self.anrakyr_unit_position != -1:
             self.planet_pos_to_deploy = int(game_update_string[1])
@@ -811,6 +880,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.aiming_reticle_coords_hand = None
             secondary_player.create_enemy_played_event_reactions()
             self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Planet is not infested.")
     elif self.action_chosen == "Ork Kannon":
         self.location_of_indirect = "PLANET"
         self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
@@ -843,6 +915,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
             if not self.infested_planets[chosen_planet]:
                 self.infest_planet(chosen_planet, primary_player)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Planet is already infested.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Adjacent planet only.")
     elif self.action_chosen == "Nurgling Bomb":
         found_nurgling_bomb_target_p1 = False
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
@@ -948,7 +1026,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.misc_target_planet = chosen_planet
                 self.chosen_first_card = True
             else:
-                await self.send_update_message("An enemy warlord is present.")
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Enemy warlord is present.")
     elif self.action_chosen == "Ksi'm'yen Orbital City":
         if self.chosen_first_card:
             origin_planet, origin_pos = self.misc_target_unit
@@ -970,6 +1049,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Adjacent planet movement only.")
     elif self.action_chosen == "Snotling Attack":
         primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
         self.misc_counter = self.misc_counter - 1

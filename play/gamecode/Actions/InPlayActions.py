@@ -33,6 +33,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if primary_player.spend_resources(2):
                             self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
                             self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Insufficient resources.")
                 if player_owning_card.name_player == name:
                     if ability == "Haemonculus Tormentor":
                         if player_owning_card.spend_resources(1):
@@ -41,6 +44,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
                             await self.send_update_message("Haemonculus buffed")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Insufficient resources.")
                     elif ability == "Virulent Spore Sacs":
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.infest_planet(planet_pos, player_owning_card)
@@ -61,6 +67,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.position_of_actioned_card = (planet_pos, unit_pos)
                                 self.chosen_second_card = False
                                 self.chosen_first_card = False
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Once per round ability used.")
                         elif not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             self.misc_target_planet = planet_pos
@@ -69,12 +78,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.chosen_second_card = False
                             self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Air Caste Courier":
                         if card_chosen.get_ready():
                             player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.chosen_second_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Big Mek Kagdrak":
                         if not card.get_once_per_round_used():
                             card.set_once_per_round_used(True)
@@ -82,6 +97,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Big Mek Kagdrak BLOODIED":
                         if not card.get_once_per_game_used():
                             card.set_once_per_game_used(True)
@@ -89,12 +107,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per game ability used.")
                     elif ability == "Wildrider Squadron":
                         if not card_chosen.get_once_per_phase_used():
                             if player_owning_card.name_player == name:
                                 self.action_chosen = ability
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Canoness Vardina":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
@@ -105,6 +129,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             if secondary_player.check_for_warlord(planet_pos, True, primary_player.name_player):
                                 self.misc_counter = 3
                             await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Canoness Vardina BLOODIED":
                         if not card_chosen.get_once_per_game_used():
                             card_chosen.set_once_per_game_used(True)
@@ -113,12 +140,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.misc_counter = 2
                             await self.send_update_message("Place " + str(self.misc_counter) + " faith tokens.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per game ability used.")
                     elif ability == "Vaulting Harlequin":
                         if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eop = True
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Boss Zugnog":
                         if not card_chosen.get_once_per_phase_used():
                             if self.planets_in_play_array[self.round_number]:
@@ -128,23 +161,38 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.misc_target_planet = planet_pos
                                 self.misc_counter = 0
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "First planet is not in play.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Hunter Gargoyles":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Castellan Crowe BLOODIED":
                         if not card_chosen.get_once_per_game_used():
                             card_chosen.set_once_per_game_used(True)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             self.action_chosen = ability
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per game ability used.")
                     elif ability == "Torquemada Coteaz":
                         if not card_chosen.misc_ability_used:
                             card_chosen.misc_ability_used = True
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Torquemada Coteaz ability already used this attack.")
                     elif ability == "Canoptek Spyder":
                         if not card_chosen.once_per_combat_round_used:
                             if planet_pos == self.last_planet_checked_for_battle:
@@ -153,12 +201,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.position_of_actioned_card = (planet_pos, unit_pos)
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per combat round ability used.")
                     elif ability == "Mandragoran Immortals":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Autarch Celachia":
                         if not card_chosen.once_per_round_used:
                             if primary_player.spend_resources(1):
@@ -169,6 +223,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.choices_available = ["Area Effect (1)", "Armorbane", "Mobile"]
                                 self.choice_context = "Autarch Celachia"
                                 self.name_player_making_choices = primary_player.name_player
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Insufficient resources.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Immortal Legion":
                         if card_chosen.get_ready():
                             if secondary_player.warlord_faction == primary_player.enslaved_faction:
@@ -177,6 +237,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
+                                else:
+                                    await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                      "Enemy warlord is not at a planet.")
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Enslaved faction does not match faction of enemy warlord.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Lone Wolf":
                         if card_chosen.get_ready():
                             target_planet = secondary_player.get_planet_of_warlord()
@@ -185,13 +254,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
+                                else:
+                                    await self.send_mistarget_message(primary_player.name_player,
+                                                                      "Cannot Trigger Ability",
+                                                                      "You control units at the same planet as the enemy warlord.")
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Enemy warlord is not at a planet.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Pattern IX Immolator":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             self.misc_counter = secondary_player.command_struggles_won_this_phase - 1
                             if self.misc_counter < 1:
-                                await self.send_update_message("Opponent did not win enough command struggles for "
-                                                               "Pattern IX Immolator to do anything.")
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Opponent did not win enough command struggles for Pattern IX Immolator to do anything.")
                                 self.action_cleanup()
                             else:
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -199,11 +278,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.action_chosen = ability
                                 self.chosen_first_card = False
                                 await self.send_update_message("Deal " + str(self.misc_counter) + " damage first.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "The Emperor's Champion":
                         if not card_chosen.once_per_combat_round_used:
                             card_chosen.once_per_combat_round_used = True
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per combat round ability used.")
                     elif ability == "Ba'ar Zul's Cleavers":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -211,6 +296,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Agnok's Shadows":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -218,12 +306,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.misc_target_planet = planet_pos
                             self.action_chosen = ability
                             self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Ravenwing Escort":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.misc_target_planet = planet_pos
                             self.action_chosen = ability
                             self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Dread Monolith":
                         if not card_chosen.once_per_round_used:
                             primary_player.cards_in_play[planet_pos + 1][unit_pos].set_once_per_round_used(True)
@@ -256,12 +350,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 )
                                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                                 self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Pathfinder Shi Or'es":
                         if not card_chosen.get_once_per_phase_used():
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             card_chosen.set_once_per_phase_used(True)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Twisted Wracks":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -272,6 +372,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Kairos Fateweaver":
                         final_card_name = ""
                         for i in range(len(primary_player.deck)):
@@ -312,6 +415,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Broadside Shas'vre":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -319,6 +425,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.misc_counter = primary_player.get_attack_given_pos(planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Seekers of Slaanesh":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -332,6 +441,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.position_of_actioned_card = (planet_pos, unit_pos)
                                 self.misc_target_planet = planet_pos
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per combat round ability used.")
                     elif ability == "Aun'Len BLOODIED":
                         if self.planet_array[planet_pos] != "Jaricho" and \
                                 (self.planet_array[
@@ -348,6 +460,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.choice_context = "Resolve Battle Ability?"
                                 self.name_player_making_choices = primary_player.name_player
                                 self.tense_negotiations_active = True
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Once per game ability used.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Aun'Len cannot trigger that planet.")
                     elif ability == "Abrasive Squigherder":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -371,6 +489,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.number_who_is_searching = primary_player.number
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Korporal Snagbrat":
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
@@ -380,6 +501,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.misc_target_choice = ""
                             self.misc_target_unit = (-1, -1)
                             self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per pahse ability used.")
                     elif ability == "Raging Krootox":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -388,6 +512,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             await self.send_update_message("Raging Krootox gained +" + str(amount) + " ATK.")
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Dread Command Barge":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -397,12 +524,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Alluring Daemonette":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Da 'Eavy":
                         primary_player.retreat_unit(planet_pos, unit_pos)
                         self.action_cleanup()
@@ -412,6 +545,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Veteran Brother Maxos":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -427,6 +563,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.chosen_first_card = False
                                 self.misc_target_player = ""
                                 await self.send_update_message("Imotekh activated; only army units supported.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Chaplain Mavros":
                         if primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used is False:
                             primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used = 1
@@ -438,6 +577,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Mavros is out of charges.")
                     elif ability == "Zarathur's Flamers":
                         self.action_chosen = ability
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
@@ -446,17 +588,26 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Fire Caste Cadre":
                         if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Scribe Servo-Skull":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Saint Celestine":
                         if not card_chosen.get_once_per_phase_used():
                             if not card_chosen.bloodied:
@@ -464,6 +615,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.action_chosen = ability
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                                 self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Ravenous Flesh Hounds":
                         self.action_chosen = ability
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -472,6 +626,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             card.set_once_per_phase_used(True)
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Sivarla Soulbinder":
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
@@ -479,11 +636,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             self.misc_target_unit = (-1, -1)
                             self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Uncontrollable Rioters":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
                             self.take_control_of_card(secondary_player, primary_player, planet_pos, unit_pos)
                             self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Replicating Scarabs":
                         if card_chosen.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -494,20 +657,32 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.chosen_first_card = False
                             self.misc_target_planet = planet_pos
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Lekor Blight-Tongue":
                         if card.get_ready():
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Plagueburst Crawler":
                         if not card.get_ready():
                             primary_player.ready_given_pos(planet_pos, unit_pos)
                             self.action_chosen = ability
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Card is not ready.")
                     elif ability == "Improbable Runt Machine":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Kaptin Bluddflagg":
                         if not card.get_once_per_round_used():
                             card.set_once_per_round_used(True)
@@ -515,12 +690,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.chosen_first_card = False
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Ireful Vanguard":
                         if not card.get_once_per_round_used():
                             if secondary_player.won_command_struggles_planets_round[planet_pos]:
                                 card.set_once_per_round_used(True)
                                 self.action_chosen = ability
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Opponent did not win a command struggle at that planet.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per rond ability used.")
                     elif ability == "Cardback":
                         if card_chosen.actually_a_deepstrike:
                             actual_ability = card_chosen.deepstrike_card_name
@@ -542,18 +726,27 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
                                 primary_player.mulligan_hand()
                                 self.action_cleanup()
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Once per round ability used.")
                         else:
                             if not primary_player.get_once_per_game_used_given_pos(planet_pos, unit_pos):
                                 primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos, True)
                                 primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                                 primary_player.mulligan_hand()
                                 self.action_cleanup()
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Once per game ability used.")
                     elif ability == "Slave-powered Wagons":
                         if not card_chosen.get_once_per_round_used():
                             card_chosen.set_once_per_round_used(True)
                             self.action_chosen = ability
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per round ability used.")
                     elif ability == "Evangelizing Ships":
                         if not card_chosen.get_once_per_phase_used():
                             card_chosen.set_once_per_phase_used(True)
@@ -569,6 +762,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.misc_target_planet = planet_pos
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Insufficient resources.")
                     elif ability == "Keening Maleceptor":
                         if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                             if self.infested_planets[planet_pos] and self.planet_array[planet_pos] != "Jaricho":
@@ -584,11 +780,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.choice_context = "Resolve Battle Ability?"
                                 self.name_player_making_choices = primary_player.name_player
                                 self.tense_negotiations_active = True
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                                  "Planet not infested (or is Jaricho).")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
                     elif ability == "Talyesin's Warlocks":
                         if not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_combat_round_used:
                             self.action_chosen = ability
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_combat_round_used = True
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per combat round ability used.")
                     elif ability == "Ancient Keeper of Secrets":
                         if player_owning_card.name_player == name:
                             self.action_chosen = ability
@@ -604,6 +809,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     card_chosen.set_once_per_phase_used(True)
                                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                                     self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Once per phase ability used.")
     elif self.action_chosen == "Twisted Laboratory":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -640,6 +848,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     "Twisted Laboratory used on " + player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_name()
                     + ", located at planet " + str(planet_pos) + ", position " + str(unit_pos))
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Ravenwing Escort":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -648,6 +859,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Must move a unit at the same planet.")
     elif self.action_chosen == "Crown of Control":
         if game_update_string[1] == primary_player.number:
             if self.misc_target_planet == planet_pos:
@@ -656,6 +873,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_counter += 1
                     if self.misc_counter > 1:
                         self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Must remove damage from units at the same planet.")
     elif self.action_chosen == "Agnok's Shadows":
         if not self.chosen_first_card:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
@@ -690,6 +910,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.chosen_first_card = True
                         await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
                                                        " received -2 ATK!")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is a warlord.")
     elif self.action_chosen == "Evolutionary Adaptation":
         if self.chosen_first_card:
             if primary_player.get_number() == game_update_string[1]:
@@ -742,6 +965,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         )
                         self.action_cleanup()
                         self.position_of_actioned_card = (-1, -1)
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Kroot unit.")
     elif self.action_chosen == "Behind Enemy Lines":
         if self.chosen_second_card:
             if game_update_string[1] == secondary_player.get_number():
@@ -778,6 +1004,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                                     secondary_player.create_enemy_played_event_reactions()
                                     self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              "Card is an Elite unit.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
     elif self.action_chosen == "Mont'ka Strike":
         if game_update_string[1] == secondary_player.get_number():
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -792,6 +1024,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Saim-Hann Jetbike":
         if self.chosen_first_card:
             if self.misc_target_planet == planet_pos:
@@ -802,6 +1037,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Fetid Haze":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
@@ -816,6 +1054,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     secondary_player.total_indirect_damage = damage
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Nurgle unit.")
     elif self.action_chosen == "Vile Laboratory":
         if self.chosen_first_card and not self.chosen_second_card:
             if planet_pos == self.misc_target_planet:
@@ -824,6 +1065,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_second_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Vehicle unit.")
     elif self.action_chosen == "Inquisitorial Fortress":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -856,39 +1100,49 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if can_continue:
                 player_being_hit.rout_unit(planet_pos, unit_pos)
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Hate":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
         can_continue = False
-        if primary_player.resources >= player_being_hit.get_cost_given_pos(planet_pos, unit_pos) and \
-                primary_player.enslaved_faction == player_being_hit.get_faction_given_pos(planet_pos, unit_pos):
-            can_continue = True
-            possible_interrupts = []
-            if player_owning_card.name_player == primary_player.name_player:
-                possible_interrupts = secondary_player.intercept_check()
-            if player_owning_card.name_player == secondary_player.name_player:
-                possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                    planet_pos, unit_pos, intercept_possible=True, event=True)
-                if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+        if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+            if primary_player.resources >= player_being_hit.get_cost_given_pos(planet_pos, unit_pos) and \
+                    primary_player.enslaved_faction == player_being_hit.get_faction_given_pos(planet_pos, unit_pos):
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True, event=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                    elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy events.")
+                if possible_interrupts and can_continue:
                     can_continue = False
-                    await self.send_update_message("Immune to enemy card abilities.")
-                elif secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
-                    can_continue = False
-                    await self.send_update_message("Immune to enemy events.")
-            if possible_interrupts and can_continue:
-                can_continue = False
-                await self.send_update_message("Some sort of interrupt may be used.")
-                self.choices_available = possible_interrupts
-                self.choices_available.insert(0, "No Interrupt")
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Interrupt Effect?"
-                self.nullified_card_name = self.action_chosen
-                self.cost_card_nullified = 0
-                self.nullify_string = "/".join(game_update_string)
-                self.first_player_nullified = primary_player.name_player
-                self.nullify_context = "Event Action"
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = self.action_chosen
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Event Action"
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Enslaved faction or cost mismatch.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
         if can_continue:
             primary_player.spend_resources(player_being_hit.get_cost_given_pos(planet_pos, unit_pos))
             if player_being_hit.name_player == secondary_player.name_player:
@@ -928,6 +1182,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await self.send_update_message(card_name + " at " +
                                                    self.planet_array[planet_pos] + " gained " +
                                                    self.misc_target_player + "'s text box!")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Imotekh cannot target Elites or unique units.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit. (Imotekh only supports army units at this time)")
     elif self.action_chosen == "Iridescent Wand":
         if planet_pos == self.misc_target_planet:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -937,6 +1197,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_counter = self.misc_counter - 1
                     if self.misc_counter < 1:
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Must target two different units.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Torturer of Worlds":
         if game_update_string[1] == primary_player.get_number():
             if self.replaced_planets[planet_pos]:
@@ -955,6 +1221,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             del primary_player.cards_in_play[og_pla + 1][og_pos]
                             secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Planet has not been replaced.")
     elif self.action_chosen == "Canoptek Spyder":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -966,6 +1238,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                     self.position_of_actioned_card[1])
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not a Necrons army unit.")
     elif self.action_chosen == "Inexperienced Weirdboy":
         if self.position_of_actioned_card[0] == planet_pos:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1001,6 +1276,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Test of Faith":
         if game_update_string[1] == primary_player.number:
             unique_found = False
@@ -1017,6 +1295,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.drammask_nane_check()
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "No unique unit found at this planet.")
     elif self.action_chosen == "The Strength of the Enemy":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.number:
@@ -1046,6 +1330,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         await self.send_update_message(card_name + " at " +
                                                        self.planet_array[planet_pos] + " gained " +
                                                        self.misc_target_player + "'s text box!")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
         else:
             if game_update_string[1] == secondary_player.number:
                 if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1054,20 +1341,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await self.send_update_message("Stealing " + self.misc_target_player + "'s text box.")
                     secondary_player.set_blanked_given_pos(planet_pos, unit_pos)
                     self.chosen_first_card = True
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Air Caste Courier":
-        print("ACC")
         if self.chosen_first_card:
-            print("chosen")
             if game_update_string[1] == primary_player.get_number():
-                print("num")
                 origin_pla, origin_pos, origin_att = self.misc_target_attachment
-                print(origin_pla != planet_pos, origin_pos != unit_pos)
                 if origin_pla != planet_pos or origin_pos != unit_pos:
                     if primary_player.move_attachment_card(origin_pla, origin_pos, origin_att,
                                                            planet_pos, unit_pos):
                         primary_player.reset_aiming_reticle_in_play(origin_pla, origin_pos)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Units are not at the same planet.")
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if primary_player.sacrifice_card_in_play(int(game_update_string[2]),
@@ -1130,6 +1419,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                 self.misc_counter += 1
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an Orks army unit.")
             if self.misc_counter >= 2:
                 i = 0
                 while i < len(primary_player.cards_in_play[planet_pos + 1]):
@@ -1176,6 +1468,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                             by_enemy_unit=False)
                     self.misc_counter = 0
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is an Elite unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Doombolt":
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1211,6 +1509,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Final Expiration":
         if game_update_string[1] == secondary_player.number:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
@@ -1275,7 +1576,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        can_continue = True
         if primary_player.check_for_warlord(planet_pos, True, primary_player.name_player):
             if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                 if player_being_hit.name_player == secondary_player.name_player:
@@ -1312,6 +1612,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.torture_event_played("Searing Brand")
                             secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is a warlord unit.")
     elif self.action_chosen == "Torquemada Coteaz":
         if planet_pos == self.position_of_actioned_card[0]:
             if game_update_string[1] == primary_player.get_number():
@@ -1321,6 +1624,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(warlord_planet, warlord_pos)
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Unit is not at the same planet as Torquemada Coteaz.")
     elif self.action_chosen == "A Thousand Cuts":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1360,6 +1666,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.torture_event_played("A Thousand Cuts")
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is an Elite unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Power from Pain":
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1368,6 +1680,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await secondary_player.dark_eldar_event_played()
                     primary_player.create_enemy_played_event_reactions()
                     secondary_player.torture_event_played("Power from Pain")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Overrun":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1412,6 +1727,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 else:
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Overrun Rout":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
@@ -1432,6 +1750,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 del primary_player.cards_in_play[planet_pos + 1][unit_pos]
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Unit is not a Runt unit.")
     elif self.action_chosen == "Keep Firing!":
         if game_update_string[1] == primary_player.number:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Tank"):
@@ -1465,6 +1786,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Tank unit.")
     elif self.action_chosen == "Tzeentch's Firestorm":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1504,6 +1828,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.amount_spend_for_tzeentch_firestorm = -1
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Tzeentch's Firestorm cannot target warlords.")
     elif self.action_chosen == "Pattern IX Immolator":
         if planet_pos == self.position_of_actioned_card[0]:
             if not self.chosen_first_card:
@@ -1516,6 +1843,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.chosen_first_card = True
                             self.misc_counter = secondary_player.command_struggles_won_this_phase - 1
                             await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Pattern IX Immolator cannot target warlords.")
             else:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
@@ -1537,6 +1867,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                   rickety_warbuggy=True)
                         self.misc_misc = None
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Mandragoran Immortals":
         if game_update_string[1] == primary_player.get_number():
             if planet_pos == self.position_of_actioned_card[0]:
@@ -1550,6 +1883,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a non-Necrons Soldier unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Sacrificed unit must be at the same planet.")
     elif self.action_chosen == "Calculated Strike":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1587,6 +1926,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not Limited.")
     elif self.action_chosen == "Alluring Daemonette":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -1597,6 +1939,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if og_pla == planet_pos:
                             if og_pos > unit_pos:
                                 self.position_of_actioned_card = (og_pla, og_pos - 1)
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Cultist unit.")
         elif game_update_string[1] == secondary_player.get_number():
             og_pla, og_pos = self.position_of_actioned_card
             if abs(og_pla - planet_pos) == 1:
@@ -1620,6 +1965,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Canoness Vardina":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1630,6 +1978,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                 self.position_of_actioned_card[1])
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Holy Crusade":
         if game_update_string[1] == primary_player.get_number():
             primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
@@ -1649,6 +2000,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                     self.position_of_actioned_card[1])
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not at the same planet.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an Ecclesiarchy unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Embarked Squads":
         if game_update_string[1] == primary_player.number:
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
@@ -1683,6 +2043,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                        "gained the Embarked Squads effect!")
                         primary_player.reset_all_aiming_reticles_play_hq()
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Unit has forbidden traits.")
     elif self.action_chosen == "Piercing Wail":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -1701,6 +2064,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     else:
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Invalid cost for that unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Command-link Drone":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
@@ -1753,6 +2122,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Necrons unit.")
     elif self.action_chosen == "Slave-powered Wagons":
         og_pla, og_pos = self.position_of_actioned_card
         if og_pla == planet_pos or abs(og_pla - planet_pos) == 1:
@@ -1790,6 +2162,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a token unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not at a valid planet.")
     elif self.action_chosen == "Preemptive Barrage":
         if game_update_string[1] == primary_player.get_number():
             if self.misc_target_planet == -1 or self.misc_target_planet == planet_pos:
@@ -1801,6 +2179,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if self.misc_counter == 0:
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an Astra Militarum unit.")
     elif self.action_chosen == "Gauss Flayer":
         if secondary_player.get_number() == game_update_string[1]:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1833,6 +2214,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card = (-1, -1)
                     self.position_of_selected_attachment = (-1, -1, -1)
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Counteroffensive":
         if primary_player.get_number() == game_update_string[1]:
             if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
@@ -1858,10 +2242,19 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if can_continue:
                             primary_player.ready_given_pos(planet_pos, unit_pos)
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "No Psykers are present at that planet.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Ambush":
         if not self.omega_ambush_active or self.infested_planets[planet_pos]:
             if self.card_type_of_selected_card_in_hand == "Attachment":
                 await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string, True)
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Subject Omega can only ambush cards at infested planets.")
     elif self.action_chosen == "Cenobyte Servitor":
         if self.chosen_first_card:
             card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
@@ -1897,6 +2290,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Necrons unit.")
     elif self.action_chosen == "Soul Furnace":
         if planet_pos == self.position_of_actioned_card[0]:
             if game_update_string[1] == primary_player.get_number():
@@ -1909,12 +2308,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.increase_health_of_unit_at_pos(og_pla, og_pos, 2, expiration="EOP")
                         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Cultist unit.")
     elif self.action_chosen == "Fabricator Claw Array":
         if planet_pos == self.misc_target_planet:
             if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, self.misc_counter, healing=True)
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Necrons unit.")
     elif self.action_chosen == "Korporal Snagbrat":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -2004,6 +2412,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                             self.position_of_actioned_card[1])
                                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                                 self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an Elite unit.")
     elif self.action_chosen == "Ravenous Horror":
         og_pla, og_pos = self.position_of_actioned_card
         if planet_pos == og_pla:
@@ -2019,6 +2430,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.position_of_actioned_card = (og_pla, og_pos)
                             self.mask_jain_zar_check_actions(primary_player, secondary_player)
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
     elif self.action_chosen == "Boast of Strength":
         if primary_player.get_number() == player_owning_card.get_number():
             if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
@@ -2053,6 +2467,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if can_continue:
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].ranged_eor = True
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "No Shas'la unit is present at that planet.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is a Kroot unit.")
     elif self.action_chosen == "Imperial Bastion":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -2066,6 +2486,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if magus_card:
             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Unit does not have a Magus Harid card.")
     elif self.action_chosen == "Indiscriminate Bombing":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -2078,6 +2501,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         else:
                             primary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
     elif self.action_chosen == "Kraktoof Hall":
         if not self.chosen_first_card:
             if primary_player.get_number() == game_update_string[1]:
@@ -2087,6 +2513,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.position_of_actioned_card = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     self.misc_target_planet = planet_pos
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "No damage on that unit.")
         elif self.misc_target_planet == planet_pos:
             if game_update_string[1] == "1":
                 player_owning_card = self.p1
@@ -2128,6 +2557,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.draw_card()
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Warlord is not at that planet.")
     elif self.action_chosen == "Ireful Vanguard":
         if self.position_of_actioned_card[0] == planet_pos:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -2136,6 +2568,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Master Program":
         if primary_player.get_number() == game_update_string[1]:
             if not self.chosen_first_card:
@@ -2143,6 +2578,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         "Drone", primary_player.etekh_trait):
                     if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
                         self.chosen_first_card = True
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Drone unit.")
             else:
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -2172,17 +2610,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.ready_given_pos(planet_pos, unit_pos)
                             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Necrons unit.")
     elif self.action_chosen == "Hyperphase Sword":
-        print("cool sword")
         if self.chosen_first_card:
-            print("already discarded")
             origin_pla, origin_pos, origin_att = self.misc_target_attachment
             if origin_pla == planet_pos and origin_pos != unit_pos:
-                print("ok planet and pos")
                 if primary_player.move_attachment_card(origin_pla, origin_pos, origin_att,
                                                        planet_pos, unit_pos):
                     primary_player.reset_aiming_reticle_in_play(origin_pla, origin_pos)
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Unit must be at the same planet.")
     elif self.action_chosen == "Breach and Clear":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if player_owning_card.get_ready_given_pos(planet_pos, unit_pos):
@@ -2219,6 +2663,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.choice_context = "BaC: Sacrifice Attachment?"
                     self.name_player_making_choices = primary_player.name_player
                     self.resolving_search_box = True
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Sivarla Soulbinder":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -2232,11 +2679,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
                     primary_player.ready_given_pos(planet_pos, unit_pos)
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Unit has no attachments.")
     elif self.action_chosen == "Reveal The Blade":
         if self.chosen_first_card:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="NEXT")
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Everlasting Rage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Khorne"):
@@ -2250,6 +2703,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                       expiration="NEXT")
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Khorne unit.")
     elif self.action_chosen == "Plagueburst Crawler":
         if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
             can_continue = True
@@ -2278,6 +2734,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Cannot target unique units.")
     elif self.action_chosen == "Lekor Blight-Tongue":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             can_continue = True
@@ -2311,11 +2770,20 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor = 0
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Forward Outpost":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Drone"):
                 player_owning_card.cards_in_play[planet_pos + 1][unit_pos].sweep_next += 2
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is a Drone unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Guerrilla Tactics Move":
         if game_update_string[1] == primary_player.number:
             if planet_pos == self.misc_target_planet:
@@ -2325,6 +2793,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.move_unit_to_planet(planet_pos, unit_pos, self.round_number)
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not a Kroot unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Wraithbone Armour":
         if not self.chosen_first_card:
             if game_update_string[1] == secondary_player.get_number():
@@ -2400,6 +2874,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Suppressive Fire":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -2450,6 +2927,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "No faith on that unit to spend.")
     elif self.action_chosen == "The Black Rage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -2484,6 +2964,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Space Marines unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Call The Storm":
         if not self.chosen_first_card:
             if planet_pos == self.misc_target_planet:
@@ -2515,6 +3001,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.misc_target_unit = (planet_pos, unit_pos)
                             self.chosen_first_card = True
                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
     elif self.action_chosen == "Captain Markis":
         if planet_pos == self.misc_target_planet:
             if not self.chosen_first_card:
@@ -2528,6 +3017,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                               self.position_of_actioned_card[1] - 1)
                         self.chosen_first_card = True
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Captain Markis can only sacrifice Astra Militarum units.")
             else:
                 can_continue = True
                 possible_interrupts = []
@@ -2562,6 +3054,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         except:
                             pass
                         self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is a warlord unit.")
     elif self.action_chosen == "Awakening Cavern":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
@@ -2629,10 +3124,16 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.action_cleanup()
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is a warlord unit.")
     elif self.action_chosen == "Aun'shi's Sanctum":
         if primary_player.check_if_trait_at_planet(planet_pos, "Ethereal"):
             primary_player.ready_given_pos(planet_pos, unit_pos)
             self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "No Ethereal unit present at that planet.")
     elif self.action_chosen == "Saint Celestine":
         if self.chosen_first_card:
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
@@ -2647,6 +3148,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.aiming_reticle_coords_hand = None
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0], self.position_of_actioned_card[1])
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "No faith to spend on that unit.")
     elif self.action_chosen == "Omnissiah's Blessing":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \
@@ -2657,6 +3161,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card does not have Faith.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Tech-Priest or Vehicle unit.")
     elif self.action_chosen == "Rally the Charge":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
@@ -2699,6 +3209,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             )
                             secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "No warlord detected at that planet.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Space Marines unit.")
     elif self.action_chosen == "Ethereal Wisdom":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
@@ -2735,11 +3251,17 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.aiming_reticle_coords_hand = None
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Tau unit.")
     elif self.action_chosen == "Clogged with Corpses":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Termagant"):
                 primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                 self.misc_counter += 1
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Termagant unit.")
     elif self.action_chosen == "Ferocious Strength":
         if primary_player.get_number() == game_update_string[1]:
             planet_pos = int(game_update_string[2])
@@ -2753,6 +3275,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.action_cleanup()
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a warlord or synapse unit.")
     elif self.action_chosen == "Mob Up!":
         can_continue = True
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -2774,6 +3299,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Convincing Cutouts":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
@@ -2781,6 +3309,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     if not secondary_player.check_for_warlord(planet_pos):
                         primary_player.move_unit_at_planet_to_hq(planet_pos, unit_pos)
                         self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Enemy has a warlord at that planet.")
     elif self.action_chosen == "Force Reallocation":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
@@ -2790,33 +3321,37 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_chosen == "Craftworld Gate":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
-                can_continue = True
-                possible_interrupts = []
-                if player_owning_card.name_player == primary_player.name_player:
-                    possible_interrupts = secondary_player.intercept_check()
-                if player_owning_card.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        planet_pos, unit_pos, intercept_possible=True)
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    can_continue = True
+                    possible_interrupts = []
+                    if player_owning_card.name_player == primary_player.name_player:
+                        possible_interrupts = secondary_player.intercept_check()
+                    if player_owning_card.name_player == secondary_player.name_player:
+                        possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                            planet_pos, unit_pos, intercept_possible=True)
+                        if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                            can_continue = False
+                            await self.send_update_message("Immune to enemy card abilities.")
+                    if possible_interrupts and can_continue:
                         can_continue = False
-                        await self.send_update_message("Immune to enemy card abilities.")
-                if possible_interrupts and can_continue:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = self.action_chosen
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "In Play Action"
-                if can_continue:
-                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                self.position_of_actioned_card[1])
-                    primary_player.return_card_to_hand(planet_pos, unit_pos)
-                    self.action_cleanup()
+                        await self.send_update_message("Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = self.action_chosen
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "In Play Action"
+                    if can_continue:
+                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
+                                                                    self.position_of_actioned_card[1])
+                        primary_player.return_card_to_hand(planet_pos, unit_pos)
+                        self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Peacekeeper Drone":
         if planet_pos == self.position_of_actioned_card[0]:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
@@ -2867,6 +3402,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Khymera":
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Khymera.")
     elif self.action_chosen == "Shroud Cruiser":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.number:
@@ -2874,6 +3412,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     self.chosen_first_card = True
                     self.misc_target_unit = (planet_pos, unit_pos)
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an Elite unit.")
     elif self.action_chosen == "Brutal Cunning":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.number:
@@ -2886,6 +3427,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.remove_damage_from_pos(planet_pos, unit_pos, self.misc_counter)
                             self.chosen_first_card = True
                             self.misc_target_planet = planet_pos
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an Orks unit.")
         elif planet_pos == self.misc_target_planet:
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
@@ -2921,6 +3465,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         player_being_hit.set_damage_given_pos(planet_pos, unit_pos, damage + self.misc_counter)
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is an Elite unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Techmarine Aspirant":
         if game_update_string[1] == primary_player.number:
             if planet_pos == self.misc_target_planet and not primary_player.get_ready_given_pos(planet_pos, unit_pos):
@@ -2936,6 +3486,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                                  (int(primary_player.number), planet_pos, unit_pos))
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an Elite unit.")
     elif self.action_chosen == "Clearcut Refuge":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -3004,6 +3557,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         secondary_player.assign_damage_to_pos(other_pla, other_pos, atk1, by_enemy_unit=False)
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card has an invalid cost.")
     elif self.action_chosen == "Kauyon Strike":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
@@ -3011,6 +3567,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.khymera_to_move_positions.append((planet_pos, unit_pos))
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                 self.chosen_first_card = True
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an Ethereal unit.")
     elif self.action_chosen == "Eldritch Lance":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -3020,6 +3579,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if player_being_hit.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
                 player_being_hit.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Necrons unit.")
     elif self.action_chosen == "Sudden Reinforcements":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.get_ready_given_pos(planet_pos, unit_pos):
@@ -3029,6 +3591,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.summon_token_at_planet("Guardsman", planet_pos)
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Transport unit.")
     elif self.action_chosen == "Unending Barrage":
         if primary_player.get_number() == game_update_string[1]:
             if not self.chosen_first_card:
@@ -3037,6 +3602,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.misc_counter += 1
                         await self.send_update_message("Total artillery: " + str(self.misc_counter))
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an Artillery card.")
     elif self.action_chosen == "Lucky Shot":
         if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
             if player_owning_card.get_ranged_given_pos(planet_pos, unit_pos):
@@ -3044,6 +3612,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 player_owning_card.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = True
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Ranged unit.")
     elif self.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
@@ -3058,6 +3629,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                           self.position_of_actioned_card[1], 999, healing=True)
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Cultist unit.")
     elif self.action_chosen == "Chaplain Mavros":
         if primary_player.get_number() == game_update_string[1]:
             if self.get_blue_icon(planet_pos):
@@ -3069,6 +3643,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                         by_enemy_unit=False)
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Space Marines unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not at a blue planet.")
     elif self.action_chosen == "Ancient Keeper of Secrets":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
@@ -3084,6 +3664,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                     self.action_cleanup()
                     self.position_of_actioned_card = (-1, -1)
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Cultist unit.")
     elif self.action_chosen == "The Dawn Blade":
         if self.chosen_first_card:
             og_pla, og_pos = self.misc_target_unit
@@ -3171,6 +3754,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         original_player = self.p2
                     original_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Cannot move damage to a unique unit.")
     elif self.action_chosen == "Painboy Surjery":
         if game_update_string[1] == primary_player.get_number():
             if self.misc_target_unit == (-1, -1) or self.misc_target_unit == (planet_pos, unit_pos):
@@ -3226,6 +3812,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 primary_player.deck.append(primary_player.deck[0])
                                 del primary_player.deck[0]
                                 primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an Orks unit.")
     elif self.action_chosen == "Evangelizing Ships":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -3233,6 +3822,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await self.send_update_message("Faith paid, please continue.")
                     self.chosen_first_card = True
                     self.chosen_second_card = False
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "No faith to spend.")
     elif self.action_chosen == "Squadron Redeployment":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -3242,6 +3834,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.misc_target_unit = (planet_pos, unit_pos)
                         self.chosen_first_card = True
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not ready.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card has no attachments.")
         else:
             await self.send_update_message("Already selected unit to move")
     elif self.action_chosen == "Starblaze's Outpost":
@@ -3254,6 +3852,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.chosen_first_card = True
                         self.misc_counter = cost
                         self.misc_target_planet = planet_pos
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an Astra Militarum unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Brood Chamber":
         if not self.chosen_first_card:
             if secondary_player.get_number() == game_update_string[1]:
@@ -3271,9 +3875,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.choice_context = "Keyword copied from Brood Chamber"
                     self.chosen_first_card = True
                 else:
-                    await self.send_update_message(
-                        "Target has no keywords to copy."
-                    )
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "No keywords to copy on that card.")
         else:
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == self.misc_target_planet:
@@ -3301,6 +3904,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         )
                         self.action_cleanup()
                         self.position_of_actioned_card = (-1, -1)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
     elif self.action_chosen == "The Wolf Within":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Space Wolves"):
@@ -3328,6 +3934,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if self.misc_counter_2 > 1:
                             primary_player.add_resources(1)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Each unit must be at the same planet.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Space Wolves unit.")
     elif self.action_chosen == "Pinning Razorback":
         if self.position_of_actioned_card[0] == planet_pos:
             if secondary_player.number == game_update_string[1]:
@@ -3360,6 +3972,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                                     self.position_of_actioned_card[1])
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is a warlord unit.")
     elif self.action_chosen == "Mycetic Spores":
         if not self.chosen_first_card:
             if self.player_with_action == self.name_1:
@@ -3371,6 +3986,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.misc_target_unit = (planet_pos, unit_pos)
                     self.chosen_first_card = True
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Hive-Mind unit.")
     elif self.action_chosen == "Rapid Assault":
         if self.chosen_second_card:
             if self.misc_target_planet == planet_pos:
@@ -3384,6 +4002,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_cleanup()
                         else:
                             await self.send_update_message(str(self.misc_counter) + " uses left of Rapid Assault")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not a Kabalite unit.")
     elif self.action_chosen == "Holy Chapel":
         if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum" or \
                 player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
@@ -3395,6 +4016,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await self.send_update_message("Completed Holy Chapel")
                 else:
                     await self.send_update_message(str(self.misc_counter) + " targets left for Holy Chapel")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not a Space Marines or Astra Militarum unit.")
     elif self.action_chosen == "Move Psyker":
         if not self.chosen_first_card:
             if primary_player.number == game_update_string[1]:
@@ -3404,6 +4031,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.misc_target_unit = (planet_pos, unit_pos)
                         self.chosen_first_card = True
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not ready.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Psyker unit.")
     elif self.action_chosen == "Consumed by the Kindred":
         if game_update_string[1] == primary_player.get_number():
             if not self.chosen_first_card:
@@ -3412,6 +4045,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not ready.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Kroot unit.")
             else:
                 if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle"):
                     if (planet_pos, unit_pos) != self.misc_target_unit:
@@ -3420,12 +4059,21 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.add_resources(cost)
                             secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Cannot exhaust and sacrifice the same card.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is a Vehicle unit.")
     elif self.action_chosen == "+1 ATK Warrior":
         if game_update_string[1] == primary_player.number:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Warrior unit.")
     elif self.action_chosen == "Indescribable Horror":
         if game_update_string[1] == "1":
             player_being_routed = self.p1
@@ -3436,8 +4084,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         can_continue = True
         if player_being_routed.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Army":
             can_continue = False
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
         elif unit_count < unit_cost:
             can_continue = False
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Insufficient units to rout that unit.")
         possible_interrupts = []
         if player_owning_card.name_player == primary_player.name_player:
             possible_interrupts = secondary_player.intercept_check()
@@ -3481,6 +4133,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                        " gained +1 ATK and +1 HP!")
                         if self.misc_counter > 1:
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Each unit must be at a different planet.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Must target units at adjacent planets.")
     elif self.action_chosen == "The Emperor's Warrant":
         if not self.chosen_first_card:
             if not secondary_player.check_for_warlord(planet_pos):
@@ -3513,6 +4174,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.misc_target_planet = planet_pos
                             self.misc_target_unit = (planet_pos, unit_pos)
                             self.chosen_first_card = True
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not ready.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Opponent has a warlord at that planet.")
         elif self.misc_target_planet == planet_pos:
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
@@ -3586,6 +4253,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     await primary_player.dark_eldar_event_played()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Archon's Terror cannot rout unique units.")
     elif self.action_chosen == "Big Mek Kagdrak":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
@@ -3598,6 +4268,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.choice_context = "Big Mek Kagdrak Keyword"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is an Elite unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "Big Mek Kagdrak BLOODIED":
         if self.position_of_actioned_card[0] == planet_pos:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -3611,6 +4287,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.choice_context = "Big Mek Kagdrak Keyword"
                     self.name_player_making_choices = primary_player.name_player
                     self.resolving_search_box = True
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is an Elite unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Drivin' Ambishun'":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
             if self.misc_target_planet == planet_pos:
@@ -3642,6 +4324,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
                                                    " gained +" + str(health_gained) + " HP!")
                     self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not an army unit.")
     elif self.action_chosen == "The Emperor's Champion":
         if game_update_string[1] == secondary_player.get_number() and planet_pos == self.position_of_actioned_card[0]:
             if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -3673,6 +4358,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Teleportarium":
         if primary_player.get_number() == game_update_string[1]:
             if not self.chosen_first_card:
@@ -3683,6 +4371,18 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.chosen_first_card = True
                                 self.misc_target_unit = (planet_pos, unit_pos)
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                                  "Card is not a Space Marines unit.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              "Cost of the unit is too high.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not at a blue planet.")
     elif self.action_chosen == "Corrupted Teleportarium":
         if primary_player.get_number() == game_update_string[1]:
             if not self.chosen_first_card:
@@ -3691,6 +4391,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an Elite unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Unit is not at a blue planet.")
     elif self.action_chosen == "Despise":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
@@ -3731,6 +4437,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, shadow_field_possible=True,
                                                             rickety_warbuggy=True)
                     self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Zarathur's Flamers cannot target warlord units.")
     elif self.action_chosen == "Inevitable Betrayal":
         if secondary_player.number == game_update_string[1]:
             if self.misc_target_planet == -1 or self.misc_target_planet == planet_pos:
@@ -3739,18 +4448,33 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         secondary_player.set_blanked_given_pos(planet_pos, unit_pos)
                         secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
                         self.misc_target_planet = planet_pos
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Unit is damaged.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Hunting Grounds":
         if game_update_string[1] == primary_player.number:
             if not self.chosen_first_card:
                 if primary_player.get_name_given_pos(planet_pos, unit_pos) == "Khymera":
                     if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
                         self.chosen_first_card = True
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Khymera.")
             else:
                 if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Creature"):
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                             primary_player.ready_given_pos(planet_pos, unit_pos)
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Creature unit.")
     elif self.action_chosen == "Mind War":
         psyker_present = False
         for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
@@ -3796,6 +4520,15 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.aiming_reticle_coords_hand = None
                         secondary_player.create_enemy_played_event_reactions()
                         self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is an Elite unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "No Psyker army unit is present.")
     elif self.action_chosen == "Deception":
         if game_update_string[1] == "1":
             player_returning = self.p1
@@ -3837,6 +4570,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.card_pos_to_deploy = -1
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is an Elite unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Noble Deed":
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -3846,6 +4585,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.chosen_first_card = True
                         self.misc_counter = attack_value
                         self.misc_target_planet = planet_pos
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an Astra Militarum unit.")
         else:
             if game_update_string[1] == secondary_player.get_number():
                 if self.misc_target_planet == planet_pos:
@@ -3882,6 +4624,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             primary_player.aiming_reticle_coords_hand = None
                             secondary_player.create_enemy_played_event_reactions()
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not an army unit.")
     elif self.action_chosen == "Smash 'n Bash":
         if self.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -3916,10 +4661,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.misc_target_choice = primary_player.get_name_given_pos(planet_pos, unit_pos)
                         primary_player.return_card_to_hand(planet_pos, unit_pos)
                         self.chosen_first_card = True
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Cathedral of Saint Camila":
         if secondary_player.get_number() == game_update_string[1]:
             if self.misc_counter[planet_pos]:
-                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos):
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         can_continue = True
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
@@ -3941,6 +4689,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if can_continue:
                             self.misc_counter[planet_pos] = False
                             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is an Elite unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Webway Passage":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -3971,6 +4725,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         else:
                             del primary_player.cards_in_play[other_pla + 1][other_pos]
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Lost in the Webway Harlequin":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Harlequin"):
@@ -4002,6 +4759,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             del primary_player.cards_in_play[other_pla + 1][other_pos]
                     secondary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a Harlequin unit.")
     elif self.action_chosen == "Lost in the Webway Opponent":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -4033,6 +4793,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             del primary_player.cards_in_play[other_pla + 1][other_pos]
                     primary_player.create_enemy_played_event_reactions()
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Hallucinogen Grenade":
         if secondary_player.get_number() == game_update_string[1]:
             if planet_pos == self.misc_target_planet:
@@ -4065,10 +4828,13 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             atk = secondary_player.cards_in_play[planet_pos + 1][unit_pos].attack
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
                             self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is an Elite unit.")
     elif self.action_chosen == "Eldritch Storm":
         if secondary_player.get_number() == game_update_string[1]:
             if self.misc_counter[planet_pos]:
-                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos):
+                if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     if not secondary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         can_continue = True
                         possible_interrupts = secondary_player.interrupt_cancel_target_check(
@@ -4094,6 +4860,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         if can_continue:
                             self.misc_counter[planet_pos] = False
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is an Elite unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not an army unit.")
     elif self.action_chosen == "Seekers of Slaanesh":
         if self.misc_target_planet == planet_pos:
             if game_update_string[1] == primary_player.number:
@@ -4107,9 +4879,12 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.position_of_actioned_card = (pla, pos)
                         self.mask_jain_zar_check_actions(primary_player, secondary_player)
                         self.action_cleanup()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a Cultist unit.")
     elif self.action_chosen == "Gauntlet of Fire":
         if self.position_of_actioned_card[0] == planet_pos:
-            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos):
+            if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 can_continue = True
                 if secondary_player.name_player == player_owning_card.name_player:
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
@@ -4132,6 +4907,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if can_continue:
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                     self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an army unit.")
     elif self.action_chosen == "Ambush Platform":
         if game_update_string[1] == "1":
             player_receiving_attachment = self.p1
@@ -4142,8 +4920,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             army_unit_as_attachment = False
-            discounts = primary_player.search_hq_for_discounts("", "",
-                                                               is_attachment=True)
+            discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
             if card.get_ability() == "Gun Drones" or \
                     card.get_ability() == "Shadowsun's Stealth Cadre" or \
                     card.get_ability() == "Escort Drone":
@@ -4213,6 +4990,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     ", position " + game_update_string[3])
                 self.position_of_actioned_card = (-1, -1)
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Enemy warlord is present at that planet.")
     elif self.action_chosen == "Squiggify":
         if game_update_string[1] == "1":
             player_being_hit = self.p1
@@ -4258,6 +5038,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 secondary_player.create_enemy_played_event_reactions()
                 self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Squiggify can only target non-Vehicle army units.")
     elif self.action_chosen == "Catachan Outpost":
         if game_update_string[1] == "1":
             player_receiving_buff = self.p1
@@ -4300,7 +5083,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_chosen == "Tellyporta Pad":
         if game_update_string[1] == primary_player.get_number():
             card = primary_player.cards_in_play[planet_pos + 1][unit_pos]
-            if card.get_faction() == "Orks":
+            if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
                 if card.get_is_unit():
                     can_continue = True
                     possible_interrupts = []
@@ -4330,3 +5113,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                     self.position_of_actioned_card[1])
                         self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not an Orks unit.")

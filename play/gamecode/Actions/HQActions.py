@@ -2955,7 +2955,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                     army_unit_as_attachment=
                                                     army_unit_as_attachment,
                                                     discounts=discounts)
-                enemy_card = False
             else:
                 played_card = False
                 if primary_player.spend_resources(int(card.get_cost()) - discounts):
@@ -2964,19 +2963,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         army_unit_as_attachment=army_unit_as_attachment)
                     if not played_card:
                         primary_player.add_resources(int(card.get_cost()) - discounts, refund=True)
-                enemy_card = True
             if played_card:
                 if card.get_limited():
                     primary_player.can_play_limited = False
                 primary_player.remove_card_from_hand(hand_pos)
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand_2 = None
-                self.action_chosen = ""
-                self.player_with_action = ""
-                self.mode = "Normal"
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
-                self.position_of_actioned_card = (-1, -1)
+                self.action_cleanup()
     elif self.action_chosen == "Tellyporta Pad":
         if self.player_with_action == self.name_1:
             primary_player = self.p1
@@ -2990,10 +2985,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                        self.round_number)
                     primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                                 self.position_of_actioned_card[1])
-                    self.position_of_actioned_card = (-1, -1)
-                    self.action_chosen = ""
-                    self.player_with_action = ""
-                    self.mode = "Normal"
+                    self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not an Orks unit.")
