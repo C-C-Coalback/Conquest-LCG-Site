@@ -2633,7 +2633,7 @@ class Player:
                                           (int(self.number), position, last_element_index))
             if card.check_for_a_trait("Kabalite", self.etekh_trait) or card.check_for_a_trait("Raider", self.etekh_trait):
                 if self.game.get_red_icon(position):
-                    if self.search_for_card_everywhere("Archon Salaine Morn", limit_phase_rel=True):
+                    if self.search_for_card_everywhere("Archon Salaine Morn", limit_phase_rel=True, bloodied_relevant=True):
                         self.game.create_reaction("Archon Salaine Morn", self.name_player, (int(self.number), -1, -1))
             if card.check_for_a_trait("Kabalite", self.etekh_trait):
                 for i in range(len(self.cards_in_play[position + 1])):
