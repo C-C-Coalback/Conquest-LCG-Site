@@ -4734,7 +4734,7 @@ class Game:
                                 if hurt_planet == planet_pos and unit_pos != hurt_pos:
                                     primary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
-                                    self.stored_damage[0].get_amount_that_can_be_blocked(1)
+                                    self.stored_damage[0].get_amount_that_can_be_blocked()
                                     self.alt_shield_mode_active = False
                                     self.alt_shield_name = ""
                                     if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
