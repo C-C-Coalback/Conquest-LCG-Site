@@ -5602,7 +5602,7 @@ class Game:
                             card = self.preloaded_find_card("The Shadow Suit")
                             if "The Shadow Suit" in secondary_player.discard:
                                 secondary_player.discard.remove("The Shadow Suit")
-                            secondary_player.put_card_into_reserve(card, planet_pos, payment=False)
+                            secondary_player.put_card_into_reserve(card, self.misc_target_planet, payment=False)
                     if current_interrupt == "Blood of Martyrs":
                         if not self.chosen_first_card:
                             self.delete_interrupt()
