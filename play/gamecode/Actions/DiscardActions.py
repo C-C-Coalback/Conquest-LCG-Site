@@ -23,6 +23,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                     if primary_player.resources > 1:
                         primary_player.aiming_reticle_coords_discard = pos_discard
                         self.action_chosen = ability
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Insufficient resources.")
             elif ability == "Hate":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     await self.send_update_message(
@@ -46,6 +49,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         await self.send_update_message(
                             "Press the pass button to stop shuffling any more cards in."
                         )
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Insufficient resources.")
             elif ability == "Eldritch Reaping":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     await self.send_update_message(
@@ -70,8 +76,12 @@ async def update_game_event_action_discard(self, name, game_update_string):
                             primary_player.harbinger_of_eternity_active = True
                             primary_player.remove_card_from_game(ability)
                             self.chosen_first_card = False
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                              "Insufficient resources.")
                     else:
-                        await self.send_update_message("Already played a Limited card!")
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Already played a Limited card.")
             elif ability == "Vivisection":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(3):
@@ -82,6 +92,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.action_chosen = ability
                         primary_player.harbinger_of_eternity_active = True
                         primary_player.remove_card_from_game(ability)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Insufficient resources.")
             elif ability == "Recycle":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(1):
@@ -93,6 +106,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         primary_player.remove_card_from_game(ability)
                         del primary_player.discard[pos_discard]
                         self.misc_counter = 0
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Insufficient resources.")
             elif ability == "Extermination":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(5):
@@ -103,6 +119,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         primary_player.harbinger_of_eternity_active = True
                         primary_player.remove_card_from_game(ability)
                         del primary_player.discard[pos_discard]
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Insufficient resources.")
             elif ability == "Mechanical Enhancement":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(2):
@@ -113,6 +132,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         primary_player.harbinger_of_eternity_active = True
                         del primary_player.discard[pos_discard]
                         primary_player.remove_card_from_game(ability)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Insufficient resources.")
             elif ability == "The Strength of the Enemy":
                 if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
                     if primary_player.spend_resources(2):
@@ -120,6 +142,9 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.action_chosen = ability
                         self.chosen_first_card = False
                         await self.send_update_message("Please choose an enemy unit first.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Insufficient resources.")
             elif ability == "Reanimation Protocol":
                 if not primary_player.used_reanimation_protocol:
                     if primary_player.search_for_card_everywhere("Harbinger of Eternity"):
@@ -131,14 +156,27 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         del primary_player.discard[pos_discard]
                         primary_player.used_reanimation_protocol = True
                         primary_player.remove_card_from_game(ability)
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                      "Already played a Reanimation Protocol.")
     elif self.action_chosen == "Drudgery":
         if not self.chosen_first_card:
             if chosen_discard == int(primary_player.number):
                 card = self.preloaded_find_card(primary_player.discard[pos_discard])
-                if card.get_cost() < 4 and card.get_faction() != "Necrons" and card.get_card_type() == "Army":
-                    self.chosen_first_card = True
-                    self.misc_target_choice = card.get_name()
-                    primary_player.aiming_reticle_coords_discard = pos_discard
+                if card.get_cost() < 4:
+                    if card.get_faction() != "Necrons" and card.get_card_type() == "Army":
+                        self.chosen_first_card = True
+                        self.misc_target_choice = card.get_name()
+                        primary_player.aiming_reticle_coords_discard = pos_discard
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Card is not a non-Necrons unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Cost of the card is too great.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Drudgery only targets our discard pile.")
     elif self.action_chosen == "Eternity Gate":
         if chosen_discard == int(primary_player.number):
             primary_player.move_to_top_of_discard(pos_discard)
@@ -161,6 +199,15 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         self.chosen_first_card = True
                         secondary_player.aiming_reticle_coords_discard = pos_discard
                         self.anrakyr_unit_position = pos_discard
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Cost of the card is too great.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a unit.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Soul Seizure targets the enemy discard.")
     elif self.action_chosen == "Merciless Reclamation":
         if self.chosen_first_card and not self.chosen_second_card:
             if chosen_discard == int(primary_player.number):
@@ -177,17 +224,34 @@ async def update_game_event_action_discard(self, name, game_update_string):
             if chosen_discard == int(primary_player.number):
                 card = self.preloaded_find_card(primary_player.discard[pos_discard])
                 if self.trium_tracker[0] != card.get_name():
-                    if not card.check_for_a_trait("Elite") and card.get_card_type() == "Army":
-                        self.card_to_deploy = card
-                        self.chosen_first_card = True
-                        primary_player.aiming_reticle_coords_discard = pos_discard
+                    if not card.check_for_a_trait("Elite"):
+                        if card.get_card_type() == "Army":
+                            self.card_to_deploy = card
+                            self.chosen_first_card = True
+                            primary_player.aiming_reticle_coords_discard = pos_discard
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              "Card is not a unit.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Elite units cannot be deployed with Triumvirate of Ynnead.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Triumvirate of Ynnead must deploy cards of different names.")
     elif self.action_chosen == "Spore Burst":
         if not self.chosen_first_card:
             if chosen_discard == int(primary_player.number):
                 card = self.preloaded_find_card(primary_player.discard[pos_discard])
-                if card.get_card_type() == "Army" and card.get_cost() < 4:
-                    self.chosen_first_card = True
-                    primary_player.aiming_reticle_coords_discard = pos_discard
+                if card.get_card_type() == "Army":
+                    if card.get_cost() < 4:
+                        self.chosen_first_card = True
+                        primary_player.aiming_reticle_coords_discard = pos_discard
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Cost of the card is too great.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a unit.")
     elif self.action_chosen == "Evolutionary Adaptation":
         if chosen_discard == int(secondary_player.get_number()):
             if not self.chosen_first_card:
@@ -222,20 +286,29 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         secondary_player.remove_card_from_game(card.get_name())
                         del secondary_player.discard[pos_discard]
                     else:
-                        await self.send_update_message(
-                            "Target has no keywords to copy."
-                        )
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Target has no keywords to copy.")
     elif self.action_chosen == "Imotekh the Stormlord":
         if not self.chosen_first_card:
             if chosen_discard == int(primary_player.number):
                 card = self.preloaded_find_card(primary_player.discard[pos_discard])
                 if card.get_card_type() == "Army":
-                    if not card.get_unique() and not card.check_for_a_trait("Elite"):
-                        self.misc_target_player = card.get_ability()
-                        self.chosen_first_card = True
-                        primary_player.remove_card_from_game(card.get_name())
-                        del primary_player.discard[pos_discard]
-                        await self.send_update_message("Granting the " + card.get_ability() + "'s text box.")
+                    if not card.get_unique():
+                        if card.check_for_a_trait("Elite"):
+                            self.misc_target_player = card.get_ability()
+                            self.chosen_first_card = True
+                            primary_player.remove_card_from_game(card.get_name())
+                            del primary_player.discard[pos_discard]
+                            await self.send_update_message("Granting the " + card.get_ability() + "'s text box.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              "Imotekh the Stormlord cannot swap Elite cards.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Imotekh the Stormlord cannot swap Unique cards.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Card is not a unit (Imotekh the Stormlord only supports units at this time).")
     elif self.action_chosen == "Particle Whip":
         if chosen_discard == int(primary_player.number):
             card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array, self.cards_dict,
@@ -243,3 +316,6 @@ async def update_game_event_action_discard(self, name, game_update_string):
             if card.get_is_unit():
                 primary_player.shuffle_card_in_discard_into_deck(pos_discard)
                 self.misc_counter += 1
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card is not a unit.")
