@@ -36,6 +36,24 @@ h4 {
     background: rgba(47, 40, 153, 0.3);
 }
 
+#mistarget-info {
+    position: fixed;
+    display: none;
+    z-index: 1000;
+    border-width: 2px;
+    border-style: double;
+    border-color: lightblue;
+    background: rgba(47, 40, 153, 0.3);
+    color: yellow;
+    margin-left: 40vw;
+    top: -10vh;
+    min-width: 20vw;
+    text-align: center;
+    min-height: 10vh;
+    font-size: 30px;
+    line-height: 3px;
+}
+
 #in-play-box {
     position: relative;
     height: calc(48vh + 10px);

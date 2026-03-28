@@ -13,6 +13,9 @@
     <div id="helper-text-box">
 
     </div>
+    <div id="mistarget-info">
+        <p style="color:red">Invalid Target:</p><p style="color: yellow">Card must be an army unit.</p>
+    </div>
     <div id="chat-log">Use "/loaddeck/{deck_name}" to load a deck<br></div>
     <input id="chat-message-input" type="text">
     <input id="chat-message-submit" type="button" value="Send">
@@ -1052,6 +1055,17 @@
                     console.log("trying to play sound")
                     var soundUrl = "/static/sounds/" + split_data[2] + ".wav";
                     playSound(soundUrl);
+                } else if (split_data[1] === "MISTARGET") {
+                    if (split_data[2] === "{{ user.username }}") {
+                        const mistarget_main_info = split_data[3];
+                        const mistarget_add_info = split_data[4];
+                        console.log("Mistarget: ", mistarget_add_info)
+                        var mistarget_element = document.getElementById("mistarget-info");
+                        mistarget_element.innerHTML = `<p style="color:red">` + mistarget_main_info + `</p><p style="color: yellow">` + mistarget_add_info + `</p>`;
+                        mistarget_element.style["display"] = "block";
+                        makeMistargetAppearAndSlide();
+                        setTimeout(makeMistargetDisappearAndSlide, 10000);
+                    }
                 } else if (split_data[1] === "INITIATIVE") {
                     var e_1 = document.getElementById("initiative-player-1");
                     var e_2 = document.getElementById("initiative-player-2");
@@ -1208,8 +1222,47 @@
             });
         });
 
+        function clearMistarget() {
+            var mistarget_element = document.getElementById("mistarget-info");
+            mistarget_element.innerHTML = `<p style="color:red"></p><p style="color: yellow"></p>`;
+            mistarget_element.style["display"] = "none";
+        }
+
         function changeDefDeepstrike(image_src) {
             document.getElementById("LargeHelperCard").src=image_src;
+        }
+
+        function makeMistargetDisappearAndSlide() {
+            var elem = document.getElementById("mistarget-info");
+            var pos = 5;
+            var id = null;
+            clearInterval(id);
+            id = setInterval(frame, 1);
+            function frame() {
+                if (pos <= -10) {
+                    clearInterval(id);
+                    clearMistarget();
+                } else {
+                    pos = pos - 0.25;
+                    elem.style.top = pos + 'vh';
+                }
+            }
+        }
+
+        function makeMistargetAppearAndSlide() {
+            var elem = document.getElementById("mistarget-info");
+            var pos = -10;
+            var id = null;
+            clearInterval(id);
+            id = setInterval(frame, 10);
+            function frame() {
+                if (pos >= 5) {
+                    clearInterval(id);
+                } else {
+                    pos = pos + 0.25;
+                    elem.style.top = pos + 'vh';
+                }
+            }
         }
 
         function changeDef(image_src) {

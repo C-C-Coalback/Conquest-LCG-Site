@@ -29,6 +29,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_selected_attachment = (planet_pos, unit_pos, attachment_pos)
                             await self.send_update_message(ability + " activated")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                              "No resources to spend.")
                 elif ability == "The Dawn Blade":
                     if card_chosen.get_ready():
                         if player_owning_card.name_player == primary_player.get_name_player():
@@ -39,15 +42,24 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.choices_available = ["Deepstrike", "Move"]
                             self.choice_context = "The Dawn Blade Choice"
                             self.name_player_making_choices = primary_player.get_name_player()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Steed of Slaanesh":
                     if card_chosen.get_ready():
                         card_chosen.exhaust_card()
                         self.action_chosen = ability
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Riptide Battlesuit":
                     if card_chosen.get_ready():
                         card_chosen.exhaust_card()
                         player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, "EOP")
                         self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Searchlight":
                     if primary_player.get_name_player() == player_owning_card.name_player:
                         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
@@ -57,6 +69,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             await self.send_update_message(ability + " activated")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                              "Warlord is not ready.")
                 elif ability == "Positional Relay":
                     if card_chosen.get_ready():
                         if player_owning_card.name_player == primary_player.get_name_player():
@@ -80,6 +95,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                                 self.name_player_who_is_searching = primary_player.get_name_player()
                                 self.number_who_is_searching = primary_player.get_number()
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Missile Pod":
                     if primary_player.get_name_player() == self.player_with_action:
                         player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
@@ -93,12 +111,18 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             card_chosen.exhaust_card()
                             await self.create_necrons_wheel_choice(primary_player)
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Gauntlet of Fire":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
                             card_chosen.exhaust_card()
                             await self.create_necrons_wheel_choice(primary_player)
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Blight Grenades":
                     if primary_player.get_name_player() == self.player_with_action:
                         primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
@@ -111,6 +135,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.misc_target_unit = (-2, unit_pos)
                             primary_player.set_aiming_reticle_in_play(-2, unit_pos)
                             self.action_chosen = ability
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Once per game ability used.")
                 elif ability == "Memories of Fallen Comrades":
                     if player_owning_card.name_player == primary_player.get_name_player():
                         if card_chosen.get_ready():
@@ -118,6 +145,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                             self.action_chosen = ability
                             self.misc_counter = 0
                             self.misc_target_unit = (-1, -1)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                              "Card is not ready.")
                 elif ability == "Ymgarl Factor":
                     if primary_player.spend_resources(1):
                         self.action_chosen = ability
@@ -126,6 +156,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                         self.choice_context = "Ymgarl Factor gains:"
                         self.name_player_making_choices = primary_player.get_name_player()
                         self.resolving_search_box = True
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "No resources to spend.")
                 elif ability == "Cenobyte Servitor":
                     primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                     self.chosen_first_card = False
@@ -140,23 +173,35 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                                     self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
                                     last_el = len(primary_player.headquarters) - 1
                                     primary_player.headquarters[last_el].mind_shackle_scarab_effect = True
+                                else:
+                                    await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                                      "Enslaved faction does not match faction of unit.")
                             else:
                                 await self.game_sockets[0].receive_game_update(
                                     "Mind Shackle Scarab on own unit not supported"
                                 )
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Regeneration":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
                             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                             card_chosen.exhaust_card()
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Pulsating Carapace":
                     if card_chosen.get_ready():
                         if primary_player.get_name_player() == self.player_with_action:
                             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 2, healing=True)
                             card_chosen.exhaust_card()
                             self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Card is not ready.")
                 elif ability == "Heavy Venom Cannon":
                     if not card_chosen.get_once_per_phase_used():
                         self.choice_context = ability
@@ -164,6 +209,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                         self.name_player_making_choices = primary_player.get_name_player()
                         self.misc_target_attachment = (planet_pos, unit_pos, attachment_pos)
                         self.misc_target_player = player_owning_card.name_player
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                          "Once per phase ability used.")
     elif self.action_chosen == "Even the Odds":
         if not self.chosen_first_card:
             self.misc_player_storage = player_owning_card.get_number()
@@ -178,6 +226,9 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                 primary_player.cards.append(player_owning_card.headquarters[unit_pos].attachments[attachment_pos].get_name())
                 del player_owning_card.headquarters[unit_pos].attachments[attachment_pos]
                 self.action_cleanup()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  "Card has the Drone trait.")
     elif self.action_chosen == "Fire Caste Cadre":
         if self.position_of_actioned_card[0] == planet_pos and self.position_of_actioned_card[1] == unit_pos:
             if card_chosen.name_owner == primary_player.get_name_player():
@@ -210,3 +261,6 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
             self.action_cleanup()
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Card is not Limited.")

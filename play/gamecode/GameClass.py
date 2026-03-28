@@ -1160,6 +1160,11 @@ class Game:
                                         if self.mode == "DISCOUNT":
                                             self.mode = "Normal"
 
+    async def send_mistarget_message(self, name_player, mistarget_main, mistarget_extra):
+        message = "GAME_INFO/MISTARGET/"
+        message = message + name_player + "/" + mistarget_main + "/" + mistarget_extra
+        await self.send_update_message(message)
+
     async def aoe_routine(self, primary_player, secondary_player, chosen_planet, amount_aoe, faction="",
                           shadow_field_possible=False, rickety_warbuggy=False, actual_aoe=False):
         secondary_player.suffer_area_effect(chosen_planet, amount_aoe, faction=faction,
