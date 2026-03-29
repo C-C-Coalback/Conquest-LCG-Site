@@ -424,9 +424,9 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                               "Kaerux Erameas cannot target the first planet.")
     elif self.action_chosen == "Bond of Brotherhood":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            if primary_player.get_faction_given_pos(chosen_planet, i) == "Tau":
+            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Tau"):
                 primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eop += 2
-            if primary_player.get_faction_given_pos(chosen_planet, i) == "Astra Militarum":
+            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Astra Militarum"):
                 primary_player.cards_in_play[chosen_planet + 1][i].extra_attack_until_end_of_phase += 2
         secondary_player.create_enemy_played_event_reactions()
         self.action_cleanup()
