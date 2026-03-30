@@ -1,7 +1,12 @@
 from .Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
     DarkEldarCardsInit, EldarCardsInit, TauCardsInit, SpaceMarinesCardsInit, AstraMilitarumCardsInit, \
     TyranidsCardsInit, NecronsCardsInit, TokensCardsInit, ApokaErrataCardsInit, BlackstoneProjectCardsInit, \
-    BlackstoneErrataCardsInit
+    BlackstoneErrataCardsInit, FFGCardsListInit
+
+
+def init_ffg_only_cards():
+    ffg_only_cards_init = FFGCardsListInit.ffg_only_cards_init()
+    return ffg_only_cards_init
 
 
 def init_player_cards():

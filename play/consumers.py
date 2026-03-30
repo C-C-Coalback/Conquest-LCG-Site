@@ -12,7 +12,13 @@ import copy
 from django.contrib.auth.models import User
 
 
+ban_list_apoka = [
+    "Bonesinger Choir", "Squiggoth Brute", "Corrupted Teleportarium", "Gun Drones", "Archon's Palace",
+    "Land Speeder Vengeance", "Sowing Chaos", "Smasha Gun Battery", "The Prince's Might", "Purveyor of Hubris", "Doom",
+    "Exterminatus", "Mind Shackle Scarab", "Crypt of Saint Camila", "Warp Storm"
+]
 card_array = Initfunctions.init_player_cards()
+ffg_only_cards_list = Initfunctions.init_ffg_only_cards()
 cards_dict = {}
 for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
@@ -50,6 +56,35 @@ def get_active_games():
     return active_games
 
 
+def check_legality(deck_list, legality):
+    deck_list = list(filter(("----------------------------------------------------------------------").__ne__, deck_list))
+    deck_list = list(filter(None, deck_list))
+    warlord_name = deck_list[1]
+    if legality == "FFG":
+        if warlord_name not in ffg_only_cards_list:
+            return False
+        print(deck_list[3])
+        if deck_list[3] != "Signature Squad":
+            return False
+        for i in range(3, len(deck_list)):
+            if deck_list[i] not in ["Signature Squad", "Army", "Support", "Event", "Attachment", "Synapse", "Planet"]:
+                card_name = deck_list[i][3:]
+                if card_name not in ffg_only_cards_list:
+                    print(card_name)
+                    return False
+    elif legality == "Apoka":
+        start_index = 3
+        if deck_list[start_index] != "Signature Squad":
+            start_index = 4
+        for i in range(start_index, len(deck_list)):
+            if deck_list[i] not in ["Signature Squad", "Army", "Support", "Event", "Attachment", "Synapse", "Planet"]:
+                card_name = deck_list[i][3:]
+                if card_name in ban_list_apoka:
+                    print(card_name)
+                    return False
+    return True
+
+
 def convert_name_to_img_src(card_name):
     card_name = card_name.replace("\"", "")
     card_name = card_name.replace(" ", "_")
@@ -58,7 +93,7 @@ def convert_name_to_img_src(card_name):
     return card_name
 
 
-def get_decks_user(username, start_index, end_index, required_faction=""):
+def get_decks_user(username, start_index, end_index, required_faction="", legality=""):
     if not username:
         return []
     decks_stored = []
@@ -73,7 +108,11 @@ def get_decks_user(username, start_index, end_index, required_faction=""):
                 faction = split_content[3]
                 faction = faction.split(sep=" (")[0]
                 if not required_faction or faction == required_faction:
-                    decks_stored.append((deck_name, convert_name_to_img_src(warlord_name), faction))
+                    if legality == "" or legality == "All":
+                        decks_stored.append((deck_name, convert_name_to_img_src(warlord_name), faction))
+                    else:
+                        if check_legality(split_content, legality):
+                            decks_stored.append((deck_name, convert_name_to_img_src(warlord_name), faction))
     decks_stored = sorted(decks_stored, key=lambda x: x[0])
     end_index = min(end_index, len(decks_stored))
     start_index = min(start_index, len(decks_stored))
@@ -157,7 +196,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         if split_message[0] == "Load More":
             value = int(split_message[1])
             required_faction = split_message[2]
-            decks_user = get_decks_user(self.user.username, value, value + 5, required_faction)
+            legality = split_message[3]
+            decks_user = get_decks_user(self.user.username, value, value + 5, required_faction, legality)
             for i in range(len(decks_user)):
                 deck_name = decks_user[i][0]
                 warlord_name = decks_user[i][1]

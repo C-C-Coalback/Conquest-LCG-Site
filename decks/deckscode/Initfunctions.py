@@ -1,6 +1,11 @@
 from play.gamecode.Inits import ChaosCardsInit, FinalCardInit, NeutralCardsInit, OrksCardsInit, PlanetCardsInit, \
     SpaceMarinesCardsInit, EldarCardsInit, AstraMilitarumCardsInit, TauCardsInit, DarkEldarCardsInit, \
-    TyranidsCardsInit, NecronsCardsInit, BlackstoneProjectCardsInit
+    TyranidsCardsInit, NecronsCardsInit, BlackstoneProjectCardsInit, FFGCardsListInit
+
+
+def init_ffg_only_cards():
+    ffg_only_cards_init = FFGCardsListInit.ffg_only_cards_init()
+    return ffg_only_cards_init
 
 
 def init_player_cards():

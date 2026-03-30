@@ -77,6 +77,14 @@
         <option value="Tyranids">Tyranids</option>
         <option value="Necrons">Necrons</option>
     </select>
+    <div>Legality Filter</div>
+    <label for="legality-filter"></label>
+    <select id="legality-filter" name="legality-filter" onchange="clearUpdateLoad()">
+        <option value="All">All</option>
+        <option value="FFG">FFG Only</option>
+        <option value="Apoka">Apoka</option>
+    </select>
+    <p></p>
     <button id="load-more" onclick="loadMore()">Load More</button>
     <p>Your current decks:</p>
     <div id="deck-lists">
@@ -107,6 +115,7 @@
 
     var current_deck_amount = 0;
     var preferred_faction = "";
+    var preferred_legality = "";
 
     function clearUpdateLoad() {
         clearDecks();
@@ -128,6 +137,8 @@
     function updatePreference() {
         var e = document.getElementById("faction-filter");
         preferred_faction = e.value;
+        var f = document.getElementById("legality-filter");
+        preferred_legality = f.value;
     }
 
     function clearDecks() {
@@ -146,7 +157,7 @@
 
     function loadMore() {
         decksSocket.send(JSON.stringify({
-            'message': "Load More/" + current_deck_amount.toString() + "/" + preferred_faction
+            'message': "Load More/" + current_deck_amount.toString() + "/" + preferred_faction + "/" + preferred_legality
         }));
     }
 
