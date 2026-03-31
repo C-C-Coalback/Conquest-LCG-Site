@@ -27,8 +27,8 @@ async def update_game_event_headquarters_section(self, name, game_update_string)
                 await self.send_update_message(self.name_2 + " is ready to move on to the next round.")
             if self.p1.has_passed and self.p2.has_passed:
                 await self.automated_headquarters_phase()
-                await self.change_phase("DEPLOY")
                 await self.reset_values_for_new_round()
+                await self.change_phase("DEPLOY")
 
 
 def headquarters_phase(p_one, p_two, round_number):
