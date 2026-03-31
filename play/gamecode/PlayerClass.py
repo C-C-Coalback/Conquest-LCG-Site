@@ -7997,6 +7997,11 @@ class Player:
         return False
 
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
+        if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
+            every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
+            if every_worr_check:
+                if self.game.get_green_icon(planet_id):
+                    return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_ability_given_pos(planet_id, unit_id) == "Growing Tide":
                 return False
@@ -8007,11 +8012,6 @@ class Player:
                                                                                    "Umbral Preacher")
             if own_umbral_check or enemy_umbral_check:
                 return False
-            if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
-                every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
-                if every_worr_check:
-                    if self.game.get_green_icon(planet_id):
-                        return False
             own_worr_check = self.search_card_at_planet(planet_id, "Broderick Worr", bloodied_relevant=True)
             enemy_worr_check = self.game.request_search_for_enemy_card_at_planet(
                 self.number, planet_id, "Broderick Worr", bloodied_relevant=True)
