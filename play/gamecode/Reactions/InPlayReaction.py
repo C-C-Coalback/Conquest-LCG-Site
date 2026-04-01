@@ -165,6 +165,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if not already_present:
                         secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                         self.misc_misc.append((planet_pos, unit_pos))
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "A warlord is present at that planet.")
         elif current_reaction == "Excellor Commit":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
@@ -216,6 +218,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                        " gained the Flying keyword until the end of the combat round.")
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target Warrior units.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target orks units.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
         elif current_reaction == "Junk Chucka Kommando":
             if self.chosen_first_card:
                 if self.misc_target_attachment[1] == planet_pos:
@@ -262,6 +272,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.misc_counter = self.misc_counter - 1
                     if self.misc_counter < 1:
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Siege Regiment Manticore":
             if abs(planet_pos - og_pla) == 1:
                 if game_update_string[1] == secondary_player.number:
@@ -310,6 +323,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_being_hit.destroy_card_in_play(planet_pos, unit_pos)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target damaged units.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Prodigal Sons Disciple":
             if game_update_string[1] == secondary_player.number:
                 att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
@@ -343,6 +362,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                   rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Vezuel's Hunters":
             if game_update_string[1] == secondary_player.number:
                 att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
@@ -374,6 +396,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Mandrake Cutthroat":
             att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if att_pla == planet_pos:
@@ -420,6 +445,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Crush of Sky-Slashers":
             if game_update_string[1] == secondary_player.number:
                 att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
@@ -453,6 +481,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                       rickety_warbuggy=True, shadow_field_possible=True)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " can only target 2 cost or lower units.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Fenrisian Wolf":
             att_num, att_pla, att_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if att_pla == planet_pos:
@@ -488,6 +522,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, att_value, by_enemy_unit=False)
                         self.advance_damage_aiming_reticle()
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Vengeance!":
             if planet_pos == og_pla:
                 if primary_player.number == game_update_string[1]:
@@ -520,6 +557,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.discard_card_name_from_hand("Vengeance!")
                             primary_player.ready_given_pos(planet_pos, unit_pos)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target Space Marines army units.")
         elif current_reaction == "Commander Starblaze":
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
@@ -528,6 +568,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, war_pla)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target Astra Militarum units.")
         elif current_reaction == "Ravening Psychopath":
             if game_update_string[1] == secondary_player.number:
                 if planet_pos == og_pla:
@@ -536,6 +579,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                               rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Deathly Web Shrine":
             if planet_pos == og_pla:
                 if game_update_string[1] == "1":
@@ -546,6 +592,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot target Elite units.")
         elif current_reaction == "The Inevitable Decay":
             if not self.chosen_first_card:
                 if game_update_string[1] == secondary_player.get_number():
@@ -612,6 +664,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             await self.send_update_message("The Grand Plan is active!")
                             primary_player.drammask_nane_check()
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only sacrifice units at a planet without an enemy army unit.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Wildrider Vyper":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
@@ -623,6 +681,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.move_unit_to_planet(og_pla, og_pos, planet_pos)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot move to that planet.")
         elif current_reaction == "Staff of Change":
             if secondary_player.get_number() == game_update_string[1]:
                 if og_pla == planet_pos:
@@ -659,6 +720,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.cards_in_play[planet_pos + 1][unit_pos].shadowed_thorns_venom_valid = False
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                         self.misc_target_unit = (planet_pos, unit_pos)
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Not a valid target for " + current_reaction + ".")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Vow of Honor":
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_vow_of_honor:
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
@@ -668,6 +735,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.create_reaction("Vow of Honor", primary_player.name_player,
                                          (int(primary_player.number), -1, -1))
                 self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Not a valid target for Vow of Honor.")
         elif current_reaction == "Kabalite Harriers":
             if planet_pos == og_pla:
                 if game_update_string[1] == "1":
@@ -701,6 +770,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target undamaged units.")
         elif current_reaction == "Veteran Barbrus":
             if planet_pos == og_pla:
                 if game_update_string[1] == "1":
@@ -738,8 +810,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
                 else:
-                    await self.send_update_message(
-                        "Forbidden faction for Veteran Barbrus.")
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Forbidden faction for Veteran Barbrus.")
         elif current_reaction == "Thundering Wraith":
             if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -773,6 +845,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             self.name_player_making_choices = secondary_player.name_player
                             self.resolving_search_box = True
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Flayer Affliction":
             if planet_pos == og_pla:
                 if primary_player.get_number() == game_update_string[1]:
@@ -814,6 +889,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
         elif current_reaction == "Beastmaster's Whip":
             if planet_pos == og_pla:
                 if primary_player.get_number() == game_update_string[1]:
@@ -822,6 +899,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                 primary_player.ready_given_pos(planet_pos, unit_pos)
                                 self.delete_reaction()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " can only target Elite units.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target Creature units.")
         elif current_reaction == "Decayed Gardens":
             if player_owning_card.get_lumbering_given_pos(planet_pos, unit_pos):
                 can_continue = True
@@ -850,6 +933,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if can_continue:
                     player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
                     self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target Lumbering units.")
         elif current_reaction == "Explosive Scarabs":
             if planet_pos == og_pla:
                 if unit_pos != og_pos or primary_player.get_number() != game_update_string[1]:
@@ -890,6 +975,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Fire Prism":
             if planet_pos == og_pla:
                 if secondary_player.get_number() == game_update_string[1]:
@@ -920,6 +1008,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Devourer Venomthrope":
             if planet_pos == og_pla:
                 if secondary_player.get_number() == game_update_string[1]:
@@ -951,6 +1042,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " cannot target Elite units.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Obedience":
             if game_update_string[1] == primary_player.number:
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
@@ -958,6 +1055,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.chosen_first_card = True
                         self.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target non-Necrons units.")
         elif current_reaction == "8th Company Assault Squad":
             if planet_pos == og_pla:
                 if game_update_string[1] == "1":
@@ -992,6 +1092,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         target_player.ready_given_pos(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target exhausted Space Marines units.")
         elif current_reaction == "Kommando Sneakaz":
             if game_update_string[1] == primary_player.get_number():
                 if planet_pos == og_pla:
@@ -1023,6 +1126,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target Orks units.")
         elif current_reaction == "Invasive Genestealers":
             if game_update_string[1] == secondary_player.get_number():
                 if planet_pos == og_pla:
@@ -1054,42 +1160,27 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.cards_in_play[og_pla + 1][og_pos].positive_hp_until_eop += 1
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Soul Grinder":
             if primary_player.get_number() == game_update_string[1]:
                 planet_pos_sg = self.reactions_needing_resolving[0].get_planet_pos()
                 if planet_pos == planet_pos_sg:
-                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
-                        primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
+                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot sacrifice that unit.")
         elif current_reaction == "Wrathful Dreadnought":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 can_continue = True
-                possible_interrupts = []
-                if player_owning_card.name_player == primary_player.name_player:
-                    possible_interrupts = secondary_player.intercept_check()
-                if player_owning_card.name_player == secondary_player.name_player:
-                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
-                        planet_pos, unit_pos, intercept_possible=True)
-                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
-                        can_continue = False
-                        await self.send_update_message("Immune to enemy card abilities.")
-                if possible_interrupts and can_continue:
-                    can_continue = False
-                    await self.send_update_message("Some sort of interrupt may be used.")
-                    self.choices_available = possible_interrupts
-                    self.choices_available.insert(0, "No Interrupt")
-                    self.name_player_making_choices = secondary_player.name_player
-                    self.choice_context = "Interrupt Effect?"
-                    self.nullified_card_name = current_reaction
-                    self.cost_card_nullified = 0
-                    self.nullify_string = "/".join(game_update_string)
-                    self.first_player_nullified = primary_player.name_player
-                    self.nullify_context = "Reaction"
                 if can_continue:
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = 4
-                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
         elif current_reaction == "Reclamation Pool":
             if planet_pos == og_pla:
                 if primary_player.get_number() == game_update_string[1]:
@@ -1150,7 +1241,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.adjust_own_reactions(og_pla, 0)
                             self.delete_reaction()
                         else:
-                            await self.send_update_message("PROBLEM: NO UNIT FOR THUNDERWOLF CAVALRY TO SWITCH WITH!")
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              "No unit for Thunderwolf Cavalry to switch with.")
         elif current_reaction == "Fire Warrior Elite":
             if game_update_string[1] == primary_player.get_number():
                 _, current_planet, current_unit = self.last_defender_position
@@ -1233,11 +1325,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.misc_target_unit = (planet_pos, unit_pos)
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                                 self.chosen_first_card = True
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                                  current_reaction + " can only target army units.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " can only target Kabalite units.")
         elif current_reaction == "Made Ta Fight":
-            if game_update_string[1] == "1":
-                player_being_hit = self.p1
-            else:
-                player_being_hit = self.p2
             if self.misc_target_planet == planet_pos:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                     can_continue = True
@@ -1301,6 +1395,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " cannot target warlord units.")
         elif current_reaction == "The Blinded Princess":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos != og_pla:
@@ -1330,12 +1427,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         await self.send_update_message(card_name_1 + " and " + card_name_2 + " swapped printed ATK!")
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
         elif current_reaction == "Host of the Emissary":
             if self.last_planet_checked_for_battle == planet_pos:
                 if game_update_string[1] == primary_player.number:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Yvraine":
             if abs(og_pla - planet_pos) == 1:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -1345,6 +1447,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_owning_card.cards_in_play[planet_pos + 1][unit_pos].yvraine_active = True
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target Elite units.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Morkanaut Rekuperator":
             if og_pla == planet_pos:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1,
@@ -1373,11 +1481,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.reset_aiming_reticle_in_play(current_planet, current_unit)
                     self.may_move_defender = False
                     print("Calling defender in the funny way")
-                    new_game_update_string = ["IN_PLAY", primary_player.get_number(), str(planet_pos),
-                                              str(unit_pos)]
+                    new_game_update_string = ["IN_PLAY", primary_player.get_number(), str(planet_pos), str(unit_pos)]
                     await CombatPhase.update_game_event_combat_section(
                         self, secondary_player.name_player, new_game_update_string)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target ready Runt units.")
         elif current_reaction == "Impulsive Loota In Play":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.number:
@@ -1469,13 +1579,23 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_being_hit.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target Elite units.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Tunneling Mawloc":
             card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
             if card_type == "Army":
                 if not self.chosen_first_card:
-                    primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
-                    self.infest_planet(self.misc_target_planet, primary_player)
-                    self.delete_reaction()
+                    if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                        primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+                        self.infest_planet(self.misc_target_planet, primary_player)
+                        self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target Elite units.")
             elif card_type == "Token":
                 primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
                 self.misc_counter += 1
@@ -1533,6 +1653,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.game.create_reaction("Erupting Aberrants", primary_player.name_player,
                                                       (int(primary_player.number), -1, -1))
                     self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
         elif current_reaction == "Death Guard Preachers":
             if planet_pos == og_pla:
                 if not self.chosen_first_card:
@@ -1542,6 +1664,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.misc_target_player = player_owning_card.name_player
                             self.chosen_first_card = True
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " can only target army units.")
                 else:
                     if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if self.misc_target_player != player_owning_card.name_player or \
@@ -1555,6 +1680,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Rail Rifle":
             if planet_pos == self.misc_target_planet:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
@@ -1612,6 +1740,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 next_phase = "DEPLOY"
                             player_owning_card.cards_in_play[planet_pos + 1][
                                 unit_pos].move_to_planet_end_of_phase_phase = next_phase
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Dark Allegiance":
             if self.card_to_deploy is not None:
                 if self.card_to_deploy.get_card_type() == "Attachment":
@@ -1627,15 +1758,21 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Gue'vesa Overseer":
             if abs(planet_pos - og_pla) == 1:
                 if not self.chosen_first_card:
-                    if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) != "Tau":
+                    if player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Tau"):
                         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                             player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
                             self.chosen_first_card = True
                             self.misc_target_unit = (planet_pos, unit_pos)
                             await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
                                                            " received +1 ATK! Now choose the +1 HP target.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " can only target army units.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target non-Tau units.")
                 else:
-                    if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) != "Tau":
+                    if player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Tau"):
                         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                             if self.misc_target_unit != (planet_pos, unit_pos):
                                 player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
@@ -1644,6 +1781,15 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                     " received +1 HP!")
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                                  current_reaction + " cannot target the same unit for both effects.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " can only target army units.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target non-Tau units.")
         elif current_reaction == "Farsight Vanguard":
             if not self.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:
@@ -1685,6 +1831,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target units with cost 2 or lower.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Mars Alpha Exterminator":
             if planet_pos == og_pla:
                 if game_update_string[1] == secondary_player.get_number():
@@ -1722,6 +1874,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.destroy_card_in_play(planet_pos, unit_pos)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units with cost 2 or lower and token units.")
         elif current_reaction == "Voidscarred Corsair":
             if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
@@ -1758,6 +1913,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.move_unit_to_planet(
                             planet_pos, unit_pos, og_pla)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Dynastic Weaponry":
             if "Dynastic Weaponry" not in primary_player.discard:
                 self.delete_reaction()
@@ -1769,6 +1927,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.create_reaction("Dynastic Weaponry", primary_player.name_player,
                                              (int(primary_player.get_number()), planet_pos, unit_pos))
                     self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Invalid target for Dynastic Weaponry.")
         elif current_reaction == "Howling Exarch":
             if planet_pos == og_pla:
                 if (int(game_update_string[1]), planet_pos, unit_pos) not in self.misc_misc:
@@ -1817,6 +1977,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                 shadow_field_possible=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot target warlord units.")
         elif current_reaction == "Pain Crafter":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.number:
@@ -1826,6 +1989,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 self.chosen_first_card = True
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                                  current_reaction + " already used its once per phase ability.")
             else:
                 card_name = ""
                 for i in range(len(primary_player.discard)):
@@ -1901,6 +2067,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.chosen_first_card = True
                             self.misc_counter = 3
                             await self.send_update_message("Now place 3 faith.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target Astra Militarum army units and Ecclesiarchy units.")
                 else:
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
@@ -1908,6 +2077,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if self.misc_counter < 1:
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Wrathful Retribution":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.get_number():
@@ -1917,11 +2089,17 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if self.misc_counter < 1:
                             self.chosen_first_card = True
                             await self.send_update_message("Now ready unit with faith.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
             else:
                 if player_owning_card.get_has_faith_given_pos(planet_pos, unit_pos) > 0:
                     if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         player_owning_card.ready_given_pos(planet_pos, unit_pos)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target Elite units.")
         elif current_reaction == "Vengeful Seraphim":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
@@ -1934,6 +2112,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
         elif current_reaction == "Saint Erika":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
@@ -1950,6 +2130,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, damage, rickety_warbuggy=True)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Not a valid target for Defense Battery.")
         elif current_reaction == "Nahumekh":
             if planet_pos == og_pla:
                 if game_update_string[1] == "1":
@@ -1988,6 +2170,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         )
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Tactical Withdrawal":
             if self.chosen_first_card:
                 if game_update_string[1] == primary_player.get_number():
@@ -2001,6 +2186,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target exhausted units.")
         elif current_reaction == "Shrouded Harlequin":
             if game_update_string[1] != primary_player.get_number():
                 can_continue = True
@@ -2050,6 +2238,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                               self.sweep_value, can_shield=can_shield,
                                                               rickety_warbuggy=True, shadow_field_possible=shadow)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "That unit is not a valid Sweep target.")
         elif current_reaction == "Imperial Fists Siege Force":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
@@ -2079,6 +2270,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.nullify_context = "Reaction"
                     if can_continue:
                         player_being_hit.rout_unit(planet_pos, unit_pos)
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target Ally units.")
         elif current_reaction == "Superiority":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
@@ -2119,6 +2313,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Venomthrope Polluter":
             if game_update_string[1] == primary_player.number:
                 if primary_player.check_for_warlord(planet_pos):
@@ -2127,9 +2324,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest_planet)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target warlord units.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "You do not have a warlord at that planet.")
         elif current_reaction == "Commissarial Bolt Pistol":
             if planet_pos == og_pla:
-                can_continue = True
                 if og_num == int(game_update_string[1]):
                     player_owning_card = primary_player
                 else:
@@ -2160,6 +2362,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if can_continue:
                         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Alaitoc Shrine":
             if int(primary_player.get_number()) == int(og_num):
                 player_num = int(primary_player.get_number())
@@ -2170,7 +2375,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
                         primary_player.allowed_units_alaitoc_shrine = []
                     else:
-                        await self.send_update_message("Unit already ready")
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Unit already ready.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Invalid target for Alaitoc Shrine.")
         elif current_reaction == "Cato's Stronghold":
             if int(primary_player.get_number()) == int(og_num):
                 if planet_pos in primary_player.allowed_planets_cato_stronghold:
@@ -2202,7 +2411,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.delete_reaction()
                             primary_player.allowed_planets_cato_stronghold = []
                     else:
-                        await self.send_update_message("Unit already ready")
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "Unit already ready.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot target that unit.")
         elif current_reaction == "Beasthunter Wyches":
             if int(primary_player.get_number()) == int(og_num):
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Beasthunter Wyches":
@@ -2213,6 +2426,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.summon_token_at_hq("Khymera", 1)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          "That unit already used its ability.")
         elif current_reaction == "Bladeguard Veteran Squad":
             if int(primary_player.get_number()) == int(og_num):
                 if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
@@ -2220,6 +2436,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target Space Marines units.")
         elif current_reaction == "Devoted Enginseer":
             if planet_pos == og_pla:
                 if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle") or \
@@ -2229,6 +2448,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if self.misc_counter < 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target Vehicle and Tech-Priest units.")
         elif current_reaction == "Spiritseer Erathal":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == og_pla:
@@ -2264,6 +2486,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False,
                                                           by_enemy_unit=False)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot deal damage to units that are immune to enemy events.")
         elif current_reaction == "Draining Cronos":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == og_pla:
@@ -2294,6 +2519,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Eloquent Confessor":
             if primary_player.get_number() == game_update_string[1]:
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
@@ -2307,6 +2535,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Devoted Hospitaller":
             if not self.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:
@@ -2353,6 +2584,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, dest)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target Khymeras at adjacent planets.")
         elif current_reaction == "Shrieking Exarch":
             if secondary_player.get_number() == game_update_string[1]:
                 can_continue = True
@@ -2388,6 +2622,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if card_type == "Warlord" or card_type == "Synapse":
                     primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target warlords and synapses.")
         elif current_reaction == "Standard Bearer":
             if primary_player.get_number() == game_update_string[1]:
                 if planet_pos == og_pla:
@@ -2395,6 +2632,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Nocturne-Ultima Storm Bolter":
             if game_update_string[1] == "1":
                 player_being_hit = self.p1
@@ -2442,7 +2682,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     _, prev_def_planet, prev_def_pos = self.last_defender_position
                     target_unit_pos = int(game_update_string[3])
                     if target_unit_pos == prev_def_pos:
-                        await self.send_update_message("Can't select last defender")
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Can't select last defender")
                     else:
                         secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1,
                                                               rickety_warbuggy=True)
@@ -2511,6 +2751,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.set_blanked_given_pos(planet_pos, unit_pos, exp="EOR")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target that unit.")
         elif current_reaction == "Venomous Fiend":
             if primary_player.get_number() != game_update_string[1]:
                 origin_planet = og_pla
@@ -2545,6 +2788,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                   rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Treacherous Lhamaean":
             num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if primary_player.number == game_update_string[1]:
@@ -2552,6 +2798,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only sacrifice army units.")
         elif current_reaction == "Defense Battery":
             if self.chosen_first_card:
                 if game_update_string[1] == secondary_player.get_number():
@@ -2559,6 +2808,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                             self.delete_reaction()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " cannot target that unit.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
         elif current_reaction == "Parasite of Mortrex":
             if self.chosen_first_card:
                 num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
@@ -2589,6 +2844,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             self.misc_target_unit = (planet_pos, unit_pos)
                             self.chosen_first_card = True
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " can only target army units.")
         elif current_reaction == "Dutiful Castellan":
             if planet_pos == og_pla:
                 can_continue = True
@@ -2647,6 +2905,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             hit_by_frenzied_wulfen_names.append(primary_player.name_player)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Prognosticator":
             valid_planet = False
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
@@ -2657,6 +2918,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Sanguinary Guard":
             if planet_pos == self.last_planet_checked_for_battle:
                 if game_update_string[1] == primary_player.get_number():
@@ -2673,6 +2937,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 self.misc_counter += 1
                 if self.misc_counter > 1:
                     self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  current_reaction + " cannot target that unit.")
         elif current_reaction == "Brotherhood Justicar":
             if planet_pos == og_pla:
                 if game_update_string[1] == primary_player.get_number():
@@ -2685,6 +2952,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 player_owning_card.increase_faith_given_pos(planet_pos, unit_pos, 1)
                 self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  current_reaction + " can only target army units.")
         elif current_reaction == "The Blade of Antwyr":
             if game_update_string[1] == primary_player.number:
                 if planet_pos in self.misc_misc:
@@ -2703,12 +2973,18 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             context="Interceptor Squad")
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot target that unit.")
         elif current_reaction == "Steadfast Sword Brethren":
             if game_update_string[1] == primary_player.number:
                 if planet_pos != og_pla or unit_pos != og_pos:
                     if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Black Templars"):
                         primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOP")
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target Black Templars units.")
         elif current_reaction == "Sanctified Aggressor":
             if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -2716,6 +2992,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     primary_player.add_resources(1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
         elif current_reaction == "Inspiring Sergeant":
             if planet_pos == og_pla:
                 can_continue = True
@@ -2818,6 +3097,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target that unit.")
         elif current_reaction == "Banner of the Ashen Sky":
             if game_update_string[1] == primary_player.number:
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
@@ -2825,12 +3107,18 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                     await self.send_update_message(card_name + " gained +2 ATK from Banner!")
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot target that unit.")
         elif current_reaction == "Drifting Spore Mines":
             if planet_pos == self.misc_target_unit[0]:
                 if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_unique():
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             shadow_field_possible=True)
                     self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot target unique units.")
         elif current_reaction == "Cry of the Wind":
             if not self.chosen_first_card:
                 if game_update_string[1] == primary_player.number:
@@ -2838,6 +3126,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         self.chosen_first_card = True
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target that unit.")
         elif current_reaction == "Galvax the Bloated":
             if planet_pos == og_pla:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
@@ -2857,6 +3148,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             primary_player.draw_card()
                             await self.send_update_message(secondary_player.name_player +
                                                            " may now choose a unit to damage.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot target that unit.")
             else:
                 if secondary_player.get_number() == game_update_string[1]:
                     if secondary_player.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "blue":
@@ -2864,7 +3158,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.reset_all_aiming_reticles_play_hq()
                         self.delete_reaction()
         elif current_reaction == "Sicarius's Chosen":
-            print("Resolve Sicarius's chosen")
             origin_planet = og_pla
             target_planet = int(game_update_string[2])
             target_pos = int(game_update_string[3])
@@ -2899,8 +3192,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                  int(game_update_string[3]),
                                                                  origin_planet)
                             new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
-                            secondary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1,
-                                                                  context="Sicarius's Chosen",
-                                                                  rickety_warbuggy=True)
+                            secondary_player.assign_damage_to_pos(
+                                origin_planet, new_unit_pos, 1, context="Sicarius's Chosen", rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target army units.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target units at adjacent planets.")
