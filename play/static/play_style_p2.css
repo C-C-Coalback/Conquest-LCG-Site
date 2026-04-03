@@ -50,8 +50,9 @@ h4 {
     min-width: 20vw;
     text-align: center;
     min-height: 10vh;
+    max-width: 20vw;
     font-size: 30px;
-    line-height: 3px;
+    line-height: 30px;
 }
 
 #in-play-box {
