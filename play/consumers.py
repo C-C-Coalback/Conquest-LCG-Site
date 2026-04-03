@@ -571,6 +571,30 @@ class GameConsumer(AsyncWebsocketConsumer):
                                         if not active_games[i].p2.deck_loaded:
                                             await active_games[i].p2.setup_player(deck_content,
                                                                                   active_games[i].planet_array)
+                    elif message[1] == "loadrandom":
+                        decks_lists = os.listdir(os.getcwd() + "/decks/DeckStorage/" + self.user.username)
+                        print(decks_lists)
+                        if decks_lists:
+                            random.shuffle(decks_lists)
+                            path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + self.user.username + "/" + decks_lists[0]
+                            if os.path.exists(path_to_player_decks):
+                                print("Success")
+                                with open(path_to_player_decks, 'r') as f:
+                                    deck_content = f.read()
+                                print(deck_content)
+                                for i in range(len(active_games)):
+                                    if active_games[i].game_id == self.room_name:
+                                        print("In correct room")
+                                        if active_games[i].name_1 == self.name:
+                                            print("Need to load player one's deck")
+                                            if not active_games[i].p1.deck_loaded:
+                                                await active_games[i].p1.setup_player(deck_content,
+                                                                                      active_games[i].planet_array)
+                                        elif active_games[i].name_2 == self.name:
+                                            print("Need to load player two's deck")
+                                            if not active_games[i].p2.deck_loaded:
+                                                await active_games[i].p2.setup_player(deck_content,
+                                                                                      active_games[i].planet_array)
                     elif message[1] == "concede" or message[1] == "resign":
                         if self.name == active_games[self.game_position].name_1:
                             await active_games[self.game_position].send_victory_proper(
