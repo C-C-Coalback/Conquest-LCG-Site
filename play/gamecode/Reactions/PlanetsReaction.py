@@ -58,7 +58,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                     primary_player.valid_aunlen_planets[chosen_planet] = False
                     self.need_to_resolve_battle_ability = True
                     self.resolving_search_box = True
-                    self.battle_ability_to_resolve = self.planet_array[chosen_planet]
+                    self.battle_ability_to_resolve = self.get_planet_ability_given_pos(chosen_planet)
                     self.player_resolving_battle_ability = primary_player.name_player
                     self.number_resolving_battle_ability = primary_player.number
                     self.choices_available = ["Yes", "No"]
@@ -99,6 +99,16 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if abs(chosen_planet - planet_pos) == 1:
             self.create_reaction(self.planet_array[chosen_planet] + " Commit", primary_player.name_player,
                                  (int(primary_player.number), planet_pos, -1))
+            self.delete_reaction()
+    elif current_reaction == "Burgeoning Incubation":
+        primary_player.burgeoning_incubation_target = chosen_planet
+        self.delete_reaction()
+    elif current_reaction == "Subject W-808" or current_reaction == "Subject W-808 BLD":
+        if chosen_planet != self.round_number:
+            card = self.preloaded_find_card(self.misc_target_choice)
+            pos = primary_player.add_card_to_planet(card, chosen_planet)
+            if pos != -1:
+                primary_player.cards_in_play[chosen_planet + 1][pos].remove_end_of_round = True
             self.delete_reaction()
     elif current_reaction == "Catatonic Pain":
         if abs(planet_pos - chosen_planet) == 1:
@@ -268,7 +278,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.exhaust_given_pos(warlord_pla, warlord_pos)
             self.delete_reaction()
             self.need_to_resolve_battle_ability = True
-            self.battle_ability_to_resolve = self.planet_array[chosen_planet]
+            self.battle_ability_to_resolve = self.get_planet_ability_given_pos(chosen_planet)
             self.player_resolving_battle_ability = primary_player.name_player
             self.number_resolving_battle_ability = str(primary_player.number)
             self.choices_available = ["Yes", "No"]

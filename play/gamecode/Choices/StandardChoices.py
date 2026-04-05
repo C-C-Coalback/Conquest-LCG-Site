@@ -228,7 +228,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 del primary_player.deck[int(game_update_string[1])]
                 primary_player.cards.append(card.get_name())
                 primary_player.bottom_remaining_cards()
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.choice_context == "Garden of Solitude":
         choice_pos = int(game_update_string[1])
@@ -576,7 +576,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if chosen_choice == "Sacrifice":
             pass
         else:
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
         self.reset_choices_available()
         self.resolving_search_box = False
@@ -977,7 +977,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             secondary_player.shuffle_deck()
             self.reset_choices_available()
             self.resolving_search_box = False
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.choice_context == "BTD: Last Planet or HQ?":
         if primary_player.aiming_reticle_coords_hand is not None:
@@ -1024,6 +1024,20 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.misc_target_choice = chosen_choice
         self.reset_choices_available()
         self.resolving_search_box = False
+    elif self.choice_context == "BI: Extra Synapse Choice":
+        card = self.preloaded_find_card(chosen_choice)
+        if primary_player.add_to_hq(card):
+            pos = len(primary_player.headquarters) - 1
+            primary_player.headquarters[pos].incubated_synapse = True
+        self.reset_choices_available()
+        self.resolving_search_box = False
+        self.delete_reaction()
+    elif self.choice_context == "W-808 Extra Synapse":
+        self.misc_target_choice = chosen_choice
+        primary_player.used_w_808_synapses.append(chosen_choice)
+        self.reset_choices_available()
+        self.resolving_search_box = False
+        await self.send_update_message("Please select the planet for the synapse.")
     elif self.choice_context == "Anshan opponent gains":
         if chosen_choice == "Draw 1 card":
             secondary_player.draw_card()
@@ -1314,7 +1328,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 primary_player.add_resources(diff)
             self.reset_choices_available()
             self.resolving_search_box = False
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.choice_context == "Eldritch Reaping: Enemy Announce":
         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
@@ -1341,7 +1355,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.location_of_indirect = "ALL"
         self.reset_choices_available()
         self.resolving_search_box = False
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.choice_context == "WillSub: Draw Card for Damage?":
         if chosen_choice == "Yes":
@@ -1553,7 +1567,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.discard_card_name_from_hand(card_name)
         self.reset_choices_available()
         self.resolving_search_box = False
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
         await secondary_player.dark_eldar_event_played()
         secondary_player.torture_event_played("Rakarth's Experimentations")
@@ -1666,7 +1680,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             if "Searing Brand" in secondary_player.cards:
                 secondary_player.discard_card_name_from_hand("Searing Brand")
             secondary_player.aiming_reticle_coords_hand = None
-            primary_player.create_enemy_played_event_reactions()
+            secondary_player.resolve_played_any_event()
             self.action_cleanup()
             self.reset_choices_available()
     elif self.choice_context == "Searing Brand":
@@ -1697,6 +1711,15 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.choices_available = ["Yes", "No"]
         self.choice_context = "Resolve Battle Ability?"
         self.name_player_making_choices = name
+    elif self.choice_context == "Swap Warlord with Khymera?":
+        if chosen_choice == "Yes":
+            _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
+            other_pla, other_pos = self.misc_target_unit
+            primary_player.switch_locations_of_units(planet_pos, unit_pos, other_pla, other_pos)
+        self.reset_choices_available()
+        self.resolving_search_box = False
+        primary_player.resolve_played_any_event()
+        self.delete_reaction()
     elif self.choice_context == "Which Player? (Slake the Thirst):":
         self.misc_target_choice = game_update_string[1]
         self.choices_available = ["0"]
@@ -1710,7 +1733,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Overrun: Followup Rout?":
         self.reset_choices_available()
         if game_update_string[1] == "1":
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.choice_context == "How Many Cards? (Slake the Thirst):":
         num_cards = int(chosen_choice)
@@ -1725,7 +1748,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             for _ in range(num_cards):
                 secondary_player.draw_card()
         await primary_player.dark_eldar_event_played()
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
         self.reset_choices_available()
     elif self.choice_context == "Use Backlash?":
@@ -2083,7 +2106,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
         if target_choice == "Gain 1 Resource":
             primary_player.add_resources(1)
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
         else:
             self.chosen_first_card = False
@@ -2148,7 +2171,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         secondary_player.discard_card_from_hand(int(game_update_string[1]))
         self.reset_choices_available()
         self.resolving_search_box = False
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
         await primary_player.dark_eldar_event_played()
         primary_player.torture_event_played("Visions of Agony")

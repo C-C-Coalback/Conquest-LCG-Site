@@ -307,7 +307,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 other_player = self.p1
                             if player.cards[hand_pos] == "Launch da Snots":
                                 print("is launch")
-                                if player.get_faction_given_pos(self.attacker_planet, self.attacker_position) == "Orks":
+                                if player.check_if_faction_given_pos(self.attacker_planet, self.attacker_position, "Orks", own_event=True):
                                     print("is orks")
                                     if player.resources > 0:
                                         if self.nullify_enabled and other_player.nullify_check():
@@ -814,8 +814,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                      (int(player.number), self.attacker_planet, self.attacker_position))
                             if player.check_for_trait_given_pos(
                                     self.attacker_planet, self.attacker_position, "Ecclesiarchy"):
-                                if player.get_faction_given_pos(
-                                        self.attacker_planet, self.attacker_position) == "Astra Militarum":
+                                if player.check_if_faction_given_pos(self.attacker_planet, self.attacker_position, "Astra Militarum"):
                                     for i in range(len(player.cards_in_play[self.attacker_planet + 1])):
                                         if i != self.attacker_position:
                                             if player.get_ability_given_pos(
@@ -1216,8 +1215,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                        self.defender_planet,
                                                                        self.defender_position)
                                 elif secondary_player.search_card_in_hq("Fake Ooman Base", ready_relevant=True):
-                                    if secondary_player.get_faction_given_pos(
-                                            self.defender_planet, self.defender_position) == "Orks" and \
+                                    if secondary_player.check_if_faction_given_pos(self.defender_planet, self.defender_position, "Orks") and \
                                             secondary_player.check_for_trait_given_pos(
                                                 self.defender_planet, self.defender_position, "Soldier") and \
                                             secondary_player.get_card_type_given_pos(

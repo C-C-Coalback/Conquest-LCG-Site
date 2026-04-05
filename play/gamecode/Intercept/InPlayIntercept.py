@@ -341,7 +341,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         primary_player.discard_attachments_from_card(planet_pos, unit_pos)
         card = primary_player.cards_in_play[planet_pos + 1][unit_pos]
         primary_player.cards_in_reserve[planet_pos].append(card)
-        primary_player.remove_card_from_play(planet_pos, unit_pos)
+        primary_player.remove_card_from_play(planet_pos, unit_pos, proper_remove=False)
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Clearcut Refuge":

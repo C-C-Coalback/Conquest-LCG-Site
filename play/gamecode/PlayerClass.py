@@ -248,6 +248,25 @@ class Player:
         self.ability_recursion_count = 0
         self.max_ability_recursion = 10
         self.misc_counter = 0
+        self.used_w_808_synapses = []
+        self.burgeoning_incubation_target = -1
+        self.shadow_in_the_warp_count = 0
+
+    def resolve_played_any_event(self, event_name=""):
+        if self.shadow_in_the_warp_count:
+            self.add_resources(self.shadow_in_the_warp_count)
+        planet_pos, unit_pos = self.get_location_of_warlord()
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Kariaq Dreadking":
+            if not self.get_once_per_round_used_given_pos(planet_pos, unit_pos):
+                if not self.check_if_already_have_reaction("Kariaq Dreadking"):
+                    self.game.create_reaction("Kariaq Dreadking", self.name_player,
+                                              (int(self.number), planet_pos, unit_pos))
+        other_player = self.get_other_player()
+        other_player.create_enemy_played_event_reactions()
+        if other_player.shadow_in_the_warp_count:
+            if self.spend_resources(other_player.shadow_in_the_warp_count):
+                return False
+        return True
 
     def put_card_into_reserve(self, card, planet_pos, payment=True):
         if planet_pos == -2:
@@ -606,12 +625,12 @@ class Player:
                         single_card_string += "_blackstone"
                 single_card_string = single_card_string + "|"
                 if current_card.ready:
-                    if current_card.check_for_a_trait("Pledge"):
+                    if current_card.check_for_a_trait("Pledge") and not current_card.get_name() == "Grand Schemes":
                         single_card_string += "PR|"
                     else:
                         single_card_string += "R|"
                 else:
-                    if current_card.check_for_a_trait("Pledge"):
+                    if current_card.check_for_a_trait("Pledge") and not current_card.get_name() == "Grand Schemes":
                         single_card_string += "PE|"
                     else:
                         single_card_string += "E|"
@@ -789,6 +808,29 @@ class Player:
             ds_value = ds_value - 1
         return ds_value
 
+    def switch_locations_of_units(self, planet_pos, unit_pos, other_pla, other_pos):
+        if other_pla != planet_pos:
+            card1 = self.get_card_given_pos(planet_pos, unit_pos)
+            card2 = self.get_card_given_pos(other_pla, other_pos)
+            if other_pla == -2:
+                self.headquarters.append(copy.deepcopy(card1))
+            else:
+                self.cards_in_play[other_pla + 1].append(copy.deepcopy(card1))
+            if planet_pos == -2:
+                self.headquarters.append(copy.deepcopy(card2))
+            else:
+                self.cards_in_play[planet_pos + 1].append(copy.deepcopy(card2))
+            if planet_pos == -2:
+                del self.headquarters[unit_pos]
+            else:
+                del self.cards_in_play[planet_pos + 1][unit_pos]
+            if other_pla == -2:
+                del self.headquarters[other_pos]
+            else:
+                del self.cards_in_play[other_pla + 1][other_pos]
+            return True
+        return False
+
     def deepstrike_event(self, planet_id, unit_id, in_play_card=False):
         if not self.idden_base_active and not in_play_card:
             ability = self.cards_in_reserve[planet_id][unit_id].get_name()
@@ -796,6 +838,8 @@ class Player:
             ability = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
         if ability == "The Prince's Might":
             self.the_princes_might_active[planet_id] = True
+        if ability == "Webway Schemes":
+            self.game.create_reaction("Webway Schemes", self.name_player, (int(self.number), planet_id, -1))
         if ability == "Unseen Strike":
             self.game.force_set_battle_initiative(self.name_player, self.number)
         if ability == "Concealing Darkness":
@@ -2118,7 +2162,22 @@ class Player:
             if self.get_ability_given_pos(planet_pos, i) == "Great Unclean One":
                 if self.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     sweep_value += 2
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Protective Horrors":
+            if self.search_unique_unit_at_planet(planet_pos):
+                sweep_value += 1
+            else:
+                other_player = self.get_other_player()
+                if other_player.search_unique_unit_at_planet(planet_pos):
+                    sweep_value += 1
         return sweep_value
+
+    def search_unique_unit_at_planet(self, planet_pos):
+        if planet_pos == -2:
+            return False
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.get_unique_given_pos(planet_pos, i):
+                return True
+        return False
 
     def get_card_in_hand(self, position_hand):
         card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict,
@@ -2921,6 +2980,11 @@ class Player:
                             if card.get_ability() == "The Flayed Mask":
                                 self.game.create_reaction("The Flayed Mask", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Grand Schemes":
+                                self.game.create_reaction("The Broken Sigil", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("The Flayed Mask", self.name_player,
+                                                          (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Hive Fleet Leviathan":
                                 self.game.create_reaction("Hive Fleet Leviathan", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -3022,6 +3086,10 @@ class Player:
                             if card.get_ability() == "Patron Saint":
                                 self.game.create_reaction("Patron Saint", self.name_player,
                                                           (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Kariaq's Inner Circle":
+                                if self.game.determine_last_planet() == position:
+                                    self.game.create_reaction("Kariaq's Inner Circle", self.name_player,
+                                                              (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Imperial Fists Siege Force":
                                 self.game.create_reaction("Imperial Fists Siege Force", self.name_player,
                                                           (int(self.number), position, location_of_unit))
@@ -3303,7 +3371,7 @@ class Player:
                 self.discard_attachments_from_card(planet_pos, unit_pos)
             else:
                 self.return_attachments_on_card_to_hand(planet_pos, unit_pos)
-            self.remove_card_from_hq(unit_pos)
+            self.remove_card_from_hq(unit_pos, proper_remove=False)
             return None
         if self.cards_in_play[planet_pos + 1][unit_pos].name_owner == self.name_player:
             self.cards.append(self.cards_in_play[planet_pos + 1][unit_pos].get_name())
@@ -3316,7 +3384,7 @@ class Player:
             self.discard_attachments_from_card(planet_pos, unit_pos)
         else:
             self.return_attachments_on_card_to_hand(planet_pos, unit_pos)
-        self.remove_card_from_play(planet_pos, unit_pos)
+        self.remove_card_from_play(planet_pos, unit_pos, proper_remove=False)
         return None
 
     def discard_card_at_random(self):
@@ -3454,7 +3522,7 @@ class Player:
                                                   (int(other_player.number), destination, new_pos))
             if self.get_ability_given_pos(destination, new_pos) == "Venomous Fiend":
                 self.game.create_reaction("Venomous Fiend", self.name_player, (int(self.number), destination, new_pos))
-            self.remove_card_from_hq(origin_position)
+            self.remove_card_from_hq(origin_position, proper_remove=False)
             return True
         else:
             other_player = self.get_other_player()
@@ -3522,7 +3590,7 @@ class Player:
             last_element_index = new_pos
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
-            self.remove_card_from_play(origin_planet, origin_position)
+            self.remove_card_from_play(origin_planet, origin_position, proper_remove=False)
             self.aunla_prince_check(destination, new_pos, origin_planet)
             if self.get_ability_given_pos(destination, new_pos) == "Quartermasters":
                 if self.get_damage_given_pos(destination, new_pos) > 0:
@@ -3750,8 +3818,9 @@ class Player:
 
     def commit_synapse_to_planet(self):
         if self.synapse_commit_location != -1:
-            for i in range(len(self.headquarters)):
-                if self.headquarters[i].get_card_type() == "Synapse" and self.headquarters[i].from_deck:
+            i = 0
+            while i < len(self.headquarters):
+                if self.headquarters[i].get_card_type() == "Synapse" and (self.headquarters[i].from_deck or self.headquarters[i].incubated_synapse):
                     if self.headquarters[i].get_ability() == "Gravid Tervigon":
                         self.game.create_reaction("Gravid Tervigon", self.name_player,
                                                   (int(self.number), self.synapse_commit_location, -1))
@@ -3759,10 +3828,11 @@ class Player:
                         self.game.create_reaction("Venomthrope Polluter", self.name_player,
                                                   (int(self.number), self.synapse_commit_location, -1))
                     self.move_unit_to_planet(-2, i, self.synapse_commit_location, card_effect=False)
+                    i = i - 1
                     for j in range(len(self.headquarters)):
                         if self.headquarters[j].get_ability() == "Synaptic Link":
                             self.game.create_reaction("Synaptic Link", self.name_player, (int(self.number), -1, -1))
-                    return None
+                i += 1
         return None
 
     def ready_unit_by_name(self, name, planet):
@@ -4853,7 +4923,23 @@ class Player:
             self.cards_in_play[planet_pos + 1][unit_pos].mobile_eor = True
         return None
 
+    def rounds_end_triggers_resolution(self):
+        i = 0
+        while i < len(self.headquarters):
+            if self.headquarters[i].remove_end_of_round:
+                self.remove_card_from_hq(i, proper_remove=True)
+                i = i - 1
+            i = i + 1
+        for i in range(7):
+            j = 0
+            while j < len(self.cards_in_play[i + 1]):
+                if self.cards_in_play[i + 1][j].remove_end_of_round:
+                    self.remove_card_from_play(i, j, proper_remove=True)
+                    j = j - 1
+                j = j + 1
+
     def round_ends_reset_values(self):
+        self.burgeoning_incubation_target = -1
         self.reset_all_blanked_eor()
         for i in range(len(self.headquarters)):
             self.headquarters[i].set_once_per_round_used(False)
@@ -5451,6 +5537,9 @@ class Player:
                 warlord_pla, warlord_pos = other_player.get_location_of_warlord()
                 if other_player.get_bloodied_given_pos(warlord_pla, warlord_pos):
                     attack_value += 1
+        if ability == "Kariaq's Inner Circle":
+            if self.game.round_number == planet_id:
+                attack_value += 1
         if ability == "Holy Battery":
             if self.search_faith_at_planet(planet_id):
                 attack_value += 1
@@ -6239,6 +6328,9 @@ class Player:
                 warlord_pla, warlord_pos = other_player.get_location_of_warlord()
                 if other_player.get_bloodied_given_pos(warlord_pla, warlord_pos):
                     health += 1
+        if ability == "Kariaq's Inner Circle":
+            if self.game.round_number == planet_id:
+                health += 1
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 health += 1
@@ -6489,7 +6581,10 @@ class Player:
                     return False
         return True
 
-    def check_if_faction_given_pos(self, planet_pos, unit_pos, faction):
+    def check_if_faction_given_pos(self, planet_pos, unit_pos, faction, own_event=False):
+        if own_event:
+            if self.search_for_card_everywhere("Kariaq Dreadking", bloodied_relevant=True):
+                return True
         if self.get_faction_given_pos(planet_pos, unit_pos) == faction:
             return True
         elif faction == "Astra Militarum" and \
@@ -6556,6 +6651,12 @@ class Player:
             if self.headquarters[i].get_ability() == "Promethium Mine":
                 if phase == "DEPLOY" and self.headquarters[i].counter:
                     self.game.create_reaction("Promethium Mine", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Subject W-808":
+                if phase == "DEPLOY":
+                    if not self.get_bloodied_given_pos(-2, i):
+                        self.game.create_reaction("Subject W-808", self.name_player, (int(self.number), -2, i))
+                    elif not self.get_once_per_game_used_given_pos(-2, i):
+                        self.game.create_reaction("Subject W-808 BLD", self.name_player, (int(self.number), -2, i))
             if self.get_ability_given_pos(-2, i) == "Mobilize the Chapter":
                 if phase == "COMBAT":
                     self.game.create_reaction("Mobilize the Chapter", self.name_player, (int(self.number), -2, i))
@@ -6572,6 +6673,9 @@ class Player:
                 if phase == "DEPLOY":
                     if self.check_if_all_units_have_trait(self.headquarters[i].misc_string):
                         self.game.create_reaction("Dark Allegiance", self.name_player, (int(self.number), -2, i))
+            if self.get_ability_given_pos(-2, i) == "Burgeoning Incubation":
+                if phase == "DEPLOY":
+                    self.game.create_reaction("Burgeoning Incubation", self.name_player, (int(self.number), -2, i))
             if self.get_ability_given_pos(-2, i) == "Vamii Industrial Complex":
                 if phase == "COMBAT":
                     self.game.create_reaction("Vamii Industrial Complex", self.name_player, (int(self.number), -2, i))
@@ -6635,6 +6739,9 @@ class Player:
                 if self.attachments_at_planet[i][j].get_ability() == "Trapped Objective":
                     if phase == "COMBAT":
                         self.game.create_reaction("Trapped Objective", self.name_player, (int(self.number), i, -1))
+                if self.attachments_at_planet[i][j].get_ability() == "The Silent Eye":
+                    if phase == "COMBAT":
+                        self.game.create_reaction("The Silent Eye", self.name_player, (int(self.number), i, -1))
             for j in range(len(self.cards_in_reserve[i])):
                 if self.cards_in_reserve[i][j].get_ability() == "Snagbrat's Scouts":
                     if phase == "COMMAND":
@@ -7486,7 +7593,8 @@ class Player:
                 if self.search_for_card_everywhere("Sivarla Soulbinder"):
                     limit = 2
             if self.count_copies_in_play(card.get_name()) < limit:
-                self.add_card_to_planet(card, planet_num, already_exhausted=already_exhausted)
+                return self.add_card_to_planet(card, planet_num, already_exhausted=already_exhausted)
+        return -1
 
     def summon_token_at_hq(self, token_name, amount=1):
         card = FindCard.find_card(token_name, self.card_array, self.cards_dict,
@@ -7500,10 +7608,13 @@ class Player:
                 if self.count_copies_in_play(card.get_name()) < limit:
                     self.add_to_hq(card)
 
-    def remove_card_from_play(self, planet_num, card_pos):
+    def remove_card_from_play(self, planet_num, card_pos, proper_remove=True):
         if planet_num == -2:
-            self.remove_card_from_hq(card_pos)
+            self.remove_card_from_hq(card_pos, proper_remove=proper_remove)
             return None
+        if proper_remove:
+            self.cards_removed_from_game.append(self.get_name_given_pos(planet_num, card_pos))
+            self.cards_removed_from_game_hidden.append("N")
         del self.cards_in_play[planet_num + 1][card_pos]
         self.adjust_own_reactions(planet_num, card_pos)
         self.adjust_own_interrupts(planet_num, card_pos)
@@ -7511,7 +7622,10 @@ class Player:
         self.adjust_own_damage(planet_num, card_pos)
         return None
 
-    def remove_card_from_hq(self, card_pos):
+    def remove_card_from_hq(self, card_pos, proper_remove=True):
+        if proper_remove:
+            self.cards_removed_from_game.append(self.get_name_given_pos(-2, card_pos))
+            self.cards_removed_from_game_hidden.append("N")
         del self.headquarters[card_pos]
         self.adjust_own_reactions(-2, card_pos)
         self.adjust_own_interrupts(-2, card_pos)
@@ -7678,7 +7792,7 @@ class Player:
                 if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
                     self.game.create_reaction("Hive Ship Tendrils", self.name_player, (self.number, -2, i))
         self.discard_attachments_from_card(planet_num, card_pos)
-        self.remove_card_from_play(planet_num, card_pos)
+        self.remove_card_from_play(planet_num, card_pos, proper_remove=False)
 
     def search_faith_at_planet(self, planet_pos):
         for i in range(len(self.cards_in_play[planet_pos + 1])):
@@ -7758,7 +7872,7 @@ class Player:
                 if self.get_ability_given_pos(-2, i) == "Hive Ship Tendrils":
                     self.game.create_reaction("Hive Ship Tendrils", self.name_player, (self.number, -2, i))
         self.discard_attachments_from_card(-2, card_pos)
-        self.remove_card_from_hq(card_pos)
+        self.remove_card_from_hq(card_pos, proper_remove=False)
 
     def retreat_warlord(self):
         for i in range(len(self.cards_in_play[0])):
@@ -7806,7 +7920,7 @@ class Player:
                     if self.get_ready_given_pos(-2, i):
                         self.game.create_reaction("Homing Beacon", self.name_player, (int(self.number), -2, i))
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
-        self.remove_card_from_play(planet_id, unit_id)
+        self.remove_card_from_play(planet_id, unit_id, proper_remove=False)
         last_element_index = len(self.headquarters) - 1
         self.aunla_prince_check(-2, last_element_index, planet_id)
         for i in range(len(self.headquarters)):

@@ -364,6 +364,39 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.ready_given_pos(planet_pos, unit_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Webway Schemes":
+            pos_khymera = primary_player.summon_token_at_planet("Khymera", planet_pos)
+            if pos_khymera != -1:
+                warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                if warlord_pla != planet_pos:
+                    self.reactions_needing_resolving[0].set_position_unit_triggering((int(primary_player.number), planet_pos, pos_khymera))
+                    self.misc_target_unit = (warlord_pla, warlord_pos)
+                    self.choice_context = "Swap Warlord with Khymera?"
+                    self.create_choices(["Yes", "No"])
+                    self.name_player_making_choices = primary_player.name_player
+                    self.resolving_search_box = True
+                else:
+                    primary_player.resolve_played_any_event()
+                    self.delete_reaction()
+            else:
+                primary_player.resolve_played_any_event()
+                self.delete_reaction()
+        elif current_reaction == "Kariaq's Inner Circle":
+            primary_player.add_resources(1)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
+        elif current_reaction == "The Silent Eye":
+            i = 0
+            while i < len(primary_player.attachments_at_planet[planet_pos]):
+                if primary_player.attachments_at_planet[planet_pos][
+                        i].get_ability() == "The Silent Eye":
+                    primary_player.cards.append("The Silent Eye")
+                    del primary_player.attachments_at_planet[planet_pos][i]
+                    i = i - 1
+                i = i + 1
+            if secondary_player.check_for_warlord(planet_pos):
+                primary_player.draw_card()
+            self.delete_reaction()
         elif current_reaction == "Obedience":
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             self.chosen_first_card = False
@@ -1302,7 +1335,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.delete_reaction()
                 self.need_to_resolve_battle_ability = True
                 self.resolving_search_box = True
-                self.battle_ability_to_resolve = self.planet_array[planet_pos]
+                self.battle_ability_to_resolve = self.get_planet_ability_given_pos(planet_pos)
                 self.player_resolving_battle_ability = primary_player.name_player
                 self.number_resolving_battle_ability = primary_player.number
                 self.choices_available = ["Yes", "No"]
@@ -1311,6 +1344,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.tense_negotiations_active = True
             else:
                 self.delete_reaction()
+        elif current_reaction == "Kariaq Dreadking":
+            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos)
+            primary_player.draw_card()
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Crushing Blow":
             can_continue = True
             if self.nullify_enabled:
@@ -1429,6 +1467,35 @@ async def start_resolving_reaction(self, name, game_update_string):
                     if primary_player.spend_resources(1):
                         primary_player.discard_card_name_from_hand(current_reaction)
             else:
+                self.delete_reaction()
+        elif current_reaction == "Burgeoning Incubation":
+            primary_player.sacrifice_card_in_hq(unit_pos)
+        elif current_reaction == "BI: Extra Synapse":
+            available_synapses = copy.copy(primary_player.synapse_list)
+            if "Ravenous Horror" in available_synapses:
+                available_synapses.remove("Ravenous Horror")
+            self.choice_context = "BI: Extra Synapse Choice"
+            self.create_choices(available_synapses, general_imaging_format="All")
+            self.name_player_making_choices = primary_player.name_player
+            self.resolving_search_box = True
+        elif current_reaction == "Subject W-808" or current_reaction == "Subject W-808 BLD":
+            if primary_player.spend_resources(1):
+                if current_reaction == "Subject W-808 BLD":
+                    primary_player.set_once_per_game_used_given_pos(planet_pos, unit_pos)
+                available_synapses = copy.copy(primary_player.synapse_list)
+                if "Ravenous Horror" in available_synapses:
+                    available_synapses.remove("Ravenous Horror")
+                if current_reaction != "Subject W-808 BLD":
+                    for i in range(len(primary_player.used_w_808_synapses)):
+                        if primary_player.used_w_808_synapses[i] in available_synapses:
+                            available_synapses.remove(primary_player.used_w_808_synapses[i])
+                self.choice_context = "W-808 Extra Synapse"
+                self.create_choices(available_synapses, general_imaging_format="All")
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Insufficient Resources",
+                                                  "Cannot use W-808's ability due to a lack of resources.")
                 self.delete_reaction()
         elif current_reaction == "Gene Implantation":
             if primary_player.resources > 0:
@@ -2631,7 +2698,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                             secondary_player.discard_card_at_random()
                             await primary_player.dark_eldar_event_played()
                             primary_player.torture_event_played()
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.delete_reaction()
                     else:
                         self.delete_reaction()

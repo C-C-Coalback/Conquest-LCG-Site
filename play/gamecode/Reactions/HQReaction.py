@@ -203,7 +203,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if game_update_string[1] == primary_player.get_number():
             if not self.chosen_first_card:
                 if (primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and
-                    primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum") or \
+                    primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum")) or \
                         primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Ecclesiarchy"):
                     before_damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
@@ -468,7 +468,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target supports.")
     elif current_reaction == "Da Swoopy":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-            if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+            if player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Orks"):
                 if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
                     player_owning_card.headquarters[unit_pos].flying_eocr = True
                     await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
@@ -485,7 +485,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target Orks units.")
     elif current_reaction == "Advocator of Blood":
         if (player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and
-            player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Chaos") or \
+            player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Chaos")) or \
                 player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Khorne"):
             player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1)
             _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
@@ -505,7 +505,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if not self.chosen_first_card:
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
-                    if primary_player.get_faction_given_pos(-2, unit_pos) == "Space Marines":
+                    if primary_player.check_if_faction_given_pos(-2, unit_pos, "Space Marines", own_event=True):
                         if not primary_player.check_for_trait_given_pos(-2, unit_pos, "Elite"):
                             self.chosen_first_card = True
                             self.misc_target_unit = (-2, unit_pos)

@@ -181,6 +181,10 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
         card_result = FindCard.find_card(current_name, cards_array, cards_dict)
         current_index = 5
         card_count = 1
+        if not card_result.check_for_a_trait("Pledge"):
+            return "Unexpected card in pledge area: " + current_name
+        if warlord == "Kariaq Dreadking":
+            return "Kariaq Dreadking cannot have pledge: " + current_name
         if card_result.get_name() == "Holy Crusade":
             holy_crusade_relevant = True
         if card_result.get_faction() == factions[0]:
@@ -213,6 +217,7 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
         if len(deck[current_index]) > 3:
             current_name = deck[current_index][3:]
             current_amount = deck[current_index][0]
+            card_result = FindCard.find_card(current_name, cards_array, cards_dict)
             try:
                 card_count += int(current_amount)
                 max_copies = 3
@@ -223,12 +228,14 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
                     if has_non_sig_ritual:
                         return "Too many non-signature Ritual cards."
                     has_non_sig_ritual = True
+                if warlord == "Kariaq Dreadking":
+                    if card_result.get_card_type() == "Event":
+                        max_copies = 1
                 if int(current_amount) > max_copies:
                     print("Too many copies")
                     return "Too many copies: " + current_name + " (max " + str(current_amount) + ")"
             except ValueError:
                 return "Number missing"
-            card_result = FindCard.find_card(current_name, cards_array, cards_dict)
             if holy_crusade_relevant:
                 if not card_result.check_for_a_trait("Ecclesiarchy"):
                     return "Non-Ecclesiarchy unit found: " + current_name
@@ -270,6 +277,11 @@ def deck_validation(deck, remaining_signature_squad, factions, warlord=""):
                 if card_result.get_faction() == "Astra Militarum" or card_result.get_faction() == "Space Marines":
                     if card_result.get_card_type() == "Army" and card_result.get_loyalty() == "Common":
                         if card_result.check_for_a_trait("Vehicle"):
+                            faction_check_passed = True
+            elif warlord == "Kariaq Dreadking":
+                if card_result.get_card_type() == "Event":
+                    if card_result.get_faction() not in ["Necrons", "Tyranids"]:
+                        if card_result.get_loyalty() != "Signature":
                             faction_check_passed = True
             if not faction_check_passed:
                 print("Faction check not passed", factions[0], factions[1], card_result.get_faction())
@@ -352,14 +364,15 @@ class DecksConsumer(AsyncWebsocketConsumer):
                     self.warlord = card_object.get_name()
                 if card_loyalty != "Signature" or card_type == "Warlord":
                     if card_object.check_for_a_trait("Pledge"):
-                        message = "Pledge/" + card_object.get_name()
-                        print("New message", message)
-                        if self.main_faction == card_object.get_faction():
-                            print("sending")
-                            await self.send(text_data=json.dumps({"message": message}))
-                        elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
-                            print("sending")
-                            await self.send(text_data=json.dumps({"message": message}))
+                        if self.warlord != "Kariaq Dreadking":
+                            message = "Pledge/" + card_object.get_name()
+                            print("New message", message)
+                            if self.main_faction == card_object.get_faction():
+                                print("sending")
+                                await self.send(text_data=json.dumps({"message": message}))
+                            elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
+                                print("sending")
+                                await self.send(text_data=json.dumps({"message": message}))
                     elif self.main_faction == card_object.get_faction():
                         await self.send(text_data=json.dumps({"message": message}))
                     elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
@@ -385,6 +398,11 @@ class DecksConsumer(AsyncWebsocketConsumer):
                                 if card_object.check_for_a_trait("Vehicle"):
                                     if card_loyalty == "Common":
                                         await self.send(text_data=json.dumps({"message": message}))
+                    elif self.warlord == "Kariaq Dreadking":
+                        if card_object.get_card_type() == "Event":
+                            if card_object.get_faction() not in ["Tyranids", "Necrons"]:
+                                if card_object.get_loyalty() != "Signature":
+                                    await self.send(text_data=json.dumps({"message": message}))
                 if card_type == "Warlord":
                     sig_squad = card_object.signature_squad
                     for i in range(len(sig_squad)):
@@ -455,6 +473,7 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         deck_name = "Name/" + deck_list_content[0]
                         await self.send(text_data=json.dumps({"message": deck_name}))
                         warlord = "Warlord/" + deck_list_content[2]
+                        self.warlord = deck_list_content[2]
                         await self.send(text_data=json.dumps({"message": warlord}))
                         factions = deck_list_content[3]
                         factions = factions.split(sep=" (")

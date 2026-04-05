@@ -202,7 +202,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
     elif current_interrupt == "Blood of Martyrs":
         if game_update_string[1] == primary_player.number:
             if not self.chosen_first_card:
-                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum"):
                     if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                         self.misc_misc = []
                         self.misc_counter = 3
@@ -385,5 +385,6 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 except:
                     pass
                 self.delete_interrupt()
+                primary_player.resolve_played_any_event()
                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                          alt_shields=False, can_no_mercy=False)

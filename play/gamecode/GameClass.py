@@ -589,6 +589,10 @@ class Game:
 
     def get_red_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
+        if self.p1.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            return False
+        if self.p2.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            return False
         if planet_card.get_red():
             return True
         if "red" in self.additional_icons_planets_eop[planet_pos]:
@@ -599,6 +603,10 @@ class Game:
 
     def get_blue_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
+        if self.p1.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            return False
+        if self.p2.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            return False
         if planet_card.get_blue():
             return True
         if "blue" in self.additional_icons_planets_eop[planet_pos]:
@@ -609,6 +617,10 @@ class Game:
 
     def get_green_icon(self, planet_pos):
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
+        if self.p1.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            return False
+        if self.p2.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            return False
         if planet_card.get_green():
             return True
         if "green" in self.additional_icons_planets_eop[planet_pos]:
@@ -994,6 +1006,10 @@ class Game:
                 info_string += "Blanked.\n"
             if self.replaced_planets[i]:
                 info_string += "Original Planet: " + self.original_planet_array[i] + "\n"
+            if self.p1.burgeoning_incubation_target == i:
+                info_string += self.name_1 + ": Burgeoning Incubation Target"
+            if self.p2.burgeoning_incubation_target == i:
+                info_string += self.name_2 + ": Burgeoning Incubation Target"
             if self.additional_icons_planets_eob[i]:
                 info_string += "Additional Icons (EOB)\n"
                 if "blue" in self.additional_icons_planets_eob[i]:
@@ -1196,15 +1212,15 @@ class Game:
                         print("Try to stop smash n bash")
                         if self.chosen_first_card:
                             await self.send_update_message("Stopping Smash 'n Bash early")
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                     elif self.action_chosen == "Seer's Exodus":
                         await self.send_update_message("Stopping Seer's Exodus")
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Rapid Evolution":
                         await self.send_update_message("Stopping Rapid Evolution")
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Despise":
                         await self.send_update_message(
@@ -1217,24 +1233,24 @@ class Game:
                             self.player_with_action = self.name_1
                             self.p2.sacced_card_for_despise = True
                         if self.p1.sacced_card_for_despise and self.p2.sacced_card_for_despise:
-                            primary_player.create_enemy_played_event_reactions()
+                            secondary_player.resolve_played_any_event()
                             self.action_cleanup()
                             await secondary_player.dark_eldar_event_played()
                     elif self.action_chosen == "Preemptive Barrage":
                         await self.send_update_message("Stopping Preemptive Barrage early")
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Rapid Assault":
                         if self.chosen_second_card:
                             await self.send_update_message("Rapid Assault ended early")
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             await primary_player.dark_eldar_event_played()
                             self.action_cleanup()
                     elif self.action_chosen == "Inevitable Betrayal":
                         await self.send_update_message("Finished resolving Inevitable Betrayal")
                         self.p1.reset_all_aiming_reticles_play_hq()
                         self.p2.reset_all_aiming_reticles_play_hq()
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                     elif self.action_chosen == "Cathedral of Saint Camila" or self.action_chosen == "Eldritch Storm":
@@ -1242,7 +1258,7 @@ class Game:
                         self.misc_counter = 0
                         self.action_cleanup()
                     elif self.action_chosen == "Daring Assault" and not self.chosen_first_card:
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Pattern IX Immolator":
                         if not self.chosen_first_card:
@@ -1257,23 +1273,23 @@ class Game:
                             self.player_with_action = secondary_player.name_player
                             await self.send_update_message("Indiscriminate Bombing passed.")
                         else:
-                            primary_player.create_enemy_played_event_reactions()
+                            secondary_player.resolve_played_any_event()
                             self.action_cleanup()
                             await self.send_update_message("Indiscriminate Bombing passed.")
                     elif self.action_chosen == "Biomass Sacrifice":
                         await self.send_update_message("Finished " + self.action_chosen)
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Crown of Control":
                         await self.send_update_message("Finished " + self.action_chosen)
                         self.action_cleanup()
                     elif self.action_chosen == "Piercing Wail":
                         await self.send_update_message("Finished " + self.action_chosen)
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Soot-Blackened Axe":
                         self.action_cleanup()
@@ -1288,7 +1304,7 @@ class Game:
                         secondary_player.add_resources(resources)
                         await self.send_update_message("Gained " + str(resources) + " resources for unrevealed cards.")
                         self.misc_misc = None
-                        primary_player.create_enemy_played_event_reactions()
+                        secondary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Attuned Gyrinx":
                         await self.send_update_message("Stopping Attuned Gyrinx early")
@@ -1301,22 +1317,22 @@ class Game:
                         primary_player.harbinger_of_eternity_active = False
                         primary_player.aiming_reticle_coords_hand = None
                         primary_player.shuffle_deck()
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Whirling Death":
                         await self.send_update_message("Stopping Whirling Death")
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Force Reallocation":
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Boast of Strength":
                         if not self.chosen_first_card:
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                         else:
                             secondary_player.draw_card()
                             secondary_player.add_resources(2)
-                            primary_player.create_enemy_played_event_reactions()
+                            secondary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "The Wolf Within":
                         await self.send_update_message("Stopping The Wolf Within early")
@@ -1502,11 +1518,11 @@ class Game:
                                 actual_card = primary_player.cards_in_reserve[planet_pos][unit_pos]
                                 if actual_card.get_card_type() == "Army":
                                     primary_player.deepstrike_unit(planet_pos, unit_pos)
-                                    secondary_player.create_enemy_played_event_reactions()
+                                    primary_player.resolve_played_any_event()
                                     self.action_cleanup()
                                 elif actual_card.get_card_type() == "Event":
                                     primary_player.deepstrike_event(planet_pos, unit_pos)
-                                    secondary_player.create_enemy_played_event_reactions()
+                                    primary_player.resolve_played_any_event()
                                     self.action_cleanup()
                                 elif actual_card.get_card_type() == "Attachment":
                                     if primary_player.cards_in_reserve[planet_pos][unit_pos].planet_attachment:
@@ -1514,7 +1530,7 @@ class Game:
                                             planet_pos, primary_player.cards_in_reserve[planet_pos][unit_pos])
                                         del primary_player.cards_in_reserve[planet_pos][unit_pos]
                                         primary_player.deepstrike_attachment_extras(planet_pos)
-                                        secondary_player.create_enemy_played_event_reactions()
+                                        primary_player.resolve_played_any_event()
                                         self.action_cleanup()
                                     else:
                                         self.chosen_first_card = True
@@ -1548,7 +1564,7 @@ class Game:
                         del target.cards_in_reserve[planet_pos][unit_pos]
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
             elif len(game_update_string) == 5:
                 if game_update_string[0] == "ATTACHMENT" and game_update_string[1] == "HQ":
@@ -1595,7 +1611,7 @@ class Game:
                                                 self.action_chosen = "Rain of Mycetic Spores"
                                                 self.misc_target_planet = pos_planet
                             elif player_with_attach.attachments_at_planet[pos_planet][
-                                pos_attachment].get_ability() == "Call The Storm":
+                                    pos_attachment].get_ability() == "Call The Storm":
                                 if primary_player.number == game_update_string[2]:
                                     if player_with_attach.attachments_at_planet[pos_planet][
                                         pos_attachment].get_ready():
@@ -1606,6 +1622,13 @@ class Game:
                                             self.action_chosen = "Call The Storm"
                                             self.chosen_first_card = False
                                             self.misc_target_planet = pos_planet
+                            elif player_with_attach.attachments_at_planet[pos_planet][
+                                    pos_attachment].get_ability() == "Planetary Devastation":
+                                if primary_player.number == game_update_string[2]:
+                                    primary_player.cards.append("Planetary Devastation")
+                                    primary_player.summon_token_at_planet("Termagant", pos_planet)
+                                    del player_with_attach.attachments_at_planet[pos_planet][pos_attachment]
+                                    self.action_cleanup()
                     elif self.action_chosen == "Subdual":
                         player_with_attach.deck.insert(
                             0, player_with_attach.attachments_at_planet[pos_planet][pos_attachment].get_name())
@@ -1616,7 +1639,7 @@ class Game:
                             primary_player = self.p2
                         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.aiming_reticle_coords_hand = None
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif self.action_chosen == "Smuggler's Den":
                         if self.player_with_action == self.name_1:
@@ -1820,7 +1843,7 @@ class Game:
                     if self.number_who_is_searching == "1":
                         self.p1.bottom_remaining_cards()
                         if self.action_chosen == "Drop Pod Assault":
-                            self.p2.create_enemy_played_event_reactions()
+                            self.p1.resolve_played_any_event()
                             self.action_cleanup()
                         if self.faction_of_searched_card == "Necrons":
                             if self.reactions_needing_resolving:
@@ -1831,7 +1854,7 @@ class Game:
                     else:
                         self.p2.bottom_remaining_cards()
                         if self.action_chosen == "Drop Pod Assault":
-                            self.p1.create_enemy_played_event_reactions()
+                            self.p2.resolve_played_any_event()
                             self.action_cleanup()
                         if self.faction_of_searched_card == "Necrons":
                             if self.reactions_needing_resolving:
@@ -1906,7 +1929,7 @@ class Game:
                             primary_player.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                                 int(game_update_string[1]), card_chosen)
                             if self.action_chosen == "Drop Pod Assault":
-                                secondary_player.create_enemy_played_event_reactions()
+                                primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                         elif self.what_to_do_with_searched_card == "STORE":
                             self.misc_target_choice = primary_player.deck[int(game_update_string[1])]
@@ -2326,8 +2349,8 @@ class Game:
                                                  (int(primary_player.number), -1, -1))
                     self.delete_reaction()
                 elif self.nullify_context == "Event Action":
-                    secondary_player.create_enemy_played_event_reactions()
-                    primary_player.create_enemy_played_event_reactions()
+                    primary_player.resolve_played_any_event()
+                    secondary_player.resolve_played_any_event()
                     self.action_cleanup()
                 elif self.nullify_context == "In Play Action":
                     self.action_cleanup()
@@ -2393,6 +2416,7 @@ class Game:
         self.retaliate_used = True
         primary_player.return_card_to_hand(planet_pos, unit_pos, return_attachments=True)
         primary_player.draw_card()
+        primary_player.resolve_played_any_event()
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
     async def resolve_i_do_not_serve(self, primary_player, secondary_player):
@@ -2403,6 +2427,7 @@ class Game:
         self.pos_shield_card = -1
         primary_player.remove_damage_from_pos(planet_pos, unit_pos, self.stored_damage[0].get_amount_that_can_be_blocked())
         self.stored_damage[0].set_amount_that_can_be_blocked(0)
+        primary_player.resolve_played_any_event()
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
     async def resolve_indomitable(self, primary_player, secondary_player):
@@ -2413,6 +2438,7 @@ class Game:
         self.pos_shield_card = -1
         primary_player.remove_damage_from_pos(planet_pos, unit_pos, self.stored_damage[0].get_amount_that_can_be_blocked())
         self.stored_damage[0].set_amount_that_can_be_blocked(0)
+        primary_player.resolve_played_any_event()
         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
 
     async def complete_storm_of_silence(self, primary_player, secondary_player):
@@ -2420,6 +2446,7 @@ class Game:
         primary_player.spend_resources(2)
         primary_player.discard_card_name_from_hand("Storm of Silence")
         primary_player.resolve_reactions_on_cancelling_enemy_effect()
+        primary_player.resolve_played_any_event()
         if self.storm_of_silence_friendly_unit:
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
             if not primary_player.get_ready_given_pos(warlord_pla, warlord_pos):
@@ -2460,6 +2487,7 @@ class Game:
             primary_player.spend_resources(1)
         print(self.nullified_card_name)
         print(self.nullify_context)
+        primary_player.resolve_played_any_event()
         primary_player.resolve_reactions_on_cancelling_enemy_effect()
         if self.nullify_context == "Event Action":
             if self.nullified_card_name == "Overrun":
@@ -2470,8 +2498,7 @@ class Game:
             secondary_player.aiming_reticle_coords_hand = None
             secondary_player.aiming_reticle_coords_hand_2 = None
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            primary_player.create_enemy_played_event_reactions()
-            secondary_player.create_enemy_played_event_reactions()
+            secondary_player.resolve_played_any_event()
             self.action_cleanup()
         elif self.nullify_context == "In Play Action":
             secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
@@ -2491,8 +2518,7 @@ class Game:
         elif self.nullify_context == "Reaction Event":
             self.delete_reaction()
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            secondary_player.create_enemy_played_event_reactions()
-            primary_player.create_enemy_played_event_reactions()
+            secondary_player.resolve_played_any_event()
         elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
             await self.resolve_battle_conclusion(secondary_player, game_string="")
 
@@ -2788,7 +2814,9 @@ class Game:
 
     async def quick_battle_ability_resolution(self, name, game_update_string, winner, loser):
         self.reset_choices_available()
-        if self.battle_ability_to_resolve == "Osus IV":
+        if self.battle_ability_to_resolve == "BLANKED":
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Osus IV":
             if loser.spend_resources(1):
                 winner.add_resources(1)
             await self.resolve_battle_conclusion(name, game_update_string)
@@ -3202,7 +3230,7 @@ class Game:
             primary_player.draw_card()
             primary_player.draw_card()
             self.card_pos_to_deploy = -1
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
             await primary_player.dark_eldar_event_played()
         elif effect == "Visions of Agony":
@@ -3216,7 +3244,7 @@ class Game:
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
             else:
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
                 await primary_player.dark_eldar_event_played()
         del self.stored_discard_and_target[0]
@@ -3490,7 +3518,7 @@ class Game:
                 if self.stored_taken_damage[i].get_position_attacker() is not None:
                     if (primary_player.check_for_trait_given_pos(planet, pos, "Warrior") or
                         primary_player.check_for_trait_given_pos(planet, pos, "Soldier")) and \
-                            primary_player.get_faction_given_pos(planet, pos) == "Necrons":
+                            primary_player.check_if_faction_given_pos(planet, pos, "Necrons"):
                         if primary_player.search_card_at_planet(planet, "Ghost Ark of Orikan"):
                             if primary_player.get_cost_given_pos(planet, pos) > 0:
                                 self.create_reaction("Ghost Ark of Orikan", primary_player.name_player,
@@ -4040,7 +4068,7 @@ class Game:
                                  (int(secondary_player.number), att_pla, att_pos))
         if secondary_player.search_hand_for_card("Sneaky Lootin'"):
             if secondary_player.resources > 0:
-                if secondary_player.get_faction_given_pos(att_pla, att_pos) == "Orks":
+                if secondary_player.check_if_faction_given_pos(att_pla, att_pos, "Orks", own_event=True):
                     if secondary_player.check_for_trait_given_pos(att_pla, att_pos, "Soldier"):
                         self.create_reaction("Sneaky Lootin'", secondary_player.name_player,
                                              (int(secondary_player.number), att_pla, att_pos))
@@ -4144,7 +4172,7 @@ class Game:
                         self.create_reaction("Zogwort's Runtherders", primary_player.name_player,
                                              (int(primary_player.number), planet_pos, unit_pos))
                     if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                        if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                        if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
                             primary_player.set_vow_of_honor(planet_pos, unit_pos, True)
                             if primary_player.resources > 0:
                                 if primary_player.search_hand_for_card("Vow of Honor"):
@@ -4182,8 +4210,7 @@ class Game:
                                 if primary_player.cards[hand_pos] == "Indomitable":
                                     if primary_player.resources > 0:
                                         if self.stored_damage[0].get_position_attacker() is not None:
-                                            if primary_player.get_faction_given_pos(
-                                                    planet_pos, unit_pos) == "Space Marines":
+                                            if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
                                                 alt_shield_check = True
                                                 self.choices_available = ["Shield", "Effect"]
                                                 self.name_player_making_choices = name
@@ -4384,7 +4411,7 @@ class Game:
                                                     self.create_reaction("Revered Heavy Flamer",
                                                                          secondary_player.name_player,
                                                                          (int(secondary_player.number), planet_pos, i))
-                                        if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                                        if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Necrons"):
                                             if primary_player.defensive_protocols_active:
                                                 amount_to_remove = \
                                                     self.stored_damage[0].get_amount_that_can_be_blocked() - 1
@@ -4469,8 +4496,7 @@ class Game:
                                             else:
                                                 self.stored_taken_damage.append(self.stored_damage[0])
                                             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                                if primary_player.get_faction_given_pos(planet_pos,
-                                                                                        unit_pos) == "Space Marines":
+                                                if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
                                                     primary_player.set_vow_of_honor(planet_pos, unit_pos, True)
                                                     if primary_player.resources > 0:
                                                         if primary_player.search_hand_for_card("Vow of Honor"):
@@ -4548,7 +4574,7 @@ class Game:
                                         self.misc_target_unit = (planet_pos, last_el)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Extra Boomsticks":
                             if primary_player.headquarters[hq_pos].get_ready():
-                                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                                if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Orks"):
                                     primary_player.exhaust_given_pos(-2, hq_pos)
                                     primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 2)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Talon Strike Force":
@@ -4602,7 +4628,7 @@ class Game:
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif primary_player.headquarters[hq_pos].get_ability() == "Null Shield Matrix":
-                            if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
+                            if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Necrons"):
                                 if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                     if not primary_player.headquarters[hq_pos].misc_ability_used:
                                         primary_player.headquarters[hq_pos].misc_ability_used = True
@@ -4614,7 +4640,7 @@ class Game:
                         elif primary_player.headquarters[hq_pos].get_ability() == "Kustom Field Generator":
                             if primary_player.headquarters[hq_pos].get_ready():
                                 hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
-                                if primary_player.get_faction_given_pos(hurt_planet, hurt_pos) == "Orks":
+                                if primary_player.check_if_faction_given_pos(hurt_planet, hurt_pos, "Orks"):
                                     if self.stored_damage[0].get_position_attacker() is not None:
                                         primary_player.exhaust_given_pos(-2, hq_pos)
                                         damage = self.stored_damage[0].get_amount_that_can_be_blocked()
@@ -4950,6 +4976,16 @@ class Game:
                                         if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
                                             primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                             await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Protective Horrors":
+                            hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
+                            if planet_pos == hurt_planet:
+                                if primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Synapse":
+                                    damage_to_remove = self.stored_damage[0].get_amount_that_can_be_blocked()
+                                    primary_player.assign_damage_to_pos(planet_pos, unit_pos, damage_to_remove)
+                                    self.stored_damage[0].decrease_amount_that_can_be_blocked(damage_to_remove)
+                                    primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_to_remove)
+                                    primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
+                                    await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
                         elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Steel Legion Chimera":
                             if self.stored_damage[0].get_position_attacker():
                                 hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
@@ -5904,14 +5940,14 @@ class Game:
                         player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_attacker()
                         if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
                             if secondary_player.search_hand_for_card("Crushing Blow"):
-                                if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                                if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
                                     self.create_reaction("Crushing Blow", secondary_player.name_player,
                                                          (int(primary_player.number), -1, -1))
                                     primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
                         if not secondary_player.check_if_already_have_reaction("The Fury of Sicarius"):
                             if secondary_player.search_hand_for_card("The Fury of Sicarius"):
                                 if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
-                                    if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines":
+                                    if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
                                         self.create_reaction("The Fury of Sicarius", secondary_player.name_player,
                                                              (int(primary_player.number), def_pla, def_pos))
 
@@ -5936,7 +5972,7 @@ class Game:
                     if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
                         if primary_player.search_hand_for_card("Righteous Reprisal") and \
                                 primary_player.get_resources() > 0:
-                            if primary_player.get_faction_given_pos(def_pla, def_pos) == "Space Marines" and \
+                            if primary_player.check_if_faction_given_pos(def_pla, def_pos, "Space Marines", own_event=True) and \
                                     primary_player.get_ready_given_pos(def_pla, def_pos):
                                 self.create_reaction("Righteous Reprisal", primary_player.name_player,
                                                      (num, def_pla, def_pos))
@@ -5946,7 +5982,7 @@ class Game:
                                                  (def_pla, def_pos))
                 else:
                     if primary_player.get_card_type_given_pos(def_pla, def_pos) != "Warlord":
-                        if secondary_player.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                        if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Orks"):
                             for _ in range(secondary_player.mork_blessings_count):
                                 self.create_delayed_reaction("Blessing of Mork", secondary_player.name_player,
                                                              (int(secondary_player.number), planet_pos, unit_pos))
@@ -6018,7 +6054,7 @@ class Game:
         if self.action_chosen == "Painboy Surjery":
             player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_unit()
             if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
         if dmg_to_add_back > 0:
             player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_unit()
@@ -7535,6 +7571,9 @@ class Game:
                             self.create_reaction("WAAAGH! Ungskar Deepstrike", winner.name_player,
                                                  (int(winner.number), planet_id, -1))
                             reactions_exist = True
+            if planet_id == winner.burgeoning_incubation_target:
+                self.create_reaction("BI: Extra Synapse", winner.name_player, (int(winner.number), planet_id, -1))
+                reactions_exist = True
             if winner.search_card_in_hq("Novokh Dynasty"):
                 for i in range(len(winner.cards_in_reserve[planet_id])):
                     if winner.get_deepstrike_value_given_pos(planet_id, i, in_play_card=False) > 50:
@@ -7643,9 +7682,17 @@ class Game:
                                          (int(player_doing_infesting.number), planet_pos, unit_pos),
                                          additional_info=planet)
 
+    def get_planet_ability_given_pos(self, planet_pos):
+        ability = self.planet_array[planet_pos]
+        if self.p1.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            ability = "BLANKED"
+        elif self.p2.search_planet_attachments(planet_pos, "Planetary Devastation"):
+            ability = "BLANKED"
+        return ability
+
     async def resolve_winning_combat(self, winner, loser):
         self.name_player_who_won_combat = winner.name_player
-        planet_name = self.planet_array[self.last_planet_checked_for_battle]
+        planet_name = self.get_planet_ability_given_pos(self.last_planet_checked_for_battle)
         reactions_lose = self.check_reactions_from_losing_combat(winner, loser, self.last_planet_checked_for_battle)
         if self.infested_planets[self.last_planet_checked_for_battle] and \
                 self.last_planet_checked_for_battle != self.round_number and not self.already_asked_remove_infestation \
@@ -7679,8 +7726,9 @@ class Game:
                     self.sacaellums_finest_active = False
                 self.choice_context = "Resolve Battle Ability?"
                 self.name_player_making_choices = winner.name_player
-                await self.send_update_message(winner.name_player + " has the right to use"
-                                                                    " the battle ability of " + planet_name)
+                await self.send_update_message(
+                    winner.name_player + " has the right to use the battle ability of " + planet_name
+                )
                 if not self.need_to_resolve_battle_ability:
                     if self.round_number == self.last_planet_checked_for_battle:
                         winner.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
@@ -7750,10 +7798,10 @@ class Game:
     def take_control_of_card(self, primary_player, secondary_player, planet_pos, unit_pos):
         if planet_pos == -2:
             primary_player.headquarters.append(secondary_player.headquarters[unit_pos])
-            secondary_player.remove_card_from_hq(unit_pos)
+            secondary_player.remove_card_from_hq(unit_pos, proper_remove=False)
             return None
         primary_player.cards_in_play[planet_pos + 1].append(secondary_player.cards_in_play[planet_pos + 1][unit_pos])
-        secondary_player.remove_card_from_play(planet_pos, unit_pos)
+        secondary_player.remove_card_from_play(planet_pos, unit_pos, proper_remove=False)
         return None
 
     async def reset_values_for_new_round(self):
@@ -7840,6 +7888,8 @@ class Game:
         self.p1.our_last_stand_bonus_active = False
         self.p2.our_last_stand_bonus_active = False
         self.mode = "Normal"
+        self.p1.rounds_end_triggers_resolution()
+        self.p2.rounds_end_triggers_resolution()
         self.p1.round_ends_reset_values()
         self.p2.round_ends_reset_values()
         self.p1.committed_warlord = False

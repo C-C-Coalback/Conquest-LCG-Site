@@ -102,6 +102,8 @@ class Card:
         self.used_techmarine_ids = []
         self.card_moved_recently = False
         self.cannot_remove_damage_eor = False
+        self.remove_end_of_round = False
+        self.incubated_synapse = False
 
     def spend_faith(self, faith):
         return False

@@ -62,10 +62,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Theater of War":
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
         self.need_to_resolve_battle_ability = True
-        self.battle_ability_to_resolve = self.planet_array[chosen_planet]
+        self.battle_ability_to_resolve = self.get_planet_ability_given_pos(chosen_planet)
         self.player_resolving_battle_ability = primary_player.name_player
         self.number_resolving_battle_ability = str(primary_player.number)
         self.choices_available = ["Yes", "No"]
@@ -95,7 +95,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.imperial_blockades_active[chosen_planet] = self.imperial_blockades_active[chosen_planet] + 1
         planet_name = self.get_planet_name(chosen_planet)
         await self.send_update_message(planet_name + " targeted for Imperial Blockade.")
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Saim-Hann Jetbike":
         if not self.chosen_first_card:
@@ -190,7 +190,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.aiming_reticle_color = None
             primary_player.aiming_reticle_coords_hand = None
             self.card_pos_to_deploy = -1
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -209,7 +209,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if adj_1_infested or adj_2_infested:
             self.infest_planet(chosen_planet, primary_player)
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
             primary_player.aiming_reticle_coords_hand = None
         else:
@@ -283,7 +283,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                             if unit_pos_2 > unit_pos:
                                 unit_pos_2 -= 1
                                 self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.action_chosen == "Wildrider Squadron":
         if abs(chosen_planet - self.position_of_actioned_card[0]) == 1:
@@ -321,16 +321,16 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                               "Planet is not infested.")
     elif self.action_chosen == "Vivisection":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            if primary_player.get_faction_given_pos(chosen_planet, i) == "Necrons":
+            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True):
                 if primary_player.get_damage_given_pos(chosen_planet, i) > 0:
                     primary_player.remove_damage_from_pos(chosen_planet, i, 1, healing=True)
             else:
                 primary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            if secondary_player.get_faction_given_pos(chosen_planet, i) != "Necrons":
+            if secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons"):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Sacrificial Altar":
         if chosen_planet != self.round_number:
@@ -395,7 +395,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.add_card_to_planet(card, chosen_planet)
                 del primary_player.discard[primary_player.aiming_reticle_coords_discard]
                 primary_player.aiming_reticle_coords_discard = None
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -424,20 +424,20 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                               "Kaerux Erameas cannot target the first planet.")
     elif self.action_chosen == "Bond of Brotherhood":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Tau"):
+            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Tau", own_event=True):
                 primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eop += 2
             if primary_player.check_if_faction_given_pos(chosen_planet, i, "Astra Militarum"):
                 primary_player.cards_in_play[chosen_planet + 1][i].extra_attack_until_end_of_phase += 2
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Mechanical Enhancement":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            if primary_player.get_faction_given_pos(chosen_planet, i) == "Necrons":
+            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True):
                 primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eop += 2
         if not primary_player.harbinger_of_eternity_active:
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Ravenwing Escort":
         if self.chosen_first_card:
@@ -453,7 +453,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             if chosen_planet != planet_pos:
                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_chosen == "Crypt of Saint Camila":
         if self.chosen_first_card:
@@ -478,7 +478,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.misc_target_planet = chosen_planet
                 await self.send_update_message("Rapid Assault can ready units at the planet")
             else:
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_chosen == "Killing Field":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
@@ -488,11 +488,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.action_cleanup()
     elif self.action_chosen == "Extermination":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            if primary_player.get_faction_given_pos(chosen_planet, i) != "Necrons" and \
+            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True) and \
                     not primary_player.cards_in_play[chosen_planet + 1][i].get_unique():
                 primary_player.cards_in_play[chosen_planet + 1][i].negative_hp_until_eop += 3
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            if secondary_player.get_faction_given_pos(chosen_planet, i) != "Necrons" and \
+            if secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons") and \
                     not secondary_player.cards_in_play[chosen_planet + 1][i].get_unique() and \
                     not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                 secondary_player.cards_in_play[chosen_planet + 1][i].negative_hp_until_eop += 3
@@ -500,7 +500,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
         primary_player.has_passed = True
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Troop Transport":
         primary_player.summon_token_at_planet("Guardsman", chosen_planet)
@@ -548,12 +548,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Empower":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
-                if primary_player.get_faction_given_pos(chosen_planet, i) == "Eldar":
+                if primary_player.check_if_faction_given_pos(chosen_planet, i, "Eldar", own_event=True):
                     primary_player.cards_in_play[chosen_planet + 1][i].increase_extra_attack_until_end_of_battle(1)
                     primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eob += 1
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Nesting Chamber":
         if not self.infested_planets[chosen_planet]:
@@ -709,7 +709,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             if primary_player.optimized_protocol_check():
                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                      (int(primary_player.get_number()), chosen_planet, -1))
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.action_chosen == "Steed of Slaanesh":
         if not secondary_player.check_for_warlord(chosen_planet):
@@ -730,7 +730,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
                         if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
                             secondary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
         else:
             await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
@@ -762,7 +762,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     for i in range(len(secondary_player.cards_in_play[chosen_planet + 2])):
                         if not secondary_player.get_immune_to_enemy_events(chosen_planet + 1, i, power=True):
                             secondary_player.assign_damage_to_pos(chosen_planet + 1, i, 1, by_enemy_unit=False)
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
             else:
                 await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
@@ -772,7 +772,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             dest_planet = chosen_planet
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, dest_planet)
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.action_chosen == "Mycetic Spores":
         if self.chosen_first_card:
@@ -857,7 +857,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 self.original_planet_array[self.misc_target_planet] = temp
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_chosen == "Ecstatic Seizures":
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
@@ -868,7 +868,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 secondary_player.discard_attachments_from_card(chosen_planet, i)
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Spore Burst":
         if self.infested_planets[chosen_planet]:
@@ -878,7 +878,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.add_card_to_planet(card, chosen_planet)
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -908,7 +908,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             secondary_player.aiming_reticle_coords_discard = None
             await primary_player.dark_eldar_event_played()
             primary_player.torture_event_played("Soul Seizure")
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.action_chosen == "Rain of Mycetic Spores":
         if abs(self.misc_target_planet - chosen_planet) == 1:
@@ -946,7 +946,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.player_resolving_nurgling_bomb = secondary_player.name_player
         else:
             self.resolving_nurgling_bomb = False
-        secondary_player.create_enemy_played_event_reactions()
+        primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_chosen == "Behind Enemy Lines":
         if self.chosen_first_card:
@@ -994,7 +994,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     self.position_of_actioned_card = (-1, -1)
                     await self.send_update_message(str(self.misc_counter) + " uses left of Know No Fear")
                 else:
-                    secondary_player.create_enemy_played_event_reactions()
+                    primary_player.resolve_played_any_event()
                     self.action_cleanup()
                     self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
     elif self.action_chosen == "Gift of Isha":
@@ -1011,7 +1011,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     primary_player.aiming_reticle_color = None
                     primary_player.aiming_reticle_coords_hand = None
                     self.card_pos_to_deploy = -1
-                    secondary_player.create_enemy_played_event_reactions()
+                    primary_player.resolve_played_any_event()
                     self.action_cleanup()
                 i = -1
             i = i - 1
@@ -1059,5 +1059,5 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             primary_player.aiming_reticle_color = None
             primary_player.aiming_reticle_coords_hand = None
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()

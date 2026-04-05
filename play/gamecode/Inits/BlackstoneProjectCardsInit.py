@@ -689,6 +689,67 @@ def blackstone_project_cards_init():
         CardClasses.AttachmentCard("Extra Munitions", "Attach to an army unit with a printed Area Effect keyword.\n"
                                                       "Attached unit gains Area Effect (1).", "Wargear. Weapon.",
                                    1, "Neutral", "Common", 1, False,
-                                   type_of_units_allowed_for_attachment="Army")
+                                   type_of_units_allowed_for_attachment="Army"),
+        CardClasses.WarlordCard("Subject W-808",
+                                "Reaction: After the deploy phase begins, pay 1 resource to put into "
+                                "play a synapse unit from the card collection at a non-first planet."
+                                " Remove that card from the game at the end of the round. "
+                                "(Limit once per synapse)", "Creature. Dagon.", "Tyranids", 2, 6, 2, 5,
+                                "Bloodied.\n"
+                                "Forced Reaction: After the deploy phase begins, pay 1 resource to put into"
+                                " play a synapse unit from the card collection at a non-first planet. Remove that card "
+                                "from the game at the end of the round. (Limit once per game)", 6, 6,
+                                ["1x Planetary Devastation", "2x The Shadow in the Warp",
+                                 "4x Protective Horrors", "1x Burgeoning Incubation"]),
+        CardClasses.SupportCard("Burgeoning Incubation",
+                                "Reaction: After the deploy phase begins, sacrifice this supports"
+                                "to target a planet. If you win a battle at that planet this "
+                                "round, put a synapse into play from the card collection at your HQ.",
+                                "Location.", 1, "Tyranids", "Signature", False),
+        CardClasses.ArmyCard("Protective Horrors",
+                             "While at a planet with a unique unit, this unit gets Sweep (1).\n"
+                             "Reaction: After a synapse unit at this planet is assigned damage, reassign "
+                             "all of that damage to this unit instead.", "Creature.",
+                             2, "Tyranids", "Signature", 1, 3, 1, False),
+        CardClasses.EventCard("The Shadow in the Warp",
+                              "Limited.\n"
+                              "Action: Until the end of the round, gain 1 resource each time you play an event and "
+                              "your opponent must pay 1 resource each time they play an event.", "Power.",
+                              0, "Tyranids", "Signature", 1, False, limited=True,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Planetary Devastation",
+                                   "Limited.\n"
+                                   "Attach to a planet.\n"
+                                   "Attached planet loses its textbox, type (color) and its bonuses are set to 0.\n"
+                                   "Action: Return this attachment to your hand to put a Termagant token into play "
+                                   "at this planet.", "Disaster.", 0, "Tyranids", "Signature", 3, False, limited=True,
+                                   planet_attachment=True, action_in_play=True, allowed_phases_in_play="ALL"),
+        CardClasses.WarlordCard("Kariaq Dreadking",
+                                "You can include common and loyal events from any faction on the Alignment wheel but "
+                                "can only have one copy of any event. Your units are considered to be of the faction "
+                                "of an event while you play it.\n"
+                                "Reaction: After you play an event, draw a card. (Limit once per round)",
+                                "Warrior. Archon.", "Dark Eldar", 2, 6, 2, 6,
+                                "Bloodied.\n"
+                                "Reaction: After you play an event, draw a card. (Limit once per round)", 7, 7,
+                                ["1x The Silent Eye", "2x Webway Schemes",
+                                 "4x Kariaq's Inner Circle", "1x Grand Schemes"]),
+        CardClasses.ArmyCard("Kariaq's Inner Circle",
+                             "While at the first planet, this unit gets +1 ATK and +1 HP.\n"
+                             "Reaction: After you deploy this unit at the last planet, gain 1 resource.",
+                             "Warrior.", 2, "Dark Eldar", "Signature", 2, 2, 1, False),
+        CardClasses.EventCard("Webway Schemes",
+                              "Deep Strike (0).\n"
+                              "Reaction: After you Deep Strike this event, place a Khymera token into play at this "
+                              "planet. Then you may switch location between that token and your warlord.",
+                              "Tactic.", -1, "Dark Eldar", "Signature", 1, False, deepstrike=0),
+        CardClasses.AttachmentCard("The Silent Eye",
+                                   "Attach to a planet.\n"
+                                   "Reaction: After the combat phase begins, return this attachment to your hand, "
+                                   "if there is an enemy warlord at this planet, draw a card.",
+                                   "Patrol. Vehicle.", 0, "Dark Eldar", "Signature", 3, False, planet_attachment=True),
+        CardClasses.SupportCard("Grand Schemes",
+                                "This support is considered to be The Broken Sigil and The Flayed Mask.",
+                                "Pledge.", 1, "Dark Eldar", "Signature", False)
     ]
     return blackstone_project_cards

@@ -677,7 +677,7 @@ def try_entire_command(self, planet_pos):
                     auto_interrupts = True
             tau_present = False
             for i in range(len(self.p2.cards_in_play[planet_pos + 1])):
-                if self.p2.get_faction_given_pos(planet_pos, i) == "Tau":
+                if self.p2.check_if_faction_given_pos(planet_pos, i, "Tau"):
                     tau_present = True
             if tau_present:
                 if self.p2.search_for_card_everywhere("Arrangement at Elova IV"):
@@ -711,7 +711,7 @@ def try_entire_command(self, planet_pos):
                     auto_interrupts = True
             tau_present = False
             for i in range(len(self.p1.cards_in_play[planet_pos + 1])):
-                if self.p1.get_faction_given_pos(planet_pos, i) == "Tau":
+                if self.p1.check_if_faction_given_pos(planet_pos, i, "Tau"):
                     tau_present = True
             if tau_present:
                 if self.p1.search_for_card_everywhere("Arrangement at Elova IV"):
@@ -765,9 +765,13 @@ def resolve_winnings(self, winner, loser, planet_id):
     extra_resources, extra_cards = winner.get_bonus_winnings_at_planet(planet_id)
     resources_won += extra_resources
     cards_won += extra_cards
-    if self.canceled_resource_bonuses[planet_id] or not winner.automated_command_rewards:
+    if self.canceled_resource_bonuses[planet_id] or not winner.automated_command_rewards or \
+        self.p1.search_planet_attachments(planet_id, "Planetary Devastation") or \
+            self.p2.search_planet_attachments(planet_id, "Planetary Devastation"):
         resources_won = 0
-    if self.canceled_card_bonuses[planet_id] or not winner.automated_command_rewards:
+    if self.canceled_card_bonuses[planet_id] or not winner.automated_command_rewards or \
+        self.p1.search_planet_attachments(planet_id, "Planetary Devastation") or \
+            self.p2.search_planet_attachments(planet_id, "Planetary Devastation"):
         cards_won = 0
     ret_val = [winner.number, resources_won, cards_won]
     already_noxious = False

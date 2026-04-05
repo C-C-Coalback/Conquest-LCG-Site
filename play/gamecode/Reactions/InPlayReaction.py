@@ -211,7 +211,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Da Swoopy":
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Orks":
+                if player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Orks"):
                     if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
                         player_owning_card.cards_in_play[planet_pos + 1][unit_pos].flying_eocr = True
                         await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
@@ -528,7 +528,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Vengeance!":
             if planet_pos == og_pla:
                 if primary_player.number == game_update_string[1]:
-                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Space Marines" \
+                    if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True) \
                             and primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
                         possible_interrupts = []
@@ -562,7 +562,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           current_reaction + " can only target Space Marines army units.")
         elif current_reaction == "Commander Starblaze":
             if game_update_string[1] == primary_player.number:
-                if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum"):
                     war_num, war_pla, war_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     if abs(war_pla - planet_pos) == 1:
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, war_pla)

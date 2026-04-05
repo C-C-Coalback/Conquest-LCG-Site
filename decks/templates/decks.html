@@ -233,6 +233,10 @@
         return str.substr(0, count.index) + (++count[0]);
     };
 
+    function determineWarlordName() {
+        return document.getElementById("warlord-card").children[0].id.split('_').join(' ');
+    }
+
     setInitialDeck()
     decksSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
@@ -435,13 +439,19 @@
                 var e = document.getElementById(countName);
                 if (typeof(e) != 'undefined' && e != null) {
                     var str = e.innerHTML;
-                    if (str[2] !== "3") {
+                    var max_copies = "3";
+                    var warlord_name = determineWarlordName();
+                    if (warlord_name === "Kariaq Dreadking") {
+                        max_copies = "1";
+                    }
+                    if (str[2] !== max_copies) {
                         str = incrementString(str);
                         e.innerHTML = str;
                         cardCount = cardCount + 1;
                         updateCardCount();
                     }
                 } else {
+                    var warlord_name = determineWarlordName();
                     var newPart = `<div class="card-name-and-count" id=`;
                     newPart += holderName;
                     newPart += `><div id=`;
@@ -450,9 +460,13 @@
                     newPart += cardName;
                     newPart += `</div><div id=`;
                     newPart += idName + "-Count";
-                    newPart += ` class="no-break"> x1</div><input id=`;
-                    newPart += idName + "-Increase";
-                    newPart += ` type="button" value="+" onclick="incrementCount(this.id);"><input id=`;
+                    newPart += ` class="no-break"> x1</div>`
+                    if (warlord_name !== "Kariaq Dreadking") {
+                        newPart += `<input id=`;
+                        newPart += idName + "-Increase";
+                        newPart += ` type="button" value="+" onclick="incrementCount(this.id);">`
+                    }
+                    newPart += `<input id=`;
                     newPart += idName + "-Decrease";
                     newPart += ` type="button" value="-" onclick="decreaseCount(this.id);">`
                     newPart += `</div>`

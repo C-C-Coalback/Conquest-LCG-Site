@@ -902,7 +902,7 @@ async def manual_craftworld_lugath_ability(self, name, game_update_string, prima
         if game_update_string[0] == "PLANETS":
             if self.misc_target_choice == "Copy Adjacent":
                 if abs(self.last_planet_checked_for_battle - int(game_update_string[1])):
-                    self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+                    self.battle_ability_to_resolve = self.get_planet_ability_given_pos(int(game_update_string[1]))
                     self.choices_available = ["Yes", "No"]
                     self.choice_context = "Resolve Battle Ability?"
                     self.name_player_making_choices = name
@@ -919,7 +919,7 @@ async def manual_baneful_veil_ability(self, name, game_update_string, primary_pl
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
             if abs(self.last_planet_checked_for_battle - int(game_update_string[1])) == 1:
-                self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+                self.battle_ability_to_resolve = self.get_planet_ability_given_pos(int(game_update_string[1]))
                 self.choices_available = ["Yes", "No"]
                 self.choice_context = "Resolve Battle Ability?"
                 self.name_player_making_choices = name
@@ -1304,7 +1304,7 @@ async def manual_hissan_xi_ability(self, name, game_update_string, primary_playe
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
             self.player_resolving_battle_ability = secondary_player.name_player
-            self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+            self.battle_ability_to_resolve = self.get_planet_ability_given_pos(int(game_update_string[1]))
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Resolve Battle Ability?"
             self.name_player_making_choices = secondary_player.name_player
@@ -1313,7 +1313,7 @@ async def manual_hissan_xi_ability(self, name, game_update_string, primary_playe
 async def manual_carnath_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
-            self.battle_ability_to_resolve = self.planet_array[int(game_update_string[1])]
+            self.battle_ability_to_resolve = self.get_planet_ability_given_pos(int(game_update_string[1]))
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Resolve Battle Ability?"
             self.name_player_making_choices = name

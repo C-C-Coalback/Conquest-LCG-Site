@@ -28,6 +28,7 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
                     secondary_player.discard_card_from_hand(self.pos_shield_card)
                 except:
                     pass
+                primary_player.resolve_played_any_event()
                 self.delete_interrupt()
                 await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
                                                          alt_shields=False, can_no_mercy=False)

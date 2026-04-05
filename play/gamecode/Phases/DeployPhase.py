@@ -557,7 +557,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.action_cleanup()
     if self.action_chosen == "Triumvirate of Ynnead":
         if self.trium_count > 1:
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.action_chosen == "Behind Enemy Lines":
         self.chosen_second_card = True

@@ -91,7 +91,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if self.planets_in_play_array[i]:
                                 primary_player.summon_token_at_planet("Termagant", i)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Test of Faith":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
@@ -175,7 +175,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if len(secondary_player.cards) < 6:
                                 primary_player.torture_event_played(ability)
                                 await primary_player.dark_eldar_event_played()
-                                secondary_player.create_enemy_played_event_reactions()
+                                primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                             else:
                                 self.player_with_action = secondary_player.name_player
@@ -189,7 +189,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.choices_available.append(primary_player.deck[i])
                         if not self.choices_available or len(self.choices_available) == 1:
                             self.reset_choices_available()
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
                             self.create_choices(
@@ -228,7 +228,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 if primary_player.get_mobile_given_pos(warlord_pla, i):
                                     primary_player.cards_in_play[warlord_pla + 1][i].flying_eocr = True
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Muster the Guard":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
@@ -236,7 +236,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
                             primary_player.muster_the_guard_count += 1
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -263,7 +263,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 primary_player.looted_skrap_count = 3
                                 primary_player.looted_skrap_planet = self.last_planet_checked_for_battle
                                 primary_player.discard_card_from_hand(hand_pos)
-                                secondary_player.create_enemy_played_event_reactions()
+                                primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                     elif ability == "The Bloodied Host":
                         if not primary_player.bloodied_host_used and self.last_planet_checked_for_battle != -1:
@@ -275,7 +275,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             for i in range(7):
                                 for j in range(len(primary_player.cards_in_play[i + 1])):
                                     primary_player.cards_in_play[i + 1][j].health_eocr += 2
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
                             primary_player.add_resources(1, refund=True)
@@ -317,7 +317,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.choices_available = []
                             copies_khorne = primary_player.count_units_with_trait("Khorne")
                             if copies_khorne < 1:
-                                secondary_player.create_enemy_played_event_reactions()
+                                primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                             else:
                                 for i in range(copies_khorne):
@@ -344,7 +344,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.our_last_stand_used = True
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             for i in range(len(primary_player.cards_in_play[self.round_number + 1])):
-                                if primary_player.get_faction_given_pos(self.round_number, i) == "Astra Militarum":
+                                if primary_player.check_if_faction_given_pos(self.round_number, i, "Astra Militarum", own_event=True):
                                     primary_player.increase_faith_given_pos(self.round_number, i, 1)
                             icons = secondary_player.get_icons_on_captured()
                             if icons[0] > 1:
@@ -359,7 +359,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if primary_player.our_last_stand_bonus_active:
                                 await self.send_update_message("Warlord has gained the additional damage reduction "
                                                                "bonus from Our Last Stand.")
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -373,6 +373,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Warlord is in the HQ.")
+                    elif ability == "The Shadow in the Warp":
+                        if primary_player.can_play_limited:
+                            primary_player.can_play_limited = False
+                            primary_player.shadow_in_the_warp_count += 1
+                            primary_player.discard_card_from_hand(hand_pos)
+                            self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
+                                                              "Already played a Limited card.")
                     elif ability == "Eldritch Storm":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
@@ -429,7 +438,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         else:
                             primary_player.add_resources(cost, refund=True)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Behind Enemy Lines":
                         primary_player.discard_card_from_hand(hand_pos)
@@ -478,7 +487,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.cards_in_search_box = primary_player.deck[:len(primary_player.deck)]
                         self.name_player_who_is_searching = primary_player.name_player
                         self.number_who_is_searching = primary_player.number
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "A Thousand Cuts":
                         self.action_chosen = ability
@@ -553,7 +562,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     if secondary_player.cards_in_play[i + 1][j].get_is_unit():
                                         if not secondary_player.get_immune_to_enemy_events(i, j):
                                             secondary_player.assign_damage_to_pos(i, j, 1, by_enemy_unit=False)
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -562,7 +571,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
                                                                             expiration="EOB")
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Power from Pain":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
@@ -644,7 +653,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
                             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                             self.location_of_indirect = "ALL"
                             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
@@ -683,10 +692,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 if self.planet_array[warlord_planet] != "Jaricho":
                                     primary_player.discard_card_from_hand(int(game_update_string[2]))
                                     primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
-                                    secondary_player.create_enemy_played_event_reactions()
+                                    primary_player.resolve_played_any_event()
                                     self.action_cleanup()
                                     self.need_to_resolve_battle_ability = True
-                                    self.battle_ability_to_resolve = self.planet_array[warlord_planet]
+                                    self.battle_ability_to_resolve = self.get_planet_ability_given_pos(warlord_planet)
                                     self.player_resolving_battle_ability = primary_player.name_player
                                     self.number_resolving_battle_ability = str(primary_player.number)
                                     self.choices_available = ["Yes", "No"]
@@ -753,7 +762,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Dark Possession":
                         primary_player.dark_possession_active = True
                         primary_player.discard_card_from_hand(hand_pos)
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played()
@@ -764,7 +773,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         if self.last_planet_checked_for_battle != -1:
                             primary_player.discard_card_from_hand(hand_pos)
                             primary_player.mork_blessings_count += 1
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -845,7 +854,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                                 j = j - 1
                                     j = j + 1
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Accelerated Gestation":
                         self.action_chosen = ability
@@ -880,7 +889,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     for j in range(len(primary_player.cards_in_play[i + 1])):
                                         if primary_player.cards_in_play[i + 1][j].get_attachments():
                                             primary_player.ready_given_pos(i, j)
-                                secondary_player.create_enemy_played_event_reactions()
+                                primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                             else:
                                 await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -965,6 +974,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.traits_of_searched_card = None
                             self.card_type_of_searched_card = "Army"
                             self.faction_of_searched_card = "Space Marines"
+                            if primary_player.search_for_card_everywhere("Kariaq Dreadking", bloodied_relevant=True):
+                                self.faction_of_searched_card = None
                             self.max_cost_of_searched_card = 3
                             self.all_conditions_searched_card_required = True
                             self.no_restrictions_on_chosen_card = False
@@ -1035,14 +1046,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                             i = i - 1
                                 i += 1
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Doom":
                         print("Resolve Doom")
                         primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=False)
                         secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=True)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Warp Rift":
                         self.action_chosen = ability
@@ -1134,7 +1145,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.resolving_search_box = True
                             for i in range(len(primary_player.victory_display)):
                                 self.choices_available.append(primary_player.victory_display[i].get_name())
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Reinforced Synaptic Network":
                         primary_player.discard_card_from_hand(hand_pos)
@@ -1146,7 +1157,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choice_context = "Select new synapse (RSN):"
                         self.name_player_making_choices = primary_player.name_player
                         self.resolving_search_box = True
-                        secondary_player.create_enemy_played_event_reactions()
+                        primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Visions of Agony":
                         if secondary_player.cards:
@@ -1231,12 +1242,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 else:
                     await primary_player.dark_eldar_event_played()
                     primary_player.torture_event_played(self.action_chosen)
-                    secondary_player.create_enemy_played_event_reactions()
+                    primary_player.resolve_played_any_event()
                     self.action_cleanup()
             else:
                 await secondary_player.dark_eldar_event_played()
                 secondary_player.torture_event_played(self.action_chosen)
-                primary_player.create_enemy_played_event_reactions()
+                secondary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_chosen == "Rapid Evolution":
         if card.get_card_type() == "Army":
@@ -1365,7 +1376,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         if self.misc_target_choice != card.get_name():
                             primary_player.add_card_to_planet(card, self.misc_target_planet)
                             primary_player.remove_card_from_hand(int(game_update_string[2]))
-                            secondary_player.create_enemy_played_event_reactions()
+                            primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1473,7 +1484,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.remove_card_from_hand(hand_pos)
                     last_el_index = len(primary_player.headquarters) - 1
                     primary_player.headquarters[last_el_index].quick_construct = True
-                    secondary_player.create_enemy_played_event_reactions()
+                    primary_player.resolve_played_any_event()
                     self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1516,7 +1527,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.aiming_reticle_coords_hand -= 1
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1556,7 +1567,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             if card.get_cost() <= self.misc_counter:
                 primary_player.add_to_hq(card)
                 primary_player.remove_card_from_hand(int(game_update_string[2]))
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1570,7 +1581,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         if self.misc_counter > 0:
             await self.send_update_message(str(self.misc_counter) + " cards left to discard")
         else:
-            secondary_player.create_enemy_played_event_reactions()
+            primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.action_chosen == "Recycle":
         if primary_player.aiming_reticle_coords_hand != int(game_update_string[2]):
@@ -1585,7 +1596,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.aiming_reticle_coords_hand = None
                 for _ in range(3):
                     primary_player.draw_card()
-                secondary_player.create_enemy_played_event_reactions()
+                primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_chosen == "Infernal Gateway":
         if self.player_with_action == self.name_1:
