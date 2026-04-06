@@ -799,7 +799,13 @@
                             card_name = card_name.split(' ').join('_');
                             var is_ready = card_data_split[1];
                             var damage = card_data_split[2];
+                            if (parseInt(damage) > 9) {
+                                damage = "9+";
+                            }
                             var faith = card_data_split[3];
+                            if (parseInt(faith) > 6) {
+                                faith = "6+";
+                            }
                             var hale = card_data_split[4];
                             var additional_helper_text = card_data_split[5];
                             var deepstrike = "False";
@@ -910,7 +916,13 @@
                         card_name = card_name.split(' ').join('_');
                         var is_ready = card_data_split[1];
                         var damage = card_data_split[2];
+                        if (parseInt(damage) > 9) {
+                            damage = "9+";
+                        }
                         var faith = card_data_split[3];
+                        if (parseInt(faith) > 6) {
+                            faith = "6+";
+                        }
                         var hale = card_data_split[4];
                         var additional_helper_text = card_data_split[5];
                         var string_id = (i-4).toString();

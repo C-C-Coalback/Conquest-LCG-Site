@@ -515,6 +515,10 @@ class UnitCard(Card):
 
     def get_extra_info_string(self):
         string = ""
+        if self.get_damage() > 9:
+            string += "Damage: " + str(self.get_damage()) + "\n"
+        if self.get_faith() > 6:
+            string += "Faith: " + str(self.get_faith()) + "\n"
         if self.get_ability() == "Techmarine Aspirant" or self.get_ability() == "Salamander Flamer Squad" \
                 or self.get_ability() == "Storming Librarian":
             string += "Card ID: " + str(self.card_id) + "\n"
