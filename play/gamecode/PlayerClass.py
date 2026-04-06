@@ -2277,6 +2277,9 @@ class Player:
             if relic_check_allowed:
                 if self.search_for_existing_relic():
                     return False
+        if card.get_unique():
+            if self.search_for_unique_card(card.get_name()):
+                return False
         if army_unit_as_attachment:
             if type_of_card != "Army":
                 print("Army units as attachments can only be attached to other army units")
