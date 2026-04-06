@@ -1983,6 +1983,9 @@ class Player:
         if card_object.get_unique():
             if self.search_for_unique_card(card_object.name):
                 return False
+        if card_object.check_for_a_trait("Relic"):
+            if self.search_for_existing_relic():
+                return False
         self.headquarters.append(copy.deepcopy(card_object))
         position = -2
         last_element_index = len(self.headquarters) - 1
