@@ -6371,7 +6371,7 @@ class Game:
         return nurg_count
 
     async def resolution_of_kugath_nurglings(self, name, game_update_string):
-        if self.p1.has_initiative:
+        if self.player_with_initiative == self.name_1:
             primary_player = self.p1
             secondary_player = self.p2
         else:
