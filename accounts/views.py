@@ -42,7 +42,15 @@ def change_settings(request):
                 background = "Imperial Aquila"
             print(cardback)
             print(background)
-            full_string = zoom + "\n" + cardback + "\n" + background + "\n"
+            with open(settings_file, "r") as f:
+                contents = f.read()
+                content_split = contents.split(sep="\n")
+                while len(content_split) < 7:
+                    content_split.append("-1")
+                content_split[0] = zoom
+                content_split[1] = cardback
+                content_split[2] = background
+                full_string = "\n".join(content_split)
             with open(settings_file, "w") as f:
                 f.write(full_string)
     return redirect("/settings/")

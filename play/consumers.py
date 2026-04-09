@@ -483,6 +483,21 @@ class GameConsumer(AsyncWebsocketConsumer):
         if room_already_exists:
             await active_games[game_id_if_exists].joined_requests_graphics(self.name)
             await self.receive_game_update(self.name + " joined the lobby")
+            if self.name != "Anonymous":
+                pref_path = "user_preferences_storage/" + self.name + ".txt"
+                if os.path.exists(pref_path):
+                    with open(pref_path, "r") as f:
+                        contents = f.read()
+                        content_split = contents.split(sep="\n")
+                        if len(content_split) > 6:
+                            choices_box_h = content_split[3]
+                            choices_box_v = content_split[4]
+                            info_box_h = content_split[5]
+                            info_box_v = content_split[6]
+                            await self.receive_game_update(
+                                "GAME_INFO/SET_BOX_LOCATIONS/" + self.name + "/" + choices_box_h + "/" + choices_box_v + "/" +
+                                info_box_h + "/" + info_box_v
+                            )
         condition_games.notify_all()
         condition_games.release()
 
@@ -538,7 +553,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     await self.receive_game_update(
                         "An error has occurred on the server side. Your game may become unstable or unplayable."
                     )
-        if message[0] == "CHAT_MESSAGE" and len(message) > 1:
+        elif message[0] == "CHAT_MESSAGE" and len(message) > 1:
             del message[0]
             try:
                 if message[0] == "" and len(message) > 1:
@@ -1344,5 +1359,33 @@ class GameConsumer(AsyncWebsocketConsumer):
                     self.room_group_name, {"type": "chat.message", "message": "server: "
                                                                               "Something went wrong during command"}
                 )
+        elif message[0] == "UPDATE_CHOICE_BOX_LOCATION" and len(message) == 3:
+            if self.name != "Anonymous":
+                pref_path = "user_preferences_storage/" + self.name + ".txt"
+                if os.path.exists(pref_path):
+                    with open(pref_path, "r") as f:
+                        contents = f.read()
+                        content_split = contents.split(sep="\n")
+                        while len(content_split) < 7:
+                            content_split.append("-1")
+                        content_split[3] = message[1]
+                        content_split[4] = message[2]
+                        contents = "\n".join(content_split)
+                    with open(pref_path, "w") as f:
+                        f.write(contents)
+        elif message[0] == "UPDATE_INFO_BOX_LOCATION" and len(message) == 3:
+            if self.name != "Anonymous":
+                pref_path = "user_preferences_storage/" + self.name + ".txt"
+                if os.path.exists(pref_path):
+                    with open(pref_path, "r") as f:
+                        contents = f.read()
+                        content_split = contents.split(sep="\n")
+                        while len(content_split) < 7:
+                            content_split.append("-1")
+                        content_split[5] = message[1]
+                        content_split[6] = message[2]
+                        contents = "\n".join(content_split)
+                    with open(pref_path, "w") as f:
+                        f.write(contents)
         condition_games.notify_all()
         condition_games.release()

@@ -1148,6 +1148,28 @@
                             `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
                     }
+                } else if (split_data[1] === "SET_BOX_LOCATIONS") {
+                    console.log("setting box locations");
+                    if (split_data[2] === "{{ user.username }}") {
+                        var box_choice_h = split_data[3];
+                        var box_choice_v = split_data[4];
+                        var box_info_h = split_data[5];
+                        var box_info_v = split_data[6];
+
+                        if (box_choice_h !== "-1" && box_choice_v !== "-1") {
+                            var box_choice = document.getElementById("search-collapse");
+
+                            box_choice.style.left = box_choice_h + `px`;
+                            box_choice.style.top = box_choice_v + `px`;
+                        }
+
+                        if (box_info_h !== "-1" && box_info_v !== "-1") {
+                            var box_info = document.getElementById("info-box");
+
+                            box_info.style.left = box_info_h + `px`;
+                            box_info.style.top = box_info_v + `px`;
+                        }
+                    }
                 }
                 applyZoom();
             } else {
@@ -1219,8 +1241,22 @@
         function onMouseDrag(event, element) {
             let leftValue = parseInt(window.getComputedStyle(element).left);
             let topValue = parseInt(window.getComputedStyle(element).top);
-            element.style.left = `${leftValue + event.movementX}px`;
-            element.style.top = `${topValue + event.movementY}px`;
+
+            var newLeftValue = `${leftValue + event.movementX}`;
+            var newTopValue = `${topValue + event.movementY}`;
+
+            element.style.left = newLeftValue + `px`;
+            element.style.top = newTopValue + `px`;
+
+            if (element.id === "info-box") {
+                gameSocket.send(JSON.stringify({
+                    'message': 'UPDATE_INFO_BOX_LOCATION/' + newLeftValue + '/' + newTopValue
+                }));
+            } else if (element.id === "search-collapse") {
+                gameSocket.send(JSON.stringify({
+                    'message': 'UPDATE_CHOICE_BOX_LOCATION/' + newLeftValue + '/' + newTopValue
+                }));
+            }
         }
 
         dragElements.forEach((element) => {
