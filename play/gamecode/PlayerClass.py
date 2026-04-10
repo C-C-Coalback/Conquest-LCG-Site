@@ -5453,6 +5453,10 @@ class Player:
                                 self.get_damage_given_pos(planet_id, unit_id)
             if card.get_ability() == "Virulent Plague Squad":
                 attack_value = attack_value + self.game.request_number_of_enemy_units_in_discard(str(self.number))
+            if self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
+                if self.check_if_faction_given_pos(planet_id, unit_id, "Orks"):
+                    if self.search_card_in_hq("Kustomisation Station"):
+                        attack_value += 1
             return attack_value
         card = self.cards_in_play[planet_id + 1][unit_id]
         if card.attack_set_next is not None:
@@ -6278,6 +6282,10 @@ class Player:
                 health += self.discard.count("Pyrrhian Eternals")
             if ability == "Shard of the Deceiver":
                 health += len(self.discard)
+            if self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
+                if self.check_if_faction_given_pos(planet_id, unit_id, "Orks"):
+                    if self.search_card_in_hq("Kustomisation Station"):
+                        health += 1
             for i in range(len(self.headquarters[unit_id].get_attachments())):
                 attachment = self.headquarters[unit_id].get_attachments()[i]
                 if attachment.get_ability() == "Adaptative Thorax Swarm":
