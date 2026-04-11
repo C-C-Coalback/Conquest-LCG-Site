@@ -1606,6 +1606,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_context = "Event Action"
                     if can_continue:
                         if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                            primary_player.discard_card_name_from_hand("Searing Brand")
+                            primary_player.aiming_reticle_coords_hand = None
                             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False,
                                                                   by_enemy_unit=False)
                             await primary_player.dark_eldar_event_played()
