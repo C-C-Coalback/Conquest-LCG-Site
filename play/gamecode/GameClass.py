@@ -6072,7 +6072,7 @@ class Game:
         print("updating")
         if self.interrupts_waiting_on_resolution and not self.already_resolving_interrupt \
                 and not self.already_resolving_reaction and not self.resolving_search_box \
-                and not self.queued_moves:
+                and not self.queued_moves and self.mode != "DISCOUNT":
             print("not already resolving")
             if count < 10:
                 p_one_count, p_two_count = self.count_number_interrupts_for_each_player()
@@ -6161,7 +6161,7 @@ class Game:
         if count < 10:
             if self.reactions_needing_resolving and not self.already_resolving_reaction and not \
                     self.resolving_search_box and not self.interrupts_waiting_on_resolution \
-                    and not self.stored_damage and not self.queued_moves:
+                    and not self.stored_damage and not self.queued_moves and self.mode != "DISCOUNT":
                 p_one_count, p_two_count = self.count_number_reactions_for_each_player()
                 print("p_one count: ", p_one_count, "p_two count: ", p_two_count)
                 if p_one_count > 0 and ((self.player_with_initiative == self.name_1 and
@@ -6892,10 +6892,10 @@ class Game:
                 await self.resolve_card_in_search_box(name, game_update_string)
             elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
                 await self.apply_indirect_damage(name, game_update_string)
-            elif self.mode == "DISCOUNT":
-                await self.update_game_event_applying_discounts(name, game_update_string)
             elif self.choices_available:
                 await self.resolve_choice(name, game_update_string)
+            elif self.mode == "DISCOUNT":
+                await self.update_game_event_applying_discounts(name, game_update_string)
             elif self.interrupting_discard_effect_active:
                 await self.resolve_discard_interrupt(name, game_update_string)
             elif self.resolving_nurgling_bomb:
