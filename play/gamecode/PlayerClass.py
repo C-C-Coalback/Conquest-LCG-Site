@@ -8127,10 +8127,11 @@ class Player:
 
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
-            every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
-            if every_worr_check:
-                if self.game.get_green_icon(planet_id):
-                    return False
+            if self.get_card_given_pos(planet_id, unit_id) != "Warlord":
+                every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
+                if every_worr_check:
+                    if self.game.get_green_icon(planet_id):
+                        return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.get_ability_given_pos(planet_id, unit_id) == "Growing Tide":
                 return False
