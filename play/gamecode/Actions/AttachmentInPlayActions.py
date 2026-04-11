@@ -244,7 +244,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 enemy_damage = secondary_player.get_damage_given_pos(enemy_warlord_pla,
                                                                                      enemy_warlord_pos)
                                 primary_player.set_damage_given_pos(planet_pos, unit_pos, enemy_damage)
-                                secondary_player.set_damage_given_pos(planet_pos, unit_pos, own_damage)
+                                secondary_player.set_damage_given_pos(enemy_warlord_pla, enemy_warlord_pos, own_damage)
                                 self.action_cleanup()
                     elif ability == "Drone Defense System":
                         if player_owning_card.name_player == primary_player.get_name_player():
