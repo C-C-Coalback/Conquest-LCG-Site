@@ -396,6 +396,8 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 card_name = self.misc_target_choice
                 card = self.preloaded_find_card(card_name)
                 primary_player.add_card_to_planet(card, chosen_planet)
+                if primary_player.search_card_in_hq("Endless Legions", ready_relevant=True):
+                    self.create_reaction("Endless Legions", primary_player.name_player, (1, -1, -1))
                 self.delete_reaction()
     elif current_reaction == "Reinforced Synaptic Network":
         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
