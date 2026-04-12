@@ -826,8 +826,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.name_player_making_choices = primary_player.name_player
                     elif ability == "The Emperor's Warrant":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.chosen_first_card = False
                         self.misc_target_planet = -1
                         self.misc_counter = -1

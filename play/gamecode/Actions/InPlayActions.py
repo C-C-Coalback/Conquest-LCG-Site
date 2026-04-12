@@ -4211,7 +4211,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Event Action"
             if can_continue:
-                primary_player.discard_card_name_from_hand("The Emperor's Warrant")
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.misc_counter, by_enemy_unit=False)
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
