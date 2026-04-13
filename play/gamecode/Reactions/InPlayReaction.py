@@ -1758,7 +1758,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Gue'vesa Overseer":
             if abs(planet_pos - og_pla) == 1:
                 if not self.chosen_first_card:
-                    if player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum"):
+                    if not player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Tau"):
                         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                             player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
                             self.chosen_first_card = True
