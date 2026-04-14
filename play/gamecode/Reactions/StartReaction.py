@@ -1986,6 +1986,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Primal Howl")
                 for _ in range(3):
                     primary_player.draw_card()
+                primary_player.resolve_played_any_event()
                 self.delete_reaction()
         elif current_reaction == "Mighty Wraithknight":
             if not self.apoka:
