@@ -241,7 +241,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     chosen_planet = int(game_update_string[1])
                     if chosen_planet == self.last_planet_checked_for_battle:
                         if self.attacker_position != -1 and self.defender_position == -1:
-                            if self.number_with_combat_turn == "1":
+                            if name == self.name_1:
                                 primary_player = self.p1
                                 secondary_player = self.p2
                             else:
