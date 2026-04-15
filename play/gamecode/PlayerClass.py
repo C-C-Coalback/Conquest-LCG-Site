@@ -6173,6 +6173,9 @@ class Player:
             if actual_area_effect:
                 if self.search_card_in_hq("Hive Fleet Leviathan"):
                     amount = min(1, amount)
+                other_player = self.get_other_player()
+                if other_player.search_card_in_hq("Hive Fleet Leviathan"):
+                    amount = min(1, amount)
                 for j in range(len(self.cards_in_play[planet_id + 1])):
                     if self.get_ability_given_pos(planet_id, j) == "Genestealer Hybrids" and i != j:
                         genestealer_hybrids_relevant = True
