@@ -5858,11 +5858,8 @@ class Player:
                         self.game.create_reaction("Until Justice is Done", self.name_player, att_pos)
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if i != unit_id:
-                    print("Get attachments")
                     for j in range(len(self.cards_in_play[planet_id + 1][i].get_attachments())):
-                        print("Bodyguard check")
                         if self.cards_in_play[planet_id + 1][i].get_attachments()[j].get_ability() == "Bodyguard":
-                            print("Bodyguard found")
                             if damage > 0:
                                 damage = damage - 1
                                 bodyguard_damage_list.append(i)
@@ -6122,6 +6119,7 @@ class Player:
                         self.headquarters[unit_id].get_attachments()[i].ready_card()
         if self.search_attachments_at_pos(-2, unit_id, "Heavy Marker Drone"):
             damage = damage * 2
+        planet_id = -2
         prior_damage = self.headquarters[unit_id].get_damage()
         damage_too_great = self.headquarters[unit_id].damage_card(self, damage, can_shield)
         afterwards_damage = self.headquarters[unit_id].get_damage()
@@ -6145,6 +6143,19 @@ class Player:
                                                   (int(self.number), -2, unit_id))
                     if self.get_ability_given_pos(-2, unit_id) == "Fighting Company Daras":
                         self.increase_retaliate_given_pos_eop(-2, unit_id, 2)
+            for i in range(len(self.headquarters[unit_id].get_attachments())):
+                if self.headquarters[unit_id].get_attachments()[i].\
+                        get_ability() == "Ancient Crozius Arcanum":
+                    if not self.headquarters[unit_id].get_attachments()[i].once_per_round_used:
+                        self.headquarters[unit_id].get_attachments()[i].once_per_round_used = True
+                        if prior_damage > 0:
+                            self.remove_damage_from_pos(planet_id, unit_id, 1, healing=True)
+                            prior_damage = prior_damage - 1
+                            afterwards_damage = afterwards_damage - 1
+                        if total_that_can_be_blocked > 0:
+                            self.headquarters[unit_id].set_damage(afterwards_damage - 1)
+                            total_that_can_be_blocked = total_that_can_be_blocked - 1
+                            afterwards_damage = afterwards_damage - 1
         if total_that_can_be_blocked > 0:
             if self.get_card_type_given_pos(-2, unit_id) == "Warlord":
                 if self.check_if_card_is_destroyed(-2, unit_id):
