@@ -6635,6 +6635,7 @@ class Game:
                                 card = self.preloaded_find_card("Blade of the Crimson Oath")
                                 if primary_player.attach_card(card, -2, int(game_update_string[2])):
                                     self.interrupting_discard_effect_active = False
+                                    primary_player.remove_card_name_from_hand("Blade of the Crimson Oath")
                                     self.interrupts_discard_enemy_allowed = False
                                     await self.complete_enemy_discard(primary_player, secondary_player)
                                     self.interrupts_discard_enemy_allowed = True
@@ -6645,6 +6646,7 @@ class Game:
                                 if primary_player.attach_card(card, int(game_update_string[2]),
                                                               int(game_update_string[3])):
                                     self.interrupting_discard_effect_active = False
+                                    primary_player.remove_card_name_from_hand("Blade of the Crimson Oath")
                                     self.interrupts_discard_enemy_allowed = False
                                     await self.complete_enemy_discard(primary_player, secondary_player)
                                     self.interrupts_discard_enemy_allowed = True
