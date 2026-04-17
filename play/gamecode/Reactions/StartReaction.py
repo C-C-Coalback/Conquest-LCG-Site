@@ -1400,6 +1400,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if can_continue:
                     if primary_player.spend_resources(2):
                         primary_player.discard_card_name_from_hand(current_reaction)
+                        if secondary_player.get_ability_given_pos(
+                                planet_pos, unit_pos) == "Flayed Ones Revenants":
+                            self.create_reaction("Flayed Ones Revenants",
+                                                 secondary_player.name_player,
+                                                 (int(secondary_player.number), planet_pos, -1))
                         secondary_player.destroy_card_in_play(planet_pos, unit_pos)
                         self.delete_reaction()
             else:
