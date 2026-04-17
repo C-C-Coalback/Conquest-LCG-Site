@@ -259,7 +259,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             message = "The following planets can be hit by Sautekh Royal Crypt: "
             for i in range(len(self.misc_misc)):
                 if self.misc_misc[i]:
-                    message += self.planet_array[chosen_planet] + ", "
+                    message += self.planet_array[i] + ", "
             message += ". Press pass when done."
             self.misc_misc_2 = []
             await self.send_update_message(message)
