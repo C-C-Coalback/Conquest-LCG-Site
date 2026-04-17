@@ -294,7 +294,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                 card = self.preloaded_find_card(primary_player.discard[pos_discard])
                 if card.get_card_type() == "Army":
                     if not card.get_unique():
-                        if card.check_for_a_trait("Elite"):
+                        if not card.check_for_a_trait("Elite"):
                             self.misc_target_player = card.get_ability()
                             self.chosen_first_card = True
                             primary_player.remove_card_from_game(card.get_name())
