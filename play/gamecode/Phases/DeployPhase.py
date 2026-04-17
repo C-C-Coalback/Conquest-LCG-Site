@@ -567,7 +567,6 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if played_card == "SUCCESS":
         if damage_to_take > 0:
             self.damage_is_taken_one_at_a_time = True
-            primary_player.set_aiming_reticle_in_play(planet_pos, position_of_unit, "red")
         if not self.action_chosen:
             self.action_cleanup()
     if self.action_chosen == "Triumvirate of Ynnead":
