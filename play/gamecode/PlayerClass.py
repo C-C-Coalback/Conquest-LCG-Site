@@ -2161,6 +2161,9 @@ class Player:
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Kastelan Crusher":
             if self.get_has_faith_given_pos(planet_pos, unit_pos):
                 sweep_value += 3
+        if self.get_ability_given_pos(planet_pos, unit_pos) == "Aurora Predator":
+            if self.get_has_faith_given_pos(planet_pos, unit_pos):
+                sweep_value += 1
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             if self.get_ability_given_pos(planet_pos, i) == "Great Unclean One":
                 if self.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -5568,7 +5571,7 @@ class Player:
                 attack_value += 1
         if ability == "Aurora Predator":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
-                attack_value += 3
+                attack_value += 2
         if ability == "Eloquent Confessor":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 attack_value += 1
@@ -7122,14 +7125,6 @@ class Player:
                 self.game.create_reaction("Yvraine's Entourage", self.name_player, (int(self.number), planet_num, i))
             if self.get_ability_given_pos(planet_num, i) == "Cegorach's Jesters":
                 self.game.create_reaction("Cegorach's Jesters", self.name_player, (int(self.number), planet_num, i))
-        for i in range(7):
-            if i != planet_num:
-                for j in range(len(self.cards_in_play[i + 1])):
-                    if self.get_ability_given_pos(i, j) == "Peacekeeper Drone":
-                        self.game.create_reaction("Peacekeeper Drone", self.name_player, (int(self.number), i, j))
-        for i in range(len(self.headquarters)):
-            if self.get_ability_given_pos(-2, i) == "Peacekeeper Drone":
-                self.game.create_reaction("Peacekeeper Drone", self.name_player, (int(self.number), -2, i))
 
     def set_valid_crushing_blow_given_pos(self, planet_id, unit_id, val=False):
         if planet_id == -2:

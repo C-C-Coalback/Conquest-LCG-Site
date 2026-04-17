@@ -7595,8 +7595,9 @@ class Game:
                     self.create_reaction("Kabalite Blackguard", winner.name_player, (int(winner.number), planet_id, i))
                     reactions_exist = True
                 if winner.get_ability_given_pos(planet_id, i) == "Khornate Heldrake":
-                    self.create_reaction("Khornate Heldrake", winner.name_player, (int(winner.number), planet_id, i))
-                    reactions_exist = True
+                    if self.get_blue_icon(planet_id):
+                        self.create_reaction("Khornate Heldrake", winner.name_player, (int(winner.number), planet_id, i))
+                        reactions_exist = True
                 if winner.get_ability_given_pos(planet_id, i) == "Sanguinary Guard":
                     self.create_reaction("Sanguinary Guard", winner.name_player, (int(winner.number), planet_id, i))
                     reactions_exist = True

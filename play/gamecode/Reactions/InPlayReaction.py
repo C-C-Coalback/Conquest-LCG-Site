@@ -939,6 +939,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if planet_pos == og_pla:
                 if unit_pos != og_pos or primary_player.get_number() != game_update_string[1]:
                     atk = primary_player.get_health_given_pos(og_pla, og_pos) - primary_player.get_damage_given_pos(og_pla, og_pos)
+                    atk = min(atk, 4)
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, atk)
                     primary_player.sacrifice_card_in_play(og_pla, og_pos)
                     self.delete_reaction()

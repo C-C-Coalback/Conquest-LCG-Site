@@ -10,7 +10,7 @@ def blackstone_project_cards_init():
                                                         " +1 ATK and +1 HP.\n Reaction: After you deploy a Vehicle"
                                                         " unit, treat its printed text box as blank until the end "
                                                         "of the game", "Tech-Priest.",
-                                "Astra Militarum", 2, 7, 2, 6,
+                                "Astra Militarum", 1, 7, 1, 6,
                                 "Bloodied. \nForced Reaction: After you deploy a Vehicle unit, treat its printed"
                                 " text box as blank until the end of the game.", 7, 7,
                                 ["1x Dominus' Forge", "2x Devoted Enginseer",
@@ -94,8 +94,9 @@ def blackstone_project_cards_init():
                                                      "with printed cost 3 or greater you control at that planet.",
                              "Vehicle. Elite.", 7, "Astra Militarum", "Common", 3, 5, 3, False,
                              flying=True, wargear_attachments_permitted=False),
-        CardClasses.ArmyCard("Imperial Fists Legion", "Reaction: After this unit is declared as an attacker, remove 1 "
-                                                      "damage from a target support card.", "Soldier. Imperial Fists.",
+        CardClasses.ArmyCard("Imperial Fists Legion",
+                             "Reaction: After this unit is declared as an attacker, exhaust a target support to remove "
+                             "1 damage from that support.", "Soldier. Imperial Fists.",
                              1, "Space Marines", "Common", 1, 2, 1, False),
         CardClasses.EventCard("Righteous Reprisal", "Reaction: After a Space Marines unit you control is damaged by an"
                                                     " attack, exhaust that unit to deal damage equal to twice the"
@@ -125,7 +126,7 @@ def blackstone_project_cards_init():
                                                     "damage from it.", "Creature. Space Wolves.",
                              2, "Space Marines", "Common", 3, 3, 0, False, no_attachments=True),
         CardClasses.ArmyCard("Aurora Predator", "No Wargear Attachments.\n"
-                                                "While this unit has faith it gets +3 ATK.",
+                                                "While this unit has faith it gets +2 ATK and gains Sweep (1).",
                              "Vehicle. Grey Knights. Elite.", 5, "Space Marines", "Common", 4, 6, 1, False,
                              wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Imperial Fists Apothecary", "Reaction: After a Space Marines unit you control at this "
@@ -146,13 +147,13 @@ def blackstone_project_cards_init():
                                 1, "Space Marines", "Loyal", True),
         CardClasses.AttachmentCard("Imposing Presence", "Attach to a Soldier army unit. Limit 1 per unit.\n"
                                                         "While attached unit is ready, each enemy army and token unit "
-                                                        "at this planet has -1 ATK.", "Skill.",
+                                                        "at this planet gets -1 ATK.", "Skill.",
                                    1, "Space Marines", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
                                    required_traits="Soldier", limit_one_per_unit=True),
         CardClasses.ArmyCard("Ravenwing Dark Talons", "No Wargear Attachments. Flying.\n"
                                                       "Reaction: After this unit resolves an attack against a warlord "
                                                       "unit, this unit gets +1 ATK and +1 HP until the end of the"
-                                                      " game.", "Vehicle. Raven Guard.", 2, "Space Marines",
+                                                      " game.", "Vehicle. Dark Angels.", 2, "Space Marines",
                              "Loyal", 1, 2, 1, False, wargear_attachments_permitted=False, flying=True),
         CardClasses.SupportCard("Klan Totem", "Reaction: After a unit with the Deep Strike keyword is destroyed, "
                                               "exhaust this support to put that unit into reserve at a non-first "
@@ -161,10 +162,10 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Baddfrag", "Deep Strike (2).\n"
                                          "Each Vehicle unit you control at this planet gets +1 ATK.",
                              "Warrior. Blood Axe.", 3, "Orks", "Common", 3, 3, 0, True, deepstrike=2),
-        CardClasses.ArmyCard("Shok Troopa", "Retaliate (1).\n"
+        CardClasses.ArmyCard("Shok Troopa", "Limited. Retaliate (1).\n"
                                             "Forced Interrupt: When this unit leaves play, deal 1 damage to "
                                             "each unit at this planet.", "Scout. Boyz. Ally.",
-                             1, "Orks", "Loyal", 1, 1, 1, False, retaliate=1),
+                             1, "Orks", "Loyal", 1, 1, 1, False, retaliate=1, limited=True),
         CardClasses.ArmyCard("Cowardly Squig", "No Attachments. \n"
                                                "This unit's ATK is equal to its remaining HP.",
                              "Creature. Squig.", 4, "Orks", "Common", 0, 6, 0, False, no_attachments=True),
@@ -298,7 +299,7 @@ def blackstone_project_cards_init():
                                                  "This unit deals double damage while attacking a damaged unit.",
                              "Warrior. Khorne.", 3, "Chaos", "Common", 2, 3, 1, False, sweep=1),
         CardClasses.ArmyCard("Khornate Heldrake", "No Wargear Attachments. Flying.\n"
-                                                  "Reaction: After you win a battle at this planet, destroy a "
+                                                  "Reaction: After you win a battle at a Technology planet, destroy a "
                                                   "target enemy army unit.", "Daemon. Khorne. Elite.",
                              8, "Chaos", "Loyal", 7, 5, 2, False, flying=True, wargear_attachments_permitted=False),
         CardClasses.SupportCard("Decayed Gardens", "Reaction: After the combat phase begins, exhaust this support to "
@@ -359,7 +360,7 @@ def blackstone_project_cards_init():
                                                      "at the last planet.", "Creature. Abomination.",
                              4, "Dark Eldar", "Loyal", 3, 3, 2, True, no_attachments=True),
         CardClasses.ArmyCard("Stalking Scourge", "Flying.", "Warrior.", 2, "Dark Eldar", "Loyal",
-                             1, 2, 2, False, flying=True),
+                             0, 2, 2, False, flying=True),
         CardClasses.EventCard("Unconquerable Fear", "Reaction: After your opponent plays an event card, exhaust your "
                                                     "warlord to discard two cards at random from their hand. "
                                                     "Max 1 per round.", "Power. Torture. Maneuver.",
@@ -430,9 +431,7 @@ def blackstone_project_cards_init():
         CardClasses.EventCard("Counteroffensive",
                               "Action: Ready a target unit you control at a planet with a Psyker unit.", "Tactic.",
                               2, "Eldar", "Common", 1, False, action_in_hand=True, allowed_phases_in_hand="ALL"),
-        CardClasses.ArmyCard("Peacekeeper Drone", "Reaction: After a battle begins at a planet, "
-                                                  "move this unit to that planet. \n"
-                                                  "Combat Action: A target non-warlord unit at this planet gets "
+        CardClasses.ArmyCard("Peacekeeper Drone", "Combat Action: A target non-warlord unit at this planet gets "
                                                   "-1 ATK until the end of the phase. (Limit once per phase)",
                              "Drone.", 1, "Tau", "Common", 0, 3, 0, False,
                              action_in_play=True, allowed_phases_in_play="COMBAT"),
@@ -513,9 +512,8 @@ def blackstone_project_cards_init():
                                                    "printed cost 2 or lower at this planet.", "Vehicle. Elite.",
                              6, "Tau", "Common", 4, 4, 2, False, area_effect=1, sweep=3,
                              wargear_attachments_permitted=False),
-        CardClasses.WarlordCard("Red Terror", "Each army unit you control with 3 or fewer damage tokens on it gains"
-                                              " brutal.", "Creature. Behemoth.",
-                                "Tyranids", 2, 6, 0, 6, "Bloodied. Brutal.", 6, 6,
+        CardClasses.WarlordCard("Red Terror", "Each army unit you control with 3 or fewer damage on it gains brutal.",
+                                "Creature. Behemoth.", "Tyranids", 2, 6, 0, 6, "Bloodied. Brutal.", 6, 6,
                                 ["1x Restorative Tunnels", "2x Unexpected Ferocity",
                                  "1x Dripping Scythes", "4x Formless Leaper"]),
         CardClasses.ArmyCard("Formless Leaper", "This unit cannot be targeted by enemy card effects while it is the "
@@ -667,7 +665,8 @@ def blackstone_project_cards_init():
                                    "Wargear.", 1, "Necrons", "Common", 1, False, unit_must_match_faction=True,
                                    required_traits="Drone", action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.ArmyCard("Explosive Scarabs", "Reaction: After this unit resolves its attack, sacrifice it to deal "
-                                                  "damage equal to it's remaining HP to a target unit at this planet.",
+                                                  "damage equal to it's remaining HP to a target unit at this planet. "
+                                                  "(max 4)",
                              "Drone.", 2, "Necrons", "Common", 1, 4, 0, False),
         CardClasses.EventCard("Excavated Minerals", "Reaction: After this card is discarded from your deck, "
                                                     "gain 1 Resource.", "Fortune.",

@@ -145,10 +145,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             self.delete_reaction()
     elif current_reaction == "Imperial Fists Legion":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
-            if player_owning_card.headquarters[unit_pos].damage > 0:
+            if player_owning_card.headquarters[unit_pos].damage > 0 and player_owning_card.get_ready_given_pos(planet_pos, unit_pos):
+                player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
                 player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target ready and damaged supports.")
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target supports.")
     elif current_reaction == "Tunneling Mawloc":
