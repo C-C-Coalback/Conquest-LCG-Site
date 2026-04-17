@@ -59,6 +59,7 @@ class Game:
                                     "Incubus of the Severed", "Lurking Termagant"]
         self.attack_being_resolved = False
         self.attack_resolution_cleanup = False
+        self.queued_mistarget_message = None
         self.p1 = PlayerClass.Player(player_one_name, 1, card_array, cards_dict, apoka_errata_cards, self)
         self.p2 = PlayerClass.Player(player_two_name, 2, card_array, cards_dict, apoka_errata_cards, self)
         self.phase = "SETUP"
@@ -6866,6 +6867,18 @@ class Game:
             return False
         return True
 
+    def reset_queued_mistarget_message(self):
+        self.queued_mistarget_message = None
+
+    def set_queued_mistarget_message(self, name, main, details):
+        self.queued_mistarget_message = (name, main, details)
+
+    async def send_queued_mistarget_message(self):
+        if self.queued_mistarget_message is not None:
+            name, main, details = self.queued_mistarget_message
+            await self.send_mistarget_message(name, main, details)
+            self.reset_queued_mistarget_message()
+
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:
             self.condition_main_game.acquire()
@@ -7404,6 +7417,7 @@ class Game:
         await self.send_initiative()
         await self.send_queued_sound()
         await self.send_queued_message()
+        await self.send_queued_mistarget_message()
 
     def get_name_interrupts_of_players_interrupts(self, name):
         interrupts_positions_list = []

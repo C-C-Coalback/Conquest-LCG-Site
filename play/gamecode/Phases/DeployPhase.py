@@ -49,6 +49,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.p1.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
+                        self.p1.aiming_reticle_coords_hand = None
                         if self.p2.search_hand_for_card("The Emperor's Retribution") and self.p2.get_resources() > 0:
                             self.create_reaction("The Emperor's Retribution", self.name_2, (2, -1, -1))
                         if self.p2.search_hand_for_card("Shadow Hunt") and self.p2.get_resources() > 0:
@@ -60,6 +61,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.p2.has_passed = True
                         self.discounts_applied = 0
                         self.available_discounts = 0
+                        self.p2.aiming_reticle_coords_hand = None
                         if self.p1.search_hand_for_card("The Emperor's Retribution") and self.p1.get_resources() > 0:
                             self.create_reaction("The Emperor's Retribution", self.name_1, (1, -1, -1))
                         if self.p1.search_hand_for_card("Shadow Hunt") and self.p1.get_resources() > 0:
@@ -106,7 +108,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             return None
                         if card.get_limited() and not primary_player.can_play_limited and not \
                                 self.paying_shrieking_exarch_cost:
-                            await self.send_update_message("You have already played a Limited card this round!")
+                            self.set_queued_mistarget_message(primary_player.name_player, "Cannot Play Card", "Already played a Limited card this round.")
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
                             return None
                         previous_faction = self.faction_of_card_to_play
@@ -194,6 +196,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 else:
                                     self.card_pos_to_deploy = previous_card_pos_to_deploy
                             else:
+                                self.set_queued_mistarget_message(primary_player.name_player, "Cannot Play Card", "Enslaved faction does not match the faction of the card being played.")
                                 self.card_pos_to_deploy = previous_card_pos_to_deploy
                         elif card.get_card_type() == "Attachment":
                             primary_player.aiming_reticle_color = "blue"
@@ -297,7 +300,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     if card.get_is_unit():
                                         self.choices_available.append(card.get_name())
                                 if len(self.choices_available) < 2:
-                                    await self.send_update_message("Not enough units to satisfy Raving Cryptek.")
+                                    self.set_queued_mistarget_message(player.name_player, "Cannot Play Card", "Insufficient units in hand for Raving Cryptek.")
                                     self.choices_available = []
                                 else:
                                     self.create_choices(
@@ -328,21 +331,33 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 if card.get_unique():
                                     if player.search_for_unique_card(card.get_name()):
                                         can_continue = False
+                                        self.set_queued_mistarget_message(player.name_player, "Cannot Play Card",
+                                                                          "Already controlling a unique card of the same name.")
                                 if card.get_limited():
                                     if not player.can_play_limited:
                                         can_continue = False
+                                        self.set_queued_mistarget_message(player.name_player, "Cannot Play Card",
+                                                                          "Already played a Limited card this round.")
                                 if card.limit_one_per_unit:
                                     for i in range(len(player.attachments_at_planet[planet_chosen])):
                                         if player.attachments_at_planet[planet_chosen][i].get_name() == card.get_name():
+                                            self.set_queued_mistarget_message(player.name_player, "Cannot Play Card",
+                                                                              "Maximum one copy of that attachment per planet.")
                                             can_continue = False
                                 if card.red_required:
                                     if not self.get_red_icon(planet_chosen):
+                                        self.set_queued_mistarget_message(player.name_player, "Cannot Play Card",
+                                                                          "Attachment requires material (red) planet icon.")
                                         can_continue = False
                                 if card.blue_required:
                                     if not self.get_blue_icon(planet_chosen):
+                                        self.set_queued_mistarget_message(player.name_player, "Cannot Play Card",
+                                                                          "Attachment requires technology (blue) planet icon.")
                                         can_continue = False
                                 if card.green_required:
                                     if not self.get_green_icon(planet_chosen):
+                                        self.set_queued_mistarget_message(player.name_player, "Cannot Play Card",
+                                                                          "Attachment requires strongpoint (green) planet icon.")
                                         can_continue = False
                                 if can_continue:
                                     cost = card.get_cost()
@@ -635,6 +650,8 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         player_gaining_attachment = self.p2
     if player_gaining_attachment.get_card_type_given_pos(
             int(game_update_string[2]), int(game_update_string[3])) == "Support":
+        self.set_queued_mistarget_message(primary_player.name_player, "Cannot Attach Card",
+                                          "Attachments cannot be attached to supports.")
         return None
     card = None
     magus_harid = False
@@ -685,10 +702,10 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         print("Limited state of card:", limited)
         print("Name of card:", card.get_name())
         if not primary_player.can_play_limited and limited:
-            pass
+            self.set_queued_mistarget_message(primary_player.name_player, "Cannot Attach Card",
+                                              "Already played a Limited card this round.")
         else:
             if primary_player.get_number() == player_gaining_attachment.get_number():
-                print("Playing own card")
                 played_card = primary_player.play_attachment_card_to_in_play(card, int(game_update_string[2]),
                                                                              int(game_update_string[3]),
                                                                              army_unit_as_attachment=

@@ -1982,9 +1982,11 @@ class Player:
     def add_to_hq(self, card_object):
         if card_object.get_unique():
             if self.search_for_unique_card(card_object.name):
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "The card is unique, and you already control a copy of that card.")
                 return False
         if card_object.check_for_a_trait("Relic"):
             if self.search_for_existing_relic():
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "The card is a Relic, and you already control a Relic.")
                 return False
         self.headquarters.append(copy.deepcopy(card_object))
         position = -2
@@ -2275,22 +2277,38 @@ class Player:
         print("Adding attachment code")
         print(card.get_name())
         print(target_card.get_no_attachments())
+        name_owner = self.name_player
+        if not_own_attachment:
+            if self.number == "1":
+                name_owner = self.game.p2.name_player
+            elif self.number == "2":
+                name_owner = self.game.p1.name_player
         type_of_card = target_card.get_card_type()
         if card.check_for_a_trait("Relic"):
             if relic_check_allowed:
                 if self.search_for_existing_relic():
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Already controlling a Relic.")
                     return False
         if card.get_unique():
             if self.search_for_unique_card(card.get_name()):
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Already controlling a unique card of the same name.")
                 return False
         if army_unit_as_attachment:
             if type_of_card != "Army":
                 print("Army units as attachments can only be attached to other army units")
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Army units as attachments can only be attached to other army units.")
                 return False
             if target_card.get_no_attachments():
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment must go to own unit.")
                 print("Unit may not have attachments")
                 return False
             if target_card.check_for_a_trait("Vehicle"):
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment must go to enemy unit.")
                 print("Vehicles may not have army units as attachments")
                 return False
             name_owner = self.name_player
@@ -2304,58 +2322,76 @@ class Player:
             return True
         allowed_types = card.type_of_units_allowed_for_attachment
         if type_of_card not in allowed_types:
+            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                   "Attachment cannot be played to that type of card.")
             print("Can't play to this card type.", type_of_card, allowed_types)
             return False
         if card.unit_must_match_faction:
             if card.get_faction() != target_card.get_faction():
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment must go to a unit with a matching faction.")
                 return False
         if card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
                 card.get_name() == "Missile Pod":
             if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit is missing a required trait for the attachment.")
                 return False
         elif card.get_name() == "Krak Grenade":
             if not target_card.check_for_a_trait("Soldier") and not target_card.check_for_a_trait("Warrior"):
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit is missing a required trait for the attachment.")
                 return False
         elif card.get_name() == "Extra Munitions":
             if not target_card.area_effect > 0 or self.get_blanked_given_pos(planet, position):
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit does not have a printed Area Effect keyword.")
                 return False
         elif card.required_traits not in target_card.get_traits():
-            print("Wrong traits.")
+            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                   "Unit is missing a required trait for the attachment.")
             return False
         if card.get_ability() == "Raging Daemonhost":
             if "Vehicle" in target_card.get_traits() or "Daemon" in target_card.get_traits():
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit has a forbidden trait for that attachment.")
                 return False
         if card.forbidden_traits in target_card.get_traits():
+            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                   "Unit has a forbidden trait for that attachment.")
             return False
         if card.unit_must_be_unique:
             if not target_card.get_unique():
                 print("Must be a unique unit, but is not")
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment can only go to a unique unit.")
                 return False
         if card.limit_one_per_unit:
             attachments_active = target_card.get_attachments()
             for i in range(len(attachments_active)):
                 if attachments_active[i].get_name() == card.get_name() and not attachments_active[i].from_magus_harid:
-                    print("Limit one per unit")
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Limit one copy of that attachment per unit.")
                     return False
         if target_card.get_no_attachments():
-            print("Unit may not have attachments")
+            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                   "Unit has the No Attachments keyword.")
             return False
         if card.check_for_a_trait("Wargear"):
             if not target_card.get_wargear_attachments_permitted():
-                print("Unit may not have wargear")
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit has the No Wargear Attachments keyword.")
                 return False
         if card.get_name() == "The Shining Blade":
             if not target_card.get_mobile():
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit is not Mobile.")
                 return False
         if card.get_name() == "Flesh Hooks" and not card.from_magus_harid:
             if target_card.get_cost() > 2:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Cost of unit is too great.")
                 return False
-        name_owner = self.name_player
-        if not_own_attachment:
-            if self.number == "1":
-                name_owner = self.game.p2.name_player
-            elif self.number == "2":
-                name_owner = self.game.p1.name_player
         target_card.add_attachment(card, name_owner=name_owner)
         if card.get_ability() == "Fusion Cascade Defiance":
             if planet != -2:
@@ -2386,11 +2422,21 @@ class Player:
 
     def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False,
                                         army_unit_as_attachment=False):
+        name_owner = self.name_player
+        if not_own_attachment:
+            if self.number == "1":
+                name_owner = self.game.p2.name_player
+            elif self.number == "2":
+                name_owner = self.game.p1.name_player
         if card.get_unique():
             if self.search_for_unique_card(card.name):
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Already controlling a unique card of the same name.")
                 return False
         if card.check_for_a_trait("Relic"):
             if self.search_for_existing_relic():
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Already controlling a Relic.")
                 return False
         if army_unit_as_attachment:
             if not_own_attachment:
@@ -2410,9 +2456,13 @@ class Player:
                 self.add_resources(cost, refund=True)
         else:
             if card.must_be_own_unit and not_own_attachment:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment must go to own unit.")
                 print("Must be own unit, but is not")
                 return False
             if card.must_be_enemy_unit and not not_own_attachment:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment must go to enemy unit.")
                 print("Must be enemy unit, but is not")
                 return False
             if not_own_attachment:
@@ -2456,18 +2506,22 @@ class Player:
             return self.add_to_hq(card)
         if card.get_unique():
             if self.search_for_unique_card(card.name):
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", "The card is unique, and you already control a copy of that card.")
                 return -1
         if triggered_card_effect and not card.check_for_a_trait("Runt", etekh_trait=self.etekh_trait):
             resources_to_spend = self.game.imperial_blockades_active[position]
             if resources_to_spend:
                 if not self.spend_resources(resources_to_spend):
                     self.game.queued_message = "Important Info: Imperial Blockade prevented a card from being added."
+                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
+                                                           "Insufficient resources to pay for Imperial Blockade.")
                     return -1
                 else:
                     self.game.queued_message = "Important Info: " + str(resources_to_spend) + \
                                                " resources were spent due to Imperial Blockade."
         if card.get_card_type() == "Army" and self.game.phase == "COMBAT":
             if self.game.planet_array[position] == "Fenos":
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", "The planet Fenos prevents army units from entering play during the combat phase.")
                 return -1
         self.cards_in_play[position + 1].append(copy.deepcopy(card))
         last_element_index = len(self.cards_in_play[position + 1]) - 1
@@ -2905,8 +2959,6 @@ class Player:
                 if not self.bluddflagg_used:
                     position = -2
             if position == -2:
-                print("Play card to HQ")
-                print(card.get_limited(), self.can_play_limited)
                 if card.get_card_type() == "Support":
                     for i in range(len(self.headquarters)):
                         if self.get_ability_given_pos(-2, i) == "Orbital Relay":
@@ -2928,20 +2980,22 @@ class Player:
                                                 damage_on_play -= 1
                                         else:
                                             self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
-                                print("Played card to HQ")
                                 return "SUCCESS", -1
                             self.add_resources(cost, refund=True)
                             return "FAIL/Unique already in play", -1
                     else:
+                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ",
+                                                               "Already played a Limited card this round.")
                         return "FAIL/Limited already played", -1
                 else:
                     if card.get_ability() == "Devoted Hospitaller":
                         if self.check_if_control_trait("Commissar"):
+                            self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ",
+                                                                   "Devoted Hospitaller cannot be played due to the presence of a Commissar unit.")
                             return "FAIL/Controls Commissar and is Devoted Hospitaller", -1
                     if self.spend_resources(cost):
                         if self.add_to_hq(card):
                             location_of_unit = len(self.headquarters) - 1
-                            print("Played card to HQ")
                             if self.check_for_trait_given_pos(position, location_of_unit, "Vehicle"):
                                 if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
                                     self.game.create_reaction("Forge Master Dominus", self.name_player,
@@ -3033,11 +3087,14 @@ class Player:
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
-                print("Insufficient resources")
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ",
+                                                       "Insufficient resources to play the card.")
                 return "FAIL/Insufficient resources", -1
             else:
                 if card.get_ability() == "Devoted Hospitaller":
                     if self.check_if_control_trait("Commissar"):
+                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
+                                                               "Devoted Hospitaller cannot be played due to the presence of a Commissar unit.")
                         return "FAIL/Controls Commissar and is Devoted Hospitaller", -1
                 cost = card.get_cost() - discounts
                 if card.get_limited():
@@ -3061,6 +3118,8 @@ class Player:
                             self.add_resources(cost, refund=True)
                             return "FAIL/Unique already in play", -1
                     else:
+                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
+                                                               "Already played a Limited card this round.")
                         return "FAIL/Limited already played", -1
                 elif not self.enemy_holding_cell_check(card.get_name()):
                     if self.spend_resources(cost):
@@ -3267,8 +3326,12 @@ class Player:
                             return "SUCCESS", location_of_unit
                         self.add_resources(cost, refund=True)
                         return "FAIL/Unique already in play", -1
-                print("Insufficient resources")
-                return "FAIL/Insufficient resources", -1
+                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
+                                                           "Insufficient resources to play the card.")
+                    return "FAIL/Insufficient resources", -1
+                else:
+                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
+                                                           "Enemy Holding Cell prevents the card from being played.")
         return "FAIL/Invalid card", -1
 
     def count_units_of_faction(self, faction):
