@@ -3925,17 +3925,19 @@ class Game:
                                                                   planet_chosen=planet_chosen,
                                                                   name_of_card=card.get_name())
         if card.check_for_a_trait("Haemonculus", etekh_trait=player.etekh_trait):
-            for i in range(len(player.cards_in_play[planet_chosen + 1])):
-                if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
-                    self.available_discounts = self.available_discounts - 1
-            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
-                if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
-                    self.available_discounts = self.available_discounts - 1
+            if planet_chosen is not None:
+                for i in range(len(player.cards_in_play[planet_chosen + 1])):
+                    if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
+                        self.available_discounts = self.available_discounts - 1
+                for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+                    if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
+                        self.available_discounts = self.available_discounts - 1
         if card.get_faction() == "Astra Militarum":
-            for i in range(len(player.attachments_at_planet[planet_chosen])):
-                if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
-                    if card.get_cost() - self.available_discounts > 1:
-                        self.available_discounts += 1
+            if planet_chosen is not None:
+                for i in range(len(player.attachments_at_planet[planet_chosen])):
+                    if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
+                        if card.get_cost() - self.available_discounts > 1:
+                            self.available_discounts += 1
         hand_disc = player.search_hand_for_discounts(card.get_faction(), card.get_traits())
         self.available_discounts += hand_disc
         if hand_disc > 0:

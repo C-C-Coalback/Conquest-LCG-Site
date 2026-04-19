@@ -2326,10 +2326,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     self.anrakyr_unit_position = i
                     if card.get_faction() == "Necrons" or card.get_faction() == "Neutral" or \
                             card.get_faction() == primary_player.enslaved_faction:
-                        if card.get_cost() > primary_player.resources:
-                            can_play_card = False
-                        else:
-                            can_play_card = True
+                        can_play_card = True
                 i -= 1
         else:
             self.anrakyr_deck_choice = secondary_player.name_player
@@ -2343,10 +2340,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     self.anrakyr_unit_position = i
                     if card.get_faction() == "Necrons" or card.get_faction() == "Neutral" or \
                             card.get_faction() == primary_player.enslaved_faction:
-                        if card.get_cost() > primary_player.resources:
-                            can_play_card = False
-                        else:
-                            can_play_card = True
+                        can_play_card = True
                 i -= 1
         if found_card:
             if not can_play_card:
