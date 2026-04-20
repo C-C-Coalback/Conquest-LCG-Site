@@ -371,3 +371,6 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards), 0)
         self.assertEqual(len(test_game.p1.attachments_at_planet[4]), 1)
 
+
+if __name__ == "__main__":
+    unittest.main()
