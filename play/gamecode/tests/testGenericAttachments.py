@@ -240,3 +240,87 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.attach_card(test_game.preloaded_find_card("Lucky Warpaint"), 0, 0)
         self.assertEqual(test_game.p1.check_for_trait_given_pos(0, 0, "Blue"), True)
 
+    async def test_area_effect_granting_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Vicious Bloodletter"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Predatory Instinct"), 0, 0)
+        self.assertEqual(test_game.p1.get_area_effect_given_pos(0, 0), 4)
+
+    async def test_sweep_granting_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.attach_card(test_game.preloaded_find_card("The Dawn Blade"), -2, 0)
+        self.assertEqual(test_game.p1.get_sweep_given_pos(-2, 0), 1)
+
+    async def test_mobile_granting_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Mobility"), 0, 0)
+        self.assertEqual(test_game.p1.get_mobile_given_pos(0, 0), True)
+
+    async def test_wargear_attachment_fail_on_vehicles(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Experimental Devilfish"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Godwyn Pattern Bolter"), 0, 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Godwyn Pattern Bolter"), 0, 1)
+        self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 0)
+        self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 1)), 1)
+
+    async def test_required_trait_for_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Experimental Devilfish"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Drone Defense System"), 0, 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Drone Defense System"), 0, 1)
+        self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
+        self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 1)), 0)
+
+    async def test_limit_one_per_unit_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Ripper Swarm"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Regeneration"), 0, 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Regeneration"), 0, 0)
+        self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
+
