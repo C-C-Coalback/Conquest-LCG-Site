@@ -4258,6 +4258,25 @@ class Player:
 
     def get_armorbane_given_pos(self, planet_id, unit_id, enemy_unit_damage=0):
         if planet_id == -2:
+            if self.check_is_unit_at_pos(planet_id, unit_id):
+                if self.headquarters[unit_id].get_armorbane():
+                    return True
+                ability = self.get_ability_given_pos(planet_id, unit_id)
+                if ability == "Praetorian Ancient":
+                    if self.count_units_in_discard() > 5:
+                        return True
+                if ability == "Treacherous Lhamaean":
+                    if self.warlord_faction != "Dark Eldar":
+                        return True
+                if ability == "Dominion Eugenia":
+                    if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
+                        return True
+                if ability == "Frenzied Bloodthirster":
+                    if self.game.bloodthirst_active[planet_id]:
+                        return True
+                if ability == "Carnifex":
+                    if self.game.bloodthirst_active[planet_id]:
+                        return True
             return False
         warlord_pla, warlord_pos = self.get_location_of_warlord()
         if warlord_pla == planet_id:
@@ -4270,19 +4289,20 @@ class Player:
                 return False
         if self.get_blanked_given_pos(planet_id, unit_id):
             return False
-        if self.cards_in_play[planet_id + 1][unit_id].get_ability() == "Praetorian Ancient":
+        ability = self.get_ability_given_pos(planet_id, unit_id)
+        if ability == "Praetorian Ancient":
             if self.count_units_in_discard() > 5:
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Treacherous Lhamaean":
+        if ability == "Treacherous Lhamaean":
             if self.warlord_faction != "Dark Eldar":
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Dominion Eugenia":
+        if ability == "Dominion Eugenia":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Frenzied Bloodthirster":
+        if ability == "Frenzied Bloodthirster":
             if self.game.bloodthirst_active[planet_id]:
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Carnifex":
+        if ability == "Carnifex":
             if self.game.bloodthirst_active[planet_id]:
                 return True
         if planet_id != -2:
@@ -4292,8 +4312,7 @@ class Player:
             if self.search_attachments_at_pos(planet_id, unit_id, "Honorifica Imperialis"):
                 if self.check_for_enemy_warlord(planet_id):
                     return True
-        if self.get_name_given_pos(planet_id, unit_id) == "Termagant" or \
-                self.get_ability_given_pos(planet_id, unit_id) == "Lurking Termagant":
+        if self.get_name_given_pos(planet_id, unit_id) == "Termagant" or ability == "Lurking Termagant":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.get_ability_given_pos(planet_id, i) == "Caustic Tyrannofex":
                     if self.cards_in_play[planet_id + 1][i].misc_ability_used:
