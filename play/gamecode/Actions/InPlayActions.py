@@ -2548,7 +2548,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "In Play Action"
             if can_continue:
-                player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, by_enemy_unit=False)
+                player_owning_card.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                 self.chosen_second_card = True
                 primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                             self.position_of_actioned_card[1])
