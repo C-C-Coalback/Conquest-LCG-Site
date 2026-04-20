@@ -599,9 +599,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.choice_context = "Catachan Devils Patrol: make a choice"
             self.name_player_making_choices = secondary_player.get_name_player()
             self.resolving_search_box = True
-    if self.reactions_needing_resolving and self.already_resolving_reaction:
-        if self.reactions_needing_resolving[0].get_reaction_name() == "Vamii Industrial Complex":
-            self.delete_reaction()
+    if self.reactions_needing_resolving and self.already_resolving_reaction and is_a_reaction:
+        self.delete_reaction()
     if is_battle_ability:
         pass
     if primary_player.extra_deploy_turn_active:
