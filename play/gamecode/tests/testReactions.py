@@ -24,6 +24,9 @@ with open(first_deck_location, 'r') as file:
 with open(second_deck_location, 'r') as file:
     deck_content_2 = file.read()
 
+with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
+    cato_deck_content = file.read()
+
 
 class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_experimental_devilfish(self):
@@ -40,6 +43,20 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["PLANETS", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertEqual(test_game.p1.get_ready_given_pos(0, 1), True)
+
+    async def test_captain_cato_sicarius(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.move_unit_to_planet(-2, 0, 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Shoota Mob"), 0)
+        test_game.p2.destroy_card_in_play(0, 0)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.p1.get_resources(), 8)
 
     async def test_ardent_auxiliaries(self):
         random.seed(42)
