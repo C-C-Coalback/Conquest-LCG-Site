@@ -808,6 +808,8 @@ async def manual_beheaded_hope_ability(self, name, game_update_string, primary_p
                     if game_update_string[1] == primary_player.get_number():
                         hand_pos = int(game_update_string[2])
                         card = primary_player.get_card_in_hand(hand_pos)
+                        if card is None:
+                            return None
                         if card.get_card_type() == "Army":
                             self.card_to_deploy = card
                             primary_player.aiming_reticle_coords_hand = hand_pos
@@ -820,6 +822,8 @@ async def manual_bhorsapolis_the_decadent_ability(self, name, game_update_string
         if game_update_string[0] == "HAND":
             if game_update_string[1] == primary_player.get_number():
                 card = primary_player.get_card_in_hand(int(game_update_string[2]))
+                if card is None:
+                    return None
                 if not card.check_for_a_trait("Elite"):
                     if card.get_card_type() == "Army":
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])

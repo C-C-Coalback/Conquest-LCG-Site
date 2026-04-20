@@ -2098,6 +2098,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
     elif self.action_chosen == "Cenobyte Servitor":
         if self.chosen_first_card:
             card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+            if card is None:
+                return None
             player_getting_attachment = self.p1
             if game_update_string[1] == "2":
                 player_getting_attachment = self.p2
@@ -2527,6 +2529,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.misc_counter = self.misc_counter - 1
                 if self.misc_counter < 1:
                     card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+                    if card is None:
+                        return None
                     del primary_player.cards[primary_player.aiming_reticle_coords_hand]
                     target_planet = self.position_of_actioned_card[0]
                     final_pos = primary_player.add_card_to_planet(card, target_planet)

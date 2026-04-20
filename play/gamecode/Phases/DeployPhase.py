@@ -100,6 +100,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player = self.p2
                             secondary_player = self.p1
                         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+                        if card is None:
+                            return None
                         has_deepstrike = card.get_has_deepstrike()
                         if card.get_card_type() == "Attachment" and primary_player.farsight_relevant:
                             has_deepstrike = True
@@ -278,6 +280,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                     if self.card_pos_to_deploy < len(player.cards):
                         self.planet_pos_to_deploy = planet_chosen
                         card = player.get_card_in_hand(self.card_pos_to_deploy)
+                        if card is None:
+                            return None
                         if self.deepstrike_deployment_active:
                             if player.put_card_into_reserve(card, planet_chosen):
                                 player.remove_card_from_hand(self.card_pos_to_deploy)
@@ -684,6 +688,8 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                 secondary_player = self.p1
     if card is None:
         card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+        if card is None:
+            return None
     discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
     if primary_player.waaagh_arbuttz_active:
         discounts += 1

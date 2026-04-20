@@ -3092,6 +3092,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if secondary_player.number == game_update_string[1]:
                     if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_magus_harid:
                         card = primary_player.get_card_in_hand(self.misc_player_storage)
+                        if card is None:
+                            return None
                         secondary_player.cards_in_play[planet_pos + 1][unit_pos].add_attachment(
                             card, name_owner=primary_player.name_player, is_magus=True)
                         primary_player.remove_card_from_hand(self.misc_player_storage)

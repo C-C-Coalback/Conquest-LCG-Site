@@ -24,6 +24,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 (not primary_player.followers_of_asuryan_relevant or self.round_number != chosen_planet):
             self.planet_pos_to_deploy = int(game_update_string[1])
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+            if card is None:
+                return None
             self.traits_of_card_to_play = card.get_traits()
             self.faction_of_card_to_play = card.get_faction()
             self.name_of_card_to_play = card.get_name()
@@ -459,6 +461,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if self.chosen_first_card:
             if self.get_blue_icon(chosen_planet):
                 card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+                if card is None:
+                    return None
                 primary_player.add_card_to_planet(card, chosen_planet)
                 primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
@@ -468,8 +472,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                                   "Planet is not a technological (blue) planet.")
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_second_card and self.chosen_first_card:
-            self.chosen_second_card = True
             card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+            if card is None:
+                return None
+            self.chosen_second_card = True
             primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
             primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
@@ -968,6 +974,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+            if card is None:
+                return None
             await self.discount_begin_routine(planet_chosen, card, primary_player)
             if card.check_for_a_trait("Elite"):
                 primary_player.master_warpsmith_count = 0

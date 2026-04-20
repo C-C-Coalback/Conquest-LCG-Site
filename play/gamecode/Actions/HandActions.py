@@ -11,6 +11,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         secondary_player = self.p1
     hand_pos = int(game_update_string[2])
     card = primary_player.get_card_in_hand(int(game_update_string[2]))
+    if card is None:
+        return None
     ability = card.get_ability()
     urien_rel = primary_player.urien_relevant
     cost = card.get_cost(urien_rel)
@@ -1214,6 +1216,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Starblaze's Outpost":
         if self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card is None:
+                return None
             if card.get_card_type() == "Army":
                 if card.get_faction() == "Tau":
                     if card.get_cost() <= self.misc_counter:
@@ -1309,6 +1313,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Rapid Assault":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card is None:
+                return None
             if card.get_card_type() == "Army":
                 if card.check_for_a_trait("Kabalite", primary_player.etekh_trait):
                     if card.get_cost() < 4:
@@ -1327,6 +1333,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Canoptek Spyder":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card is None:
+                return None
             if card.get_card_type() == "Army":
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                 self.chosen_first_card = True
@@ -1356,6 +1364,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Cenobyte Servitor":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card is None:
+                return None
             if card.get_card_type() == "Attachment":
                 if card.check_for_a_trait("Relic"):
                     self.chosen_first_card = True
@@ -1370,6 +1380,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Sudden Adaptation":
         if self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card is None:
+                return None
             if card.get_cost() <= self.misc_counter:
                 if card.get_card_type() == "Army":
                     if card.get_faction() == "Tyranids":
@@ -1394,6 +1406,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Merciless Reclamation":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card is None:
+                return None
             if card.get_card_type() == "Army" and card.get_faction() == "Necrons":
                 if card.check_for_a_trait("Soldier", primary_player.etekh_trait) or \
                         card.check_for_a_trait("Warrior", primary_player.etekh_trait):
@@ -1422,6 +1436,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 self.action_cleanup()
     elif self.action_chosen == "Talyesin's Warlocks":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card is None:
+            return None
         if card.check_for_a_trait("Warrior", primary_player.etekh_trait):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             planet_pos, unit_pos = self.position_of_actioned_card
@@ -1434,6 +1450,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                               "Card does not have Warrior trait.")
     elif self.action_chosen == "Behind Enemy Lines":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card is None:
+            return None
         if card.get_is_unit():
             self.chosen_first_card = True
             self.card_pos_to_deploy = int(game_update_string[2])
@@ -1448,6 +1466,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                               "Card is not an army unit.")
     elif self.action_chosen == "Staging Ground":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card is None:
+            return None
         if card.get_is_unit():
             if card.get_cost() < 3:
                 self.chosen_first_card = True
@@ -1466,6 +1486,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                               "Card is not an army unit.")
     elif self.action_chosen == "Launch Pads":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card is None:
+            return None
         if card.get_is_unit():
             if card.get_cost() == 3 and card.get_faction() == "Space Marines":
                 self.chosen_first_card = True
@@ -1478,6 +1500,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 self.card_type_of_selected_card_in_hand = "Army"
     elif self.action_chosen == "Kwik' Konstruckshun":
         card = primary_player.get_card_in_hand(hand_pos)
+        if card is None:
+            return None
         if card.get_card_type() == "Support":
             if card.get_cost() < 4:
                 if primary_player.add_to_hq(card):
@@ -1495,6 +1519,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     elif self.action_chosen == "Crypt of Saint Camila":
         if not self.chosen_first_card:
             card = primary_player.get_card_in_hand(hand_pos)
+            if card is None:
+                return None
             if not card.check_for_a_trait("Elite"):
                 if card.get_faction() == "Space Marines":
                     if card.get_card_type() == "Army":
@@ -1563,6 +1589,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             self.chosen_first_card = True
     elif self.action_chosen == "Bolster the Defense":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
+        if card is None:
+            return None
         if card.get_card_type() == "Support":
             if card.get_cost() <= self.misc_counter:
                 primary_player.add_to_hq(card)

@@ -990,6 +990,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "BTD: Last Planet or HQ?":
         if primary_player.aiming_reticle_coords_hand is not None:
             card = primary_player.get_card_in_hand(primary_player.aiming_reticle_coords_hand)
+            if card is None:
+                return None
             if chosen_choice == "HQ":
                 if primary_player.add_to_hq(card):
                     del primary_player.cards[primary_player.aiming_reticle_coords_hand]

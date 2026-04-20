@@ -2188,6 +2188,8 @@ class Player:
         return False
 
     def get_card_in_hand(self, position_hand):
+        if not self.cards or position_hand == -1:
+            return None
         card = FindCard.find_card(self.cards[position_hand], self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         return card

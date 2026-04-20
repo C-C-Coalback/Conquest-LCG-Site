@@ -71,6 +71,8 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                 primary_player.aiming_reticle_color = "blue"
         elif current_reaction == "Seething Mycetic Spore":
             card = primary_player.get_card_in_hand(hand_pos)
+            if card is None:
+                return None
             if card.get_card_type() == "Army" and card.get_cost() < 2 and card.get_name() != self.misc_player_storage:
                 primary_player.add_card_to_planet(card, self.misc_target_planet)
                 primary_player.remove_card_from_hand(hand_pos)
@@ -83,6 +85,8 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             chosen_planet = self.reactions_needing_resolving[0].get_planet_pos()
             if self.chosen_first_card:
                 card = primary_player.get_card_in_hand(hand_pos)
+                if card is None:
+                    return None
                 if card.get_name() != self.misc_target_choice and card.get_card_type() == "Army" and \
                         card.check_for_a_trait("Harlequin"):
                     self.chosen_second_card = True
@@ -131,6 +135,8 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
         elif current_reaction == "Vamii Industrial Complex":
             if not self.chosen_first_card:
                 card = primary_player.get_card_in_hand(hand_pos)
+                if card is None:
+                    return None
                 if card.get_is_unit():
                     self.card_pos_to_deploy = hand_pos
                     self.card_to_deploy = card
@@ -151,12 +157,16 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
         elif current_reaction == "Salvaged Battlewagon":
             if not self.chosen_first_card:
                 card = primary_player.get_card_in_hand(int(game_update_string[2]))
+                if card is None:
+                    return None
                 if card.get_faction() == "Orks" and card.get_cost() < 4 and card.get_card_type() == "Army":
                     primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     primary_player.aiming_reticle_color = "blue"
                     self.chosen_first_card = True
         elif current_reaction == "Blood Claw Pack":
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
+            if card is None:
+                return None
             if card.check_for_a_trait("Space Wolves", primary_player.etekh_trait):
                 if card.get_is_unit():
                     num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()

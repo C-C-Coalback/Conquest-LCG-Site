@@ -411,6 +411,8 @@ async def update_game_event_command_section(self, name, game_update_string):
                         if primary_player.cards[hand_pos] == "Wraithguard Revenant":
                             if self.get_green_icon(self.last_planet_checked_command_struggle):
                                 card = primary_player.get_card_in_hand(hand_pos)
+                                if card is None:
+                                    return None
                                 primary_player.add_card_to_planet(card, self.last_planet_checked_command_struggle)
                                 del primary_player.cards[hand_pos]
                                 self.p1.has_passed = True
