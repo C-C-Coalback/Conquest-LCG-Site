@@ -966,11 +966,19 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.chosen_first_card = True
             self.chosen_second_card = False
             self.choices_available.remove(chosen_choice)
+            self.create_choices(
+                self.choices_available,
+                general_imaging_format="All"
+            )
         elif not self.chosen_second_card:
             await self.send_update_message("Please decide which card to give your opponent.")
             self.choices_available = [chosen_choice, self.misc_target_choice]
             self.name_player_making_choices = secondary_player.name_player
             self.chosen_second_card = True
+            self.create_choices(
+                self.choices_available,
+                general_imaging_format="All"
+            )
         else:
             secondary_player.cards.append(chosen_choice)
             secondary_player.deck.remove(chosen_choice)
