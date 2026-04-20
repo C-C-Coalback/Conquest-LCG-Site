@@ -247,6 +247,11 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.misc_misc.append(planet_pos + 1)
             if not self.misc_misc:
                 self.delete_reaction()
+        elif current_reaction == "Straken's Cunning":
+            primary_player.draw_card()
+            primary_player.draw_card()
+            primary_player.draw_card()
+            self.delete_reaction()
         elif current_reaction == "Sautekh Royal Crypt Damage":
             self.misc_misc = [False, False, False, False, False, False, False]
             self.misc_misc[planet_pos] = True

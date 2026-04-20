@@ -229,6 +229,24 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
         self.assertEqual(len(test_game.p1.discard), 0)
 
+    async def test_strakens_cunning(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        with open(os.path.join(current_dir, 'decksForTests/ShadowsunCore.txt')) as file:
+            new_warlord_deck_content = file.read()
+        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.attach_card(test_game.preloaded_find_card("Straken's Cunning"), 0, 0)
+        test_game.p1.destroy_card_in_play(0, 0)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(len(test_game.p1.cards), 3)
+
 
 if __name__ == "__main__":
     unittest.main()
