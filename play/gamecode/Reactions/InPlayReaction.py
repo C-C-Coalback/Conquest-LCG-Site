@@ -1773,7 +1773,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target non-Tau units.")
                 else:
-                    if player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Tau"):
+                    if not player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Tau"):
                         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                             if self.misc_target_unit != (planet_pos, unit_pos):
                                 player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, "EOG")
