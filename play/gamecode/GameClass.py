@@ -550,11 +550,17 @@ class Game:
             self.p2.setup_player_no_send(raw_deck_text_2, self.planet_array)
 
     async def send_queued_message(self):
+        """Sends the queued message, if there is one."""
         if self.queued_message:
             await self.send_update_message(self.queued_message)
             self.queued_message = ""
 
     def safety_check(self):
+        """
+        Checks whether the game state is safe, i.e. is anything currently happening.
+        Requirements for safety: no choices, no queued damage, reactions, or interrupts, no action being taken,
+        not rearranging a deck, and not in some other mode such as discounts.
+        """
         if self.choices_available:
             print("Choices are available")
             return False
@@ -579,16 +585,31 @@ class Game:
         return True
 
     async def send_queued_sound(self):
+        """Sends the queued sound, if any."""
         if self.queued_sound:
             print("sending sound")
             await self.send_update_message("GAME_INFO/SOUND/" + self.queued_sound)
             self.queued_sound = ""
 
     def get_planet_name(self, planet_pos):
+        """
+        Gets the name of a planet at the given position.
+        args:
+            planet_pos: position of the planet.
+        returns:
+            string containing the planet name.
+        """
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
         return planet_card.get_name()
 
     def get_red_icon(self, planet_pos):
+        """
+        Determines if there is a red icon on the planet at the given position, including abilities which modify
+        the icons of planets.
+
+        :param planet_pos: position of the planet.
+        :return: boolean.
+        """
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
         if self.p1.search_planet_attachments(planet_pos, "Planetary Devastation"):
             return False
@@ -603,6 +624,13 @@ class Game:
         return False
 
     def get_blue_icon(self, planet_pos):
+        """
+        Determines if there is a blue icon on the planet at the given position, including abilities which modify
+        the icons of planets.
+
+        :param planet_pos: position of the planet.
+        :return: boolean.
+        """
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
         if self.p1.search_planet_attachments(planet_pos, "Planetary Devastation"):
             return False
@@ -617,6 +645,13 @@ class Game:
         return False
 
     def get_green_icon(self, planet_pos):
+        """
+        Determines if there is a green icon on the planet at the given position, including abilities which modify
+        the icons of planets.
+
+        :param planet_pos: position of the planet.
+        :return: boolean.
+        """
         planet_card = FindCard.find_planet_card(self.planet_array[planet_pos], self.planet_cards_array)
         if self.p1.search_planet_attachments(planet_pos, "Planetary Devastation"):
             return False
@@ -631,16 +666,29 @@ class Game:
         return False
 
     async def send_update_message(self, message):
+        """
+        Sends a message to all users in the current room.
+
+        :param message: string containing the message.
+        """
         if self.game_sockets:
             await self.game_sockets[0].receive_game_update(message)
 
     def reset_action_data(self):
+        """
+        Resets action data. Not the same function as action_cleanup().
+        :return: None
+        """
         self.mode = "Normal"
         self.action_chosen = ""
         self.player_with_action = ""
         self.position_of_actioned_card = (-1, -1)
 
     def reset_damage_data(self):
+        """
+        Resets stored damage data.
+        :return: None
+        """
         self.stored_damage = []
         self.stored_taken_damage = []
         self.damage_from_atrox = False
@@ -649,14 +697,26 @@ class Game:
         self.furiable_unit_position = (-1, -1)
 
     def reset_effects_data(self):
+        """
+        Resets stored interrupt data.
+        :return: None
+        """
         self.already_resolving_interrupt = False
         self.interrupts_waiting_on_resolution = []
 
     def reset_reactions_data(self):
+        """
+        Resets stored reaction data.
+        :return: None
+        """
         self.reactions_needing_resolving = []
         self.already_resolving_reaction = False
 
     def get_actions_allowed(self):
+        """
+        Checks if initiating actions are allowed. Many things can prevent actions from being taken.
+        :return: boolean
+        """
         if self.manual_bodyguard_resolution:
             return False
         elif self.resolving_kugath_nurglings:
@@ -680,6 +740,11 @@ class Game:
         return True
 
     async def joined_requests_graphics(self, name):
+        """
+        Sends all the game data to all users in the channel.
+        :param name: name of the user who joined, unused.
+        :return: None
+        """
         self.condition_main_game.acquire()
         await self.send_decks(force=True)
         await self.p1.send_hand(force=True)
@@ -704,6 +769,13 @@ class Game:
         self.condition_main_game.release()
 
     async def send_decks(self, force=False):
+        """
+        Sends the top card of each players' deck.
+        Usually, this is just the card back, however some cards interact with this.
+
+        :param force: If False, only send the deck data if there has been a change since the last send.
+        :return: None
+        """
         card_one = "Cardback"
         card_two = "Cardback"
         if self.p1.deck:
@@ -722,6 +794,15 @@ class Game:
             await self.send_update_message("GAME_INFO/DECK/2/" + card_two)
 
     def create_choices(self, choices_array, general_imaging_format="No Images", custom_array=None):
+        """
+        Creates choices from array along with embedding helper card image links in the choices.
+
+        :param choices_array: Array of choices
+        :param general_imaging_format: Should images be used, and where?
+        Options are currently "No Images", "All But Last", "All" and "All Planets".
+        :param custom_array: Allows for customising the images that are embedded in the choices.
+        :return: None
+        """
         self.choices_available = choices_array
         self.resolving_search_box = True
         if custom_array is not None:
