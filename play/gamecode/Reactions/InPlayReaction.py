@@ -1515,6 +1515,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if warlord_pla != planet_pos and warlord_pla != -1:
                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Blackmane Sentinel":
                         primary_player.move_unit_to_planet(planet_pos, unit_pos, warlord_pla)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Ragnar Blackmane":
             if planet_pos == og_pla:
