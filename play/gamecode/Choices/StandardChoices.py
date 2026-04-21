@@ -2298,28 +2298,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
             await self.better_shield_card_resolution(
                 primary_player.name_player, self.last_shield_string, alt_shields=False)
-    elif self.choice_context == "Target Holy Sepulchre:":
-        target = self.choices_available[int(game_update_string[1])]
-        primary_player.cards.append(target)
-        primary_player.discard.remove(target)
-        primary_player.cards_recently_discarded.remove(target)
-        primary_player.exhaust_card_in_hq_given_name("Holy Sepulchre")
-        self.choices_available = []
-        if self.holy_sepulchre_check(primary_player):
-            for i in range(len(primary_player.cards_recently_discarded)):
-                card = FindCard.find_card(primary_player.cards_recently_discarded[i],
-                                          self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                if card.get_faction() == "Space Marines" and card.get_is_unit():
-                    self.choices_available.append(card.get_name())
-                    self.create_choices(
-                        self.choices_available,
-                        general_imaging_format="All"
-                    )
-        if not self.choices_available:
-            self.choice_context = ""
-            self.name_player_making_choices = ""
-            self.resolving_search_box = False
     elif self.choice_context == "Anrakyr: Select which discard:":
         found_card = False
         can_play_card = False
@@ -2665,26 +2643,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                             self.choices_available,
                             general_imaging_format="All"
                         )
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.resolving_search_box = False
-    elif self.choice_context == "Use Holy Sepulchre?":
-        if game_update_string[1] == "0":
-            self.choices_available = []
-            self.choice_context = "Target Holy Sepulchre:"
-            for i in range(len(primary_player.cards_recently_discarded)):
-                card = FindCard.find_card(primary_player.cards_recently_discarded[i],
-                                          self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                if card.get_faction() == "Space Marines" and card.get_is_unit():
-                    self.choices_available.append(card.get_name())
-                    self.create_choices(
-                        self.choices_available,
-                        general_imaging_format="All"
-                    )
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.resolving_search_box = False
         elif game_update_string[1] == "1":
             self.reset_choices_available()
             self.resolving_search_box = False

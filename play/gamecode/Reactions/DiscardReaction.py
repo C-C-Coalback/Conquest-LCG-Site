@@ -64,6 +64,14 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             primary_player.aiming_reticle_coords_discard = pos_discard
                             self.misc_player_storage = card.get_name()
                             self.chosen_first_card = True
+        elif current_reaction == "Holy Sepulchre":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_name() in primary_player.cards_recently_discarded:
+                    if card.get_card_type() == "Army" and card.get_faction() == "Space Marines":
+                        primary_player.cards.append(card.get_name())
+                        del primary_player.discard[pos_discard]
+                        self.delete_reaction()
         elif current_reaction == "Ghost Ark of Orikan":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)

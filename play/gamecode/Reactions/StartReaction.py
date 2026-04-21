@@ -2928,11 +2928,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.chosen_first_card = False
             primary_player.exhaust_card_in_hq_given_name("Leviathan Hive Ship")
         elif current_reaction == "Holy Sepulchre":
-            self.resolving_search_box = True
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Holy Sepulchre?"
-            self.name_player_making_choices = primary_player.name_player
-            self.delete_reaction()
+            if not primary_player.exhaust_card_in_hq_given_name("Holy Sepulchre"):
+                self.delete_reaction()
         elif current_reaction == "Cato's Stronghold":
             primary_player.exhaust_card_in_hq_given_name("Cato's Stronghold")
         elif current_reaction == "Ardaci-strain Broodlord":
