@@ -1859,7 +1859,7 @@ class Player:
                             i = i - 1
             i += 1
 
-    def adjust_own_reactions(self, planet_pos, unit_pos):
+    def adjust_own_reactions(self, planet_pos, unit_pos, new_position=None):
         i = 0
         while i < len(self.game.reactions_needing_resolving):
             num, pla, pos = self.game.reactions_needing_resolving[i].get_position_unit_triggering()
@@ -1871,10 +1871,18 @@ class Player:
                     elif pos == unit_pos:
                         if i == 0:
                             if not self.game.already_resolving_reaction:
-                                del self.game.reactions_needing_resolving[i]
+                                if new_position is not None:
+                                    new_pla, new_pos = new_position
+                                    self.game.reactions_needing_resolving[i].set_position_unit_triggering((num, new_pla, new_pos))
+                                else:
+                                    del self.game.reactions_needing_resolving[i]
                                 i = i - 1
                         else:
-                            del self.game.reactions_needing_resolving[i]
+                            if new_position is not None:
+                                new_pla, new_pos = new_position
+                                self.game.reactions_needing_resolving[i].set_position_unit_triggering((num, new_pla, new_pos))
+                            else:
+                                del self.game.reactions_needing_resolving[i]
                             i = i - 1
             i += 1
         i = 0
@@ -1886,7 +1894,11 @@ class Player:
                         pos -= 1
                         self.game.delayed_reactions_needing_resolving[i].set_position_unit_triggering((num, pla, pos))
                     elif pos == unit_pos:
-                        del self.game.delayed_reactions_needing_resolving[i]
+                        if new_position is not None:
+                            new_pla, new_pos = new_position
+                            self.game.delayed_reactions_needing_resolving[i].set_position_unit_triggering((num, new_pla, new_pos))
+                        else:
+                            del self.game.delayed_reactions_needing_resolving[i]
                         i = i - 1
             i += 1
 
@@ -3664,7 +3676,7 @@ class Player:
             last_element_index = new_pos
             self.cards_in_play[destination + 1][new_pos].valid_kugath_nurgling_target = True
             self.game.just_moved_units = True
-            self.remove_card_from_play(origin_planet, origin_position, proper_remove=False)
+            self.remove_card_from_play(origin_planet, origin_position, proper_remove=False, new_position=(destination, new_pos))
             self.aunla_prince_check(destination, new_pos, origin_planet)
             if self.get_ability_given_pos(destination, new_pos) == "Quartermasters":
                 if self.get_damage_given_pos(destination, new_pos) > 0:
@@ -7336,11 +7348,6 @@ class Player:
                                 self.game.create_interrupt("Necrodermis", self.name_player,
                                                            (int(self.number), -2, i))
                                 self.necrodermis_allowed = False
-                            # elif self.search_for_card_everywhere("Harbinger of Eternity"):
-                            #     if "Necrodermis" in self.discard:
-                            #         self.game.create_interrupt("Necrodermis", self.name_player,
-                            #                                    (int(self.number), -2, i))
-                            #         self.necrodermis_allowed = False
 
         for i in range(7):
             for j in range(len(self.cards_in_play[i + 1])):
@@ -7715,7 +7722,7 @@ class Player:
                 if self.count_copies_in_play(card.get_name()) < limit:
                     self.add_to_hq(card)
 
-    def remove_card_from_play(self, planet_num, card_pos, proper_remove=True):
+    def remove_card_from_play(self, planet_num, card_pos, proper_remove=True, new_position=None):
         if planet_num == -2:
             self.remove_card_from_hq(card_pos, proper_remove=proper_remove)
             return None
@@ -7723,20 +7730,22 @@ class Player:
             self.cards_removed_from_game.append(self.get_name_given_pos(planet_num, card_pos))
             self.cards_removed_from_game_hidden.append("N")
         del self.cards_in_play[planet_num + 1][card_pos]
-        self.adjust_own_reactions(planet_num, card_pos)
+        self.adjust_own_reactions(planet_num, card_pos, new_position=new_position)
         self.adjust_own_interrupts(planet_num, card_pos)
         self.adjust_last_def_pos(planet_num, card_pos)
         self.adjust_own_damage(planet_num, card_pos)
         return None
 
-    def remove_card_from_hq(self, card_pos, proper_remove=True):
+    def remove_card_from_hq(self, card_pos, proper_remove=True, new_position=None):
         if proper_remove:
             self.cards_removed_from_game.append(self.get_name_given_pos(-2, card_pos))
             self.cards_removed_from_game_hidden.append("N")
         del self.headquarters[card_pos]
-        self.adjust_own_reactions(-2, card_pos)
+        self.adjust_own_reactions(-2, card_pos, new_position=new_position)
         self.adjust_own_interrupts(-2, card_pos)
         self.adjust_last_def_pos(-2, card_pos)
+        self.adjust_own_damage(-2, card_pos)
+        return None
 
     def add_card_in_play_to_discard(self, planet_num, card_pos):
         if planet_num == -2:
@@ -8027,8 +8036,8 @@ class Player:
                     if self.get_ready_given_pos(-2, i):
                         self.game.create_reaction("Homing Beacon", self.name_player, (int(self.number), -2, i))
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
-        self.remove_card_from_play(planet_id, unit_id, proper_remove=False)
         last_element_index = len(self.headquarters) - 1
+        self.remove_card_from_play(planet_id, unit_id, proper_remove=False, new_position=(-2, last_element_index))
         self.aunla_prince_check(-2, last_element_index, planet_id)
         for i in range(len(self.headquarters)):
             if i != last_element_index:
