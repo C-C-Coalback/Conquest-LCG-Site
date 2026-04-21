@@ -775,7 +775,7 @@ class Game:
 
     async def send_initiative(self, force=False):
         initiative_string = "GAME_INFO/INITIATIVE/"
-        if self.last_planet_checked_for_battle != -1:
+        if self.check_if_battle_taking_place():
             if self.p1.has_initiative_for_battle:
                 initiative_string += "1"
             else:
@@ -3915,6 +3915,11 @@ class Game:
         if slaanesh_temptation:
             self.discounts_applied -= 1
         self.discounts_applied += self.vamii_complex_discount
+
+    def check_if_battle_taking_place(self):
+        if self.last_planet_checked_for_battle != -1 and self.battle_in_progress:
+            return True
+        return False
 
     async def calculate_available_discounts_unit(self, planet_chosen, card, player):
         other_player = self.p1

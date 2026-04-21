@@ -195,7 +195,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                               "Torquemada Coteaz ability already used this attack.")
                     elif ability == "Canoptek Spyder":
                         if not card_chosen.once_per_combat_round_used:
-                            if planet_pos == self.last_planet_checked_for_battle:
+                            if planet_pos == self.last_planet_checked_for_battle and self.check_if_battle_taking_place():
                                 card_chosen.once_per_combat_round_used = True
                                 self.action_chosen = ability
                                 self.position_of_actioned_card = (planet_pos, unit_pos)
@@ -435,7 +435,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.misc_target_planet = planet_pos
                     elif ability == "Inexperienced Weirdboy":
                         if not card_chosen.once_per_combat_round_used:
-                            if planet_pos == self.last_planet_checked_for_battle:
+                            if planet_pos == self.last_planet_checked_for_battle and self.check_if_battle_taking_place():
                                 card_chosen.once_per_combat_round_used = True
                                 self.action_chosen = ability
                                 player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")

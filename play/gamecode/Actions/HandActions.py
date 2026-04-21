@@ -259,7 +259,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                     elif ability == "Looted Skrap":
                         if primary_player.can_play_limited:
-                            if self.last_planet_checked_for_battle != -1:
+                            if self.check_if_battle_taking_place():
                                 primary_player.can_play_limited = False
                                 primary_player.looted_skrap_active = True
                                 primary_player.looted_skrap_count = 3
@@ -268,7 +268,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                     elif ability == "The Bloodied Host":
-                        if not primary_player.bloodied_host_used and self.last_planet_checked_for_battle != -1:
+                        if not primary_player.bloodied_host_used and self.check_if_battle_taking_place():
                             primary_player.bloodied_host_used = True
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             for i in range(len(primary_player.headquarters)):
@@ -433,7 +433,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 primary_player.draw_card()
                                 self.action_chosen = ability
                     elif ability == "Rok Bombardment":
-                        if self.last_planet_checked_for_battle != -1:
+                        if self.check_if_battle_taking_place():
                             secondary_player.rok_bombardment_active.append("Enemy")
                             if not self.get_red_icon(self.last_planet_checked_for_battle):
                                 primary_player.rok_bombardment_active.append("Own")
@@ -773,7 +773,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Blessing of Mork":
-                        if self.last_planet_checked_for_battle != -1:
+                        if self.check_if_battle_taking_place():
                             primary_player.discard_card_from_hand(hand_pos)
                             primary_player.mork_blessings_count += 1
                             primary_player.resolve_played_any_event()
@@ -957,7 +957,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Drop Pod Assault":
-                        if self.last_planet_checked_for_battle != -1:
+                        if self.check_if_battle_taking_place():
                             self.action_chosen = ability
                             self.choice_context = ability
                             primary_player.discard_card_from_hand(hand_pos)

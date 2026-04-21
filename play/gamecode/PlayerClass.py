@@ -497,7 +497,7 @@ class Player:
             enemy_player = self.game.p2
         else:
             enemy_player = self.game.p1
-        if self.game.last_planet_checked_for_battle != -1:
+        if self.game.check_if_battle_taking_place():
             if enemy_player.has_initiative_for_battle:
                 return True
         elif self.game.player_with_initiative == enemy_player.name_player:
@@ -2496,7 +2496,7 @@ class Player:
         return self.cards_in_play[planet_pos + 1][unit_pos]
 
     def iyanden_farseer_check(self):
-        if self.game.battle_in_progress and self.game.last_planet_checked_for_battle != -1:
+        if self.game.check_if_battle_taking_place():
             for i in range(len(self.cards_in_play[self.game.last_planet_checked_for_battle + 1])):
                 if self.get_ability_given_pos(self.game.last_planet_checked_for_battle, i) == "Iyanden Farseer":
                     return True
@@ -7331,7 +7331,7 @@ class Player:
                                 self.hit_by_gorgul and not self.get_once_per_game_used_given_pos(-2, i):
                             self.game.create_interrupt("Saint Celestine: Rebirth", self.name_player,
                                                        (int(self.number), -2, i))
-                        elif self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
+                        elif self.game.check_if_battle_taking_place() and self.necrodermis_allowed:
                             if self.necrodermis_check():
                                 self.game.create_interrupt("Necrodermis", self.name_player,
                                                            (int(self.number), -2, i))
@@ -7356,7 +7356,7 @@ class Player:
                                     self.hit_by_gorgul and not self.get_once_per_game_used_given_pos(i, j):
                                 self.game.create_interrupt("Saint Celestine: Rebirth", self.name_player,
                                                            (int(self.number), i, j))
-                            elif self.game.last_planet_checked_for_battle != -1 and self.necrodermis_allowed:
+                            elif self.game.check_if_battle_taking_place() and self.necrodermis_allowed:
                                 if self.necrodermis_check():
                                     self.game.create_interrupt("Necrodermis", self.name_player,
                                                                (int(self.number), i, j))
