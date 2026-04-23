@@ -315,6 +315,39 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["pass-P1"])
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 1), 2)
 
+    async def test_drifting_spore_mines(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
+            new_warlord_deck_content = file.read()
+        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Drifting Spore Mines"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Zarathur's Flamers"), 1)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Veteran Brother Maxos"), 1)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P2", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["PLANETS", "1"])
+        self.assertEqual(test_game.choice_context, "Damage Drifting Spore Mines?")
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "2", "1", "1"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "2", "1", "0"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        self.assertEqual(test_game.p2.get_damage_given_pos(1, 0), 1)
+        self.assertEqual(test_game.p2.get_damage_given_pos(1, 1), 0)
+        self.assertEqual(test_game.p1.get_damage_given_pos(1, 0), 1)
 
 if __name__ == "__main__":
     unittest.main()
