@@ -1583,6 +1583,8 @@ class Player:
         return shields
 
     def get_damage_given_pos(self, planet_id, unit_id):
+        if planet_id == -1 or unit_id == -1:
+            return 0
         if planet_id == -2:
             return self.headquarters[unit_id].get_damage()
         return self.cards_in_play[planet_id + 1][unit_id].get_damage()
@@ -4364,6 +4366,8 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_has_hive_mind()
 
     def get_blanked_given_pos(self, planet_id, unit_id):
+        if planet_id == -1 or unit_id == -1:
+            return False
         if planet_id == -2:
             return self.headquarters[unit_id].get_blanked()
         other_player = self.get_other_player()
@@ -4381,6 +4385,8 @@ class Player:
         return self.cards_in_play[planet_id + 1][unit_id].get_blanked()
 
     def get_ability_given_pos(self, planet_id, unit_id, bloodied_relevant=False):
+        if planet_id == -1 or unit_id == -1:
+            return ""
         self.ability_recursion_count += 1
         if self.ability_recursion_count > self.max_ability_recursion:
             self.game.queued_message = "DEBUG: Ability Recursion Fail-Safe Hit."
