@@ -458,7 +458,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 secondary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
                 last_element_index = len(secondary_player.cards_in_play[chosen_planet + 1]) - 1
                 self.misc_target_unit = (chosen_planet, last_element_index)
-                self.reactions_needing_resolving[0].get_player_resolving_reaction(secondary_player.name_player)
+                self.reactions_needing_resolving[0].get_player_resolving_reaction()
                 self.choices_available = ["Yes", "No"]
                 self.choice_context = "Damage Drifting Spore Mines?"
                 self.resolving_search_box = True

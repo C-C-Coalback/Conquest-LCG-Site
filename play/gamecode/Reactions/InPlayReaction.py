@@ -228,7 +228,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
         elif current_reaction == "Junk Chucka Kommando":
             if self.chosen_first_card:
-                if self.misc_target_attachment[1] == planet_pos:
+                og_pla, og_pos, og_attachment = self.misc_target_attachment
+                if og_pla == planet_pos:
                     can_continue = True
                     possible_interrupts = []
                     if player_owning_card.name_player == primary_player.name_player:
@@ -252,7 +253,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        og_pla, og_pos, og_attachment = self.misc_target_attachment
                         attachment = primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
                         owner_attachment = attachment.name_owner
                         not_own_attachment = False
