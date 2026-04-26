@@ -1,5 +1,6 @@
 from .. import FindCard
 from ..Phases import DeployPhase
+from .. import CardClasses
 
 
 async def resolve_hq_reaction(self, name, game_update_string, primary_player, secondary_player):
