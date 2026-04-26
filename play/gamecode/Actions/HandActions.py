@@ -1165,6 +1165,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         if secondary_player.cards:
                             interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            primary_player.discard_card_from_hand(hand_pos)
                             if interrupts:
                                 await self.send_update_message("Some sort of interrupt may be used.")
                                 self.choices_available = interrupts
@@ -1174,8 +1175,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.resolving_search_box = True
                                 self.stored_discard_and_target.append((ability, primary_player.number))
                             else:
-                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                                primary_player.aiming_reticle_coords_hand = None
                                 self.create_choices(
                                     secondary_player.cards,
                                     general_imaging_format="All"
