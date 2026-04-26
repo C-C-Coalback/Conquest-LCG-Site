@@ -1175,6 +1175,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                         planet_pos = int(message[2])
                         active_games[self.game_position].infested_planets[planet_pos] = False
                         await active_games[self.game_position].send_planet_array()
+                    elif message[1] == "return" and len(message) == 2:
+                        active_games[self.game_position].debug_mode = "return"
+                        await self.receive_game_update("Click card to return it to your hand.")
                     elif message[1] == "ready-card":
                         if len(message) == 2:
                             active_games[self.game_position].debug_mode = "ready-card"

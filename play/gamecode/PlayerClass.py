@@ -1558,6 +1558,10 @@ class Player:
         if name in self.cards:
             self.cards.remove(name)
 
+    def return_discard_to_hand(self, position):
+        self.cards.append(self.discard[position])
+        del self.discard[position]
+
     def get_shields_given_pos(self, pos_in_hand, planet_pos=None, tank=False):
         shield_card_name = self.cards[pos_in_hand]
         card_object = FindCard.find_card(shield_card_name, self.card_array, self.cards_dict,

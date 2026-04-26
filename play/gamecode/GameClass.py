@@ -6845,6 +6845,9 @@ class Game:
                     elif self.debug_mode == "destroy":
                         primary_player.destroy_card_in_play(planet_pos, unit_pos)
                         self.debug_mode = None
+                    elif self.debug_mode == "return":
+                        primary_player.return_card_to_hand(planet_pos, unit_pos, return_attachments=True)
+                        self.debug_mode = None
                     elif self.debug_mode == "ready-card":
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.debug_mode = None
@@ -6874,6 +6877,9 @@ class Game:
                     if self.debug_mode == "move-to-top-discard":
                         primary_player.move_to_top_of_discard(discard_pos)
                         self.debug_mode = None
+                    elif self.debug_mode == "return":
+                        primary_player.return_discard_to_hand(discard_pos)
+                        self.debug_mode = None
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     planet_pos = int(game_update_string[2])
@@ -6888,8 +6894,10 @@ class Game:
                         primary_player.ready_given_pos(planet_pos, unit_pos)
                         self.debug_mode = None
                     elif self.debug_mode == "destroy":
-                        print("trying to destroy")
                         primary_player.destroy_card_in_play(planet_pos, unit_pos)
+                        self.debug_mode = None
+                    elif self.debug_mode == "return":
+                        primary_player.return_card_to_hand(planet_pos, unit_pos, return_attachments=True)
                         self.debug_mode = None
                     elif self.debug_mode == "clear-reticle":
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -6916,6 +6924,9 @@ class Game:
                         if self.debug_mode == "destroy":
                             primary_player.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                             self.debug_mode = None
+                        elif self.debug_mode == "return":
+                            primary_player.return_attachment_to_hand(planet_pos, unit_pos, attachment_pos)
+                            self.debug_mode = None
             elif len(game_update_string) == 6:
                 if game_update_string[0] == "ATTACHMENT":
                     if game_update_string[1] == "IN_PLAY":
@@ -6927,6 +6938,9 @@ class Game:
                             primary_player = self.p1
                         if self.debug_mode == "destroy":
                             primary_player.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
+                            self.debug_mode = None
+                        elif self.debug_mode == "return":
+                            primary_player.return_attachment_to_hand(planet_pos, unit_pos, attachment_pos)
                             self.debug_mode = None
         except:
             self.debug_mode = None
