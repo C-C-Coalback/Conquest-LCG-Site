@@ -398,6 +398,20 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     primary_player.discard.remove(card_name)
                     self.delete_reaction()
+    elif current_reaction == "Shadowed Thorns Venom":
+        if not self.chosen_first_card:
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if primary_player.headquarters[unit_pos].shadowed_thorns_venom_valid:
+                    self.chosen_first_card = True
+                    primary_player.headquarters[unit_pos].shadowed_thorns_venom_valid = False
+                    primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      "Not a valid target for " + current_reaction + ".")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  current_reaction + " can only target army units.")
     elif current_reaction == "Cult of Khorne Attachment":
         card = CardClasses.AttachmentCard(
             "Cult of Khorne", "Attach to an army unit. Attached unit gets +2 ATK.",
