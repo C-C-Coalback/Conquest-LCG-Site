@@ -7105,6 +7105,8 @@ class Game:
                     self.reactions_needing_resolving[0].set_player_resolving_reaction(self.name_1)
             if not self.p1.discard_inquis_caius_wroth and not self.p2.discard_inquis_caius_wroth:
                 self.delete_reaction()
+        if self.check_if_units_can_be_destroyed():
+            await self.destroy_check_all_cards()
         await self.update_interrupts(name, game_update_string)
         await self.update_interrupts(name, game_update_string)
         await self.update_reactions(name, game_update_string)
@@ -7157,8 +7159,6 @@ class Game:
                 self.player_who_is_shielding = self.name_2
                 self.number_who_is_shielding = "2"
                 self.p2.set_aiming_reticle_in_play(pos_holder[1], pos_holder[2], "red")
-        if self.check_if_units_can_be_destroyed():
-            await self.destroy_check_all_cards()
         if not self.stored_damage and not self.interrupts_waiting_on_resolution \
                 and not self.choices_available and self.p1.mobile_resolved and self.p2.mobile_resolved and \
                 self.mode == "Normal" and not self.xv805_enforcer_active and not self.queued_moves:
