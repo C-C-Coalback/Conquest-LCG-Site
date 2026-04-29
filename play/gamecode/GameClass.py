@@ -6026,16 +6026,18 @@ class Game:
                         player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_attacker()
                         if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
                             if secondary_player.search_hand_for_card("Crushing Blow"):
-                                if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
-                                    self.create_reaction("Crushing Blow", secondary_player.name_player,
-                                                         (int(primary_player.number), -1, -1))
+                                if not primary_player.get_immune_to_enemy_events(def_pla, def_pos):
+                                    if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
+                                        self.create_reaction("Crushing Blow", secondary_player.name_player,
+                                                             (int(primary_player.number), -1, -1))
                                     primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
                         if not secondary_player.check_if_already_have_reaction("The Fury of Sicarius"):
                             if secondary_player.search_hand_for_card("The Fury of Sicarius"):
                                 if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
-                                    if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
-                                        self.create_reaction("The Fury of Sicarius", secondary_player.name_player,
-                                                             (int(primary_player.number), def_pla, def_pos))
+                                    if not primary_player.get_immune_to_enemy_events(def_pla, def_pos):
+                                        if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
+                                            self.create_reaction("The Fury of Sicarius", secondary_player.name_player,
+                                                                 (int(primary_player.number), def_pla, def_pos))
 
             if self.stored_damage[0].get_position_attacker() is not None:
                 player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_attacker()
