@@ -4468,18 +4468,6 @@ class Game:
                                         took_damage = True
                                         if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                             took_damage = False
-                                        if primary_player.get_ability_given_pos(
-                                                planet_pos, unit_pos) == "Sororitas Command Squad":
-                                            if self.stored_damage[0].get_position_attacker():
-                                                if not primary_player.get_once_per_phase_used_given_pos(planet_pos,
-                                                                                                        unit_pos):
-                                                    self.sororitas_command_squad_value = shields
-                                                    primary_player.set_once_per_phase_used_given_pos(
-                                                        planet_pos, unit_pos, True)
-                                                    self.create_reaction(
-                                                        "Sororitas Command Squad", primary_player.name_player,
-                                                        self.stored_damage[0].get_position_attacker()
-                                                    )
                                         if self.stored_damage[0].get_position_attacker():
                                             num_atk, pla_atk, pos_atk = self.stored_damage[0].get_position_attacker()
                                             for attach_pos in range(len(secondary_player.cards_in_play[pla_atk + 1
@@ -4492,6 +4480,17 @@ class Game:
                                                         (num_atk, pla_atk,
                                                          pos_atk))
                                                     self.spray_and_pray_amounts.append(shields)
+                                            if primary_player.get_ability_given_pos(
+                                                    planet_pos, unit_pos) == "Sororitas Command Squad":
+                                                if secondary_player.get_card_type_given_pos(pla_atk, pos_atk) != "Warlord":
+                                                    if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                                                        if not primary_player.check_if_already_have_reaction_of_position("Sororitas Command Squad", planet_pos, unit_pos):
+                                                            self.sororitas_command_squad_value = shields
+                                                            self.create_reaction(
+                                                                "Sororitas Command Squad", primary_player.name_player,
+                                                                (int(primary_player.number), planet_pos, unit_pos),
+                                                                additional_info=self.stored_damage[0].get_position_attacker()
+                                                            )
                                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                                             for j in range(len(secondary_player.cards_in_play[
                                                                    planet_pos + 1][i].attachments)):
@@ -4786,6 +4785,7 @@ class Game:
                                     amount_to_remove = amount_to_remove * 2
                                 if amount_to_remove > self.stored_damage[0].get_amount_that_can_be_blocked():
                                     amount_to_remove = self.stored_damage[0].get_amount_that_can_be_blocked()
+                                self.stored_damage[0].decrease_amount_that_can_be_blocked(amount_to_remove)
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
                                 self.queued_sound = "shield"
                                 primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)
@@ -4985,19 +4985,21 @@ class Game:
                                     amount_to_remove = amount_to_remove * 2
                                 if amount_to_remove > self.stored_damage[0].get_amount_that_can_be_blocked():
                                     amount_to_remove = self.stored_damage[0].get_amount_that_can_be_blocked()
-                                if primary_player.get_ability_given_pos(
-                                        hurt_planet, hurt_pos) == "Sororitas Command Squad":
-                                    if self.stored_damage[0].get_position_attacker():
-                                        if not primary_player.get_once_per_phase_used_given_pos(hurt_planet, hurt_pos):
-                                            primary_player.set_once_per_phase_used_given_pos(hurt_planet,
-                                                                                             hurt_pos, True)
-                                            self.sororitas_command_squad_value = amount_to_remove
-                                            self.create_reaction("Sororitas Command Squad", primary_player.name_player,
-                                                                 self.stored_damage[0].get_position_attacker())
-                                print("pre-spray")
                                 if self.stored_damage[0].get_position_attacker():
-                                    print("Spray check")
                                     num_atk, pla_atk, pos_atk = self.stored_damage[0].get_position_attacker()
+                                    if primary_player.get_ability_given_pos(
+                                            planet_pos, unit_pos) == "Sororitas Command Squad":
+                                        if secondary_player.get_card_type_given_pos(pla_atk, pos_atk) != "Warlord":
+                                            if not primary_player.get_once_per_phase_used_given_pos(planet_pos,
+                                                                                                    unit_pos):
+                                                if not primary_player.check_if_already_have_reaction_of_position(
+                                                        "Sororitas Command Squad", planet_pos, unit_pos):
+                                                    self.sororitas_command_squad_value = amount_to_remove
+                                                    self.create_reaction(
+                                                        "Sororitas Command Squad", primary_player.name_player,
+                                                        (int(primary_player.number), planet_pos, unit_pos),
+                                                        additional_info=self.stored_damage[0].get_position_attacker()
+                                                    )
                                     for attach_pos in range(len(secondary_player.cards_in_play[pla_atk + 1
                                                                 ][pos_atk].get_attachments())):
                                         if secondary_player.cards_in_play[pla_atk + 1][

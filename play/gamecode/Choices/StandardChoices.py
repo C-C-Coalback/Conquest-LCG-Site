@@ -2853,13 +2853,20 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.alt_shield_mode_active = False
         self.reset_choices_available()
         self.resolving_search_box = False
-        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Sororitas Command Squad":
-            if self.stored_damage[0].get_position_attacker():
-                if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
-                    self.sororitas_command_squad_value = amount
-                    primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
-                    self.create_reaction("Sororitas Command Squad", primary_player.name_player,
-                                         self.stored_damage[0].get_position_attacker())
+        if self.stored_damage[0].get_position_attacker():
+            num_atk, pla_atk, pos_atk = self.stored_damage[0].get_position_attacker()
+            if primary_player.get_ability_given_pos(
+                    planet_pos, unit_pos) == "Sororitas Command Squad":
+                if secondary_player.get_card_type_given_pos(pla_atk, pos_atk) != "Warlord":
+                    if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
+                        if not primary_player.check_if_already_have_reaction_of_position("Sororitas Command Squad",
+                                                                                         planet_pos, unit_pos):
+                            self.sororitas_command_squad_value = shields
+                            self.create_reaction(
+                                "Sororitas Command Squad", primary_player.name_player,
+                                (int(primary_player.number), planet_pos, unit_pos),
+                                additional_info=self.stored_damage[0].get_position_attacker()
+                            )
         if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             await self.shield_cleanup(primary_player, secondary_player, planet_pos)

@@ -2155,12 +2155,10 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Sanctified Bolter":
             self.misc_counter = 0
         elif current_reaction == "Sororitas Command Squad":
-            if num == 1:
-                if self.p1.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
-                    self.p1.assign_damage_to_pos(planet_pos, unit_pos, self.sororitas_command_squad_value)
-            else:
-                if self.p2.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
-                    self.p2.assign_damage_to_pos(planet_pos, unit_pos, self.sororitas_command_squad_value)
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
+            _, att_pla, att_pos = extra_info
+            secondary_player.assign_damage_to_pos(att_pla, att_pos, self.sororitas_command_squad_value)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Eloquent Confessor":
             await self.send_update_message("Please pay 1 faith.")
