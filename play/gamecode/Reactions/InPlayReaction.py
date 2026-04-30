@@ -2489,9 +2489,16 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Crushing Blow":
             if game_update_string[1] == secondary_player.get_number():
                 if not secondary_player.get_immune_to_enemy_events(planet_pos, unit_pos):
-                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False,
-                                                          by_enemy_unit=False)
-                    self.delete_reaction()
+                    if secondary_player.get_valid_crushing_blow_given_pos(planet_pos, unit_pos):
+                        secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False,
+                                                              by_enemy_unit=False)
+                        if primary_player.search_hand_for_card("Crushing Blow"):
+                            self.create_reaction("Crushing Blow", primary_player.name_player,
+                                                 (int(primary_player.number), -1, -1))
+                        self.delete_reaction()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " cannot deal damage to that unit.")
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       current_reaction + " cannot deal damage to units that are immune to enemy events.")

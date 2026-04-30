@@ -7239,6 +7239,11 @@ class Player:
         self.cards_in_play[planet_id + 1][unit_id].can_be_crushing_blowed = val
         return None
 
+    def get_valid_crushing_blow_given_pos(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].can_be_crushing_blowed
+        return self.cards_in_play[planet_id + 1][unit_id].can_be_crushing_blowed
+
     def get_lumbering_given_pos(self, planet_id, unit_id):
         if self.get_ability_given_pos(planet_id, unit_id) == "Looming Grotesque":
             if self.count_tortures_in_discard() < 6:
