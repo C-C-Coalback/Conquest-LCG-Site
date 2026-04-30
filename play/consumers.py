@@ -57,8 +57,13 @@ def get_active_games():
 
 
 def create_bot_game(name_bot_1, name_bot_2, game_id, errata="No Errata", sector="Traxis Sector", deck_1="", deck_2=""):
+    global spectator_games
     game_id = self.create_game(name_bot_1, name_bot_2, game_id, errata, sector=sector,
                                deck_1=deck_1, deck_2=deck_2)
+    current_time = datetime.datetime.now()
+    time_change = datetime.timedelta(minutes=14400)
+    end_time = current_time + time_change
+    spectator_games.append((name_bot_1, name_bot_2, game_id, end_time))
     return game_id
 
 

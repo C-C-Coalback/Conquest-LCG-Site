@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from ..play.consumers import create_bot_game
 import os
 
+
 def create_bot_room(request, room_name):
     if request.method == "POST":
         try:
