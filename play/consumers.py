@@ -56,6 +56,12 @@ def get_active_games():
     return active_games
 
 
+def create_bot_game(name_bot_1, name_bot_2, game_id, errata="No Errata", sector="Traxis Sector", deck_1="", deck_2=""):
+    game_id = self.create_game(name_bot_1, name_bot_2, game_id, errata, sector=sector,
+                               deck_1=deck_1, deck_2=deck_2)
+    return game_id
+
+
 def check_legality(deck_list, legality):
     deck_list = list(filter(("----------------------------------------------------------------------").__ne__, deck_list))
     deck_list = list(filter(None, deck_list))

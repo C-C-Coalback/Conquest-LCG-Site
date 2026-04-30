@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import secrets
 import socket
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,14 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k8sq_8=t^^ld8j#ujxo9+ac(!nn6a9!)bfsl+&z__!90paljdp'
-# SECRET_KEY = secrets.token_hex(100)
+if not os.path.exists("secret_key.txt"):
+    with open("secret_key.txt", "w") as f:
+        f.write(secrets.token_hex(100))
+
+with open("secret_key.txt", 'r') as f:
+    SECRET_KEY = f.read()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-# ALLOWED_HOSTS = ['.awsapprunner.com']
 
 
 # Application definition
@@ -40,6 +44,7 @@ INSTALLED_APPS = [
     'decks',
     'chat',
     'play',
+    'api',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -138,7 +143,7 @@ MEDIA_URL = 'media/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://34.205.139.124', "https://www.iridial.net"
+    'https://' + socket.gethostbyname(socket.gethostname()), "https://www.iridial.net"
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -151,8 +156,6 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
-# hostname = socket.gethostname()
-# IPAddr = socket.gethostbyname(hostname)
 
 ASGI_APPLICATION = "conquest_site.asgi.application"
 CHANNEL_LAYERS = {
