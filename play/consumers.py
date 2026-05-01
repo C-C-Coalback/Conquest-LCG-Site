@@ -680,7 +680,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 position_p1_details = file_content.find("-----\nP1 DETAILS\n-----")
                                 position_p2_details = file_content.find("-----\nP2 DETAILS\n-----")
                                 replay_details = file_content.find("-----\nREPLAY DETAILS\n-----")
-                                # /Load-Game/hO2kl3cpykc1r7tv
                                 stored_p1_deck_text = file_content[position_start_p1_deck + len("-----\nDECK P1\n-----") + 1:position_start_p2_deck]
                                 print(stored_p1_deck_text)
                                 stored_p2_deck_text = file_content[position_start_p2_deck + len("-----\nDECK P1\n-----") + 1:position_game_details]

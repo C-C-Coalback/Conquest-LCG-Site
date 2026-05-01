@@ -546,8 +546,12 @@ class Game:
                 self.game_events_as_mono_string += self.name_2 + "|||" + "/loaddeck/" + deck_name + "\n"
                 self.p2.setup_player_no_send(deck_content, self.planet_array)
         if raw_deck_text_1 and raw_deck_text_2:
-            self.p1.setup_player_no_send(raw_deck_text_1, self.planet_array)
-            self.p2.setup_player_no_send(raw_deck_text_2, self.planet_array)
+            if first_to_load == self.name_1:
+                self.p1.setup_player_no_send(raw_deck_text_1, self.planet_array)
+                self.p2.setup_player_no_send(raw_deck_text_2, self.planet_array)
+            else:
+                self.p2.setup_player_no_send(raw_deck_text_1, self.planet_array)
+                self.p1.setup_player_no_send(raw_deck_text_2, self.planet_array)
 
     async def send_queued_message(self):
         """Sends the queued message, if there is one."""
