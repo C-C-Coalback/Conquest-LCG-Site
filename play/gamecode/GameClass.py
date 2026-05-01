@@ -550,8 +550,8 @@ class Game:
                 self.p1.setup_player_no_send(raw_deck_text_1, self.planet_array)
                 self.p2.setup_player_no_send(raw_deck_text_2, self.planet_array)
             else:
-                self.p2.setup_player_no_send(raw_deck_text_1, self.planet_array)
-                self.p1.setup_player_no_send(raw_deck_text_2, self.planet_array)
+                self.p2.setup_player_no_send(raw_deck_text_2, self.planet_array)
+                self.p1.setup_player_no_send(raw_deck_text_1, self.planet_array)
 
     async def send_queued_message(self):
         """Sends the queued message, if there is one."""
