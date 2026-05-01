@@ -725,7 +725,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                                     if "MOVE DETAILS:" in replay_details_split[i]:
                                         move_details_started = True
                                         if not first_to_load_deck:
-                                            if p1_name == replay_details_split[i].split(sep="|||")[0]:
+                                            if p1_name == replay_details_split[i + 1].split(sep="|||")[0]:
                                                 first_to_load_deck = p1_name
                                             else:
                                                 first_to_load_deck = p2_name
