@@ -5999,12 +5999,13 @@ class Game:
                             self.create_reaction("Phantasmatic Masque", primary_player.name_player,
                                                  (int(primary_player.number), def_pla, def_pos))
                 if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
-                    if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
-                                                            bloodied_relevant=True):
-                        if not primary_player.hit_by_gorgul:
-                            self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                                 (int(primary_player.number), def_pla, def_pos),
-                                                 additional_info=self.stored_damage[0].get_amount_that_can_be_blocked())
+                    if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
+                        if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
+                                                                bloodied_relevant=True):
+                            if not primary_player.hit_by_gorgul:
+                                self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                                     (int(primary_player.number), def_pla, def_pos),
+                                                     additional_info=self.stored_damage[0].get_amount_that_can_be_blocked())
                 if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh") and def_pla != -2:
                     for i in range(7):
                         if i != def_pla:
