@@ -3545,7 +3545,6 @@ class Player:
             for i in range(len(other_player.cards_in_play[destination + 1])):
                 if other_player.get_ability_given_pos(destination, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(destination, i):
-                        self.headquarters[origin_position].valid_defense_battery_target = True
                         if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", destination, i):
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), destination, i))
@@ -3644,7 +3643,6 @@ class Player:
             for i in range(len(other_player.cards_in_play[destination + 1])):
                 if other_player.get_ability_given_pos(destination, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(destination, i):
-                        self.cards_in_play[origin_planet + 1][origin_position].valid_defense_battery_target = True
                         if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", destination, i):
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), destination, i))
@@ -3665,7 +3663,6 @@ class Player:
             for i in range(len(other_player.cards_in_play[origin_planet + 1])):
                 if other_player.get_ability_given_pos(origin_planet, i) == "Hydra Flak Tank":
                     if not other_player.get_once_per_phase_used_given_pos(origin_planet, i):
-                        self.headquarters[origin_position].valid_defense_battery_target = True
                         if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", origin_planet, i):
                             self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                       (int(other_player.number), origin_planet, i))
@@ -3891,6 +3888,23 @@ class Player:
                 if self.get_ability_given_pos(planet_pos, i) == "Phoenix Attack Fighter":
                     self.game.create_reaction("Phoenix Attack Fighter", self.name_player,
                                               (int(self.number), planet_pos, i))
+
+    def check_if_any_of_own_units_moved_to_planet(self, planet_pos):
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if self.cards_in_play[planet_pos + 1][i].card_moved_recently:
+                return True
+        return False
+
+    def after_standard_commits_cleanup(self):
+        other_player = self.get_other_player()
+        for destination in range(7):
+            if self.check_if_any_of_own_units_moved_to_planet(destination):
+                for i in range(len(other_player.cards_in_play[destination + 1])):
+                    if other_player.get_ability_given_pos(destination, i) == "Hydra Flak Tank":
+                        if not other_player.get_once_per_phase_used_given_pos(destination, i):
+                            if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", destination, i):
+                                self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
+                                                          (int(other_player.number), destination, i))
 
     def create_warlord_committed_to_planet_reactions(self, planets_list):
         for i in range(len(planets_list)):
@@ -8042,7 +8056,6 @@ class Player:
         for i in range(len(other_player.cards_in_play[planet_id + 1])):
             if other_player.get_ability_given_pos(planet_id, i) == "Hydra Flak Tank":
                 if not other_player.get_once_per_phase_used_given_pos(planet_id, i):
-                    self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
                     if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", planet_id, i):
                         self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                   (int(other_player.number), planet_id, i))

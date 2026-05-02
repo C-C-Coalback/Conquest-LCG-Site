@@ -256,6 +256,8 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p2.phoenix_attack_fighter_triggers(planets_committed_to)
                     self.p1.create_warlord_committed_to_planet_reactions(warlord_planets_committed_to)
                     self.p2.create_warlord_committed_to_planet_reactions(warlord_planets_committed_to)
+                    self.p1.after_standard_commits_cleanup()
+                    self.p2.after_standard_commits_cleanup()
                     self.p1.has_passed = False
                     self.p2.has_passed = False
                     self.committing_warlords = False

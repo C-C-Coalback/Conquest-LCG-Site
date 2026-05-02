@@ -2123,7 +2123,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.chosen_first_card = True
                     await self.send_update_message("Select card in discard to bring back.")
         elif current_reaction == "Hydra Flak Tank":
-            if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
+            if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].card_moved_recently:
                 primary_player.set_once_per_phase_used_given_pos(og_pla, og_pos, True)
                 damage = 1
                 if player_owning_card.get_flying_given_pos(planet_pos, unit_pos):
@@ -2134,7 +2134,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
             else:
-                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Not a valid target for Defense Battery.")
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Not a valid target for Hydra Flak Tank.")
         elif current_reaction == "Nahumekh":
             if planet_pos == og_pla:
                 if game_update_string[1] == "1":
