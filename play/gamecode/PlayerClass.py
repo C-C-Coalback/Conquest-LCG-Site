@@ -5055,6 +5055,7 @@ class Player:
 
     def round_ends_reset_values(self):
         self.burgeoning_incubation_target = -1
+        self.shadow_in_the_warp_count = 0
         self.reset_all_blanked_eor()
         for i in range(len(self.headquarters)):
             self.headquarters[i].set_once_per_round_used(False)
