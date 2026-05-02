@@ -6012,16 +6012,18 @@ class Game:
                                 if primary_player.get_ability_given_pos(i, j) == "Seekers of Pleasure":
                                     if not primary_player.check_if_already_have_reaction_of_position(
                                             "Seekers of Pleasure", i, j):
-                                        self.create_reaction("Seekers of Pleasure", primary_player.name_player,
-                                                             (int(primary_player.number), i, j),
-                                                             additional_info=def_pla)
+                                        if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
+                                            self.create_reaction("Seekers of Pleasure", primary_player.name_player,
+                                                                 (int(primary_player.number), i, j),
+                                                                 additional_info=def_pla)
                     for i in range(len(primary_player.headquarters)):
                         if primary_player.get_ability_given_pos(-2, i) == "Seekers of Pleasure":
                             if not primary_player.check_if_already_have_reaction_of_position(
                                     "Seekers of Pleasure", -2, i):
-                                self.create_reaction("Seekers of Pleasure", primary_player.name_player,
-                                                     (int(primary_player.number), -2, i),
-                                                     additional_info=def_pla)
+                                if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
+                                    self.create_reaction("Seekers of Pleasure", primary_player.name_player,
+                                                         (int(primary_player.number), -2, i),
+                                                         additional_info=def_pla)
                 if self.stored_damage[0].get_card_name_triggering_damage() in self.valid_crushing_blow_triggers:
                     if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
                         if secondary_player.search_hand_for_card("Crushing Blow"):
