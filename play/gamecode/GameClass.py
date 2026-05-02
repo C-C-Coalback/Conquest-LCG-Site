@@ -5978,8 +5978,8 @@ class Game:
                         damage_to_remove = self.stored_damage[0].get_amount_that_can_be_blocked() - 1
                         self.stored_damage[0].set_amount_that_can_be_blocked(1)
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage_to_remove)
+            num, def_pla, def_pos = self.stored_damage[0].get_position_unit()
             if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
-                num, def_pla, def_pos = self.stored_damage[0].get_position_unit()
                 if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                     warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
                     if primary_player.get_ability_given_pos(warlord_pla, warlord_pos,
@@ -5992,60 +5992,60 @@ class Game:
                                 primary_player.remove_damage_from_pos(def_pla, def_pos, 1)
                                 self.create_interrupt("Chapter Champion Varn", primary_player.name_player,
                                                       (int(primary_player.number), def_pla, def_pos))
-                if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
-                    if primary_player.get_ability_given_pos(def_pla, def_pos) == "Phantasmatic Masque":
-                        if primary_player.get_ready_given_pos(def_pla, def_pos):
-                            if not primary_player.get_once_per_phase_used_given_pos(def_pla, def_pos):
-                                self.create_reaction("Phantasmatic Masque", primary_player.name_player,
-                                                     (int(primary_player.number), def_pla, def_pos))
-                    if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
-                        if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
-                                                                bloodied_relevant=True):
-                            if not primary_player.hit_by_gorgul:
-                                self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
-                                                     (int(primary_player.number), def_pla, def_pos),
-                                                     additional_info=self.stored_damage[0].get_amount_that_can_be_blocked())
-                    if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh") and def_pla != -2:
-                        for i in range(7):
-                            if i != def_pla:
-                                for j in range(len(primary_player.cards_in_play[i + 1])):
-                                    if primary_player.get_ability_given_pos(i, j) == "Seekers of Pleasure":
-                                        if not primary_player.check_if_already_have_reaction_of_position(
-                                                "Seekers of Pleasure", i, j):
-                                            self.create_reaction("Seekers of Pleasure", primary_player.name_player,
-                                                                 (int(primary_player.number), i, j),
-                                                                 additional_info=def_pla)
-                        for i in range(len(primary_player.headquarters)):
-                            if primary_player.get_ability_given_pos(-2, i) == "Seekers of Pleasure":
-                                if not primary_player.check_if_already_have_reaction_of_position(
-                                        "Seekers of Pleasure", -2, i):
-                                    self.create_reaction("Seekers of Pleasure", primary_player.name_player,
-                                                         (int(primary_player.number), -2, i),
-                                                         additional_info=def_pla)
-                    if self.stored_damage[0].get_card_name_triggering_damage() in self.valid_crushing_blow_triggers:
-                        if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
-                            if secondary_player.search_hand_for_card("Crushing Blow"):
-                                self.create_reaction("Crushing Blow", secondary_player.name_player,
-                                                     (int(primary_player.number), -1, -1))
+            if not primary_player.check_if_card_is_destroyed(def_pla, def_pos):
+                if primary_player.get_ability_given_pos(def_pla, def_pos) == "Phantasmatic Masque":
+                    if primary_player.get_ready_given_pos(def_pla, def_pos):
+                        if not primary_player.get_once_per_phase_used_given_pos(def_pla, def_pos):
+                            self.create_reaction("Phantasmatic Masque", primary_player.name_player,
+                                                 (int(primary_player.number), def_pla, def_pos))
+                if primary_player.get_ability_given_pos(def_pla, def_pos) != "Ba'ar Zul the Hate-Bound":
+                    if primary_player.search_card_at_planet(def_pla, "Ba'ar Zul the Hate-Bound",
+                                                            bloodied_relevant=True):
+                        if not primary_player.hit_by_gorgul:
+                            self.create_reaction("Ba'ar Zul the Hate-Bound", primary_player.name_player,
+                                                 (int(primary_player.number), def_pla, def_pos),
+                                                 additional_info=self.stored_damage[0].get_amount_that_can_be_blocked())
+                if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh") and def_pla != -2:
+                    for i in range(7):
+                        if i != def_pla:
+                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                                if primary_player.get_ability_given_pos(i, j) == "Seekers of Pleasure":
+                                    if not primary_player.check_if_already_have_reaction_of_position(
+                                            "Seekers of Pleasure", i, j):
+                                        self.create_reaction("Seekers of Pleasure", primary_player.name_player,
+                                                             (int(primary_player.number), i, j),
+                                                             additional_info=def_pla)
+                    for i in range(len(primary_player.headquarters)):
+                        if primary_player.get_ability_given_pos(-2, i) == "Seekers of Pleasure":
+                            if not primary_player.check_if_already_have_reaction_of_position(
+                                    "Seekers of Pleasure", -2, i):
+                                self.create_reaction("Seekers of Pleasure", primary_player.name_player,
+                                                     (int(primary_player.number), -2, i),
+                                                     additional_info=def_pla)
+                if self.stored_damage[0].get_card_name_triggering_damage() in self.valid_crushing_blow_triggers:
+                    if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
+                        if secondary_player.search_hand_for_card("Crushing Blow"):
+                            self.create_reaction("Crushing Blow", secondary_player.name_player,
+                                                 (int(primary_player.number), -1, -1))
+                            primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
+                if self.stored_damage[0].get_position_attacker() is not None:
+                    player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_attacker()
+                    if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
+                        if secondary_player.search_hand_for_card("Crushing Blow"):
+                            if not primary_player.get_immune_to_enemy_events(def_pla, def_pos):
+                                if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
+                                    if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
+                                        self.create_reaction("Crushing Blow", secondary_player.name_player,
+                                                             (int(primary_player.number), -1, -1))
                                 primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
-                    if self.stored_damage[0].get_position_attacker() is not None:
-                        player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_attacker()
-                        if not secondary_player.check_if_already_have_reaction("Crushing Blow"):
-                            if secondary_player.search_hand_for_card("Crushing Blow"):
+                    if not secondary_player.check_if_already_have_reaction("The Fury of Sicarius"):
+                        if secondary_player.search_hand_for_card("The Fury of Sicarius"):
+                            if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                                 if not primary_player.get_immune_to_enemy_events(def_pla, def_pos):
                                     if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
                                         if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
-                                            self.create_reaction("Crushing Blow", secondary_player.name_player,
-                                                                 (int(primary_player.number), -1, -1))
-                                    primary_player.set_valid_crushing_blow_given_pos(def_pla, def_pos, True)
-                        if not secondary_player.check_if_already_have_reaction("The Fury of Sicarius"):
-                            if secondary_player.search_hand_for_card("The Fury of Sicarius"):
-                                if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
-                                    if not primary_player.get_immune_to_enemy_events(def_pla, def_pos):
-                                        if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
-                                            if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
-                                                self.create_reaction("The Fury of Sicarius", secondary_player.name_player,
-                                                                     (int(primary_player.number), def_pla, def_pos))
+                                            self.create_reaction("The Fury of Sicarius", secondary_player.name_player,
+                                                                 (int(primary_player.number), def_pla, def_pos))
 
             if self.stored_damage[0].get_position_attacker() is not None:
                 player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_attacker()
