@@ -20,15 +20,9 @@ def create_bot_room(request):
             game_id = data["id"]
             errata = "No Errata"
             sector = "Traxis Sector"
-            deck_1 = ""
-            deck_2 = ""
 
-            cwd = os.getcwd()
-            print(cwd)
-            content_file = cwd + "/decks/default_decks/CatoCore"
-            with open(content_file, "r") as f:
-                deck_1 = f.read()
-                deck_2 = deck_1
+            deck_1 = "CatoCore"
+            deck_2 = "CatoCore"
             game_id = create_bot_game(bot_name_1, bot_name_2, game_id, errata, sector, deck_1, deck_2)
             response = {
                 'status': 'success',
