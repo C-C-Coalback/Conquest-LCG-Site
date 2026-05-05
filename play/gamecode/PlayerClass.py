@@ -251,6 +251,8 @@ class Player:
         self.used_w_808_synapses = []
         self.burgeoning_incubation_target = -1
         self.shadow_in_the_warp_count = 0
+        self.events_requiring_battle = ["Drop Pod Assault", "The Bloodied Host", "Summary Execution", "Battle Cry",
+                                        "Rok Bombardment", "Looted Skrap", "Empower", "Clash of Wings", "Ferocious Strength"]
 
     def resolve_played_any_event(self, event_name=""):
         if self.shadow_in_the_warp_count:
@@ -529,19 +531,24 @@ class Player:
                 if card.check_for_a_trait("Pledge"):
                     if not self.can_play_pledge:
                         return "unplayable"
-                if card.get_has_action_while_in_hand():
-                    if card.allowed_phases_while_in_hand == "ALL" or \
-                            card.allowed_phases_while_in_hand == self.game.phase:
-                        if card.get_cost() <= self.get_resources():
-                            return "playable"
-                        return ""
-                    else:
-                        return "unplayable"
                 if card.get_card_type() in ["Army", "Support", "Attachment"] and self.game.phase == "DEPLOY":
                     if card.get_cost() <= self.get_resources():
                         return "playable"
                     else:
                         return ""
+                if card.get_has_action_while_in_hand():
+                    if card.allowed_phases_while_in_hand == "ALL" or \
+                            card.allowed_phases_while_in_hand == self.game.phase:
+                        if card.get_cost() <= self.get_resources():
+                            if card.get_ability() in self.events_requiring_battle:
+                                if self.game.check_if_battle_taking_place():
+                                    return "playable"
+                                return "unplayable"
+                            return "playable"
+                        return ""
+                    return "unplayable"
+                if card.get_card_type() in ["Army", "Support", "Attachment"]:
+                    return "unplayable"
         except:
             pass
         return ""
