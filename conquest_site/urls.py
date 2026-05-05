@@ -29,6 +29,7 @@ urlpatterns = [
     path("decks/", include("decks.urls")),
     path("chat/", include("chat.urls")),
     path("play/", include("play.urls")),
+    path("api/", include("api.urls")),
     path('accounts/', include('django.contrib.auth.urls')),
     path('simple_upload/', views.simple_upload, name='simple_upload'),
     path('settings/simple_upload/', views.simple_upload, name='simple_upload'),

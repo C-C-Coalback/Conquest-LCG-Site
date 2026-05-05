@@ -1,13 +1,20 @@
 import json
 from django.http import JsonResponse
-from ..play.consumers import create_bot_game
+from play.consumers import create_bot_game
 import os
+from django.views.decorators.csrf import csrf_exempt
 
 
-def create_bot_room(request, room_name):
+def index(request):
+    return JsonResponse({"status": "error"})
+
+@csrf_exempt
+def create_bot_room(request):
+    print(request.method)
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
+            data = request.POST.dict()
+            print(data)
             bot_name_1 = data["name1"]
             bot_name_2 = data["name2"]
             game_id = data["id"]
