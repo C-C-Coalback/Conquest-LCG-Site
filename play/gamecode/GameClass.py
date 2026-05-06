@@ -471,6 +471,7 @@ class Game:
         self.shadow_thorns_body_allowed = True
         self.sacaellums_finest_active = False
         self.eldritch_council_value = 0
+        self.last_automated_data_string = ""
         self.list_reactions_on_winning_combat = ["Accept Any Challenge", "Inspirational Fervor",
                                                  "Declare the Crusade", "Gut and Pillage", "Scavenging Run"]
         self.queued_sound = ""
@@ -773,7 +774,7 @@ class Game:
         await self.send_initiative(force=True)
         if self.bot_is_present:
             await self.update_automated_info()
-            await self.send_automated_info()
+            await self.send_automated_info(force=True)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -6973,13 +6974,15 @@ class Game:
             await self.send_mistarget_message(name, main, details)
             self.reset_queued_mistarget_message()
 
-    async def send_automated_info(self):
+    async def send_automated_info(self, force=False):
         message_to_send = "GAME_INFO/AUTOMATED_DATA/"
         message_to_send += self.what_is_required_automated + "/"
         message_to_send += self.automated_player_waited_on + "/"
         for i in range(len(self.clickable_items_automated)):
             message_to_send += self.clickable_items_automated[i]
-        await self.send_update_message(message_to_send)
+        if message_to_send != self.last_automated_data_string or force:
+            self.last_automated_data_string = message_to_send
+            await self.send_update_message(message_to_send)
 
     async def update_automated_info(self):
         if self.debug_mode is not None:
