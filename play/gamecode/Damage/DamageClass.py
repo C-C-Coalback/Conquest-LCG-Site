@@ -13,6 +13,9 @@ class Damage:
         self.card_name_that_caused_damage = card_name_causing_damage
         self.on_kill_effects_of_attacker = []
 
+    def get_player_num_of_unit(self):
+        return self.position_unit[0]
+
     def get_on_kill_effects_of_attacker(self):
         return self.on_kill_effects_of_attacker
 
