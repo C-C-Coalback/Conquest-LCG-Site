@@ -21,7 +21,7 @@ import sys
 class Game:
     def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, errata,
                  apoka_errata_cards, sector="Traxis", deck_1="", deck_2="", forced_planet_array=None, random_seed=None,
-                 raw_deck_text_1="", raw_deck_text_2="", first_to_load=""):
+                 raw_deck_text_1="", raw_deck_text_2="", first_to_load="", bot_is_present=False):
         self.game_sockets = []
         self.card_array = card_array
         self.cards_dict = cards_dict
@@ -38,6 +38,7 @@ class Game:
             self.blackstone = True
         print("\n\nerrata text\n\n" + errata)
         self.battle_in_progress = False
+        self.bot_is_present = bot_is_present
         self.saved_moves = []
         self.saved_move_id = 0
         self.game_id = game_id
@@ -770,6 +771,9 @@ class Game:
         await self.p2.send_victory_display()
         await self.send_planet_array(force=True)
         await self.send_initiative(force=True)
+        if self.bot_is_present:
+            await self.update_automated_info()
+            await self.send_automated_info()
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -6969,7 +6973,15 @@ class Game:
             await self.send_mistarget_message(name, main, details)
             self.reset_queued_mistarget_message()
 
-    async def update_automated_parts(self):
+    async def send_automated_info(self):
+        message_to_send = "GAME_INFO/AUTOMATED_DATA/"
+        message_to_send += self.what_is_required_automated + "/"
+        message_to_send += self.automated_player_waited_on + "/"
+        for i in range(len(self.clickable_items_automated)):
+            message_to_send += self.clickable_items_automated[i]
+        await self.send_update_message(message_to_send)
+
+    async def update_automated_info(self):
         if self.debug_mode is not None:
             self.what_is_required_automated = "None"
             self.automated_player_waited_on = ""
@@ -7569,9 +7581,9 @@ class Game:
                 if self.p2.castellan_crowe_relevant:
                     self.choice_context = "Use Psychic Ward?"
                     await self.send_update_message("Switched to offering Psychic Ward")
-        await self.send_everything()
         if not same_thread:
             await self.update_game_event("", [], same_thread=True)
+            await self.send_everything()
         if not same_thread:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()
@@ -7600,6 +7612,9 @@ class Game:
         await self.send_queued_sound()
         await self.send_queued_message()
         await self.send_queued_mistarget_message()
+        if self.bot_is_present:
+            await self.update_automated_info()
+            await self.send_automated_info()
 
     def get_name_interrupts_of_players_interrupts(self, name):
         interrupts_positions_list = []

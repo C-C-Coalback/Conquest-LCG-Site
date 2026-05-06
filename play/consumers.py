@@ -58,7 +58,7 @@ def get_active_games():
 
 def create_bot_game(name_bot_1, name_bot_2, game_id, errata="No Errata", sector="Traxis Sector", deck_1="", deck_2=""):
     global spectator_games
-    game_id = create_game(name_bot_1, name_bot_2, game_id, errata, sector=sector, deck_1=deck_1, deck_2=deck_2)
+    game_id = create_game(name_bot_1, name_bot_2, game_id, errata, sector=sector, deck_1=deck_1, deck_2=deck_2, bots_present=True)
     current_time = datetime.datetime.now()
     time_change = datetime.timedelta(minutes=14400)
     end_time = current_time + time_change
@@ -66,7 +66,7 @@ def create_bot_game(name_bot_1, name_bot_2, game_id, errata="No Errata", sector=
     return game_id
 
 
-def create_game(name_1, name_2, game_id, errata, sector="Traxis", deck_1="", deck_2=""):
+def create_game(name_1, name_2, game_id, errata, sector="Traxis", deck_1="", deck_2="", bots_present=False):
     global active_games
     global card_array
     global planet_array
@@ -75,14 +75,16 @@ def create_game(name_1, name_2, game_id, errata, sector="Traxis", deck_1="", dec
     for i in range(len(active_games)):
         if active_games[i].game_id == game_id:
             new_game_id = game_id + random.choice('0123456789ABCDEF')
-            return create_game(name_1, name_2, new_game_id, errata, sector=sector)
+            return create_game(name_1, name_2, new_game_id, errata, sector=sector, deck_1=deck_1, deck_2=deck_2,
+                               bots_present=bots_present)
     card_errata = []
     if errata == "Apoka":
         card_errata = apoka_errata_cards_array
     elif errata == "Blackstone":
         card_errata = blackstone_errata_cards_array
     active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array, cards_dict,
-                                       errata, card_errata, sector=sector, deck_1=deck_1, deck_2=deck_2))
+                                       errata, card_errata, sector=sector, deck_1=deck_1, deck_2=deck_2,
+                                       bot_is_present=bots_present))
     return game_id
 
 
