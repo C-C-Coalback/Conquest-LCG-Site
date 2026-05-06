@@ -421,8 +421,6 @@ class Game:
         self.just_moved_units = False
         self.resolving_kugath_nurglings = False
         self.kugath_nurglings_present_at_planets = [0, 0, 0, 0, 0, 0, 0]
-        self.resolving_nurgling_bomb = False
-        self.player_resolving_nurgling_bomb = ""
         self.card_type_defender = ""
         self.defender_is_flying_or_mobile = False
         self.defender_is_also_warlord = False
@@ -911,8 +909,6 @@ class Game:
             info_string += self.player_with_action + "/"
         elif self.choices_available:
             info_string += self.name_player_making_choices + "/"
-        elif self.resolving_nurgling_bomb:
-            info_string += self.player_resolving_nurgling_bomb + "/"
         elif self.interrupts_waiting_on_resolution:
             info_string += self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() + "/"
         elif self.stored_damage:
@@ -985,9 +981,6 @@ class Game:
         elif self.choices_available:
             info_string += "Choice: " + self.choice_context + "/"
             info_string += "User: " + self.name_player_making_choices + "/"
-        elif self.resolving_nurgling_bomb:
-            info_string += "Nurgling Bomb Resolution/"
-            info_string += self.player_resolving_nurgling_bomb + "/"
         elif self.interrupts_waiting_on_resolution:
             info_string += "Effect: " + self.interrupts_waiting_on_resolution[0].get_interrupt_name() + "/"
             info_string += "User: " + self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() + "/"
@@ -3743,6 +3736,7 @@ class Game:
     def advance_damage_aiming_reticle(self):
         if self.stored_damage:
             pos_holder = self.stored_damage[0].get_position_unit()
+            print(pos_holder)
             player_num, planet_pos, unit_pos = pos_holder[0], pos_holder[1], pos_holder[2]
             if player_num == 1:
                 self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
@@ -6523,39 +6517,7 @@ class Game:
                 self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target = False
                 self.p2.cards_in_play[i + 1][j].damage_from_kugath_nurgling = 0
 
-    async def nurgling_bomb_resolution(self, name, game_update_string):
-        if self.player_resolving_nurgling_bomb == self.name_1:
-            primary_player = self.p1
-        else:
-            primary_player = self.p2
-        if name == self.player_resolving_nurgling_bomb:
-            if len(game_update_string) == 4:
-                if game_update_string[0] == "IN_PLAY":
-                    if game_update_string[1] == primary_player.get_number():
-                        planet_pos = int(game_update_string[2])
-                        unit_pos = int(game_update_string[3])
-                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].need_to_resolve_nurgling_bomb:
-                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
-                            self.misc_target_unit = (planet_pos, unit_pos)
-                            self.choices_available = ["Rout", "Damage"]
-                            self.choice_context = "Nurgling Bomb Choice:"
-                            self.name_player_making_choices = primary_player.name_player
-
-    def complete_nurgling_bomb(self, planet_id):
-        i = 0
-        while i < len(self.p1.cards_in_play[planet_id + 1]):
-            if self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Rout":
-                self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
-                self.p1.rout_unit(planet_id, i)
-                i = i - 1
-            i += 1
-        i = 0
-        while i < len(self.p2.cards_in_play[planet_id + 1]):
-            if self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Rout":
-                self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
-                self.p2.rout_unit(planet_id, i)
-                i = i - 1
-            i += 1
+    def complete_nurgling_bomb(self, planet_id, primary_player):
         i = 0
         while i < len(self.p1.cards_in_play[planet_id + 1]):
             if self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Damage":
@@ -6570,16 +6532,31 @@ class Game:
                 self.p2.assign_damage_to_pos(planet_id, i, 1, by_enemy_unit=False)
                 i = i - 1
             i += 1
-        self.resolving_nurgling_bomb = False
+        i = 0
+        while i < len(self.p1.cards_in_play[planet_id + 1]):
+            if self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Rout":
+                self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
+                self.p1.rout_unit(planet_id, i)
+                i = i - 1
+            i += 1
+        i = 0
+        while i < len(self.p2.cards_in_play[planet_id + 1]):
+            if self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Rout":
+                self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
+                self.p2.rout_unit(planet_id, i)
+                i = i - 1
+            i += 1
+        primary_player.resolve_played_any_event()
+        self.action_cleanup()
 
     def scan_planet_for_nurgling_bomb(self, pri, sec, planet_id):
         for i in range(len(pri.cards_in_play[planet_id + 1])):
             if pri.cards_in_play[planet_id + 1][i].need_to_resolve_nurgling_bomb:
-                self.player_resolving_nurgling_bomb = pri.name_player
+                self.player_with_action = pri.name_player
                 return True
         for i in range(len(sec.cards_in_play[planet_id + 1])):
             if sec.cards_in_play[planet_id + 1][i].need_to_resolve_nurgling_bomb:
-                self.player_resolving_nurgling_bomb = sec.name_player
+                self.player_with_action = sec.name_player
                 return True
         return False
 
@@ -6978,8 +6955,6 @@ class Game:
             return False
         if self.mode == "DISCOUNT":
             return False
-        if self.resolving_nurgling_bomb:
-            return False
         return True
 
     def reset_queued_mistarget_message(self):
@@ -7041,10 +7016,6 @@ class Game:
             self.clickable_items_automated = []
         elif self.interrupting_discard_effect_active:
             self.what_is_required_automated = "Discard Interrupt"
-            self.automated_player_waited_on = ""
-            self.clickable_items_automated = []
-        elif self.resolving_nurgling_bomb:
-            self.what_is_required_automated = "Nurgling Bomb"
             self.automated_player_waited_on = ""
             self.clickable_items_automated = []
         elif self.interrupts_waiting_on_resolution:
@@ -7126,8 +7097,6 @@ class Game:
                 await self.update_game_event_applying_discounts(name, game_update_string)
             elif self.interrupting_discard_effect_active:
                 await self.resolve_discard_interrupt(name, game_update_string)
-            elif self.resolving_nurgling_bomb:
-                await self.nurgling_bomb_resolution(name, game_update_string)
             elif self.interrupts_waiting_on_resolution:
                 await self.resolve_interrupts(name, game_update_string)
             elif self.stored_damage:

@@ -8188,6 +8188,8 @@ class Player:
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         self.adjust_own_reactions(planet_id, unit_id)
         self.adjust_own_interrupts(planet_id, unit_id)
+        self.adjust_own_damage(planet_id, unit_id)
+        self.adjust_last_def_pos(planet_id, unit_id)
         last_element_hq = len(self.headquarters) - 1
         self.exhaust_given_pos(-2, last_element_hq)
         del self.cards_in_play[planet_id + 1][unit_id]
@@ -8323,6 +8325,8 @@ class Player:
             self.exhaust_given_pos(-2, last_element_hq)
         self.adjust_own_reactions(planet_id, unit_id)
         self.adjust_own_interrupts(planet_id, unit_id)
+        self.adjust_own_damage(planet_id, unit_id)
+        self.adjust_last_def_pos(planet_id, unit_id)
         del self.cards_in_play[planet_id + 1][unit_id]
         return True
 

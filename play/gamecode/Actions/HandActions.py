@@ -412,6 +412,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Nurgling Bomb":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability
+                        self.chosen_first_card = False
                     elif ability == "Blood For The Blood God!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_chosen = ability

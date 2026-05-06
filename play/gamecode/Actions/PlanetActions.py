@@ -928,32 +928,28 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Adjacent planet only.")
     elif self.action_chosen == "Nurgling Bomb":
+        self.chosen_first_card = True
         found_nurgling_bomb_target_p1 = False
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             primary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
-            if not primary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait(
-                    "Nurgle", primary_player.etekh_trait):
+            if not primary_player.check_for_trait_given_pos(chosen_planet, i, "Nurgle"):
                 primary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
                 primary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
                 found_nurgling_bomb_target_p1 = True
         found_nurgling_bomb_target_p2 = False
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
             secondary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
-            if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait(
-                    "Nurgle", secondary_player.etekh_trait):
-                secondary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
-                secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
-                found_nurgling_bomb_target_p2 = True
+            if not secondary_player.check_for_trait_given_pos(chosen_planet, i, "Nurgle"):
+                if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
+                    secondary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
+                    secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
+                    found_nurgling_bomb_target_p2 = True
         if found_nurgling_bomb_target_p1:
-            self.resolving_nurgling_bomb = True
-            self.player_resolving_nurgling_bomb = primary_player.name_player
+            self.player_with_action = primary_player.name_player
         elif found_nurgling_bomb_target_p2:
-            self.resolving_nurgling_bomb = True
-            self.player_resolving_nurgling_bomb = secondary_player.name_player
+            self.player_with_action = secondary_player.name_player
         else:
-            self.resolving_nurgling_bomb = False
-        primary_player.resolve_played_any_event()
-        self.action_cleanup()
+            self.complete_nurgling_bomb(chosen_planet, primary_player)
     elif self.action_chosen == "Behind Enemy Lines":
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])

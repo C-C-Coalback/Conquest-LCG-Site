@@ -126,7 +126,11 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             )
         self.reset_choices_available()
         if not self.scan_planet_for_nurgling_bomb(primary_player, secondary_player, planet):
-            self.complete_nurgling_bomb(planet)
+            if self.player_with_action == self.name_1:
+                nurgling_player = self.p1
+            else:
+                nurgling_player = self.p2
+            self.complete_nurgling_bomb(planet, nurgling_player)
     elif self.choice_context == "Prevent Psychic Ward?":
         if game_update_string[1] == "0":
             self.reset_choices_available()
