@@ -1,0 +1,147 @@
+def update_automated_attributes(self):
+    if self.debug_mode is not None:
+        self.what_is_required_automated = "None"
+        self.automated_player_waited_on = ""
+        valid_moves = []
+    elif self.choosing_unit_for_nullify:
+        self.what_is_required_automated = "Nullify"
+        self.automated_player_waited_on = self.name_player_using_nullify
+    elif self.intercept_active:
+        self.what_is_required_automated = "Intercept"
+        self.automated_player_waited_on = self.name_player_intercept
+    elif self.xv805_enforcer_active:
+        self.what_is_required_automated = "XV805 Enforcer"
+        self.automated_player_waited_on = self.player_using_xv805
+    elif self.resolving_consumption:
+        self.what_is_required_automated = "Consumption"
+        self.automated_player_waited_on = self.player_with_initiative
+    elif self.manual_bodyguard_resolution:
+        self.what_is_required_automated = "Bodyguard"
+        self.automated_player_waited_on = self.name_player_manual_bodyguard
+    elif self.rearranging_deck:
+        self.what_is_required_automated = "Rearrange"
+        self.automated_player_waited_on = self.name_player_rearranging_deck
+    elif self.cards_in_search_box:
+        self.what_is_required_automated = "Search"
+        self.automated_player_waited_on = self.name_player_who_is_searching
+    elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
+        self.what_is_required_automated = "Indirect"
+        self.automated_player_waited_on = self.player_with_initiative
+    elif self.choices_available:
+        self.what_is_required_automated = "Choice"
+        self.automated_player_waited_on = self.name_player_making_choices
+    elif self.mode == "DISCOUNT":
+        self.what_is_required_automated = "Discount"
+        player, _ = self.determine_player_with_discounts()
+        self.automated_player_waited_on = player.name_player
+    elif self.interrupting_discard_effect_active:
+        self.what_is_required_automated = "Discard Interrupt"
+        self.automated_player_waited_on = ""
+    elif self.interrupts_waiting_on_resolution:
+        self.what_is_required_automated = "Interrupt"
+        self.automated_player_waited_on = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
+    elif self.stored_damage:
+        self.what_is_required_automated = "Damage"
+        player_num = self.stored_damage[0].get_player_num_of_unit()
+        if player_num == 1:
+            self.automated_player_waited_on = self.name_1
+        else:
+            self.automated_player_waited_on = self.name_2
+    elif self.resolving_kugath_nurglings:
+        self.what_is_required_automated = "Kugaths Nurglings"
+        self.automated_player_waited_on = ""
+    elif self.reactions_needing_resolving:
+        self.what_is_required_automated = "Reaction"
+        self.automated_player_waited_on = self.reactions_needing_resolving[0].get_player_resolving_reaction()
+    elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
+        self.what_is_required_automated = "Mobile"
+        self.automated_player_waited_on = ""  # TODO: Less stupid mobile player
+    elif self.battle_ability_to_resolve:
+        self.what_is_required_automated = "Battle Ability"
+        self.automated_player_waited_on = self.player_resolving_battle_ability
+    elif self.phase == "DEPLOY":
+        self.what_is_required_automated = "Deploy Turn"
+        self.automated_player_waited_on = self.player_with_deploy_turn
+    elif self.phase == "COMMAND":
+        self.what_is_required_automated = "Commitment"
+        self.automated_player_waited_on = ""
+    elif self.phase == "COMBAT":
+        self.what_is_required_automated = "Combat Turn"
+        self.automated_player_waited_on = ""
+    elif self.phase == "HEADQUARTERS":
+        self.what_is_required_automated = "Headquarters Action"
+        self.automated_player_waited_on = ""
+    self.clickable_items_automated = determine_valid_moves(self)
+
+
+def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, hand_pos=-1, discard_pos=-1,
+                   choice_pos=-1):
+    if card_zone.capitalize() == "Pass" or card_zone == "pass-P1":
+        valid_moves.append("pass-P1")
+    elif card_zone == "PLANETS":
+        valid_moves.append("PLANETS/" + str(planet_pos))
+    elif card_zone == "HQ":
+        valid_moves.append("HQ/" + player.number + "/" + str(unit_pos))
+    elif card_zone == "IN_PLAY":
+        valid_moves.append("IN_PLAY/" + player.number + "/" + str(planet_pos) + "/" + str(unit_pos))
+    elif card_zone == "HAND":
+        valid_moves.append("HAND/" + player.number + "/" + str(hand_pos))
+    elif card_zone == "CHOICE":
+        valid_moves.append("CHOICE/" + str(choice_pos))
+    elif card_zone == "SEARCH":
+        valid_moves.append("SEARCH/" + str(choice_pos))
+    return valid_moves
+
+
+def add_active_planets_as_valid_moves(self, valid_moves):
+    for i in range(len(self.planets_in_play_array)):
+        if self.planets_in_play_array[i]:
+            valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
+    return valid_moves
+
+
+def determine_valid_moves(self):
+    valid_moves = []
+    primary_player, secondary_player = self.get_players_given_name(self.automated_player_waited_on)
+    if primary_player is not None:
+        if self.what_is_required_automated == "Nullify":
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.valid_nullify_unit(-2, i):
+                    valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
+            for planet_pos in range(7):
+                for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
+                    if self.valid_nullify_unit(planet_pos, unit_pos):
+                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=planet_pos, unit_pos=unit_pos)
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Search":
+            for i in range(len(self.cards_in_search_box)):
+                valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
+        elif self.what_is_required_automated == "Choice":
+            for i in range(len(self.choices_available)):
+                valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
+        elif self.what_is_required_automated == "Discount":
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Deploy Turn":
+            if self.card_to_deploy is None:
+                for i in range(len(primary_player.cards)):
+                    playability = primary_player.determine_playability(primary_player.cards[i])
+                    if playability == "playable":
+                        valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            else:
+                if self.card_to_deploy.get_card_type() == "Army":
+                    valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                if self.card_to_deploy.get_card_type() == "Attachment":
+                    if self.card_to_deploy.planet_attachment:
+                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                    else:
+                        valid_moves = []  # TODO: Check what units can receive attachment
+        elif self.what_is_required_automated == "COMMAND":
+            if self.committing_warlords:
+                valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+            elif self.before_command_struggle:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            elif self.after_command_struggle:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+    return valid_moves

@@ -16,6 +16,7 @@ from . import CardClasses
 from .Damage import DamageClass
 import os
 import sys
+from . import ValidMovesFinder
 
 
 class Game:
@@ -1136,29 +1137,33 @@ class Game:
             self.saved_planet_string = planet_string
             await self.send_update_message(planet_string)
 
-    async def update_game_event_applying_discounts(self, name, game_update_string):
-        if self.card_to_deploy is not None:
-            if self.player_with_action == self.name_1:
+    def determine_player_with_discounts(self):
+        if self.player_with_action == self.name_1:
+            player = self.p1
+            secondary_player = self.p2
+        else:
+            player = self.p2
+            secondary_player = self.p1
+        if self.phase == "DEPLOY":
+            if self.number_with_deploy_turn == "1":
                 player = self.p1
                 secondary_player = self.p2
             else:
                 player = self.p2
                 secondary_player = self.p1
-            if self.phase == "DEPLOY":
-                if self.number_with_deploy_turn == "1":
+        if self.interrupts_waiting_on_resolution:
+            if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Catachan Devils Patrol":
+                if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_1:
                     player = self.p1
                     secondary_player = self.p2
                 else:
                     player = self.p2
                     secondary_player = self.p1
-            if self.interrupts_waiting_on_resolution:
-                if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Catachan Devils Patrol":
-                    if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_1:
-                        player = self.p1
-                        secondary_player = self.p2
-                    else:
-                        player = self.p2
-                        secondary_player = self.p1
+        return player, secondary_player
+
+    async def update_game_event_applying_discounts(self, name, game_update_string):
+        if self.card_to_deploy is not None:
+            player, secondary_player = self.determine_player_with_discounts()
             if name == player.name_player:
                 if len(game_update_string) == 1:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
@@ -6978,105 +6983,29 @@ class Game:
         message_to_send = "GAME_INFO/AUTOMATED_DATA/"
         message_to_send += self.what_is_required_automated + "/"
         message_to_send += self.automated_player_waited_on + "/"
+        message_to_send += "|||"
         for i in range(len(self.clickable_items_automated)):
-            message_to_send += self.clickable_items_automated[i]
+            message_to_send += self.clickable_items_automated[i] + "|||"
         if message_to_send != self.last_automated_data_string or force:
             self.last_automated_data_string = message_to_send
             await self.send_update_message(message_to_send)
 
+    def get_player_given_name(self, name_player):
+        if name_player == self.name_1:
+            return self.p1
+        elif name_player == self.name_2:
+            return self.p2
+        return None
+
+    def get_players_given_name(self, name_player):
+        if name_player == self.name_1:
+            return self.p1, self.p2
+        elif name_player == self.name_2:
+            return self.p2, self.p1
+        return None, None
+
     async def update_automated_info(self):
-        if self.debug_mode is not None:
-            self.what_is_required_automated = "None"
-            self.automated_player_waited_on = ""
-            self.clickable_items_automated = []
-        elif self.choosing_unit_for_nullify:
-            self.what_is_required_automated = "Nullify"
-            self.automated_player_waited_on = self.name_player_using_nullify
-            self.clickable_items_automated = []
-        elif self.intercept_active:
-            self.what_is_required_automated = "Intercept"
-            self.automated_player_waited_on = self.name_player_intercept
-            self.clickable_items_automated = []
-        elif self.xv805_enforcer_active:
-            self.what_is_required_automated = "XV805 Enforcer"
-            self.automated_player_waited_on = self.player_using_xv805
-            self.clickable_items_automated = []
-        elif self.resolving_consumption:
-            self.what_is_required_automated = "Consumption"
-            self.automated_player_waited_on = self.player_with_initiative
-            self.clickable_items_automated = []
-        elif self.manual_bodyguard_resolution:
-            self.what_is_required_automated = "Bodyguard"
-            self.automated_player_waited_on = self.name_player_manual_bodyguard
-            self.clickable_items_automated = []
-        elif self.rearranging_deck:
-            self.what_is_required_automated = "Rearrange"
-            self.automated_player_waited_on = self.name_player_rearranging_deck
-            self.clickable_items_automated = []
-        elif self.cards_in_search_box:
-            self.what_is_required_automated = "Search"
-            self.automated_player_waited_on = self.name_player_who_is_searching
-            self.clickable_items_automated = []
-        elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
-            self.what_is_required_automated = "Indirect"
-            self.automated_player_waited_on = self.player_with_initiative
-            self.clickable_items_automated = []
-        elif self.choices_available:
-            self.what_is_required_automated = "Choice"
-            self.automated_player_waited_on = self.name_player_making_choices
-            self.clickable_items_automated = []
-        elif self.mode == "DISCOUNT":
-            self.what_is_required_automated = "Discount"
-            self.automated_player_waited_on = ""  # TODO: Add less daft player discount check
-            self.clickable_items_automated = []
-        elif self.interrupting_discard_effect_active:
-            self.what_is_required_automated = "Discard Interrupt"
-            self.automated_player_waited_on = ""
-            self.clickable_items_automated = []
-        elif self.interrupts_waiting_on_resolution:
-            self.what_is_required_automated = "Interrupt"
-            self.automated_player_waited_on = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
-            self.clickable_items_automated = []
-        elif self.stored_damage:
-            self.what_is_required_automated = "Damage"
-            player_num = self.stored_damage[0].get_player_num_of_unit()
-            if player_num == 1:
-                self.automated_player_waited_on = self.name_1
-            else:
-                self.automated_player_waited_on = self.name_2
-            self.clickable_items_automated = []
-        elif self.resolving_kugath_nurglings:
-            self.what_is_required_automated = "Kugaths Nurglings"
-            self.automated_player_waited_on = ""
-            self.clickable_items_automated = []
-        elif self.reactions_needing_resolving:
-            self.what_is_required_automated = "Reaction"
-            self.automated_player_waited_on = self.reactions_needing_resolving[0].get_player_resolving_reaction()
-            self.clickable_items_automated = []
-        elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
-            self.what_is_required_automated = "Mobile"
-            self.automated_player_waited_on = ""  # TODO: Less stupid mobile player
-            self.clickable_items_automated = []
-        elif self.battle_ability_to_resolve:
-            self.what_is_required_automated = "Battle Ability"
-            self.automated_player_waited_on = self.player_resolving_battle_ability
-            self.clickable_items_automated = []
-        elif self.phase == "DEPLOY":
-            self.what_is_required_automated = "Deployment"
-            self.automated_player_waited_on = self.player_with_deploy_turn
-            self.clickable_items_automated = []
-        elif self.phase == "COMMAND":
-            self.what_is_required_automated = "Commitment"
-            self.automated_player_waited_on = ""
-            self.clickable_items_automated = []
-        elif self.phase == "COMBAT":
-            self.what_is_required_automated = "Combat Turn"
-            self.automated_player_waited_on = ""
-            self.clickable_items_automated = []
-        elif self.phase == "HEADQUARTERS":
-            self.what_is_required_automated = "Headquarters Action"
-            self.automated_player_waited_on = ""
-            self.clickable_items_automated = []
+        ValidMovesFinder.update_automated_attributes(self)
 
     async def update_game_event(self, name, game_update_string, same_thread=False):
         if not same_thread:

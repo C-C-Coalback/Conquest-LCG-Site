@@ -4753,15 +4753,10 @@ class Player:
         return discounts_available, automatic_discounts
 
     def valid_nullify_unit(self, planet_pos, unit_pos):
-        if planet_pos == -2:
-            if self.headquarters[unit_pos].get_faction() == "Eldar" and self.headquarters[unit_pos].get_is_unit() and \
-                    self.headquarters[unit_pos].get_unique() and self.headquarters[unit_pos].get_ready():
-                return True
-            return False
-        if self.cards_in_play[planet_pos + 1][unit_pos].get_faction() == "Eldar" and \
-                self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit() and \
-                self.cards_in_play[planet_pos + 1][unit_pos].get_unique() and \
-                self.cards_in_play[planet_pos + 1][unit_pos].get_ready():
+        if self.check_if_faction_given_pos(planet_pos, unit_pos, "Eldar") and \
+                self.check_is_unit_at_pos(planet_pos, unit_pos) and \
+                self.get_unique_given_pos(planet_pos, unit_pos) and \
+                self.get_ready_given_pos(planet_pos, unit_pos):
             return True
         return False
 
