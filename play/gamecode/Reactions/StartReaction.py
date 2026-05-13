@@ -1,6 +1,7 @@
 from .. import FindCard
 from ..Phases import CombatPhase
 import copy
+import random
 
 
 async def start_resolving_reaction(self, name, game_update_string):
@@ -3196,6 +3197,89 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choices_available = ["Yes", "No"]
             self.name_player_making_choices = secondary_player.name_player
             self.resolving_search_box = True
+        elif current_reaction == "Quarantined World Arkos":
+            if primary_player.count_units_at_planet(planet_pos) == 0:
+                primary_player.draw_card()
+            self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+            self.delete_reaction()
+        elif current_reaction == "Helvetis":
+            if random.choice(["heads", "tails"]) == "tails":
+                primary_player.indirect_damage_applied = 0
+                self.location_of_indirect = "PLANET"
+                self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
+                self.planet_of_indirect = planet_pos
+                self.p1.total_indirect_damage = 2
+                self.p2.total_indirect_damage = 2
+                self.p1.indirect_damage_applied = 0
+                self.p2.indirect_damage_applied = 0
+                await self.send_update_message("Helvetis flipped tails, each player deals 2 indirect damage.")
+            else:
+                await self.send_update_message("Helvetis flipped heads, nothing happens.")
+                self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+                self.delete_reaction()
+        elif current_reaction == "Hostaryn XXI":
+            if random.choice(["heads", "tails"]) == "tails":
+                primary_player.add_resources(1)
+                secondary_player.add_resources(1)
+                await self.send_update_message("Hostaryn XXI flipped tails, each player gained a resource.")
+            else:
+                primary_player.spend_resources(1)
+                secondary_player.spend_resources(1)
+                await self.send_update_message("Hostaryn XXI flipped heads, each player lost a resource.")
+            self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+            self.delete_reaction()
+        elif current_reaction == "Deltadurne":
+            if primary_player.count_units_at_planet(planet_pos) > 0:
+                warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+                warlord_faction = primary_player.get_faction_given_pos(warlord_pla, warlord_pos)
+                faction_mismatch = False
+                for i in range(primary_player.count_units_at_planet(planet_pos)):
+                    if not primary_player.check_if_faction_given_pos(planet_pos, i, warlord_faction):
+                        faction_mismatch = True
+                if not faction_mismatch:
+                    primary_player.draw_card()
+            self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+            self.delete_reaction()
+        elif current_reaction == "Forge World Dagon":
+            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+            primary_player.remove_damage_from_pos(warlord_pla, warlord_pos, 1, healing=True)
+            self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+            self.delete_reaction()
+        elif current_reaction == "Hangyz":
+            self.misc_target_planet = planet_pos
+            if primary_player.deck:
+                card_name = primary_player.get_top_card_deck_name_only()
+                self.create_choices([card_name, "Do Nothing"], "All But Last")
+                self.choice_context = "Hangyz Scrying"
+                self.name_player_making_choices = primary_player.name_player
+                self.resolving_search_box = True
+            else:
+                await self.send_update_message("No cards in deck to look at!")
+                self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+                self.delete_reaction()
+        elif current_reaction == "Zadruk Prime":
+            self.misc_target_planet = planet_pos
+            primary_player.number_cards_to_search = 6
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
+                    if primary_player.headquarters[i].counter > 0:
+                        primary_player.number_cards_to_search += 2
+            if primary_player.number_cards_to_search > len(primary_player.deck):
+                primary_player.number_cards_to_search = len(primary_player.deck)
+            self.resolving_search_box = True
+            self.what_to_do_with_searched_card = "Zadruk Prime"
+            self.traits_of_searched_card = None
+            self.card_type_of_searched_card = "Army"
+            self.faction_of_searched_card = None
+            self.max_cost_of_searched_card = 999
+            self.all_conditions_searched_card_required = True
+            self.no_restrictions_on_chosen_card = False
+            self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
+            self.name_player_who_is_searching = primary_player.name_player
+            self.number_who_is_searching = primary_player.number
+        elif current_reaction == "Mordatyne":
+            self.chosen_first_card = False
+            self.misc_target_unit = (-1, -1)
         elif current_reaction == "Tides of Chaos":
             resources_to_spend = 1
             if primary_player.urien_relevant:
@@ -3204,19 +3288,21 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Tides of Chaos")
                 for i in range(len(primary_player.headquarters)):
                     if primary_player.get_card_type_given_pos(-2, i) == "Army":
-                        primary_player.headquarters[i].extra_command_eop += primary_player.get_attack_given_pos(-2, i)
+                        primary_player.headquarters[i].increase_extra_command_until_end_of_phase(primary_player.get_attack_given_pos(-2, i))
                 for i in range(len(secondary_player.headquarters)):
                     if secondary_player.get_card_type_given_pos(-2, i) == "Army":
-                        secondary_player.headquarters[i].extra_command_eop += secondary_player.get_attack_given_pos(-2, i)
+                        secondary_player.headquarters[i].increase_extra_command_until_end_of_phase(secondary_player.get_attack_given_pos(-2, i))
                 for i in range(7):
                     for j in range(len(primary_player.cards_in_play[i + 1])):
                         if primary_player.get_card_type_given_pos(i, j) == "Army":
-                            primary_player.cards_in_play[i + 1][j].extra_command_eop += \
+                            primary_player.cards_in_play[i + 1][j].increase_extra_command_until_end_of_phase(
                                 primary_player.get_attack_given_pos(i, j)
+                            )
                     for j in range(len(secondary_player.cards_in_play[i + 1])):
                         if secondary_player.get_card_type_given_pos(i, j) == "Army":
-                            secondary_player.cards_in_play[i + 1][j].extra_command_eop +=\
+                            secondary_player.cards_in_play[i + 1][j].increase_extra_command_until_end_of_phase(
                                 secondary_player.get_attack_given_pos(i, j)
+                            )
             self.delete_reaction()
         elif current_reaction == "The Inevitable Decay":
             if primary_player.resources > 0:

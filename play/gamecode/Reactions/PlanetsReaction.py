@@ -363,7 +363,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             if chosen_planet != self.misc_target_planet:
                 if self.get_red_icon(chosen_planet):
                     og_pla, og_pos = self.misc_target_unit
-                    primary_player.cards_in_play[og_pla + 1][og_pos].extra_command_eop += 1
+                    primary_player.cards_in_play[og_pla + 1][og_pos].increase_extra_command_until_end_of_phase(1)
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                     if primary_player.search_card_in_hq("Raiding Portal", ready_relevant=True):
@@ -444,6 +444,14 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.remove_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
+    elif current_reaction == "Mordatyne":
+        og_pla, og_pos = self.misc_target_unit
+        if self.chosen_first_card:
+            if abs(chosen_planet - og_pla) == 1:
+                primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
+                self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
                 self.delete_reaction()
     elif current_reaction == "Hive Ship Tendrils":
         if self.chosen_first_card:

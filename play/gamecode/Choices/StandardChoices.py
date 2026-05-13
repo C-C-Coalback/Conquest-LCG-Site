@@ -109,6 +109,13 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.name_player, self.last_shield_string)
         self.may_use_faith = True
         self.may_use_retaliate = True
+    elif self.choice_context == "Hangyz Scrying":
+        if game_update_string[1] == "0":
+            primary_player.discard_top_card_deck()
+        self.reset_choices_available()
+        self.resolving_search_box = False
+        self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+        self.delete_reaction()
     elif self.choice_context == "Nurgling Bomb Choice:":
         planet, unit = self.misc_target_unit
         primary_player.reset_aiming_reticle_in_play(planet, unit)
@@ -1803,6 +1810,12 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                                            str(current_unit)]
                 await CombatPhase.update_game_event_combat_section(
                     self, secondary_player.name_player, last_game_update_string)
+            elif self.reactions_needing_resolving[0].get_reaction_name() in [
+                "Frontier World Egulth", "Quarantined World Arkos", "Mordatyne", "Helvetis", "Zadruk Prime",
+                "Hostaryn XXI", "Deltadurne", "Caldera", "Hangyz", "Forge World Dagon"
+            ]:
+                planet_pos = self.reactions_needing_resolving[0].get_planet_pos()
+                self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
             self.resolving_search_box = False
             self.delete_reaction()
         self.reset_choices_available()

@@ -1380,6 +1380,13 @@ class Player:
             text = self.name_player + " reveals a " + card_name
             await self.game.send_update_message(text)
 
+    def get_top_card_deck_name_only(self):
+        if not self.deck:
+            print("Deck is empty, you lose!")
+            return None
+        else:
+            return self.deck[0]
+
     def get_top_card_deck(self):
         if not self.deck:
             print("Deck is empty, you lose!")
@@ -5126,6 +5133,19 @@ class Player:
         if self.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
             return True
         return False
+
+    def increase_command_of_unit_at_pos(self, planet_pos, unit_pos, amount, expiration="EOP"):
+        if planet_pos == -2:
+            if expiration == "EOP":
+                self.headquarters[unit_pos].increase_extra_command_until_end_of_phase(amount)
+            elif expiration == "EOG":
+                self.headquarters[unit_pos].increase_extra_command_until_end_of_game(amount)
+            return None
+        if expiration == "EOP":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_command_until_end_of_phase(amount)
+        elif expiration == "EOG":
+            self.cards_in_play[planet_pos + 1][unit_pos].increase_extra_command_until_end_of_game(amount)
+        return None
 
     def increase_health_of_unit_at_pos(self, planet_pos, unit_pos, amount, expiration="EOB"):
         if planet_pos == -2:

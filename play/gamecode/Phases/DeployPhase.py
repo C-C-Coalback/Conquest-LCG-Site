@@ -424,21 +424,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 secondary_player = self.p1
     if not is_an_interrupt:
         if self.reactions_needing_resolving and self.already_resolving_reaction:
-            if self.reactions_needing_resolving[0].get_reaction_name() == "Vamii Industrial Complex":
-                is_a_reaction = True
-                primary_player = self.p1
-                secondary_player = self.p2
-                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
-                    primary_player = self.p2
-                    secondary_player = self.p1
-            if self.reactions_needing_resolving[0].get_reaction_name() == "The Dance Without End":
-                is_a_reaction = True
-                primary_player = self.p1
-                secondary_player = self.p2
-                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_2:
-                    primary_player = self.p2
-                    secondary_player = self.p1
-            if self.reactions_needing_resolving[0].get_reaction_name() == "Dark Allegiance Rally":
+            if self.reactions_needing_resolving[0].get_reaction_name() in ["Vamii Industrial Complex", "The Dance Without End", "Dark Allegiance Rally", "Zadruk Prime"]:
                 is_a_reaction = True
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -505,7 +491,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 self.action_chosen == "Behind Enemy Lines") \
                 and not self.misc_player_storage == "RESOLVING MAGUS HARID" \
                 and not self.misc_player_storage == "RESOLVING Ice World Hydras IV" \
-                and not self.misc_player_storage == "RESOLVING DARK ALLEGIANCE":
+                and not self.misc_player_storage == "RESOLVING DARK ALLEGIANCE" \
+                and not self.misc_player_storage == "ZADRUK PRIME":
             primary_player.cards.remove(self.card_to_deploy.get_name())
         elif self.action_chosen == "Decaying Warrior Squad":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
@@ -600,6 +587,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             self.name_player_making_choices = secondary_player.get_name_player()
             self.resolving_search_box = True
     if self.reactions_needing_resolving and self.already_resolving_reaction and is_a_reaction:
+        if self.reactions_needing_resolving[0].get_reaction_name() == "Zadruk Prime":
+            self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
         self.delete_reaction()
     if is_battle_ability:
         pass

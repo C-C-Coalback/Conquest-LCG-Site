@@ -171,6 +171,8 @@ class Card:
 
     def remove_damage(self, amount):
         self.damage = self.damage - amount
+        if self.damage < 0:
+            self.damage = 0
 
     def get_once_per_game_used(self):
         return self.once_per_game_used
@@ -512,6 +514,7 @@ class UnitCard(Card):
         self.move_to_planet_end_of_phase_planet = -1
         self.move_to_planet_end_of_phase_phase = ""
         self.armorbane_next = False
+        self.extra_command_eog = 0
 
     def get_extra_info_string(self):
         string = ""
@@ -650,6 +653,8 @@ class UnitCard(Card):
             string += "New Textbox: " + self.new_ability + "\n"
         if self.extra_command_eop != 0:
             string += "Extra Command (EOP): " + str(self.extra_command_eop) + "\n"
+        if self.extra_command_eog != 0:
+            string += "Extra Command (EOG): " + str(self.extra_command_eog) + "\n"
         if self.command_until_combat:
             string += "Command Until Combat: " + str(self.command_until_combat) + "\n"
         if self.attack_set_eop != -1:
@@ -850,6 +855,12 @@ class UnitCard(Card):
 
     def increase_extra_attack_until_next_attack(self, amount):
         self.extra_attack_until_next_attack += amount
+
+    def increase_extra_command_until_end_of_phase(self, amount):
+        self.extra_command_eop += amount
+
+    def increase_extra_command_until_end_of_game(self, amount):
+        self.extra_command_eog += amount
 
     def increase_extra_health_until_end_of_phase(self, amount):
         self.positive_hp_until_eop += amount
@@ -1174,6 +1185,7 @@ class UnitCard(Card):
     def get_command(self):
         command = self.command
         command += self.extra_command_eop
+        command += self.extra_command_eog
         command += self.command_until_combat
         if self.hit_by_superiority:
             return 0

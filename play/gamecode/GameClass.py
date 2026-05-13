@@ -76,6 +76,7 @@ class Game:
         self.atrox_origin = -1
         regular_planets_setup = True
         self.sector = "Traxis"
+        self.activities = False
         if forced_planet_array is not None:
             if len(forced_planet_array) == 7:
                 for i in range(len(forced_planet_array)):
@@ -89,7 +90,7 @@ class Game:
                 self.planet_array = []
         if regular_planets_setup:
             if sector == "Random":
-                sector = self.rng.choice(["Traxis", "Gardis", "Veros", "The Breach", "Nepthis", "Sargos"])
+                sector = self.rng.choice(["Traxis", "Gardis", "Veros", "The Breach", "Nepthis", "Sargos", "Monn-Rai"])
             if sector == "Traxis":
                 for i in range(10):
                     self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -108,6 +109,10 @@ class Game:
             elif sector == "Sargos":
                 for i in range(50, 60):
                     self.planet_array.append(self.planet_cards_array[i].get_name())
+            elif sector == "Monn-Rai":
+                for i in range(60, 70):
+                    self.planet_array.append(self.planet_cards_array[i].get_name())
+                self.activities = True
             else:
                 for i in range(10):
                     self.planet_array.append(self.planet_cards_array[i].get_name())
@@ -381,7 +386,7 @@ class Game:
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
                                  "Spray and Pray", "Grey Hunters", "Shambling Revenant", "Flayer Affliction",
                                  "Avatar of Khaine", "Aun'la Prince", "Carnifex", "Gleeful Plague Beast",
-                                 "Triarch Stalkers Procession"]
+                                 "Triarch Stalkers Procession", "Helvetis"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -1937,23 +1942,29 @@ class Game:
                         if self.action_chosen == "Drop Pod Assault":
                             self.p1.resolve_played_any_event()
                             self.action_cleanup()
-                        if self.faction_of_searched_card == "Necrons":
-                            if self.reactions_needing_resolving:
+                        if self.reactions_needing_resolving:
+                            if self.faction_of_searched_card == "Necrons":
                                 if self.reactions_needing_resolving[0].get_reaction_name() == "Endless Legions":
                                     if self.p1.search_card_in_hq("Endless Legions", ready_relevant=True):
                                         self.create_reaction("Endless Legions", self.name_1, (1, -1, -1))
                                     self.delete_reaction()
+                            elif self.what_to_do_with_searched_card == "Zadruk Prime":
+                                self.start_next_activity(self.name_1, self.reactions_needing_resolving[0].get_planet_pos())
+                                self.delete_reaction()
                     else:
                         self.p2.bottom_remaining_cards()
                         if self.action_chosen == "Drop Pod Assault":
                             self.p2.resolve_played_any_event()
                             self.action_cleanup()
-                        if self.faction_of_searched_card == "Necrons":
-                            if self.reactions_needing_resolving:
+                        if self.reactions_needing_resolving:
+                            if self.faction_of_searched_card == "Necrons":
                                 if self.reactions_needing_resolving[0].get_reaction_name() == "Endless Legions":
                                     if self.p2.search_card_in_hq("Endless Legions", ready_relevant=True):
                                         self.create_reaction("Endless Legions", self.name_2, (1, -1, -1))
                                     self.delete_reaction()
+                            elif self.what_to_do_with_searched_card == "Zadruk Prime":
+                                self.start_next_activity(self.name_2, self.reactions_needing_resolving[0].get_planet_pos())
+                                self.delete_reaction()
                     self.cards_in_search_box = []
                     if self.resolving_search_box:
                         self.resolving_search_box = False
@@ -2035,6 +2046,25 @@ class Game:
                                 del primary_player.deck[int(game_update_string[1])]
                             else:
                                 primary_player.number_cards_to_search += 1
+                        elif self.what_to_do_with_searched_card == "Zadruk Prime":
+                            pla = self.misc_target_planet
+                            card_name = primary_player.deck[int(game_update_string[1])]
+                            card = self.preloaded_find_card(card_name)
+                            self.card_to_deploy = card
+                            self.planet_pos_to_deploy = pla
+                            self.misc_player_storage = "ZADRUK PRIME"
+                            await self.discount_begin_routine(pla, card, primary_player, 1)
+                            if self.available_discounts > self.discounts_applied:
+                                self.stored_mode = self.mode
+                                self.mode = "DISCOUNT"
+                                self.planet_aiming_reticle_position = pla
+                                self.planet_aiming_reticle_active = True
+                            else:
+                                units_at_planet = primary_player.count_units_at_planet(pla)
+                                await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
+                                                                      discounts=self.discounts_applied)
+                                if units_at_planet < primary_player.count_units_at_planet(pla):
+                                    del primary_player.deck[int(game_update_string[1])]
                         elif self.what_to_do_with_searched_card == "DISCARD":
                             if self.searching_enemy_deck:
                                 secondary_player.discard_card_from_deck(int(game_update_string[1]))
@@ -2904,13 +2934,39 @@ class Game:
                 return i
         return -1
 
-    async def quick_battle_ability_resolution(self, name, game_update_string, winner, loser):
+    async def quick_battle_ability_resolution(self, name, game_update_string, winner: PlayerClass.Player, loser: PlayerClass.Player):
+        planet_pos = self.last_planet_checked_for_battle
         self.reset_choices_available()
         if self.battle_ability_to_resolve == "BLANKED":
             await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Osus IV":
             if loser.spend_resources(1):
                 winner.add_resources(1)
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Frontier World Egulth":
+            if planet_pos != 0:
+                if self.planets_in_play_array[planet_pos - 1]:
+                    winner.summon_token_at_planet("Khymera", planet_pos - 1)
+            if planet_pos != 6:
+                if self.planets_in_play_array[planet_pos + 1]:
+                    winner.summon_token_at_planet("Khymera", planet_pos + 1)
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Helvetis":
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Zadruk Prime":
+            self.misc_counter = 3
+        elif self.battle_ability_to_resolve == "Hostaryn XXI":
+            winner.draw_card()
+            winner.draw_card()
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Deltadurne":
+            winner.add_resources(1)
+            winner.draw_card()
+            await self.resolve_battle_conclusion(name, game_update_string)
+        elif self.battle_ability_to_resolve == "Caldera":
+            await self.send_update_message("Opponent must sacrifice an army unit.")
+        elif self.battle_ability_to_resolve == "Forge World Dagon":
+            winner.add_resources(2)
             await self.resolve_battle_conclusion(name, game_update_string)
         elif self.battle_ability_to_resolve == "Wounded Scream":
             if not self.wounded_scream_blanked:
@@ -3410,6 +3466,27 @@ class Game:
                                             self.chosen_second_card = True
                                             await self.send_update_message(secondary_player.name_player +
                                                                            " may move an army unit to the same planet.")
+                elif self.battle_ability_to_resolve == "Caldera":
+                    if len(game_update_string) == 1:
+                        if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                            self.chosen_second_card = True
+                            await self.send_update_message("The mandatory sacrifice was not performed.")
+                    elif len(game_update_string) == 3:
+                        if game_update_string[0] == "HQ":
+                            if game_update_string[1] == primary_player.get_number():
+                                planet_pos = -2
+                                unit_pos = int(game_update_string[2])
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                                        await self.resolve_battle_conclusion(secondary_player.name_player, game_update_string)
+                    elif len(game_update_string) == 4:
+                        if game_update_string[0] == "IN_PLAY":
+                            if game_update_string[1] == primary_player.get_number():
+                                planet_pos = int(game_update_string[2])
+                                unit_pos = int(game_update_string[3])
+                                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                                    if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                                        await self.resolve_battle_conclusion(secondary_player.name_player, game_update_string)
         elif name == self.player_resolving_battle_ability:
             primary_player = self.p1
             secondary_player = self.p2
@@ -3454,6 +3531,18 @@ class Game:
             elif self.battle_ability_to_resolve == "Carnath":
                 await PlanetBattleAbilities.manual_carnath_ability(self, name, game_update_string,
                                                                    primary_player, secondary_player)
+            elif self.battle_ability_to_resolve == "Quarantined World Arkos":
+                await PlanetBattleAbilities.manual_quarantined_world_arkos_ability(self, name, game_update_string,
+                                                                                   primary_player, secondary_player)
+            elif self.battle_ability_to_resolve == "Mordatyne":
+                await PlanetBattleAbilities.manual_mordatyne_ability(self, name, game_update_string,
+                                                                     primary_player, secondary_player)
+            elif self.battle_ability_to_resolve == "Zadruk Prime":
+                await PlanetBattleAbilities.manual_zadruk_prime_ability(self, name, game_update_string,
+                                                                        primary_player, secondary_player)
+            elif self.battle_ability_to_resolve == "Hangyz":
+                await PlanetBattleAbilities.manual_hangyz_ability(self, name, game_update_string,
+                                                                  primary_player, secondary_player)
             elif self.battle_ability_to_resolve == "Hissan XI":
                 await PlanetBattleAbilities.manual_hissan_xi_ability(self, name, game_update_string,
                                                                      primary_player, secondary_player)
@@ -3797,6 +3886,47 @@ class Game:
                     i -= 1
                 i += 1
 
+    def start_next_activity(self, last_player, planet_pos):
+        current_planet = 0
+        player_acting = self.player_with_initiative
+        num_acting = int(self.number_with_initiative)
+        if planet_pos > -1:
+            current_planet = planet_pos
+        if last_player:
+            if last_player != self.player_with_initiative:
+                current_planet = current_planet + 1
+            else:
+                if player_acting == self.name_1:
+                    player_acting = self.name_2
+                    num_acting = 2
+                else:
+                    player_acting = self.name_1
+                    num_acting = 1
+        while current_planet < 7:
+            if self.planets_in_play_array[current_planet]:
+                break
+            current_planet += 1
+        if current_planet > 6:
+            return False
+        planet_name = self.get_planet_name(current_planet)
+        if planet_name == "Helvetis" and player_acting != self.player_with_initiative:
+            if player_acting == self.name_1:
+                player_acting = self.name_2
+                num_acting = 2
+            else:
+                player_acting = self.name_1
+                num_acting = 1
+            current_planet += 1
+            while current_planet < 7:
+                if self.planets_in_play_array[current_planet]:
+                    break
+                current_planet += 1
+            if current_planet > 6:
+                return False
+            planet_name = self.get_planet_name(current_planet)
+        self.create_reaction(planet_name, player_acting, (str(num_acting), current_planet, -1))
+        return True
+
     async def change_phase(self, new_val, refresh_abilities=True):
         last_phase = self.phase
         self.phase = new_val
@@ -3886,6 +4016,8 @@ class Game:
             if self.p2.search_card_in_hq("idden Base"):
                 self.p2.idden_base_transform()
                 self.p2.idden_base_active = True
+            if self.activities:
+                self.start_next_activity("", -1)
         if self.phase == "HEADQUARTERS":
             self.p1.idden_base_detransform(force=True)
             self.p1.idden_base_active = False
@@ -3942,10 +4074,12 @@ class Game:
             await self.send_victory_proper(self.name_1, "Necrodermis")
         self.create_reactions_phase_begins()
 
-    async def discount_begin_routine(self, planet_chosen, card, primary_player):
+    async def discount_begin_routine(self, planet_chosen, card, primary_player, extra_discounts=0):
         self.discounts_applied = 0
         await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
         await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+        self.available_discounts += extra_discounts
+        self.discounts_applied += extra_discounts
         if self.available_discounts > self.discounts_applied:
             await self.announce_discounts()
 
@@ -5263,8 +5397,10 @@ class Game:
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     reaction_name = self.reactions_needing_resolving[0].get_reaction_name()
-                    if reaction_name == "Power from Pain":
-                        await self.send_update_message("No sacrifice for Power from Pain")
+                    if reaction_name in ["Frontier World Egulth", "Quarantined World Arkos", "Mordatyne", "Helvetis",
+                                         "Zadruk Prime", "Hostaryn XXI", "Deltadurne", "Caldera",
+                                         "Hangyz", "Forge World Dagon"]:
+                        self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
                     if reaction_name == "Cato's Stronghold":
                         primary_player.allowed_planets_cato_stronghold = []
                     if reaction_name == "Foresight":
@@ -5499,7 +5635,7 @@ class Game:
                                                                                    int(game_update_string[3]))
                                     if last_el_index != -1:
                                         primary_player.cards_in_play[int(game_update_string[2]) + 1][
-                                            last_el_index].extra_command_eop += 2
+                                            last_el_index].increase_extra_command_until_end_of_phase(2)
                                     found_one = False
                                     for i in range(7):
                                         for j in range(len(primary_player.cards_in_reserve[i])):
@@ -5710,6 +5846,11 @@ class Game:
             await self.resolve_indirect_damage_applied()
             if self.battle_ability_to_resolve == "Diamat":
                 self.damage_from_atrox = True
+            if self.reactions_needing_resolving:
+                if self.reactions_needing_resolving[0].get_reaction_name() == "Helvetis":
+                    self.start_next_activity(self.player_with_initiative,
+                                             self.reactions_needing_resolving[0].get_planet_pos())
+                    self.delete_reaction()
             self.indirect_exhaust_only = False
             self.forbidden_traits_indirect = ""
             self.p1.total_indirect_damage = 0

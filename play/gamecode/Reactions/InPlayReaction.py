@@ -2137,11 +2137,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Not a valid target for Hydra Flak Tank.")
         elif current_reaction == "Nahumekh":
             if planet_pos == og_pla:
-                if game_update_string[1] == "1":
-                    player_being_hit = self.p1
-                else:
-                    player_being_hit = self.p2
-                if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     can_continue = True
                     possible_interrupts = []
                     if player_owning_card.name_player == primary_player.name_player:
@@ -2165,14 +2161,95 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        player_being_hit.apply_negative_health_eop(planet_pos, unit_pos,
-                                                                   primary_player.nahumekh_value)
-                        name = player_being_hit.get_name_given_pos(planet_pos, unit_pos)
+                        player_owning_card.apply_negative_health_eop(planet_pos, unit_pos,
+                                                                     primary_player.nahumekh_value)
+                        name = player_owning_card.get_name_given_pos(planet_pos, unit_pos)
                         await self.send_update_message(
                             name + " received -" + str(primary_player.nahumekh_value) + " HP."
                         )
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " can only target army units.")
+        elif current_reaction == "Frontier World Egulth":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = current_reaction
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction"
+                if can_continue:
+                    player_owning_card.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                    self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+                    self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  current_reaction + " can only target army units.")
+        elif current_reaction == "Caldera":
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                can_continue = True
+                possible_interrupts = []
+                if player_owning_card.name_player == primary_player.name_player:
+                    possible_interrupts = secondary_player.intercept_check()
+                if player_owning_card.name_player == secondary_player.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(
+                        planet_pos, unit_pos, intercept_possible=True)
+                    if secondary_player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy card abilities.")
+                if possible_interrupts and can_continue:
+                    can_continue = False
+                    await self.send_update_message("Some sort of interrupt may be used.")
+                    self.choices_available = possible_interrupts
+                    self.choices_available.insert(0, "No Interrupt")
+                    self.name_player_making_choices = secondary_player.name_player
+                    self.choice_context = "Interrupt Effect?"
+                    self.nullified_card_name = current_reaction
+                    self.cost_card_nullified = 0
+                    self.nullify_string = "/".join(game_update_string)
+                    self.first_player_nullified = primary_player.name_player
+                    self.nullify_context = "Reaction"
+                if can_continue:
+                    player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
+                    self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
+                    self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                  current_reaction + " can only target army units.")
+        elif current_reaction == "Mordatyne":
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if planet_pos == og_pla:
+                        if not primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                            if self.misc_target_unit != (-1, -1):
+                                primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
+                            self.misc_target_unit = (planet_pos, unit_pos)
+                            self.chosen_first_card = True
+                            primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                              current_reaction + " cannot target Elite units.")
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                          current_reaction + " can only target units at its planet.")
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       current_reaction + " can only target army units.")
