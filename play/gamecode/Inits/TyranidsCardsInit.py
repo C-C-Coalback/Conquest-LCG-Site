@@ -528,6 +528,40 @@ def tyranids_cards_init():
                                                      "support.", "Pledge.", 1, faction, "Common", False),
         CardClasses.SupportCard("Hive Fleet Leviathan", "Reduce damage dealt by Area Effect to 1.\n"
                                                         "Reaction: After you deploy this support, infest a target "
-                                                        "planet.", "Pledge.", 0, faction, "Common", False)
+                                                        "planet.", "Pledge.", 0, faction, "Common", False),
+        CardClasses.WarlordCard("Subject W-808",
+                                "Reaction: After the deploy phase begins, pay 1 resource to put into "
+                                "play a synapse unit from the card collection at a non-first planet."
+                                " Remove that card from the game at the end of the round. "
+                                "(Limit once per synapse)", "Creature. Dagon.", "Tyranids", 2, 6, 2, 5,
+                                "Bloodied.\n"
+                                "Forced Reaction: After the deploy phase begins, pay 1 resource to put into"
+                                " play a synapse unit from the card collection at a non-first planet. Remove that card "
+                                "from the game at the end of the round. (Limit once per game)", 6, 6,
+                                ["1x Planetary Devastation", "2x The Shadow in the Warp",
+                                 "4x Protective Horrors", "1x Burgeoning Incubation"]),
+        CardClasses.SupportCard("Burgeoning Incubation",
+                                "Reaction: After the deploy phase begins, sacrifice this supports"
+                                "to target a planet. If you win a battle at that planet this "
+                                "round, put a synapse into play from the card collection at your HQ.",
+                                "Location.", 1, "Tyranids", "Signature", False),
+        CardClasses.ArmyCard("Protective Horrors",
+                             "While at a planet with a unique unit, this unit gets Sweep (1).\n"
+                             "Reaction: After a synapse unit at this planet is assigned damage, reassign "
+                             "all of that damage to this unit instead.", "Creature.",
+                             2, "Tyranids", "Signature", 1, 3, 1, False),
+        CardClasses.EventCard("The Shadow in the Warp",
+                              "Limited.\n"
+                              "Action: Until the end of the round, gain 1 resource each time you play an event and "
+                              "your opponent must pay 1 resource each time they play an event.", "Power.",
+                              0, "Tyranids", "Signature", 1, False, limited=True,
+                              action_in_hand=True, allowed_phases_in_hand="ALL"),
+        CardClasses.AttachmentCard("Planetary Devastation",
+                                   "Limited.\n"
+                                   "Attach to a planet.\n"
+                                   "Attached planet loses its textbox, type (color) and its bonuses are set to 0.\n"
+                                   "Action: Return this attachment to your hand to put a Termagant token into play "
+                                   "at this planet.", "Disaster.", 0, "Tyranids", "Signature", 3, False, limited=True,
+                                   planet_attachment=True, action_in_play=True, allowed_phases_in_play="ALL"),
     ]
     return tyranids_card_array
