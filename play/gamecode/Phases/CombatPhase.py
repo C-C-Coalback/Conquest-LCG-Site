@@ -423,7 +423,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         await self.send_update_message("deepstriking attachment")
 
         elif game_update_string[0] == "IN_PLAY":
-            print("Unit clicked on.")
             chosen_planet = int(game_update_string[2])
             chosen_unit = int(game_update_string[3])
             if self.start_battle_deepstrike:
@@ -629,105 +628,26 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     if game_update_string[1] == self.number_with_combat_turn:
                         chosen_planet = int(game_update_string[2])
                         chosen_unit = int(game_update_string[3])
-                        valid_unit = False
                         if self.number_with_combat_turn == "1":
                             player = self.p1
                             secondary_player = self.p2
                         else:
                             player = self.p2
                             secondary_player = self.p1
-                        if chosen_planet == self.last_planet_checked_for_battle:
-                            grav_inhib_rel = player.search_card_at_planet(chosen_planet, "Grav Inhibitor Drone")
-                            if not grav_inhib_rel:
-                                grav_inhib_rel = secondary_player.search_card_at_planet(chosen_planet,
-                                                                                        "Grav Inhibitor Drone")
-                            if grav_inhib_rel:
-                                grav_inhib_rel = False
-                                for i in range(len(player.cards_in_play[chosen_planet + 1])):
-                                    if player.get_card_type_given_pos(chosen_planet, i) == "Army":
-                                        if player.get_cost_given_pos(chosen_planet, i) > 2:
-                                            if player.get_ready_given_pos(chosen_planet, i):
-                                                grav_inhib_rel = True
-                                for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-                                    if secondary_player.get_card_type_given_pos(chosen_planet, i) == "Army":
-                                        if secondary_player.get_cost_given_pos(chosen_planet, i) > 2:
-                                            if secondary_player.get_ready_given_pos(chosen_planet, i):
-                                                grav_inhib_rel = True
-                            if grav_inhib_rel:
-                                grav_inhib_rel = False
-                                if player.get_card_type_given_pos(chosen_planet, chosen_unit) == "Army":
-                                    if player.get_cost_given_pos(chosen_planet, chosen_unit) < 3:
-                                        grav_inhib_rel = True
-                            iron_hands_cent_rel = player.search_card_at_planet(chosen_planet, "Iron Hands Centurion",
-                                                                               ready_relevant=True)
-                            if not iron_hands_cent_rel:
-                                iron_hands_cent_rel = secondary_player.search_card_at_planet(chosen_planet,
-                                                                                             "Iron Hands Centurion",
-                                                                                             ready_relevant=True)
-                            if iron_hands_cent_rel:
-                                iron_hands_cent_rel = False
-                                if player.get_card_type_given_pos(chosen_planet, chosen_unit) == "Army":
-                                    if player.get_cost_given_pos(chosen_planet, chosen_unit) < 3:
-                                        iron_hands_cent_rel = True
-                            pinning_razorback = False
-                            if player.cards_in_play[chosen_planet + 1][chosen_unit].cannot_be_declared_as_attacker:
-                                pinning_razorback = True
-                            can_continue = False
-                            print("check enemy cards")
-                            print(len(secondary_player.cards_in_play[chosen_planet + 1]))
-                            if grav_inhib_rel:
-                                can_continue = False
+                        other_player = secondary_player
+                        valid_unit = False
+                        if self.check_if_unit_can_be_declared_as_attacker(player, secondary_player, chosen_planet, chosen_unit):
+                            valid_unit = True
+                            if player.get_card_type_given_pos(chosen_planet, chosen_unit) == "Warlord" and self.can_retreat_warlord:
+                                self.choices_available = ["Yes", "No"]
+                                self.choice_context = "Retreat Warlord?"
+                                self.name_player_making_choices = player.name_player
+                                self.resolving_search_box = True
+                                self.last_game_update_string = game_update_string
                                 valid_unit = False
-                                await self.send_update_message("Grav Inhibitor Drone is preventing "
-                                                               "this unit from attacking")
-                            elif iron_hands_cent_rel:
-                                can_continue = False
-                                valid_unit = False
-                                await self.send_update_message("Iron Hands Centurion is preventing "
-                                                               "this unit from attacking")
-                            elif pinning_razorback:
-                                can_continue = False
-                                valid_unit = False
-                                await self.send_update_message("Pinning Razorback is preventing "
-                                                               "this unit from attacking")
-                            elif not secondary_player.cards_in_play[chosen_planet + 1]:
-                                valid_unit = False
-                                can_continue = False
-                                await self.send_update_message("No enemy units to declare as defender. Combat ends.")
-                                await self.check_combat_end(player.name_player)
-                            elif self.ranged_skirmish_active:
-                                for i in range(len(player.cards_in_play[chosen_planet + 1])):
-                                    if player.cards_in_play[chosen_planet + 1][i].emperor_champion_active:
-                                        if player.get_ready_given_pos(chosen_planet, i):
-                                            if player.get_ranged_given_pos(chosen_planet, i):
-                                                chosen_unit = i
-                                is_ranged = player.get_ranged_given_pos(chosen_planet, chosen_unit)
-                                if is_ranged:
-                                    can_continue = True
-                            else:
-                                for i in range(len(player.cards_in_play[chosen_planet + 1])):
-                                    if player.cards_in_play[chosen_planet + 1][i].emperor_champion_active:
-                                        if player.get_ready_given_pos(chosen_planet, i):
-                                            chosen_unit = i
-                                can_continue = True
-                            if can_continue:
-                                is_ready = player.check_ready_pos(chosen_planet, chosen_unit)
-                                if is_ready:
-                                    valid_unit = True
-                                    if player.cards_in_play[chosen_planet + 1][chosen_unit] \
-                                            .get_card_type() == "Warlord" and self.can_retreat_warlord:
-                                        self.choices_available = ["Yes", "No"]
-                                        self.choice_context = "Retreat Warlord?"
-                                        self.name_player_making_choices = player.name_player
-                                        self.resolving_search_box = True
-                                        self.last_game_update_string = game_update_string
-                                        valid_unit = False
-                                        player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
-                                        self.attacker_planet = chosen_planet
-                                        self.attacker_position = chosen_unit
-                                    print("Unit ready, can be used")
-                                else:
-                                    print("Unit not ready")
+                                player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
+                                self.attacker_planet = chosen_planet
+                                self.attacker_position = chosen_unit
                         if valid_unit:
                             player.cards_in_play[chosen_planet + 1][chosen_unit].resolving_attack = True
                             player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
@@ -738,12 +658,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.shadow_thorns_body_allowed = True
                             self.attack_being_resolved = True
                             print("Attacker:", self.attacker_planet, self.attacker_position)
-                            if self.number_with_combat_turn == "1":
-                                player = self.p1
-                                other_player = self.p2
-                            else:
-                                player = self.p2
-                                other_player = self.p1
                             player.has_passed = False
                             player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
                             if player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) == "Army":

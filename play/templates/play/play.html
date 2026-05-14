@@ -807,7 +807,10 @@
                                 faith = "6+";
                             }
                             var hale = card_data_split[4];
-                            var additional_helper_text = card_data_split[5];
+                            var border_type = card_data_split[5];
+                            var additional_helper_text = card_data_split[6];
+                            var aiming_reticle = card_data_split[7];
+                            var attachment_data_position = 8;
                             var deepstrike = "False";
                             var original_text = "";
                             var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
@@ -839,8 +842,17 @@
                                 }
                                 route_text = "/static/images/CardImages/" + card_name + ".jpg";
                             }
-                            for (var j = 7; j < card_data_split.length; j++) {
-                                var attachment_string_id = (j-7).toString();
+                            console.log("Border" + border_type);
+                            if (border_type === "playable") {
+                                card_class = card_class + " generic-playable-card";
+                            } else if (border_type === "unplayable") {
+                                card_class = card_class + " generic-unplayable-card";
+                            } else {
+                                card_class = card_class + " generic-blue-border";
+                            }
+                            console.log(card_class);
+                            for (var j = attachment_data_position; j < card_data_split.length; j++) {
+                                var attachment_string_id = (j-attachment_data_position).toString();
                                 var attachment_data_split = card_data_split[j].split("+");
                                 var attachment_name = attachment_data_split[0].split(' ').join('_');
                                 var attachment_ready = attachment_data_split[1];
@@ -868,18 +880,18 @@
                                 }
                                 var attachment_style_string = "";
                                 if (attachment_rotation === "") {
-                                    attachment_style_string = ` style="margin-left: ` + (j - 7).toString() + `vw"`;
+                                    attachment_style_string = ` style="margin-left: ` + (j - attachment_data_position).toString() + `vw"`;
                                 } else {
-                                    attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - 7).toString() + `vw"`;
+                                    attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - attachment_data_position).toString() + `vw"`;
                                 }
                                 full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                             }
                             var style_string = "";
-                            if (card_data_split.length > 7) {
+                            if (card_data_split.length > attachment_data_position) {
                                 if (rotation === "") {
-                                    style_string = ` style="margin-left: ` + (card_data_split.length - 7).toString() + `vw"`;
+                                    style_string = ` style="margin-left: ` + (card_data_split.length - attachment_data_position).toString() + `vw"`;
                                 } else {
-                                    style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - 7).toString() + `vw;"`;
+                                    style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - attachment_data_position).toString() + `vw;"`;
                                 }
                             } else {
                                 if (rotation === "") {
@@ -888,10 +900,10 @@
                                     style_string = ` style="rotate: 90deg;"`;
                                 }
                             }
-                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class=` + card_class + enlarge_card_formula + ` onmouseout="changeDefOut()">`
-                            if (card_data_split[6] !== "") {
-                                var style_string_reticle = `style="left: calc(10px + ` + (card_data_split.length - 7).toString() + `vw);"`;
-                                full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[6] + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                            if (aiming_reticle !== "") {
+                                var style_string_reticle = `style="left: calc(10px + ` + (card_data_split.length - attachment_data_position).toString() + `vw);"`;
+                                full_string += `<img src="/static/images/aiming_reticle_` + aiming_reticle + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
                             }
                             if (damage === "0") {
 

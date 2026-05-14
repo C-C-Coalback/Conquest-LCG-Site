@@ -780,12 +780,16 @@ h4 {
     background: transparent;
 }
 
-.playable-hand-card {
+.playable-hand-card, .generic-playable-card {
     border: 2px solid gold !important;
 }
 
-.unplayable-hand-card {
+.unplayable-hand-card, .generic-unplayable-card {
     border: 2px solid gray !important;
+}
+
+.generic-blue-border {
+    border: 2px solid aqua;
 }
 
 .hand-card {

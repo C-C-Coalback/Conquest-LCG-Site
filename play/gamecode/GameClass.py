@@ -3886,6 +3886,70 @@ class Game:
                     i -= 1
                 i += 1
 
+    def check_if_unit_can_be_declared_as_attacker(self, primary_player, secondary_player, planet_pos, unit_pos):
+        if planet_pos == self.last_planet_checked_for_battle:
+            if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                return False
+            grav_inhib_rel = primary_player.search_card_at_planet(planet_pos, "Grav Inhibitor Drone")
+            if not grav_inhib_rel:
+                grav_inhib_rel = secondary_player.search_card_at_planet(planet_pos, "Grav Inhibitor Drone")
+            if grav_inhib_rel:
+                grav_inhib_rel = False
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if primary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                        if primary_player.get_cost_given_pos(planet_pos, i) > 2:
+                            if primary_player.get_ready_given_pos(planet_pos, i):
+                                grav_inhib_rel = True
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
+                        if secondary_player.get_cost_given_pos(planet_pos, i) > 2:
+                            if secondary_player.get_ready_given_pos(planet_pos, i):
+                                grav_inhib_rel = True
+            if grav_inhib_rel:
+                grav_inhib_rel = False
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 3:
+                        grav_inhib_rel = True
+            iron_hands_cent_rel = primary_player.search_card_at_planet(planet_pos, "Iron Hands Centurion",
+                                                               ready_relevant=True)
+            if not iron_hands_cent_rel:
+                iron_hands_cent_rel = secondary_player.search_card_at_planet(planet_pos,
+                                                                             "Iron Hands Centurion",
+                                                                             ready_relevant=True)
+            if iron_hands_cent_rel:
+                iron_hands_cent_rel = False
+                if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 3:
+                        iron_hands_cent_rel = True
+            pinning_razorback = False
+            if primary_player.cards_in_play[planet_pos + 1][unit_pos].cannot_be_declared_as_attacker:
+                pinning_razorback = True
+            if grav_inhib_rel:
+                return False
+            elif iron_hands_cent_rel:
+                return False
+            elif pinning_razorback:
+                return False
+            elif not secondary_player.cards_in_play[planet_pos + 1]:
+                return True
+            elif self.ranged_skirmish_active:
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if i != unit_pos:
+                        if primary_player.cards_in_play[planet_pos + 1][i].emperor_champion_active:
+                            if primary_player.get_ready_given_pos(planet_pos, i):
+                                if primary_player.get_ranged_given_pos(planet_pos, i):
+                                    return False
+                is_ranged = primary_player.get_ranged_given_pos(planet_pos, unit_pos)
+                return is_ranged
+            else:
+                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if i != unit_pos:
+                        if primary_player.cards_in_play[planet_pos + 1][i].emperor_champion_active:
+                            if primary_player.get_ready_given_pos(planet_pos, i):
+                                return False
+                return True
+        return False
+
     def start_next_activity(self, last_player, planet_pos):
         current_planet = 0
         player_acting = self.player_with_initiative

@@ -1010,6 +1010,26 @@ class Player:
                         else:
                             single_card_string += "H"
                         single_card_string += "|"
+                        border_type = ""
+                        if self.game.check_if_battle_taking_place():
+                            if self.game.safety_check():
+                                if self.game.number_with_combat_turn == self.get_number():
+                                    if self.game.attacker_planet == -1:
+                                        other_player = self.get_other_player()
+                                        if self.game.check_if_unit_can_be_declared_as_attacker(self, other_player, planet_id, i):
+                                            border_type = "playable"
+                                        else:
+                                            border_type = "unplayable"
+                                    elif self.game.attacker_planet == planet_id and self.game.attacker_position == i:
+                                        border_type = "playable"
+                                    else:
+                                        border_type = "unplayable"
+                                else:
+                                    border_type = "unplayable"
+                            else:
+                                border_type = "unplayable"
+                        single_card_string += border_type
+                        single_card_string += "|"
                         single_card_string += current_card.get_extra_info_string()
                         if self.game.mode == "RETREAT":
                             single_card_string += "\nRETREAT"
