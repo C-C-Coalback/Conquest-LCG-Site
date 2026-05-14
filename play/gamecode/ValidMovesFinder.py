@@ -63,14 +63,46 @@ def update_automated_attributes(self):
         self.what_is_required_automated = "Deploy Turn"
         self.automated_player_waited_on = self.player_with_deploy_turn
     elif self.phase == "COMMAND":
-        self.what_is_required_automated = "Commitment"
-        self.automated_player_waited_on = ""
+        if self.committing_warlords:
+            self.what_is_required_automated = "Commitment"
+            if not self.p1.has_passed and not self.p2.has_passed:
+                self.automated_player_waited_on = self.player_with_initiative
+            elif not self.p1.has_passed:
+                self.automated_player_waited_on = self.name_1
+            else:
+                self.automated_player_waited_on = self.name_2
+        else:
+            self.what_is_required_automated = "Command not Commitment"
+            if not self.p1.has_passed and not self.p2.has_passed:
+                self.automated_player_waited_on = self.player_with_initiative
+            elif not self.p1.has_passed:
+                self.automated_player_waited_on = self.name_1
+            else:
+                self.automated_player_waited_on = self.name_2
     elif self.phase == "COMBAT":
-        self.what_is_required_automated = "Combat Turn"
-        self.automated_player_waited_on = ""
+        if not self.check_if_battle_taking_place():
+            self.what_is_required_automated = "Outside Combat"
+            if not self.p1.has_passed and not self.p2.has_passed:
+                self.automated_player_waited_on = self.player_with_initiative
+            elif not self.p1.has_passed:
+                self.automated_player_waited_on = self.name_1
+            else:
+                self.automated_player_waited_on = self.name_2
+        else:
+            if self.mode == "RETREAT":
+                self.what_is_required_automated = "Retreat Turn"
+                self.automated_player_waited_on = self.player_with_combat_turn
+            else:
+                self.what_is_required_automated = "Combat Turn"
+                self.automated_player_waited_on = self.player_with_combat_turn
     elif self.phase == "HEADQUARTERS":
         self.what_is_required_automated = "Headquarters Action"
-        self.automated_player_waited_on = ""
+        if not self.p1.has_passed and not self.p2.has_passed:
+            self.automated_player_waited_on = self.player_with_initiative
+        elif not self.p1.has_passed:
+            self.automated_player_waited_on = self.name_1
+        else:
+            self.automated_player_waited_on = self.name_2
     self.clickable_items_automated = determine_valid_moves(self)
 
 
@@ -137,11 +169,24 @@ def determine_valid_moves(self):
                         valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
                     else:
                         valid_moves = []  # TODO: Check what units can receive attachment
-        elif self.what_is_required_automated == "COMMAND":
-            if self.committing_warlords:
-                valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
-            elif self.before_command_struggle:
-                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
-            elif self.after_command_struggle:
-                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Commitment":
+            valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+        elif self.what_is_required_automated == "Command not Commitment":
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Outside Combat":
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Combat Turn":
+            battle_planet = self.last_planet_checked_for_battle
+            if self.attacker_planet == -1 and self.attacker_position == -1:
+                for i in range(len(primary_player.cards_in_play[battle_planet + 1])):
+                    if self.check_if_unit_can_be_declared_as_attacker(primary_player, secondary_player, battle_planet, i):
+                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", battle_planet, i)
+            else:
+                for i in range(len(secondary_player.cards_in_play[battle_planet + 1])):
+                    if self.check_if_unit_can_be_declared_as_attacker(primary_player, secondary_player, battle_planet, i):
+                        valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
+        elif self.what_is_required_automated == "Retreat Turn":
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Headquarters Action":
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
     return valid_moves
