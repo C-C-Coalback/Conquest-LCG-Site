@@ -3886,6 +3886,54 @@ class Game:
                     i -= 1
                 i += 1
 
+    def check_if_unit_can_be_declared_as_defender(self, primary_player, secondary_player, planet_pos, unit_pos):
+        if self.attacker_planet != -1 and self.attacker_position != -1:
+            can_continue = False
+            if planet_pos == self.attacker_planet:
+                can_continue = True
+            elif self.shining_blade_active:
+                if abs(planet_pos - self.attacker_planet) == 1:
+                    can_continue = True
+            if can_continue:
+                if primary_player.get_number() == self.number_with_combat_turn:
+                    if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+                            emperor_champion_active:
+                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                            if i != unit_pos:
+                                if secondary_player.get_name_given_pos(planet_pos, i) == "The Emperor's Champion":
+                                    return False
+                    exa = secondary_player.search_card_at_planet(planet_pos, "Dire Avenger Exarch")
+                    ability = secondary_player.get_ability_given_pos(planet_pos, unit_pos)
+                    is_ready_lych = (ability != "Lychguard Sentinel" or not secondary_player.get_ready_given_pos(
+                                         planet_pos, unit_pos))
+                    is_fl = ability != "Front Line 'Ard Boyz"
+                    is_exa_can = not (exa and secondary_player.check_for_trait_given_pos(
+                        planet_pos, unit_pos, "Warrior"))
+                    is_gene_hybrid = ability != "Genestealer Hybrids"
+                    if ability == "Honored Librarian":
+                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                            if secondary_player.get_ability_given_pos(planet_pos, i) != "Honored Librarian":
+                                return False
+                    if is_ready_lych and is_fl and is_exa_can and is_gene_hybrid:
+                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                            ability = secondary_player.get_ability_given_pos(planet_pos, i)
+                            if not self.sweep_active or secondary_player.cards_in_play[
+                                planet_pos + 1][i].valid_sweep_target:
+                                if (ability == "Lychguard Sentinel" and
+                                    secondary_player.get_ready_given_pos(planet_pos, i)) or \
+                                        ability == "Front Line 'Ard Boyz" or \
+                                        ability == "Genestealer Hybrids" or \
+                                        (exa and secondary_player.check_for_trait_given_pos(
+                                            planet_pos, i, "Warrior")):
+                                    return False
+                if self.sweep_active:
+                    if not secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_sweep_target:
+                        return False
+                    else:
+                        return True
+                return True
+        return False
+
     def check_if_unit_can_be_declared_as_attacker(self, primary_player, secondary_player, planet_pos, unit_pos):
         if planet_pos == self.last_planet_checked_for_battle:
             if not primary_player.get_ready_given_pos(planet_pos, unit_pos):

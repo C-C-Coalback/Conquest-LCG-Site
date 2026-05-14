@@ -1025,7 +1025,11 @@ class Player:
                                     else:
                                         border_type = "unplayable"
                                 else:
-                                    border_type = "unplayable"
+                                    other_player = self.get_other_player()
+                                    if self.game.check_if_unit_can_be_declared_as_defender(other_player, self, planet_id, i):
+                                        border_type = "playable"
+                                    else:
+                                        border_type = "unplayable"
                             else:
                                 border_type = "unplayable"
                         single_card_string += border_type
