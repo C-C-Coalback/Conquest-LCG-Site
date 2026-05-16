@@ -2438,6 +2438,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.cards_recently_destroyed.remove(target)
         except ValueError:
             pass
+        primary_player.resolve_played_any_event("Fall Back!")
         primary_player.discard_card_name_from_hand("Fall Back!")
         if len(self.choices_available) > 1:
             if primary_player.search_hand_for_card("Fall Back!") and primary_player.resources > 0:
