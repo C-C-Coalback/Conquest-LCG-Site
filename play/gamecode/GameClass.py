@@ -1098,6 +1098,15 @@ class Game:
                 info_string += "Blanked.\n"
             if self.replaced_planets[i]:
                 info_string += "Original Planet: " + self.original_planet_array[i] + "\n"
+                planet_card = FindCard.find_planet_card(self.original_planet_array[i], self.planet_cards_array)
+                info_string += "Original Icons: "
+                if planet_card.get_red():
+                    info_string += "R"
+                if planet_card.get_blue():
+                    info_string += "B"
+                if planet_card.get_green():
+                    info_string += "G"
+                info_string += "\n"
             if self.p1.burgeoning_incubation_target == i:
                 info_string += self.name_1 + ": Burgeoning Incubation Target"
             if self.p2.burgeoning_incubation_target == i:
