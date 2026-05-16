@@ -638,7 +638,11 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         valid_unit = False
                         if self.check_if_unit_can_be_declared_as_attacker(player, secondary_player, chosen_planet, chosen_unit):
                             valid_unit = True
-                            if player.get_card_type_given_pos(chosen_planet, chosen_unit) == "Warlord" and self.can_retreat_warlord:
+                            if not secondary_player.cards_in_play[chosen_planet + 1]:
+                                valid_unit = False
+                                await self.send_update_message("No enemy units to declare as defender. Combat ends.")
+                                await self.check_combat_end(player.name_player)
+                            elif player.get_card_type_given_pos(chosen_planet, chosen_unit) == "Warlord" and self.can_retreat_warlord:
                                 self.choices_available = ["Yes", "No"]
                                 self.choice_context = "Retreat Warlord?"
                                 self.name_player_making_choices = player.name_player
