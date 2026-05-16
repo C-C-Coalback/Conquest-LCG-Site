@@ -738,6 +738,7 @@ class Player:
                 else:
                     single_card_string += "0"
                 single_card_string += "|D|"
+                single_card_string += "|"
                 single_card_string += current_card.get_extra_info_string() + "|"
                 if current_card.aiming_reticle_color is not None:
                     single_card_string += current_card.aiming_reticle_color
@@ -1143,6 +1144,7 @@ class Player:
                         single_card_string += str(current_card.get_faith())
                         single_card_string += "|"
                         single_card_string += "D"
+                        single_card_string += "|"
                         single_card_string += "|"
                         single_card_string += "None" + "|"
                         if current_card.aiming_reticle_color is not None:
