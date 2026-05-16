@@ -1,4 +1,5 @@
 import os
+import datetime
 
 
 async def resolve_command(self, name, message):
@@ -87,21 +88,28 @@ async def resolve_command(self, name, message):
     elif message[1] == "request-seed":
         await self.send_update_message(str(self.random_seed))
     elif message[1] == "Advance":
-        move_id = self.saved_move_id
-        moves_list = self.saved_moves
-        if move_id >= len(moves_list):
-            await self.send_update_message("Reached end of replay")
-        else:
-            move_string = moves_list[move_id]
-            if "/savegame" in move_string:
+        num_times = 1
+        if len(message) == 3:
+            num_times = int(message[2])
+        start_time = datetime.datetime.now()
+        for i in range(num_times):
+            move_id = self.saved_move_id
+            moves_list = self.saved_moves
+            if move_id >= len(moves_list):
                 await self.send_update_message("Reached end of replay")
             else:
-                self.saved_move_id = move_id + 1
-                name_user, move_details = move_string.split(sep="|||")
-                if move_details[0] != "/":
-                    await self.update_game_event(name_user, move_details.split(sep="/"))
+                move_string = moves_list[move_id]
+                if "/savegame" in move_string:
+                    await self.send_update_message("Reached end of replay")
                 else:
-                    await self.resolve_chat_message(name_user, move_details.split(sep="/"))
+                    self.saved_move_id = move_id + 1
+                    name_user, move_details = move_string.split(sep="|||")
+                    if move_details[0] != "/":
+                        await self.update_game_event(name_user, move_details.split(sep="/"))
+                    else:
+                        await self.resolve_chat_message(name_user, move_details.split(sep="/"))
+        end_time = datetime.datetime.now()
+        print("TIME\n\n\n", end_time - start_time, "\n\n\n")
     elif message[1] == "Error":
         raise ValueError
     elif message[1] == "force-quit-reactions":
