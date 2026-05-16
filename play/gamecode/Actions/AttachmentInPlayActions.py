@@ -446,9 +446,6 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                 self.card_to_deploy = card
                 self.misc_target_planet = planet_pos
                 self.planet_pos_to_deploy = planet_pos
-                self.traits_of_card_to_play = card.get_traits()
-                self.faction_of_card_to_play = card.get_faction()
-                self.name_of_card_to_play = card.get_name()
                 self.discounts_applied = 0
                 hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
                 hq_dis = primary_player.search_hq_for_discounts(card.get_faction(), card.get_traits(),

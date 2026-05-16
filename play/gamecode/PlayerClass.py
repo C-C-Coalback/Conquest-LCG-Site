@@ -990,6 +990,20 @@ class Player:
         return -1
 
     def determine_border(self, planet_pos, unit_pos):
+        if self.game.card_to_deploy is not None:
+            if self.game.card_to_deploy.get_card_type() == "Attachment" and self.game.phase == "DEPLOY":
+                non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
+                army_unit_as_attach = False
+                if self.game.card_to_deploy.get_name() in non_attachs_that_can_be_played_as_attach:
+                    army_unit_as_attach = True
+                not_own_attach = False
+                if self.game.player_with_deploy_turn != self.name_player:
+                    not_own_attach = True
+                if self.check_if_can_attach_card(
+                        self.game.card_to_deploy, planet_pos, unit_pos,
+                        not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach):
+                    return "playable"
+                return "unplayable"
         if planet_pos != -2:
             if self.game.check_if_battle_taking_place():
                 if self.game.safety_check():
@@ -2347,6 +2361,134 @@ class Player:
                 self.add_resources(card.get_cost() - extra_discounts, refund=True)
         return False
 
+    def check_if_can_attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False, relic_check_allowed=True, actual_check=False):
+        if planet == -2:
+            target_card = self.headquarters[position]
+        else:
+            target_card = self.cards_in_play[planet + 1][position]
+        name_owner = self.name_player
+        if not_own_attachment:
+            if self.number == "1":
+                name_owner = self.game.p2.name_player
+            elif self.number == "2":
+                name_owner = self.game.p1.name_player
+        type_of_card = target_card.get_card_type()
+        if card.check_for_a_trait("Relic"):
+            if relic_check_allowed:
+                if self.search_for_existing_relic():
+                    if actual_check:
+                        self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                               "Already controlling a Relic.")
+                    return False
+        if card.get_unique():
+            if self.search_for_unique_card(card.get_name()):
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Already controlling a unique card of the same name.")
+                return False
+        if army_unit_as_attachment:
+            if type_of_card != "Army":
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Army units as attachments can only be attached to other army units.")
+                return False
+            if target_card.get_no_attachments():
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Unit cannot have attachments.")
+                return False
+            if target_card.check_for_a_trait("Vehicle"):
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Vehicles cannot have 'as army unit' attachments.")
+                return False
+            return True
+        allowed_types = card.type_of_units_allowed_for_attachment
+        if type_of_card not in allowed_types:
+            if actual_check:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment cannot be played to that type of card.")
+            return False
+        if card.unit_must_match_faction:
+            if card.get_faction() != target_card.get_faction():
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Attachment must go to a unit with a matching faction.")
+                return False
+        if card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
+                card.get_name() == "Missile Pod":
+            if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Unit is missing a required trait for the attachment.")
+                return False
+        elif card.get_name() == "Krak Grenade":
+            if not target_card.check_for_a_trait("Soldier") and not target_card.check_for_a_trait("Warrior"):
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Unit is missing a required trait for the attachment.")
+                return False
+        elif card.get_name() == "Extra Munitions":
+            if not target_card.area_effect > 0 or self.get_blanked_given_pos(planet, position):
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Unit does not have a printed Area Effect keyword.")
+                return False
+        elif card.required_traits not in target_card.get_traits():
+            if actual_check:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit is missing a required trait for the attachment.")
+            return False
+        if card.get_ability() == "Raging Daemonhost":
+            if "Vehicle" in target_card.get_traits() or "Daemon" in target_card.get_traits():
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Unit has a forbidden trait for that attachment.")
+                return False
+        if card.forbidden_traits in target_card.get_traits():
+            if actual_check:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit has a forbidden trait for that attachment.")
+            return False
+        if card.unit_must_be_unique:
+            if not target_card.get_unique():
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Attachment can only go to a unique unit.")
+                return False
+        if card.limit_one_per_unit:
+            attachments_active = target_card.get_attachments()
+            for i in range(len(attachments_active)):
+                if attachments_active[i].get_name() == card.get_name() and not attachments_active[i].from_magus_harid:
+                    if actual_check:
+                        self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                               "Limit one copy of that attachment per unit.")
+                    return False
+        if target_card.get_no_attachments():
+            if actual_check:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Unit has the No Attachments keyword.")
+            return False
+        if card.check_for_a_trait("Wargear"):
+            if not target_card.get_wargear_attachments_permitted():
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Unit has the No Wargear Attachments keyword.")
+                return False
+        if card.get_name() == "The Shining Blade":
+            if not target_card.get_mobile():
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Unit is not Mobile.")
+                return False
+        if card.get_name() == "Flesh Hooks" and not card.from_magus_harid:
+            if target_card.get_cost() > 2:
+                if actual_check:
+                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                           "Cost of unit is too great.")
+                return False
+        return True
+
     def attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False,
                     relic_check_allowed=True):
         if planet == -2:
@@ -2362,115 +2504,9 @@ class Player:
                 name_owner = self.game.p2.name_player
             elif self.number == "2":
                 name_owner = self.game.p1.name_player
-        type_of_card = target_card.get_card_type()
-        if card.check_for_a_trait("Relic"):
-            if relic_check_allowed:
-                if self.search_for_existing_relic():
-                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                           "Already controlling a Relic.")
-                    return False
-        if card.get_unique():
-            if self.search_for_unique_card(card.get_name()):
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Already controlling a unique card of the same name.")
-                return False
-        if army_unit_as_attachment:
-            if type_of_card != "Army":
-                print("Army units as attachments can only be attached to other army units")
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Army units as attachments can only be attached to other army units.")
-                return False
-            if target_card.get_no_attachments():
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Attachment must go to own unit.")
-                print("Unit may not have attachments")
-                return False
-            if target_card.check_for_a_trait("Vehicle"):
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Attachment must go to enemy unit.")
-                print("Vehicles may not have army units as attachments")
-                return False
-            name_owner = self.name_player
-            if not_own_attachment:
-                if self.number == "1":
-                    name_owner = self.game.p2.name_player
-                elif self.number == "2":
-                    name_owner = self.game.p1.name_player
-            target_card.add_attachment(card, name_owner=name_owner)
-            self.game.queued_sound = "onplay"
-            return True
-        allowed_types = card.type_of_units_allowed_for_attachment
-        if type_of_card not in allowed_types:
-            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                   "Attachment cannot be played to that type of card.")
-            print("Can't play to this card type.", type_of_card, allowed_types)
+        if not self.check_if_can_attach_card(card, planet, position, not_own_attachment, army_unit_as_attachment,
+                                             relic_check_allowed, actual_check=True):
             return False
-        if card.unit_must_match_faction:
-            if card.get_faction() != target_card.get_faction():
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Attachment must go to a unit with a matching faction.")
-                return False
-        if card.get_name() == "Drone Defense System" or card.get_name() == "DX-4 Technical Drone" or \
-                card.get_name() == "Missile Pod":
-            if not target_card.check_for_a_trait("Pilot") and not target_card.check_for_a_trait("Vehicle"):
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Unit is missing a required trait for the attachment.")
-                return False
-        elif card.get_name() == "Krak Grenade":
-            if not target_card.check_for_a_trait("Soldier") and not target_card.check_for_a_trait("Warrior"):
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Unit is missing a required trait for the attachment.")
-                return False
-        elif card.get_name() == "Extra Munitions":
-            if not target_card.area_effect > 0 or self.get_blanked_given_pos(planet, position):
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Unit does not have a printed Area Effect keyword.")
-                return False
-        elif card.required_traits not in target_card.get_traits():
-            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                   "Unit is missing a required trait for the attachment.")
-            return False
-        if card.get_ability() == "Raging Daemonhost":
-            if "Vehicle" in target_card.get_traits() or "Daemon" in target_card.get_traits():
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Unit has a forbidden trait for that attachment.")
-                return False
-        if card.forbidden_traits in target_card.get_traits():
-            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                   "Unit has a forbidden trait for that attachment.")
-            return False
-        if card.unit_must_be_unique:
-            if not target_card.get_unique():
-                print("Must be a unique unit, but is not")
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Attachment can only go to a unique unit.")
-                return False
-        if card.limit_one_per_unit:
-            attachments_active = target_card.get_attachments()
-            for i in range(len(attachments_active)):
-                if attachments_active[i].get_name() == card.get_name() and not attachments_active[i].from_magus_harid:
-                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                           "Limit one copy of that attachment per unit.")
-                    return False
-        if target_card.get_no_attachments():
-            self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                   "Unit has the No Attachments keyword.")
-            return False
-        if card.check_for_a_trait("Wargear"):
-            if not target_card.get_wargear_attachments_permitted():
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Unit has the No Wargear Attachments keyword.")
-                return False
-        if card.get_name() == "The Shining Blade":
-            if not target_card.get_mobile():
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Unit is not Mobile.")
-                return False
-        if card.get_name() == "Flesh Hooks" and not card.from_magus_harid:
-            if target_card.get_cost() > 2:
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Cost of unit is too great.")
-                return False
         target_card.add_attachment(card, name_owner=name_owner)
         if card.get_ability() == "Fusion Cascade Defiance":
             if planet != -2:

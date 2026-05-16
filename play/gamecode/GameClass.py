@@ -197,8 +197,6 @@ class Game:
         self.available_discounts = 0
         self.discounts_applied = 0
         self.damage_for_unit_to_take_on_play = []
-        self.faction_of_card_to_play = ""
-        self.traits_of_card_to_play = ""
         self.ranged_skirmish_active = False
         self.interrupt_active = False
         self.what_is_being_interrupted = ""
@@ -333,7 +331,6 @@ class Game:
         self.asking_if_remove_infested_planet = False
         self.already_asked_remove_infestation = False
         self.great_scything_talons_value = 0
-        self.name_of_card_to_play = ""
         self.damage_moved_to_old_one_eye = 0
         self.old_one_eye_pos = (-1, -1)
         self.misc_target_choice = -1

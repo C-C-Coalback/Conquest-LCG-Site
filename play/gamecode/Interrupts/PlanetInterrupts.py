@@ -17,9 +17,6 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             self.card_to_deploy = card
             self.card_pos_to_deploy = primary_player.aiming_reticle_coords_hand
             self.planet_pos_to_deploy = chosen_planet
-            self.traits_of_card_to_play = card.get_traits()
-            self.faction_of_card_to_play = card.get_faction()
-            self.name_of_card_to_play = card.get_name()
             print("Trying to discount: ", card.get_name())
             self.discounts_applied = 0
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())

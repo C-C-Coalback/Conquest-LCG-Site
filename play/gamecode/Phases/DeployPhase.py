@@ -47,6 +47,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.number_with_deploy_turn = "2"
                         self.player_with_deploy_turn = self.name_2
                         self.p1.has_passed = True
+                        self.card_to_deploy = None
                         self.discounts_applied = 0
                         self.available_discounts = 0
                         self.p1.aiming_reticle_coords_hand = None
@@ -59,6 +60,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         self.number_with_deploy_turn = "1"
                         self.player_with_deploy_turn = self.name_1
                         self.p2.has_passed = True
+                        self.card_to_deploy = None
                         self.discounts_applied = 0
                         self.available_discounts = 0
                         self.p2.aiming_reticle_coords_hand = None
@@ -113,9 +115,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.set_queued_mistarget_message(primary_player.name_player, "Cannot Play Card", "Already played a Limited card this round.")
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
                             return None
-                        previous_faction = self.faction_of_card_to_play
-                        previous_name = self.name_of_card_to_play
-                        previous_traits = self.traits_of_card_to_play
                         if self.paying_shrieking_exarch_cost:
                             if self.card_pos_to_deploy != previous_card_pos_to_deploy:
                                 primary_player.discard_card_from_hand(self.card_pos_to_deploy)
@@ -132,9 +131,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             if card.check_for_a_trait("Pledge") and not primary_player.can_play_pledge:
                                 await self.send_update_message("Pledges can only be played on the first deploy turn.")
                             else:
-                                self.faction_of_card_to_play = card.get_faction()
-                                self.name_of_card_to_play = card.get_name()
-                                self.traits_of_card_to_play = card.get_traits()
+                                self.card_to_deploy = card
                                 played_support = primary_player.play_card_if_support(self.card_pos_to_deploy,
                                                                                      already_checked=True, card=card)[0]
                                 primary_player.aiming_reticle_color = ""
@@ -151,6 +148,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                             await self.send_update_message("Both passed, move to warlord movement.")
                                             await self.change_phase("COMMAND")
                             self.card_pos_to_deploy = -1
+                            self.card_to_deploy = None
                         elif has_deepstrike and primary_player.resources > 0 and self.deepstrike_allowed:
                             print("deepstrike", card.get_deepstrike_value())
                             self.stored_deploy_string = game_update_string
@@ -179,17 +177,13 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                             primary_player.aiming_reticle_color = "blue"
                                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                             self.card_type_of_selected_card_in_hand = "Army"
+                                            self.card_to_deploy = card
                                             self.misc_counter = 0
-                                            self.faction_of_card_to_play = card.get_faction()
-                                            self.name_of_card_to_play = card.get_name()
-                                            self.traits_of_card_to_play = card.get_traits()
                                     else:
                                         primary_player.aiming_reticle_color = "blue"
                                         primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                                         self.card_type_of_selected_card_in_hand = "Army"
-                                        self.faction_of_card_to_play = card.get_faction()
-                                        self.name_of_card_to_play = card.get_name()
-                                        self.traits_of_card_to_play = card.get_traits()
+                                        self.card_to_deploy = card
                                         if card.get_name() == "Quartermasters":
                                             self.choices_available = ["HQ", "Normal"]
                                             self.choice_context = "Quartermasters to HQ?"
@@ -204,9 +198,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                             self.card_type_of_selected_card_in_hand = "Attachment"
-                            self.faction_of_card_to_play = card.get_faction()
-                            self.name_of_card_to_play = card.get_name()
-                            self.traits_of_card_to_play = card.get_traits()
+                            self.card_to_deploy = card
                             if primary_player.search_card_in_hq("WAAAGH! Arbuttz", ready_relevant=True):
                                 self.choices_available = ["Yes", "No"]
                                 self.choice_context = "Use WAAAGH! Arbuttz?"
@@ -253,8 +245,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             player = self.p2
                         if self.card_type_of_selected_card_in_hand == "Army":
                             discount_received = player.perform_discount_at_pos_hq(
-                                int(game_update_string[2]), self.faction_of_card_to_play, self.traits_of_card_to_play,
-                                self.planet_aiming_reticle_position, name_of_card=self.name_of_card_to_play)
+                                int(game_update_string[2]), self.card_to_deploy.get_faction(), self.card_to_deploy.get_traits(),
+                                self.planet_aiming_reticle_position, name_of_card=self.card_to_deploy.get_name())
                             if discount_received > 0:
                                 self.discounts_applied += discount_received
                             if self.discounts_applied >= self.available_discounts:
@@ -265,7 +257,6 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 self.mode = "Normal"
                         else:
                             self.mode = "Normal"
-
     elif len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
             if name == self.player_with_deploy_turn:
@@ -394,8 +385,8 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                         player = self.p2
                     if self.card_type_of_selected_card_in_hand == "Army":
                         discount_received = player.perform_discount_at_pos_in_play(
-                            int(game_update_string[2]), int(game_update_string[3]), self.traits_of_card_to_play,
-                            name_of_card=self.name_of_card_to_play)
+                            int(game_update_string[2]), int(game_update_string[3]), self.card_to_deploy.get_traits(),
+                            name_of_card=self.card_to_deploy.get_name())
                         if discount_received > 0:
                             self.discounts_applied += discount_received
                         if self.discounts_applied >= self.available_discounts:
@@ -611,8 +602,6 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         self.planet_aiming_reticle_position = self.last_planet_checked_for_battle
     self.discounts_applied = 0
     self.available_discounts = 0
-    self.faction_of_card_to_play = ""
-    self.name_of_card_to_play = ""
     print("Finished deploying card")
 
 
@@ -759,8 +748,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                         await self.send_update_message("Both passed, move to warlord movement.")
                         await self.change_phase("COMMAND")
                 self.card_type_of_selected_card_in_hand = ""
-                self.faction_of_card_to_play = ""
-                self.name_of_card_to_play = ""
+                self.card_to_deploy = None
                 if magus_harid:
                     primary_player.discard.remove(self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info())
                     self.misc_player_storage = ""

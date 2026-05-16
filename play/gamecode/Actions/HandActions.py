@@ -1455,9 +1455,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         if card.get_is_unit():
             self.chosen_first_card = True
             self.card_pos_to_deploy = int(game_update_string[2])
-            self.faction_of_card_to_play = card.get_faction()
-            self.name_of_card_to_play = card.get_name()
-            self.traits_of_card_to_play = card.get_traits()
+            self.card_to_deploy = card
             primary_player.aiming_reticle_color = "blue"
             primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
             self.card_type_of_selected_card_in_hand = "Army"
@@ -1472,9 +1470,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             if card.get_cost() < 3:
                 self.chosen_first_card = True
                 self.card_pos_to_deploy = int(game_update_string[2])
-                self.faction_of_card_to_play = card.get_faction()
-                self.name_of_card_to_play = card.get_name()
-                self.traits_of_card_to_play = card.get_traits()
+                self.card_to_deploy = card
                 primary_player.aiming_reticle_color = "blue"
                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                 self.card_type_of_selected_card_in_hand = "Army"
@@ -1492,9 +1488,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             if card.get_cost() == 3 and card.get_faction() == "Space Marines":
                 self.chosen_first_card = True
                 self.card_pos_to_deploy = int(game_update_string[2])
-                self.faction_of_card_to_play = card.get_faction()
-                self.name_of_card_to_play = card.get_name()
-                self.traits_of_card_to_play = card.get_traits()
+                self.card_to_deploy = card
                 primary_player.aiming_reticle_color = "blue"
                 primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
                 self.card_type_of_selected_card_in_hand = "Army"

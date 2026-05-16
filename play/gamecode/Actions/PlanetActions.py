@@ -26,9 +26,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
             if card is None:
                 return None
-            self.traits_of_card_to_play = card.get_traits()
-            self.faction_of_card_to_play = card.get_faction()
-            self.name_of_card_to_play = card.get_name()
+            self.card_to_deploy = card
             print("Trying to discount: ", card.get_name())
             self.discounts_applied = 0
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
@@ -135,9 +133,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
             self.planet_pos_to_deploy = int(game_update_string[1])
             card = self.preloaded_find_card(primary_player.discard[self.anrakyr_unit_position])
             self.card_to_deploy = card
-            self.traits_of_card_to_play = card.get_traits()
-            self.faction_of_card_to_play = card.get_faction()
-            self.name_of_card_to_play = card.get_name()
             print("Trying to discount: ", card.get_name())
             self.discounts_applied = 1
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
@@ -161,9 +156,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.planet_pos_to_deploy = int(game_update_string[1])
         card = self.preloaded_find_card("Decaying Warrior Squad")
         self.card_to_deploy = card
-        self.traits_of_card_to_play = card.get_traits()
-        self.faction_of_card_to_play = card.get_faction()
-        self.name_of_card_to_play = card.get_name()
         print("Trying to discount: ", card.get_name())
         self.discounts_applied = 0
         hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
@@ -801,9 +793,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 card = FindCard.find_card(secondary_player.discard[self.anrakyr_unit_position], self.card_array,
                                           self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
             self.card_to_deploy = card
-            self.traits_of_card_to_play = card.get_traits()
-            self.faction_of_card_to_play = card.get_faction()
-            self.name_of_card_to_play = card.get_name()
             print("Trying to discount: ", card.get_name())
             self.discounts_applied = 0
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
