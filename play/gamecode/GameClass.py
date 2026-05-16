@@ -17,6 +17,7 @@ from .Damage import DamageClass
 import os
 import sys
 from . import ValidMovesFinder
+from . import Commands
 
 
 class Game:
@@ -24,6 +25,7 @@ class Game:
                  apoka_errata_cards, sector="Traxis", deck_1="", deck_2="", forced_planet_array=None, random_seed=None,
                  raw_deck_text_1="", raw_deck_text_2="", first_to_load="", bot_is_present=False):
         self.game_sockets = []
+        self.chat_messages = []
         self.card_array = card_array
         self.cards_dict = cards_dict
         self.apoka_errata_cards = apoka_errata_cards
@@ -677,7 +679,7 @@ class Game:
 
     async def send_update_message(self, message):
         """
-        Sends a message to all users in the current room.
+        Sends a message from the server to all users in the current room.
 
         :param message: string containing the message.
         """
@@ -2930,6 +2932,18 @@ class Game:
             if self.planet_array[i] == planet_name:
                 return i
         return -1
+
+    async def resolve_command(self, name, message):
+        await Commands.resolve_command(self, name, message)
+
+    async def resolve_chat_message(self, name, message):
+        if message[0] == "" and len(message) > 1:
+            await Commands.resolve_command(self, name, message)
+        else:
+            message = name + ": " + "/".join(message)
+            print("receive:", message)
+            self.chat_messages.append(message)
+            await self.game_sockets[0].broadcast_chat_message(message)
 
     async def quick_battle_ability_resolution(self, name, game_update_string, winner: PlayerClass.Player, loser: PlayerClass.Player):
         planet_pos = self.last_planet_checked_for_battle
