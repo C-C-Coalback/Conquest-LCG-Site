@@ -1,5 +1,6 @@
 import os
 import datetime
+import random
 
 
 async def resolve_command(self, name, message):
