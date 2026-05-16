@@ -321,7 +321,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             else:
                 primary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
         for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            if secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons"):
+            if not secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons"):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
         primary_player.resolve_played_any_event()
