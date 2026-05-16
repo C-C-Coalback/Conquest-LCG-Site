@@ -4833,7 +4833,7 @@ class Player:
                         self.set_aiming_reticle_in_play(-2, i, "green")
         return discounts_available
 
-    def search_planet_for_discounts(self, planet_pos, traits, faction_of_card, name_of_card=""):
+    def search_planet_for_discounts(self, planet_pos, traits, faction_of_card, name_of_card="", actual_discounts=True):
         discounts_available = 0
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             if "Ecclesiarchy" in traits:
@@ -4841,22 +4841,26 @@ class Player:
                     other_player = self.get_other_player()
                     icons = other_player.get_icons_on_captured()
                     discounts_available += icons[2] + 1
-                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(planet_pos, i, "green")
             if "Daemon" in traits:
                 if self.cards_in_play[planet_pos + 1][i].get_ability() == "Cultist" and not self.search_card_in_hq("Myriad Excesses"):
                     discounts_available += 1
                     if name_of_card == "Venomcrawler":
                         discounts_available += 1
-                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(planet_pos, i, "green")
                     if "Elite" in traits:
                         discounts_available += self.count_copies_in_play("Master Warpsmith", ability=True)
                 elif self.cards_in_play[planet_pos + 1][i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
-                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(planet_pos, i, "green")
             elif self.cards_in_play[planet_pos + 1][i].get_ability() == "Parasitic Scarabs":
                 if faction_of_card == "Necrons":
                     discounts_available += 1
-                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(planet_pos, i, "green")
         return discounts_available
 
     def reset_all_aiming_reticles_play_hq(self):
@@ -4866,20 +4870,22 @@ class Player:
             for i in range(len(self.cards_in_play[j + 1])):
                 self.reset_aiming_reticle_in_play(j, i)
 
-    def search_all_planets_for_discounts(self, traits, faction_of_card, name_of_card=""):
+    def search_all_planets_for_discounts(self, traits, faction_of_card, name_of_card="",
+                                         actual_discounts=True):
         discounts_available = 0
         for i in range(7):
-            discounts_available += self.search_planet_for_discounts(i, traits, faction_of_card,
-                                                                    name_of_card=name_of_card)
+            discounts_available += self.search_planet_for_discounts(
+                i, traits, faction_of_card, name_of_card=name_of_card, actual_discounts=actual_discounts)
         return discounts_available
 
-    def search_same_planet_for_discounts(self, faction_of_card, planet_pos):
+    def search_same_planet_for_discounts(self, faction_of_card, planet_pos, actual_discounts=True):
         discounts_available = 0
         automatic_discounts = 0
         for i in range(len(self.cards_in_play[planet_pos + 1])):
             if self.cards_in_play[planet_pos + 1][i].get_ability() == "Crushface":
                 if faction_of_card == "Orks":
-                    self.set_aiming_reticle_in_play(planet_pos, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(planet_pos, i, "green")
                     discounts_available += 1
                     automatic_discounts += 1
         return discounts_available, automatic_discounts

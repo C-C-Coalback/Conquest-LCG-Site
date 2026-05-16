@@ -4302,12 +4302,13 @@ class Game:
                 else:
                     self.queued_message = "Optimized Landing detected, may be used as a discount."
         temp_av_disc, _ = player. \
-            search_same_planet_for_discounts(card.get_faction(), planet_pos=planet_chosen)
+            search_same_planet_for_discounts(card.get_faction(), planet_pos=planet_chosen, actual_discounts=actual_discounts)
         if player.gorzod_relevant:
             if card.get_faction() == "Astra Militarum" or card.get_faction() == "Space Marines":
                 if card.get_cost() > 1:
                     warlord_planet, warlord_pos = player.get_location_of_warlord()
-                    player.set_aiming_reticle_in_play(warlord_planet, warlord_pos, "green")
+                    if actual_discounts:
+                        player.set_aiming_reticle_in_play(warlord_planet, warlord_pos, "green")
                     available_discounts += 1
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
@@ -4348,7 +4349,9 @@ class Game:
         if slaanesh_temptation:
             available_discounts -= 1
         available_discounts += player.search_all_planets_for_discounts(
-            card.get_traits(etekh_trait=player.etekh_trait), card.get_faction(), name_of_card=card.get_name())
+            card.get_traits(etekh_trait=player.etekh_trait), card.get_faction(),
+            name_of_card=card.get_name(), actual_discounts=actual_discounts
+        )
         available_discounts += temp_av_disc
         return available_discounts
 
