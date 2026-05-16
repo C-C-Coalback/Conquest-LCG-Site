@@ -521,6 +521,19 @@ class Player:
     def set_can_play_limited(self, new_val):
         self.can_play_limited = new_val
 
+    def determine_lowest_possible_cost_of_card(self, card):
+        best_cost = card.get_cost()
+        if card.get_card_type() == "Army":
+            best_cost = 999
+            for i in range(7):
+                if self.game.planets_in_play_array[i]:
+                    available_discounts = self.game.calculate_available_discounts_unit(i, card, self, False)
+                    cost = card.get_cost()
+                    cost = cost - available_discounts
+                    if cost < best_cost:
+                        best_cost = cost
+        return best_cost
+
     def determine_playability(self, card_name):
         try:
             card = self.game.preloaded_find_card(card_name)
@@ -532,7 +545,7 @@ class Player:
                     if not self.can_play_pledge:
                         return "unplayable"
                 if card.get_card_type() in ["Army", "Support", "Attachment"] and self.game.phase == "DEPLOY":
-                    if card.get_cost() <= self.get_resources():
+                    if self.determine_lowest_possible_cost_of_card(card) <= self.get_resources():
                         return "playable"
                     else:
                         return ""
@@ -4665,7 +4678,8 @@ class Player:
                         return True
         return False
 
-    def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False, planet_chosen=None, name_of_card=""):
+    def search_hq_for_discounts(self, faction_of_card, traits, is_attachment=False, planet_chosen=None, name_of_card="",
+                                actual_discounts=True):
         discounts_available = 0
         if is_attachment:
             for i in range(len(self.headquarters)):
@@ -4677,59 +4691,70 @@ class Player:
                 if self.get_ready_given_pos(-2, i):
                     if faction_of_card == self.get_faction_given_pos(-2, i):
                         discounts_available += 1
-                        self.set_aiming_reticle_in_play(-2, i, "green")
+                        if actual_discounts:
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             elif self.headquarters[i].get_ability() == "Parasitic Scarabs":
                 if faction_of_card == "Necrons":
                     discounts_available += 1
-                    self.set_aiming_reticle_in_play(-2, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(-2, i, "green")
             elif self.headquarters[i].get_ability() == "Digestion Pool":
                 if self.headquarters[i].get_ready():
                     if planet_chosen is not None:
                         if self.game.infested_planets[planet_chosen]:
                             discounts_available += 2
-                            self.set_aiming_reticle_in_play(-2, i, "green")
+                            if actual_discounts:
+                                self.set_aiming_reticle_in_play(-2, i, "green")
             elif self.headquarters[i].get_ability() == "STC Fragment":
                 if self.headquarters[i].get_ready():
                     if "Elite" in traits:
                         discounts_available += 2
-                        self.set_aiming_reticle_in_play(-2, i, "green")
+                        if actual_discounts:
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             elif self.headquarters[i].get_ability() == "Bonesinger Choir":
                 if faction_of_card == "Eldar":
                     if "Vehicle" in traits or "Drone" in traits:
                         discounts_available += 2
-                        self.set_aiming_reticle_in_play(-2, i, "green")
+                        if actual_discounts:
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist" and not self.search_card_in_hq("Myriad Excesses"):
                     discounts_available += 1
                     if name_of_card == "Venomcrawler":
                         discounts_available += 1
-                    self.set_aiming_reticle_in_play(-2, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(-2, i, "green")
                     if "Elite" in traits:
                         discounts_available += self.count_copies_in_play("Master Warpsmith", ability=True)
                 elif self.headquarters[i].get_ability() == "Splintered Path Acolyte":
                     discounts_available += 2
-                    self.set_aiming_reticle_in_play(-2, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(-2, i, "green")
             if faction_of_card != "Tau":
                 if self.headquarters[i].get_ability() == "Sae'lum Enclave":
                     if self.get_ready_given_pos(-2, i):
                         discounts_available += 2
-                        self.set_aiming_reticle_in_play(-2, i, "green")
+                        if actual_discounts:
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             if self.get_ability_given_pos(-2, i) == "Air Protection Fleet":
                 if "Soldier" in traits or "Scout" in traits:
                     if self.get_ready_given_pos(-2, i):
                         discounts_available += 1
-                        self.set_aiming_reticle_in_play(-2, i, "green")
+                        if actual_discounts:
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             if self.headquarters[i].get_ability() == "Prophets of Flesh":
                 if "Abomination" in traits or "Scholar" in traits:
                     if self.get_ready_given_pos(-2, i):
                         discounts_available += 1
-                        self.set_aiming_reticle_in_play(-2, i, "green")
+                        if actual_discounts:
+                            self.set_aiming_reticle_in_play(-2, i, "green")
             if "Ecclesiarchy" in traits:
                 if self.search_attachments_at_pos(-2, i, "Banner of the Sacred Rose", ready_relevant=True):
                     other_player = self.get_other_player()
                     icons = other_player.get_icons_on_captured()
                     discounts_available += icons[2] + 1
-                    self.set_aiming_reticle_in_play(-2, i, "green")
+                    if actual_discounts:
+                        self.set_aiming_reticle_in_play(-2, i, "green")
         return discounts_available
 
     def search_planet_for_discounts(self, planet_pos, traits, faction_of_card, name_of_card=""):

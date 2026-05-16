@@ -4187,9 +4187,8 @@ class Game:
         self.create_reactions_phase_begins()
 
     async def discount_begin_routine(self, planet_chosen, card, primary_player, extra_discounts=0):
-        self.discounts_applied = 0
-        await self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
-        await self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
+        self.available_discounts = self.calculate_available_discounts_unit(planet_chosen, card, primary_player)
+        self.discounts_applied = self.calculate_automatic_discounts_unit(planet_chosen, card, primary_player)
         self.available_discounts += extra_discounts
         self.discounts_applied += extra_discounts
         if self.available_discounts > self.discounts_applied:
@@ -4198,46 +4197,47 @@ class Game:
     async def announce_discounts(self):
         await self.send_update_message(str(self.available_discounts) + " discounts are available.")
 
-    async def calculate_automatic_discounts_unit(self, planet_chosen, card, player):
+    def calculate_automatic_discounts_unit(self, planet_chosen, card, player):
+        discounts_applied = 0
         other_player = self.p1
         if player.name_player == self.name_1:
             other_player = self.p2
         if card.check_for_a_trait("Haemonculus", etekh_trait=player.etekh_trait):
             for i in range(len(player.cards_in_play[planet_chosen + 1])):
                 if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
-                    self.discounts_applied = self.discounts_applied - 1
+                    discounts_applied = discounts_applied - 1
             for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
                 if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
-                    self.discounts_applied = self.discounts_applied - 1
+                    discounts_applied = discounts_applied - 1
         if card.get_faction() == "Astra Militarum":
             for i in range(len(player.attachments_at_planet[planet_chosen])):
                 if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
-                    if card.get_cost() - self.discounts_applied > 1:
-                        self.discounts_applied += 1
+                    if card.get_cost() - discounts_applied > 1:
+                        discounts_applied = discounts_applied + 1
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
-            self.discounts_applied += num_termagants
+            discounts_applied += num_termagants
         if card.get_faction() == "Astra Militarum":
-            self.discounts_applied += player.muster_the_guard_count
+            discounts_applied += player.muster_the_guard_count
         slaanesh_temptation = False
         if card.get_ability() == "Dutiful Castellan":
             if player.check_if_control_trait("Ecclesiarchy"):
-                self.discounts_applied += 1
+                discounts_applied += 1
         if card.check_for_a_trait("Elite"):
-            self.discounts_applied += player.master_warpsmith_count
+            discounts_applied += player.master_warpsmith_count
             if self.planet_array[planet_chosen] == "Essio":
-                self.discounts_applied = self.discounts_applied - 2
+                discounts_applied = discounts_applied - 2
         else:
             for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
                 if other_player.get_ability_given_pos(planet_chosen, i) == "Purveyor of Hubris":
-                    self.discounts_applied = self.discounts_applied - 2
+                    discounts_applied = discounts_applied - 2
         for i in range(7):
             for j in range(len(player.cards_in_play[i + 1])):
                 if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
-                    self.discounts_applied = self.discounts_applied - 1
+                    discounts_applied = discounts_applied - 1
         for i in range(len(player.headquarters)):
             if player.get_ability_given_pos(-2, i) == "Uncontrollable Rioters":
-                self.discounts_applied = self.discounts_applied - 1
+                discounts_applied = discounts_applied - 1
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):
                 if i != planet_chosen:
@@ -4251,78 +4251,76 @@ class Game:
                         if self.p1.attachments_at_planet[i][j].get_ability() == "Slaanesh's Temptation":
                             slaanesh_temptation = True
         if slaanesh_temptation:
-            self.discounts_applied -= 1
-        self.discounts_applied += self.vamii_complex_discount
+            discounts_applied -= 1
+        discounts_applied += self.vamii_complex_discount
+        return discounts_applied
 
     def check_if_battle_taking_place(self):
         if self.last_planet_checked_for_battle != -1 and self.battle_in_progress:
             return True
         return False
 
-    async def calculate_available_discounts_unit(self, planet_chosen, card, player):
+    def calculate_available_discounts_unit(self, planet_chosen, card, player, actual_discounts=True):
         other_player = self.p1
         if player.name_player == self.name_1:
             other_player = self.p2
-        self.available_discounts = player.search_hq_for_discounts(card.get_faction(),
-                                                                  card.get_traits(etekh_trait=player.etekh_trait),
-                                                                  planet_chosen=planet_chosen,
-                                                                  name_of_card=card.get_name())
+        available_discounts = player.search_hq_for_discounts(
+            card.get_faction(), card.get_traits(etekh_trait=player.etekh_trait),
+            planet_chosen=planet_chosen, name_of_card=card.get_name(), actual_discounts=actual_discounts
+        )
         if card.check_for_a_trait("Haemonculus", etekh_trait=player.etekh_trait):
             if planet_chosen is not None:
                 for i in range(len(player.cards_in_play[planet_chosen + 1])):
                     if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
-                        self.available_discounts = self.available_discounts - 1
+                        available_discounts = available_discounts - 1
                 for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
                     if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
-                        self.available_discounts = self.available_discounts - 1
+                        available_discounts = available_discounts - 1
         if card.get_faction() == "Astra Militarum":
             if planet_chosen is not None:
                 for i in range(len(player.attachments_at_planet[planet_chosen])):
                     if player.attachments_at_planet[planet_chosen][i].get_ability() == "Imperial Rally Point":
-                        if card.get_cost() - self.available_discounts > 1:
-                            self.available_discounts += 1
+                        if card.get_cost() - available_discounts > 1:
+                            available_discounts += 1
         hand_disc = player.search_hand_for_discounts(card.get_faction(), card.get_traits())
-        self.available_discounts += hand_disc
+        available_discounts += hand_disc
         if hand_disc > 0:
-            if card.get_faction() == "Orks":
-                await self.send_update_message(
-                    "Bigga Is Betta detected, may be used as a discount."
-                )
-            else:
-                await self.send_update_message(
-                    "Optimized Landing detected, may be used as a discount."
-                )
+            if actual_discounts:
+                if card.get_faction() == "Orks":
+                    self.queued_message = "Bigga Is Betta detected, may be used as a discount."
+                else:
+                    self.queued_message = "Optimized Landing detected, may be used as a discount."
         temp_av_disc, _ = player. \
-            search_same_planet_for_discounts(self.faction_of_card_to_play, planet_pos=planet_chosen)
+            search_same_planet_for_discounts(card.get_faction(), planet_pos=planet_chosen)
         if player.gorzod_relevant:
             if card.get_faction() == "Astra Militarum" or card.get_faction() == "Space Marines":
                 if card.get_cost() > 1:
                     warlord_planet, warlord_pos = player.get_location_of_warlord()
                     player.set_aiming_reticle_in_play(warlord_planet, warlord_pos, "green")
-                    self.available_discounts += 1
+                    available_discounts += 1
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
-            self.available_discounts += num_termagants
+            available_discounts += num_termagants
         if card.get_faction() == "Astra Militarum":
-            self.available_discounts += player.muster_the_guard_count
+            available_discounts += player.muster_the_guard_count
         if card.get_ability() == "Dutiful Castellan":
             if player.check_if_control_trait("Ecclesiarchy"):
-                self.available_discounts += 1
+                available_discounts += 1
         for i in range(7):
             for j in range(len(player.cards_in_play[i + 1])):
                 if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
-                    self.available_discounts = self.available_discounts - 1
+                    available_discounts = available_discounts - 1
         for i in range(len(player.headquarters)):
             if player.get_ability_given_pos(-2, i) == "Uncontrollable Rioters":
-                self.available_discounts = self.available_discounts - 1
+                available_discounts = available_discounts - 1
         if card.check_for_a_trait("Elite"):
-            self.available_discounts += player.master_warpsmith_count
+            available_discounts += player.master_warpsmith_count
             if self.planet_array[planet_chosen] == "Essio":
-                self.available_discounts = self.available_discounts - 2
+                available_discounts = available_discounts - 2
         else:
             for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
                 if other_player.get_ability_given_pos(planet_chosen, i) == "Purveyor of Hubris":
-                    self.available_discounts = self.available_discounts - 2
+                    available_discounts = available_discounts - 2
         slaanesh_temptation = False
         if player.name_player == self.name_1:
             for i in range(len(self.p2.attachments_at_planet)):
@@ -4337,10 +4335,11 @@ class Game:
                         if self.p1.attachments_at_planet[i][j].get_ability() == "Slaanesh's Temptation":
                             slaanesh_temptation = True
         if slaanesh_temptation:
-            self.available_discounts -= 1
-        self.available_discounts += player.search_all_planets_for_discounts(
+            available_discounts -= 1
+        available_discounts += player.search_all_planets_for_discounts(
             card.get_traits(etekh_trait=player.etekh_trait), card.get_faction(), name_of_card=card.get_name())
-        self.available_discounts += temp_av_disc
+        available_discounts += temp_av_disc
+        return available_discounts
 
     def create_reactions_phase_begins(self):
         self.p1.perform_own_reactions_on_phase_change(self.phase)
