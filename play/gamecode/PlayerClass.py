@@ -987,6 +987,33 @@ class Player:
             return last_element_index
         return -1
 
+    def determine_border(self, planet_pos, unit_pos):
+        if planet_pos != -2:
+            if self.game.check_if_battle_taking_place():
+                if self.game.safety_check():
+                    if self.game.number_with_combat_turn == self.get_number():
+                        if self.game.attacker_planet == -1:
+                            other_player = self.get_other_player()
+                            if self.game.check_if_unit_can_be_declared_as_attacker(self, other_player, planet_pos, unit_pos):
+                                return "playable"
+                            else:
+                                return "unplayable"
+                        elif self.game.attacker_planet == planet_pos and self.game.attacker_position == unit_pos:
+                            return "playable"
+                        else:
+                            return "unplayable"
+                    else:
+                        other_player = self.get_other_player()
+                        if self.game.check_if_unit_can_be_declared_as_defender(other_player, self, planet_pos, unit_pos):
+                            return "playable"
+                        else:
+                            return "unplayable"
+                else:
+                    return "unplayable"
+        else:
+            return ""
+        return ""
+
     async def send_units_at_planet(self, planet_id, force=False):
         if planet_id != -1:
             if planet_id == -2:
@@ -1023,28 +1050,7 @@ class Player:
                         else:
                             single_card_string += "H"
                         single_card_string += "|"
-                        border_type = ""
-                        if self.game.check_if_battle_taking_place():
-                            if self.game.safety_check():
-                                if self.game.number_with_combat_turn == self.get_number():
-                                    if self.game.attacker_planet == -1:
-                                        other_player = self.get_other_player()
-                                        if self.game.check_if_unit_can_be_declared_as_attacker(self, other_player, planet_id, i):
-                                            border_type = "playable"
-                                        else:
-                                            border_type = "unplayable"
-                                    elif self.game.attacker_planet == planet_id and self.game.attacker_position == i:
-                                        border_type = "playable"
-                                    else:
-                                        border_type = "unplayable"
-                                else:
-                                    other_player = self.get_other_player()
-                                    if self.game.check_if_unit_can_be_declared_as_defender(other_player, self, planet_id, i):
-                                        border_type = "playable"
-                                    else:
-                                        border_type = "unplayable"
-                            else:
-                                border_type = "unplayable"
+                        border_type = self.determine_border(planet_id, i)
                         single_card_string += border_type
                         single_card_string += "|"
                         single_card_string += current_card.get_extra_info_string()
