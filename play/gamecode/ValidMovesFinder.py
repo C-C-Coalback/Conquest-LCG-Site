@@ -168,7 +168,7 @@ def determine_valid_moves(self):
                     if self.card_to_deploy.planet_attachment:
                         valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
                     else:
-                        valid_moves = []  # TODO: Check what units can receive attachment
+                        valid_moves = self.get_playable_borders()
         elif self.what_is_required_automated == "Commitment":
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
         elif self.what_is_required_automated == "Command not Commitment":

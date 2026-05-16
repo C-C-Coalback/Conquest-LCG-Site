@@ -104,6 +104,13 @@ class Card:
         self.cannot_remove_damage_eor = False
         self.remove_end_of_round = False
         self.incubated_synapse = False
+        self.border = ""
+
+    def get_border(self):
+        return self.border
+
+    def set_border(self, border):
+        self.border = border
 
     def spend_faith(self, faith):
         return False

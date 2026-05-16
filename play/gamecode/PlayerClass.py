@@ -688,7 +688,7 @@ class Player:
                     single_card_string += "D|"
                 else:
                     single_card_string += "H|"
-                single_card_string += self.determine_border(-2, i)
+                single_card_string += self.determine_and_set_border(-2, i)
                 single_card_string += "|"
                 single_card_string += current_card.get_extra_info_string() + "|"
                 if current_card.aiming_reticle_color is not None:
@@ -989,6 +989,35 @@ class Player:
             return last_element_index
         return -1
 
+    def get_playable_borders(self):
+        playable_borders = []
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_border_given_pos(i, j) == "playable":
+                    playable_borders.append("IN_PLAY/" + self.get_number() + "/" + str(i) + "/" + str(j))
+        i = -2
+        for j in range(len(self.headquarters)):
+            if self.get_border_given_pos(i, j) == "playable":
+                playable_borders.append("HQ/" + self.get_number() + "/" + str(j) + "/")
+        return playable_borders
+
+    def get_border_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit_pos].get_border()
+        return self.cards_in_play[planet_pos + 1][unit_pos].get_border()
+
+    def set_border_given_pos(self, planet_pos, unit_pos, border):
+        if planet_pos == -2:
+            self.headquarters[unit_pos].set_border(border)
+            return None
+        self.cards_in_play[planet_pos + 1][unit_pos].set_border(border)
+        return None
+
+    def determine_and_set_border(self, planet_pos, unit_pos):
+        border = self.determine_border(planet_pos, unit_pos)
+        self.set_border_given_pos(planet_pos, unit_pos, border)
+        return border
+
     def determine_border(self, planet_pos, unit_pos):
         if self.game.card_to_deploy is not None:
             if self.game.card_to_deploy.get_card_type() == "Attachment" and self.game.phase == "DEPLOY":
@@ -1002,6 +1031,7 @@ class Player:
                 if self.check_if_can_attach_card(
                         self.game.card_to_deploy, planet_pos, unit_pos,
                         not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach):
+
                     return "playable"
                 return "unplayable"
         if planet_pos != -2:
@@ -1066,7 +1096,7 @@ class Player:
                         else:
                             single_card_string += "H"
                         single_card_string += "|"
-                        border_type = self.determine_border(planet_id, i)
+                        border_type = self.determine_and_set_border(planet_id, i)
                         single_card_string += border_type
                         single_card_string += "|"
                         single_card_string += current_card.get_extra_info_string()
