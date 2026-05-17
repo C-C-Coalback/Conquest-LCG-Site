@@ -552,6 +552,46 @@ class Player:
                         return "unplayable"
                 if card.get_card_type() in ["Army", "Support", "Attachment"] and self.game.phase == "DEPLOY":
                     if self.determine_lowest_possible_cost_of_card(card) <= self.get_resources():
+                        if card.get_card_type() == "Attachment":
+                            if card.planet_attachment:
+                                return "playable"
+                            non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre",
+                                                                        "Escort Drone"]
+                            army_unit_as_attach = False
+                            if card.get_name() in non_attachs_that_can_be_played_as_attach:
+                                army_unit_as_attach = True
+                            not_own_attach = False
+                            for i in range(len(self.headquarters)):
+                                if self.check_if_can_attach_card(
+                                        card, -2, i,
+                                        not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
+                                ):
+                                    return "playable"
+                            for i in range(7):
+                                for j in range(len(self.cards_in_play[i + 1])):
+                                    if self.check_if_can_attach_card(
+                                            card, i, j,
+                                            not_own_attachment=not_own_attach,
+                                            army_unit_as_attachment=army_unit_as_attach
+                                    ):
+                                        return "playable"
+                            not_own_attach = True
+                            other_player = self.get_other_player()
+                            for i in range(len(other_player.headquarters)):
+                                if other_player.check_if_can_attach_card(
+                                        card, -2, i,
+                                        not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
+                                ):
+                                    return "playable"
+                            for i in range(7):
+                                for j in range(len(other_player.cards_in_play[i + 1])):
+                                    if other_player.check_if_can_attach_card(
+                                            card, i, j,
+                                            not_own_attachment=not_own_attach,
+                                            army_unit_as_attachment=army_unit_as_attach
+                                    ):
+                                        return "playable"
+                            return "unplayable"
                         return "playable"
                     else:
                         return ""
