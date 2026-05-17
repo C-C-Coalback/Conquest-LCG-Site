@@ -65,9 +65,9 @@ def update_automated_attributes(self):
     elif self.phase == "COMMAND":
         if self.committing_warlords:
             self.what_is_required_automated = "Commitment"
-            if not self.p1.has_passed and not self.p2.has_passed:
+            if not self.p1.committed_warlord and not self.p2.committed_warlord:
                 self.automated_player_waited_on = self.player_with_initiative
-            elif not self.p1.has_passed:
+            elif not self.p1.committed_warlord:
                 self.automated_player_waited_on = self.name_1
             else:
                 self.automated_player_waited_on = self.name_2
@@ -148,7 +148,9 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Search":
             for i in range(len(self.cards_in_search_box)):
-                valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
+                if self.check_if_search_pos_satisfies_conditions(primary_player, i):
+                    valid_moves = add_valid_move(valid_moves, primary_player, "SEARCH", choice_pos=i)
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Choice":
             for i in range(len(self.choices_available)):
                 valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
@@ -168,7 +170,7 @@ def determine_valid_moves(self):
                     if self.card_to_deploy.planet_attachment:
                         valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
                     else:
-                        valid_moves = self.get_playable_borders()
+                        valid_moves = primary_player.get_playable_borders()
         elif self.what_is_required_automated == "Commitment":
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
         elif self.what_is_required_automated == "Command not Commitment":
@@ -183,7 +185,7 @@ def determine_valid_moves(self):
                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", battle_planet, i)
             else:
                 for i in range(len(secondary_player.cards_in_play[battle_planet + 1])):
-                    if self.check_if_unit_can_be_declared_as_attacker(primary_player, secondary_player, battle_planet, i):
+                    if self.check_if_unit_can_be_declared_as_defender(secondary_player, primary_player, battle_planet, i):
                         valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
         elif self.what_is_required_automated == "Retreat Turn":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")

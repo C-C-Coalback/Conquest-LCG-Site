@@ -999,7 +999,7 @@ class Player:
         i = -2
         for j in range(len(self.headquarters)):
             if self.get_border_given_pos(i, j) == "playable":
-                playable_borders.append("HQ/" + self.get_number() + "/" + str(j) + "/")
+                playable_borders.append("HQ/" + self.get_number() + "/" + str(j))
         return playable_borders
 
     def get_border_given_pos(self, planet_pos, unit_pos):

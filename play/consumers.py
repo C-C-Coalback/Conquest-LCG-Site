@@ -541,7 +541,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data): # noqa
         global active_games
-        global chat_messages
+        print(text_data)
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         print(message)
@@ -558,6 +558,26 @@ class GameConsumer(AsyncWebsocketConsumer):
                     game_relevant_string = self.name + "|||" + "/".join(message[1:])
                     active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, message[1:])
+                except:
+                    try:
+                        with open("errorslog.txt", "a") as f:
+                            f.write(traceback.format_exc())
+                    except:
+                        pass
+                    await self.receive_game_update(
+                        "An error has occurred on the server side. Your game may become unstable or unplayable."
+                    )
+        elif message[0] == "AUTOMATED_CHOICE" and len(message) > 1:
+            current_game_id = -1
+            for i in range(len(active_games)):
+                if active_games[i].game_id == self.room_name:
+                    print("Found room")
+                    current_game_id = i
+            if current_game_id != -1:
+                try:
+                    game_relevant_string = message[1] + "|||" + "/".join(message[2:])
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
+                    await active_games[current_game_id].update_game_event(message[1], message[2:])
                 except:
                     try:
                         with open("errorslog.txt", "a") as f:

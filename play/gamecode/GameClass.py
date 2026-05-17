@@ -1894,6 +1894,12 @@ class Game:
         print("Bad string")
         return False
 
+    def check_if_search_pos_satisfies_conditions(self, player, search_pos):
+        if self.no_restrictions_on_chosen_card:
+            return True
+        card_chosen = self.preloaded_find_card(player.deck[search_pos])
+        return self.check_if_card_searched_satisfies_conditions(card_chosen)
+
     def check_if_card_searched_satisfies_conditions(self, card):
         if not self.all_conditions_searched_card_required:
             if self.faction_of_searched_card is not None:
@@ -2022,13 +2028,10 @@ class Game:
                     else:
                         primary_player = self.p2
                         secondary_player = self.p1
-                    valid_card = True
-                    if not self.no_restrictions_on_chosen_card:
-                        card_chosen = FindCard.find_card(primary_player.deck[int(game_update_string[1])],
-                                                         self.card_array, self.cards_dict,
-                                                         self.apoka_errata_cards, self.cards_that_have_errata)
-                        valid_card = self.check_if_card_searched_satisfies_conditions(card_chosen)
+                    valid_card = self.check_if_search_pos_satisfies_conditions(primary_player, int(game_update_string[1]))
+                    print(valid_card)
                     if valid_card:
+                        card_chosen = self.preloaded_find_card(primary_player.deck[int(game_update_string[1])])
                         if self.what_to_do_with_searched_card == "DRAW":
                             primary_player.draw_card_at_location_deck(int(game_update_string[1]))
                         elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
@@ -8173,6 +8176,8 @@ class Game:
                     self.planets_in_play_array[self.last_planet_checked_for_battle] = False
                     self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                    if self.round_number == 6:
+                        await self.send_victory_proper("???", "not capturing the last planet...")
                 await self.resolve_battle_conclusion(name, ["", ""])
 
     async def check_combat_end(self, name):
