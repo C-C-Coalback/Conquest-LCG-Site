@@ -189,4 +189,6 @@ def determine_valid_moves(self):
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Headquarters Action":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        else:
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
     return valid_moves
