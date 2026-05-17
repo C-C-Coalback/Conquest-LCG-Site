@@ -12,8 +12,7 @@ async def manual_quarantined_world_arkos_ability(self, name, game_update_string,
             if player_owning_card.get_card_type_given_pos(-2, int(game_update_string[2])) == "Army":
                 player_owning_card.increase_health_of_unit_at_pos(-2, int(game_update_string[2]), 1, "EOG")
                 player_owning_card.increase_attack_of_unit_at_pos(-2, int(game_update_string[2]), 1, "EOG")
-                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                     game_update_string)
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             player_owning_card = primary_player
@@ -22,8 +21,7 @@ async def manual_quarantined_world_arkos_ability(self, name, game_update_string,
             if player_owning_card.get_card_type_given_pos(int(game_update_string[2]), int(game_update_string[3])) == "Army":
                 player_owning_card.increase_health_of_unit_at_pos(int(game_update_string[2]), int(game_update_string[3]), 1, "EOG")
                 player_owning_card.increase_attack_of_unit_at_pos(int(game_update_string[2]), int(game_update_string[3]), 1, "EOG")
-                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                     game_update_string)
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
 
 
 async def manual_hangyz_ability(self, name, game_update_string, primary_player, secondary_player):
@@ -59,8 +57,7 @@ async def manual_mordatyne_ability(self, name, game_update_string, primary_playe
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
                     if possible_interrupts:
                         can_continue = False
-                        await self.send_update_message(
-                            "Some sort of interrupt may be used.")
+                        await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = secondary_player.name_player
@@ -72,8 +69,7 @@ async def manual_mordatyne_ability(self, name, game_update_string, primary_playe
                         self.nullify_context = "Ferrin"
                 if can_continue:
                     player_owning_card.rout_unit(planet_pos, unit_pos)
-                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                         game_update_string)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
 
 
 async def manual_zadruk_prime_ability(self, name, game_update_string, primary_player, secondary_player):
@@ -114,8 +110,7 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
             self.damage_from_atrox = True
             if not self.stored_damage:
                 self.damage_from_atrox = False
-                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                     game_update_string)
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HQ":
             self.damage_from_atrox = True
@@ -128,8 +123,7 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
                     player.assign_damage_to_pos(-2, i, 1, by_enemy_unit=False)
             if not self.stored_damage:
                 self.damage_from_atrox = False
-                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                     game_update_string)
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             planet_pos = int(game_update_string[2])
@@ -139,20 +133,16 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
                 self.damage_from_atrox = True
                 if not self.stored_damage:
                     self.damage_from_atrox = False
-                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                         game_update_string)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
 
 
 async def manual_plannum_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
             if self.chosen_first_card:
-                primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0],
-                                                            self.misc_target_unit[1])
-                primary_player.move_unit_to_planet(self.misc_target_unit[0], self.misc_target_unit[1],
-                                                   int(game_update_string[1]))
-                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                     game_update_string)
+                primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
+                primary_player.move_unit_to_planet(self.misc_target_unit[0], self.misc_target_unit[1], int(game_update_string[1]))
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HQ":
             if game_update_string[1] == str(self.number_resolving_battle_ability):
@@ -165,8 +155,7 @@ async def manual_plannum_ability(self, name, game_update_string, primary_player,
     elif len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             if game_update_string[1] == str(self.number_resolving_battle_ability):
-                if primary_player.get_card_type_given_pos(int(game_update_string[2]),
-                                                          int(game_update_string[3])) not in ["Warlord", "Support"]:
+                if primary_player.get_card_type_given_pos(int(game_update_string[2]), int(game_update_string[3])) not in ["Warlord", "Support"]:
                     if self.chosen_first_card:
                         primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
                     self.chosen_first_card = True
@@ -183,8 +172,7 @@ async def manual_gareth_prime_ability(self, name, game_update_string, primary_pl
                 secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 secondary_player.move_unit_to_planet(og_pla, og_pos, destination)
                 self.player_resolving_battle_ability = secondary_player.name_player
-                await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                     game_update_string)
+                await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HQ":
             if game_update_string[1] == secondary_player.number:
@@ -217,8 +205,7 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                     possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
                     if possible_interrupts:
                         can_continue = False
-                        await self.send_update_message(
-                            "Some sort of interrupt may be used.")
+                        await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = self.p1.name_player
@@ -229,10 +216,8 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                         self.first_player_nullified = self.p2.name_player
                         self.nullify_context = "Iridial"
                 if can_continue:
-                    self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]),
-                                                   99, healing=True)
-                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                         game_update_string)
+                    self.p1.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99, healing=True)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
             elif game_update_string[1] == "2":
                 can_continue = True
                 planet_pos = int(game_update_string[2])
@@ -241,8 +226,7 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                     possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
                     if possible_interrupts:
                         can_continue = False
-                        await self.send_update_message(
-                            "Some sort of interrupt may be used.")
+                        await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = self.p2.name_player
@@ -253,10 +237,8 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                         self.first_player_nullified = self.p1.name_player
                         self.nullify_context = "Iridial"
                 if can_continue:
-                    self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]),
-                                                   99, healing=True)
-                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                         game_update_string)
+                    self.p2.remove_damage_from_pos(int(game_update_string[2]), int(game_update_string[3]), 99, healing=True)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HQ":
             if game_update_string[1] == "1":
@@ -267,8 +249,7 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                     possible_interrupts = self.p1.interrupt_cancel_target_check(planet_pos, unit_pos)
                     if possible_interrupts:
                         can_continue = False
-                        await self.send_update_message(
-                            "Some sort of interrupt may be used.")
+                        await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = self.p1.name_player
@@ -280,8 +261,7 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                         self.nullify_context = "Iridial"
                 if can_continue:
                     self.p1.remove_damage_from_pos(-2, int(game_update_string[2]), 99, healing=True)
-                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                         game_update_string)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
             elif game_update_string[1] == "2":
                 can_continue = True
                 planet_pos = -2
@@ -290,8 +270,7 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                     possible_interrupts = self.p2.interrupt_cancel_target_check(planet_pos, unit_pos)
                     if possible_interrupts:
                         can_continue = False
-                        await self.send_update_message(
-                            "Some sort of interrupt may be used.")
+                        await self.send_update_message("Some sort of interrupt may be used.")
                         self.choices_available = possible_interrupts
                         self.choices_available.insert(0, "No Interrupt")
                         self.name_player_making_choices = self.p2.name_player
@@ -303,8 +282,7 @@ async def manual_iridial_ability(self, name, game_update_string, primary_player,
                         self.nullify_context = "Iridial"
                 if can_continue:
                     self.p2.remove_damage_from_pos(-2, int(game_update_string[2]), 99, healing=True)
-                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
-                                                         game_update_string)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)
 
 
 async def manual_excellor_ability(self, name, game_update_string, primary_player, secondary_player):
@@ -324,10 +302,8 @@ async def manual_excellor_ability(self, name, game_update_string, primary_player
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     elif self.misc_target_player == player_owning_card.name_player:
                         og_pla, og_pos = self.misc_target_unit
-                        player_owning_card.cards_in_play[og_pla + 1].append(
-                            player_owning_card.cards_in_play[planet_pos + 1][unit_pos])
-                        player_owning_card.cards_in_play[planet_pos + 1].append(
-                            player_owning_card.cards_in_play[og_pla + 1][og_pos])
+                        player_owning_card.cards_in_play[og_pla + 1].append(player_owning_card.cards_in_play[planet_pos + 1][unit_pos])
+                        player_owning_card.cards_in_play[planet_pos + 1].append(player_owning_card.cards_in_play[og_pla + 1][og_pos])
                         del player_owning_card.cards_in_play[og_pla + 1][og_pos]
                         del player_owning_card.cards_in_play[planet_pos + 1][unit_pos]
                         player_owning_card.reset_all_aiming_reticles_play_hq()
@@ -344,8 +320,7 @@ async def manual_selphini_vii_ability(self, name, game_update_string, primary_pl
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
             if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
-                if (planet_pos, unit_pos) != self.misc_target_unit or \
-                        self.misc_target_player != player_owning_card.name_player:
+                if (planet_pos, unit_pos) != self.misc_target_unit or self.misc_target_player != player_owning_card.name_player:
                     if not self.chosen_first_card:
                         if player_owning_card.get_damage_given_pos(planet_pos, unit_pos) > 0:
                             self.misc_target_player = player_owning_card.name_player
@@ -532,6 +507,7 @@ async def manual_munos_ability(self, name, game_update_string, primary_player, s
                 player_owning_card.add_resources(cost)
                 await self.resolve_battle_conclusion(name, game_update_string)
 
+
 async def manual_jaricho_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
@@ -581,8 +557,7 @@ async def manual_zarvoss_foundry_ability(self, name, game_update_string, primary
                     not_own_attachment = False
                     if player_owning_card.get_number() != primary_player.get_number():
                         not_own_attachment = True
-                    if player_owning_card.attach_card(card, planet_pos, unit_pos,
-                                                      not_own_attachment=not_own_attachment):
+                    if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
                         await self.resolve_battle_conclusion(name, game_update_string)
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
@@ -595,8 +570,7 @@ async def manual_zarvoss_foundry_ability(self, name, game_update_string, primary
                     not_own_attachment = False
                     if player_owning_card.get_number() != primary_player.get_number():
                         not_own_attachment = True
-                    if player_owning_card.attach_card(card, planet_pos, unit_pos,
-                                                      not_own_attachment=not_own_attachment):
+                    if player_owning_card.attach_card(card, planet_pos, unit_pos, not_own_attachment=not_own_attachment):
                         await self.resolve_battle_conclusion(name, game_update_string)
 
 
@@ -621,20 +595,15 @@ async def manual_xenos_world_talling_ability(self, name, game_update_string, pri
         if game_update_string[0] == "HQ":
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.get_card_type_given_pos(-2, int(game_update_string[2])) == "Army":
-                    primary_player.move_unit_to_planet(
-                        -2, int(game_update_string[2]),
-                        self.misc_target_planet)
+                    primary_player.move_unit_to_planet(-2, int(game_update_string[2]), self.misc_target_planet)
                     await self.resolve_battle_conclusion(name, game_update_string)
     if len(game_update_string) == 4:
         if self.chosen_first_card and self.chosen_second_card:
             if game_update_string[0] == "IN_PLAY":
                 if game_update_string[1] == primary_player.get_number():
-                    if primary_player.get_card_type_given_pos(int(game_update_string[2]),
-                                                              int(game_update_string[3])) == "Army":
+                    if primary_player.get_card_type_given_pos(int(game_update_string[2]), int(game_update_string[3])) == "Army":
                         if int(game_update_string[2]) != self.misc_target_planet:
-                            primary_player.move_unit_to_planet(
-                                int(game_update_string[2]), int(game_update_string[3]),
-                                self.misc_target_planet)
+                            primary_player.move_unit_to_planet(int(game_update_string[2]), int(game_update_string[3]), self.misc_target_planet)
                             await self.resolve_battle_conclusion(name, game_update_string)
 
 
