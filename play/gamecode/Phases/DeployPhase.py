@@ -204,6 +204,10 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                 self.choice_context = "Use WAAAGH! Arbuttz?"
                                 self.name_player_making_choices = primary_player.name_player
                                 self.resolving_search_box = True
+                        elif card.get_card_type() == "Event" and card.get_has_action_while_in_hand() and card.get_allowed_phases_while_in_hand() in ["DEPLOY", "ALL"]:
+                            await update_game_event_deploy_section(self, name, ["action-button"])
+                            if self.mode == "ACTION":
+                                await update_game_event_deploy_section(self, name, game_update_string)
                         else:
                             self.card_pos_to_deploy = previous_card_pos_to_deploy
         elif game_update_string[0] == "HQ":
