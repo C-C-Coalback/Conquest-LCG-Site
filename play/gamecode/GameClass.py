@@ -2910,6 +2910,7 @@ class Game:
         self.p2.harbinger_of_eternity_active = False
         self.p1.waaagh_arbuttz_active = False
         self.p2.waaagh_arbuttz_active = False
+        self.card_to_deploy = None
         if self.phase == "DEPLOY":
             if self.number_with_deploy_turn == "1":
                 self.player_with_deploy_turn = self.name_2
