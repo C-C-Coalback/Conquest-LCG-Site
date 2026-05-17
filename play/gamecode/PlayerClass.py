@@ -539,8 +539,9 @@ class Player:
             card = self.game.preloaded_find_card(card_name)
             if self.game.stored_damage:
                 if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
-                    if card.get_shields():
-                        return "playable"
+                    if self.game.stored_damage[0].get_can_shield():
+                        if card.get_shields():
+                            return "playable"
                 return "unplayable"
             if card.get_name() != "FINAL CARD":
                 if card.get_limited():
@@ -593,6 +594,8 @@ class Player:
             card_string = "GAME_INFO/HAND/" + str(self.number) + "/" + self.name_player
         if card_string != self.last_hand_string or force:
             self.last_hand_string = card_string
+            if not force:
+                self.game.anything_changed_since_last_send = True
             await self.game.send_update_message(card_string)
 
     def count_units_with_trait_at_planet(self, trait, i):
@@ -774,6 +777,8 @@ class Player:
             joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + self.name_player
         if self.last_hq_string != joined_string or force:
             self.last_hq_string = joined_string
+            if not force:
+                self.game.anything_changed_since_last_send = True
             await self.game.send_update_message(joined_string)
 
     def check_for_trait_at_planet(self, planet_pos, trait):
@@ -1192,6 +1197,13 @@ class Player:
         return False
 
     def determine_border(self, planet_pos, unit_pos):
+        if self.game.mode == "DISCOUNT":
+            if self.game.determine_player_with_discounts() == self.name_player:
+                for i in range(7):
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if self.get_aiming_reticle_in_play(i, j) == "green":
+                            return "playable"
+            return "unplayable"
         if self.game.stored_damage:
             if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
                 if self.check_if_card_ability_usable_during_shield(planet_pos, unit_pos):
@@ -1213,8 +1225,6 @@ class Player:
                     return "playable"
                 return "unplayable"
         elif planet_pos != -2:
-            # if self.game.stored_damage:
-            #         if self.
             if self.game.check_if_battle_taking_place():
                 if self.game.safety_check():
                     if self.game.number_with_combat_turn == self.get_number():
@@ -1346,6 +1356,8 @@ class Player:
                                     "/" + str(planet_id) + "/" + self.name_player
                 if self.last_planet_strings[planet_id] != joined_string or force:
                     self.last_planet_strings[planet_id] = joined_string
+                    if not force:
+                        self.game.anything_changed_since_last_send = True
                     await self.game.send_update_message(joined_string)
 
     async def send_units_at_all_planets(self, force=False):
@@ -1356,6 +1368,8 @@ class Player:
         joined_string = "GAME_INFO/RESOURCES/" + str(self.number) + "/" + str(self.resources)
         if joined_string != self.last_resources_string or force:
             self.last_resources_string = joined_string
+            if not force:
+                self.game.anything_changed_since_last_send = True
             await self.game.send_update_message(joined_string)
 
     async def transform_indirect_into_damage(self):
@@ -1468,6 +1482,8 @@ class Player:
                 joined_string += "/" + card_name + "|" + self.cards_removed_from_game_hidden[i]
         if joined_string != self.last_removed_string or force:
             self.last_removed_string = joined_string
+            if not force:
+                self.game.anything_changed_since_last_send = True
             await self.game.send_update_message(joined_string)
 
     async def send_discard(self, force=False):
@@ -1485,6 +1501,8 @@ class Player:
                     joined_string += self.aiming_reticle_color_discard
         if joined_string != self.last_discard_string or force:
             self.last_discard_string = joined_string
+            if not force:
+                self.game.anything_changed_since_last_send = True
             await self.game.send_update_message(joined_string)
 
     def get_card_from_everywhere(self, card_name, ability=True, ready_relevant=False, must_own=False,
@@ -1791,6 +1809,11 @@ class Player:
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Warlord":
             return True
         return False
+
+    def get_aiming_reticle_in_play(self, planet_id, unit_id):
+        if planet_id == -2:
+            return self.headquarters[unit_id].aiming_reticle_color
+        return self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color
 
     def set_aiming_reticle_in_play(self, planet_id, unit_id, color="blue"):
         if planet_id == -2:

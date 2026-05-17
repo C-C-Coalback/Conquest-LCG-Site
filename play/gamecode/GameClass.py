@@ -281,6 +281,7 @@ class Game:
         self.interrupts_waiting_on_resolution = []
         self.location_hand_attachment_shadowsun = -1
         self.location_attachment_discard_shadowsun = -1
+        self.anything_changed_since_last_send = True
         self.alternative_shields = ["Indomitable", "Glorious Intervention", "Faith Denies Death", "Uphold His Honor",
                                     "Back to the Shadows", "I Do Not Serve"]
         self.last_shield_string = []
@@ -803,9 +804,13 @@ class Game:
         card_two = card_two + "/" + str(len(self.p2.deck))
         if force or self.last_deck_string_1 != card_one:
             self.last_deck_string_1 = card_one
+            if not force:
+                self.anything_changed_since_last_send = True
             await self.send_update_message("GAME_INFO/DECK/1/" + card_one)
         if force or self.last_deck_string_2 != card_two:
             self.last_deck_string_2 = card_two
+            if not force:
+                self.anything_changed_since_last_send = True
             await self.send_update_message("GAME_INFO/DECK/2/" + card_two)
 
     def create_choices(self, choices_array, general_imaging_format="No Images", custom_array=None):
@@ -883,6 +888,8 @@ class Game:
                 initiative_string += "2"
         if initiative_string != self.last_initiative_string or force:
             self.last_initiative_string = initiative_string
+            if not force:
+                self.anything_changed_since_last_send = True
             await self.send_update_message(initiative_string)
 
     async def begin_asking_nullify(self, primary_player, secondary_player, effect_name, cost_card, game_update_string,
@@ -1043,6 +1050,8 @@ class Game:
         else:
             info_string += "??????/"
         if self.last_info_box_string != info_string or force:
+            if not force:
+                self.anything_changed_since_last_send = True
             await self.send_update_message(info_string)
             self.last_info_box_string = info_string
 
@@ -1148,6 +1157,8 @@ class Game:
                 planet_string += "/"
         if planet_string != self.saved_planet_string or force:
             self.saved_planet_string = planet_string
+            if not force:
+                self.anything_changed_since_last_send = True
             await self.send_update_message(planet_string)
 
     def determine_player_with_discounts(self):
@@ -7242,9 +7253,9 @@ class Game:
         message_to_send += "|||"
         for i in range(len(self.clickable_items_automated)):
             message_to_send += self.clickable_items_automated[i] + "|||"
-        # if message_to_send != self.last_automated_data_string or force:
-        self.last_automated_data_string = message_to_send
-        await self.send_update_message(message_to_send)
+        if message_to_send != self.last_automated_data_string or force or self.anything_changed_since_last_send:
+            self.last_automated_data_string = message_to_send
+            await self.send_update_message(message_to_send)
 
     def get_player_given_name(self, name_player):
         if name_player == self.name_1:
@@ -7772,6 +7783,7 @@ class Game:
         if not same_thread:
             await self.update_game_event("", [], same_thread=True)
             await self.send_everything()
+        self.anything_changed_since_last_send = False
         if not same_thread:
             self.condition_main_game.notify_all()
             self.condition_main_game.release()

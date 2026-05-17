@@ -182,6 +182,7 @@ def determine_valid_moves(self):
             for i in range(len(self.choices_available)):
                 valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
         elif self.what_is_required_automated == "Discount":
+            valid_moves = primary_player.get_playable_borders()
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Deploy Turn":
             if self.card_to_deploy is None:
