@@ -3,32 +3,6 @@
 from . import DeployPhase
 
 
-def resolve_planet_battle_effect(p_win, p_lose, planet_id):
-    planet_name = p_win.get_planet_name_given_position(planet_id)
-    print("Resolve battle ability:")
-    print(planet_name)
-    if planet_name == "Osus_IV" or planet_name == "Osus IV":
-        osus_iv_ability(p_win, p_lose)
-    elif planet_name == "Iridial":
-        iridial_ability(p_win, p_lose)
-    elif planet_name == "Plannum":
-        plannum_ability(p_win, p_lose)
-    elif planet_name == "Tarrus":
-        tarrus_ability(p_win, p_lose)
-    elif planet_name == "Y'varn":
-        yvarn_ability(p_win, p_lose)
-    elif planet_name == "Barlus":
-        barlus_ability(p_lose)
-    elif planet_name == "Ferrin":
-        ferrin_ability(p_win, p_lose)
-    elif planet_name == "Carnath":
-        carnath_ability(p_win, p_lose)
-    elif planet_name == "Elouith":
-        elouith_ability(p_win, p_lose)
-    elif planet_name == "Atrox_Prime" or planet_name == "Atrox Prime":
-        atrox_prime_ability(p_win, p_lose, planet_id)
-
-
 async def manual_quarantined_world_arkos_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 3:
         if game_update_string[0] == "HQ":
