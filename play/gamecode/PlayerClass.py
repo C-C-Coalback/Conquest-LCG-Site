@@ -537,6 +537,11 @@ class Player:
     def determine_playability(self, card_name):
         try:
             card = self.game.preloaded_find_card(card_name)
+            if self.game.stored_damage:
+                if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
+                    if card.get_shields():
+                        return "playable"
+                return "unplayable"
             if card.get_name() != "FINAL CARD":
                 if card.get_limited():
                     if not self.can_play_limited:
@@ -1019,10 +1024,29 @@ class Player:
         self.set_border_given_pos(planet_pos, unit_pos, border)
         return border
 
+    def check_if_attachment_ability_usable_during_shield(self, planet_pos, unit_pos, attachment_pos):
+        attachment = self.get_attachment_at_pos(planet_pos, unit_pos, attachment_pos)
+        hurt_num, hurt_pla, hurt_pos = self.game.stored_damage[0].get_position_unit()
+        if planet_pos == hurt_pla and unit_pos == hurt_pos:
+            if attachment.get_ability() == "Iron Halo" and attachment.get_ready() and \
+                    attachment.name_owner == self.name_player:
+                return True
+            elif attachment.get_ability() == "Warhost Helmet" and attachment.get_ready() and \
+                    attachment.name_owner == self.name_player and \
+                    self.get_ready_given_pos(planet_pos, unit_pos):
+                return True
+            elif attachment.get_ability() == "Armored Shell" and \
+                    attachment.name_owner == self.name_player and \
+                    not attachment.from_magus_harid:
+                if self.game.stored_damage[0].get_position_attacker() is not None:
+                    if self.game.stored_damage[0].get_amount_that_can_be_blocked() > 2:
+                        return True
+        return False
+
     def check_if_card_ability_usable_during_shield(self, planet_pos, unit_pos):
         hurt_num, hurt_pla, hurt_pos = self.game.stored_damage[0].get_position_unit()
+        ability = self.get_ability_given_pos(planet_pos, unit_pos)
         if planet_pos == -2:
-            ability = self.get_ability_given_pos(planet_pos, unit_pos)
             if self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord":
                 if ability == "Unstoppable Tide":
                     if self.get_ready_given_pos(planet_pos, unit_pos):
@@ -1041,10 +1065,139 @@ class Player:
             elif ability == "Rockcrete Bunker":
                 if self.get_ready_given_pos(planet_pos, unit_pos):
                     return True
+            elif ability == "Extra Boomsticks":
+                if self.get_ready_given_pos(planet_pos, unit_pos):
+                    if self.check_if_faction_given_pos(hurt_pla, hurt_pos, "Orks"):
+                        return True
+            elif ability == "Talon Strike Force":
+                if self.headquarters[unit_pos].counter > 2:
+                    return True
+            elif ability == "Humanity's Shield":
+                if self.game.stored_damage[0].get_can_shield():
+                    return True
+            elif ability == "The Phalanx":
+                if self.game.stored_damage[0].get_can_shield():
+                    return True
+            elif ability == "Dal'yth Sept":
+                if self.dalyth_sept_active and self.game.stored_damage[0].get_can_shield():
+                    return True
+            elif ability == "Praetorian Shadow":
+                if self.get_ready_given_pos(planet_pos, unit_pos):
+                    if self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord":
+                        return True
+            elif ability == "Faith and Hatred":
+                if self.game.stored_damage[0].get_position_attacker() is not None:
+                    if self.get_ready_given_pos(planet_pos, unit_pos):
+                        return True
+            elif ability == "Null Shield Matrix":
+                if self.check_if_faction_given_pos(hurt_pla, hurt_pos, "Necrons"):
+                    if not self.get_ready_given_pos(planet_pos, unit_pos):
+                        if not self.headquarters[unit_pos].misc_ability_used:
+                            return True
+            elif ability == "Kustom Field Generator":
+                if self.get_ready_given_pos(planet_pos, unit_pos):
+                    if self.check_if_faction_given_pos(hurt_pla, hurt_pos, "Orks"):
+                        if self.game.stored_damage[0].get_position_attacker() is not None:
+                            return True
+            elif ability == "Lurking Hormagaunt":
+                if self.game.damage_moved_to_old_one_eye == 0:
+                    return True
+            elif planet_pos == hurt_pla and hurt_pos == unit_pos:
+                if self.our_last_stand_bonus_active and self.game.may_block_with_ols and \
+                        self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord" and \
+                        self.game.stored_damage[0].get_amount_that_can_be_blocked() > 1:
+                    return True
+                elif ability == "Blood Angels Veterans" and \
+                        self.get_ready_given_pos(hurt_pla, hurt_pos) and not \
+                        self.headquarters[hurt_pos].misc_ability_used:
+                    return True
+                elif self.get_faith_given_pos(hurt_pla, hurt_pos) > 0:
+                    return True
+            return False
+        elif ability == "Lurking Hormagaunt":
+            if self.game.damage_moved_to_old_one_eye == 0:
+                return True
+        elif ability == "Expendable Pawn":
+            if planet_pos != hurt_pla or unit_pos != hurt_pos:
+                if planet_pos == hurt_pla or abs(planet_pos - hurt_pla) == 1:
+                    return True
+        elif ability == "Praetorian Shadow":
+            if self.get_ready_given_pos(planet_pos, unit_pos):
+                if self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord":
+                    return True
+        elif ability == "Noble Shining Spears":
+            if not self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                if self.get_mobile_given_pos(hurt_planet, hurt_pos):
+                    return True
+        elif planet_pos == hurt_pla and hurt_pos == unit_pos:
+            can_faith = False
+            if self.get_faith_given_pos(hurt_pla, hurt_pos) > 0 and self.game.may_use_faith:
+                can_faith = True
+            can_retaliate = False
+            att_num, att_pla, att_pos = -1, -1, -1
+            if self.game.stored_damage[0].get_position_attacker() is not None:
+                att_num, att_pla, att_pos = self.game.stored_damage[0].get_position_attacker()
+            if self.get_retaliate_given_pos(planet_pos, unit_pos) > 0 and \
+                    self.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord" and \
+                    self.game.may_use_retaliate:
+                if (att_pla != -1 and att_pos != -1) or self.stored_damage[0].get_position_attacker() is not None:
+                    can_retaliate = True
+            if self.our_last_stand_bonus_active and self.game.may_block_with_ols and \
+                    self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord" and \
+                    self.game.stored_damage[0].get_amount_that_can_be_blocked() > 1:
+                return True
+            elif ability == "Blood Angels Veterans" and \
+                    self.get_ready_given_pos(planet_pos, unit_pos) and not \
+                    self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                return True
+            elif ability == "Deff Dread" and not \
+                    self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                if self.game.stored_damage[0].get_position_attacker():
+                    return True
+            elif ability == "Evanescent Players" and not \
+                    self.get_once_per_phase_used_given_pos(hurt_pla, hurt_pos) and \
+                    self.game.stored_damage[0].get_amount_that_can_be_blocked() > 2 and \
+                    self.game.stored_damage[0].get_position_attacker():
+                other_player = self.get_other_player()
+                if other_player.special_get_card_type_given_pos(
+                        self.game.stored_damage[0].get_position_attacker()
+                ) == "Army":
+                    return True
+            elif can_faith or can_retaliate:
+                return True
+        elif ability == "Follower of Gork":
+            if planet_pos == hurt_pla:
+                if self.check_for_trait_given_pos(hurt_pla, hurt_pos, "Elite"):
+                    if self.cards_in_play[hurt_pla + 1][hurt_pos].follower_of_gork_available:
+                        return True
+        elif ability == "Enginseer Mechanic":
+            if planet_pos == hurt_pla:
+                if self.check_for_trait_given_pos(hurt_pla, hurt_pos, "Vehicle"):
+                    if self.get_ready_given_pos(planet_pos, unit_pos):
+                        return True
+        elif ability == "Protective Horrors":
+            if planet_pos == hurt_pla:
+                if self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Synapse":
+                    return True
+        elif ability == "Steel Legion Chimera":
+            if self.game.stored_damage[0].get_position_attacker():
+                if planet_pos == hurt_pla:
+                    if not self.check_for_trait_given_pos(hurt_pla, hurt_pos, "Vehicle"):
+                        if not self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                            return True
+        if ability == "Adamant Hive Guard":
+            if self.get_name_given_pos(hurt_pla, hurt_pos) == "Termagant" or \
+                    self.get_has_hive_mind_given_pos(hurt_pla, hurt_pos):
+                return True
         return False
 
     def determine_border(self, planet_pos, unit_pos):
-        if self.game.card_to_deploy is not None:
+        if self.game.stored_damage:
+            if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
+                if self.check_if_card_ability_usable_during_shield(planet_pos, unit_pos):
+                    return "playable"
+            return "unplayable"
+        elif self.game.card_to_deploy is not None:
             if self.game.card_to_deploy.get_card_type() == "Attachment" and self.game.phase == "DEPLOY":
                 non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
                 army_unit_as_attach = False
@@ -1059,9 +1212,8 @@ class Player:
 
                     return "playable"
                 return "unplayable"
-        if planet_pos != -2:
+        elif planet_pos != -2:
             # if self.game.stored_damage:
-            #     if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
             #         if self.
             if self.game.check_if_battle_taking_place():
                 if self.game.safety_check():

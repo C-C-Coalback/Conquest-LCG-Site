@@ -121,7 +121,7 @@ def update_automated_attributes(self):
 
 
 def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, hand_pos=-1, discard_pos=-1,
-                   choice_pos=-1):
+                   choice_pos=-1, attachment_pos=-1):
     if card_zone.capitalize() == "Pass" or card_zone == "pass-P1":
         valid_moves.append("pass-P1")
     elif card_zone == "PLANETS":
@@ -136,6 +136,11 @@ def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, h
         valid_moves.append("CHOICE/" + str(choice_pos))
     elif card_zone == "SEARCH":
         valid_moves.append("SEARCH/" + str(choice_pos))
+    elif card_zone == "ATTACHMENT":
+        if planet_pos == -2:
+            valid_moves.append("ATTACHMENT/HQ/" + player.number + "/" + str(unit_pos) + "/" + str(attachment_pos))
+        elif card_zone == "IN_PLAY":
+            valid_moves.append("IN_PLAY/HQ/" + player.number + "/" + str(planet_pos) + "/" + str(unit_pos) + "/" + str(attachment_pos))
     return valid_moves
 
 
@@ -216,7 +221,20 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Planet Ability":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Damage":
-            pass
+            if self.stored_damage[0].get_position_unit()[0] == int(primary_player.get_number()):
+                valid_moves = primary_player.get_playable_borders()
+                for i in range(len(primary_player.cards)):
+                    playability = primary_player.determine_playability(primary_player.cards[i])
+                    if playability == "playable":
+                        valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+                hurt_num, hurt_pla, hurt_pos = self.stored_damage[0].get_position_unit()
+                for i in range(len(primary_player.get_all_attachments_at_pos(hurt_pla, hurt_pos))):
+                    if primary_player.check_if_attachment_ability_usable_during_shield(hurt_pla, hurt_pos, i):
+                        valid_moves = add_valid_move(
+                            valid_moves, primary_player, "ATTACHMENT",
+                            planet_pos=hurt_pla, unit_pos=hurt_pos, attachment_pos=i
+                        )
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Action":
             if self.action_chosen in ability_targets_dictionary:
                 type_of_targets = ability_targets_dictionary[self.action_chosen]

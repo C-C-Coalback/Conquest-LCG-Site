@@ -5219,7 +5219,7 @@ class Game:
                                                              (int(primary_player.number), planet_pos, unit_pos))
                                     _, att_pla, att_pos = self.stored_damage[0].get_position_attacker()
                                     secondary_player.assign_damage_to_pos(att_pla, att_pos, 3, rickety_warbuggy=True)
-                            elif ability and not \
+                            elif ability == "Evanescent Players" and not \
                                     primary_player.get_once_per_phase_used_given_pos(hurt_planet, hurt_pos) and \
                                     self.stored_damage[0].get_amount_that_can_be_blocked() > 2 and \
                                     self.stored_damage[0].get_position_attacker():
