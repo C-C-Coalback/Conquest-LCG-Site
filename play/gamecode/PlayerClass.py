@@ -1019,6 +1019,30 @@ class Player:
         self.set_border_given_pos(planet_pos, unit_pos, border)
         return border
 
+    def check_if_card_ability_usable_during_shield(self, planet_pos, unit_pos):
+        hurt_num, hurt_pla, hurt_pos = self.game.stored_damage[0].get_position_unit()
+        if planet_pos == -2:
+            ability = self.get_ability_given_pos(planet_pos, unit_pos)
+            if self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord":
+                if ability == "Unstoppable Tide":
+                    if self.get_ready_given_pos(planet_pos, unit_pos):
+                        return True
+            elif ability == "Ghosts of Cegorach":
+                if self.get_ready_given_pos(planet_pos, unit_pos):
+                    if self.check_for_trait_given_pos(hurt_pla, hurt_pos, "Harlequin"):
+                        if self.get_card_type_given_pos(hurt_pla, hurt_pos) != "Warlord":
+                            if self.check_for_warlord(hurt_pla):
+                                return True
+            elif ability == "Senatorum Directives":
+                if self.game.check_if_battle_taking_place():
+                    if not self.senatorum_directives_used:
+                        if self.check_for_trait_given_pos(hurt_pla, hurt_pos, "Catachan"):
+                            return True
+            elif ability == "Rockcrete Bunker":
+                if self.get_ready_given_pos(planet_pos, unit_pos):
+                    return True
+        return False
+
     def determine_border(self, planet_pos, unit_pos):
         if self.game.card_to_deploy is not None:
             if self.game.card_to_deploy.get_card_type() == "Attachment" and self.game.phase == "DEPLOY":
@@ -1036,6 +1060,9 @@ class Player:
                     return "playable"
                 return "unplayable"
         if planet_pos != -2:
+            # if self.game.stored_damage:
+            #     if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
+            #         if self.
             if self.game.check_if_battle_taking_place():
                 if self.game.safety_check():
                     if self.game.number_with_combat_turn == self.get_number():

@@ -215,6 +215,8 @@ def determine_valid_moves(self):
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Planet Ability":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Damage":
+            pass
         elif self.what_is_required_automated == "Action":
             if self.action_chosen in ability_targets_dictionary:
                 type_of_targets = ability_targets_dictionary[self.action_chosen]

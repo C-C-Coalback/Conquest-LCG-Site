@@ -2485,16 +2485,14 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
     elif self.choice_context == "Move how much damage to Old One Eye?":
         self.reset_choices_available()
-        hurt_planet = self.misc_target_planet
-        hurt_pos = self.misc_target_unit
-        old_one_planet, old_one_pos = self.old_one_eye_pos
+        _, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
+        old_one_planet, old_one_pos = primary_player.get_location_of_warlord()
         if game_update_string[1] == "0":
             pass
         elif game_update_string[1] == "1":
             self.damage_moved_to_old_one_eye += 1
             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
-            primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 1,
-                                                can_shield=False, is_reassign=True)
+            primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 1, is_reassign=True)
             if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                      (int(primary_player.number), hurt_planet, hurt_pos))
@@ -2502,14 +2500,11 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         elif game_update_string[1] == "2":
             self.damage_moved_to_old_one_eye += 2
             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 2)
-            primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 2,
-                                                can_shield=False, is_reassign=True)
+            primary_player.assign_damage_to_pos(old_one_planet, old_one_pos, 2, is_reassign=True)
             if secondary_player.search_card_at_planet(hurt_planet, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                      (int(primary_player.number), hurt_planet, hurt_pos))
             self.stored_damage[0].decrease_amount_that_can_be_blocked(2)
-        self.misc_target_planet = -1
-        self.misc_target_unit = -1
         if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
             primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
             await self.shield_cleanup(primary_player, secondary_player, hurt_planet)

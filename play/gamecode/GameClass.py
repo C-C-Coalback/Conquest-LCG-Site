@@ -4891,6 +4891,7 @@ class Game:
                     if game_update_string[1] == str(self.number_who_is_shielding):
                         hq_pos = int(game_update_string[2])
                         hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
+                        ability = primary_player.get_ability_given_pos(-2, hq_pos)
                         if self.alt_shield_mode_active:
                             if self.alt_shield_name == "Faith Denies Death":
                                 if primary_player.spend_faith_given_pos(-2, hq_pos, 1) > 0:
@@ -4905,7 +4906,7 @@ class Game:
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
                                     self.create_choices(self.choices_available)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Ghosts of Cegorach":
+                        elif ability == "Ghosts of Cegorach":
                             if primary_player.get_ready_given_pos(-2, hq_pos):
                                 if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Harlequin"):
                                     if planet_pos != -2:
@@ -4921,7 +4922,7 @@ class Game:
                                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                                     await self.shield_cleanup(primary_player, secondary_player,
                                                                               planet_pos)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Unstoppable Tide":
+                        elif ability == "Unstoppable Tide":
                             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord":
                                 if primary_player.get_ready_given_pos(-2, hq_pos):
                                     primary_player.exhaust_given_pos(-2, hq_pos)
@@ -4930,32 +4931,31 @@ class Game:
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     self.stored_damage[0].set_amount_that_can_be_blocked(0)
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Senatorum Directives":
-                            if not primary_player.senatorum_directives_used:
-                                if planet_pos != -2:
-                                    if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Catachan"):
-                                        primary_player.senatorum_directives_used = True
-                                        primary_player.summon_token_at_planet("Guardsman", planet_pos)
-                                        self.choices_available = ["Reassign", "Pass"]
-                                        self.choice_context = "Senatorum Directives Reassign"
-                                        self.name_player_making_choices = primary_player.name_player
-                                        self.resolving_search_box = True
-                                        last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
-                                        self.misc_target_unit = (planet_pos, last_el)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Extra Boomsticks":
+                        elif ability == "Senatorum Directives":
+                            if self.check_if_battle_taking_place():
+                                if not primary_player.senatorum_directives_used:
+                                    if planet_pos != -2:
+                                        if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Catachan"):
+                                            primary_player.senatorum_directives_used = True
+                                            primary_player.summon_token_at_planet("Guardsman", planet_pos)
+                                            self.choices_available = ["Reassign", "Pass"]
+                                            self.choice_context = "Senatorum Directives Reassign"
+                                            self.name_player_making_choices = primary_player.name_player
+                                            self.resolving_search_box = True
+                                            last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
+                                            self.misc_target_unit = (planet_pos, last_el)
+                        elif ability == "Extra Boomsticks":
                             if primary_player.headquarters[hq_pos].get_ready():
                                 if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Orks"):
                                     primary_player.exhaust_given_pos(-2, hq_pos)
                                     primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 2)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Talon Strike Force":
+                        elif ability == "Talon Strike Force":
                             if primary_player.headquarters[hq_pos].counter > 2:
                                 self.alt_shield_mode_active = True
                                 self.alt_shield_name = "Talon Strike Force"
                                 await self.send_update_message("Talon Strike Force shielding effect activated!")
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Rockcrete Bunker":
-                            print("is rockcrete bunker")
-                            if primary_player.headquarters[hq_pos].get_ready():
-                                print("is ready")
+                        elif ability == "Rockcrete Bunker":
+                            if primary_player.get_ready_given_pos(-2, hq_pos):
                                 primary_player.exhaust_given_pos(-2, hq_pos)
                                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
                                 self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
@@ -4965,21 +4965,21 @@ class Game:
                                 if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "Humanity's Shield":
+                        elif ability == "Humanity's Shield":
                             if self.stored_damage[0].get_can_shield():
                                 primary_player.cards.append("Humanity's Shield")
                                 del primary_player.headquarters[hq_pos]
-                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "The Phalanx":
+                        elif ability == "The Phalanx":
                             if self.stored_damage[0].get_can_shield():
                                 card_phalanx = primary_player.headquarters[hq_pos]
                                 primary_player.phalanx_shield_value = card_phalanx.damage + card_phalanx.counter + 2
                                 primary_player.cards.append("The Phalanx")
                                 del primary_player.headquarters[hq_pos]
-                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "Dal'yth Sept":
+                        elif ability == "Dal'yth Sept":
                             if primary_player.dalyth_sept_active and self.stored_damage[0].get_can_shield():
                                 primary_player.cards.append("Dal'yth Sept")
                                 del primary_player.headquarters[hq_pos]
-                        elif primary_player.get_ability_given_pos(-2, hq_pos) == "Praetorian Shadow":
+                        elif ability == "Praetorian Shadow":
                             if primary_player.get_ready_given_pos(-2, hq_pos):
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord":
                                     primary_player.exhaust_given_pos(-2, hq_pos)
@@ -4988,7 +4988,7 @@ class Game:
                                     if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Faith and Hatred":
+                        elif ability == "Faith and Hatred":
                             if self.stored_damage[0].get_position_attacker() is not None:
                                 if primary_player.headquarters[hq_pos].get_ready():
                                     primary_player.exhaust_given_pos(-2, hq_pos)
@@ -4997,7 +4997,7 @@ class Game:
                                     if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Null Shield Matrix":
+                        elif ability == "Null Shield Matrix":
                             if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Necrons"):
                                 if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                     if not primary_player.headquarters[hq_pos].misc_ability_used:
@@ -5007,7 +5007,7 @@ class Game:
                                         if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Kustom Field Generator":
+                        elif ability == "Kustom Field Generator":
                             if primary_player.headquarters[hq_pos].get_ready():
                                 hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                                 if primary_player.check_if_faction_given_pos(hurt_planet, hurt_pos, "Orks"):
@@ -5023,27 +5023,13 @@ class Game:
                                         primary_player.indirect_damage_applied = 0
                                         primary_player.total_indirect_damage = damage
                                         await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                        elif primary_player.headquarters[hq_pos].get_name() == "Old One Eye":
-                            hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
-                            if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
-                                if self.damage_moved_to_old_one_eye == 0:
-                                    self.choices_available = ["0", "1", "2"]
-                                    if self.stored_damage[0].get_amount_that_can_be_blocked() == 1:
-                                        self.choices_available = ["0", "1"]
-                                    self.choice_context = "Move how much damage to Old One Eye?"
-                                    self.name_player_making_choices = primary_player.name_player
-                                    self.misc_target_planet = hurt_planet
-                                    self.misc_target_unit = hurt_pos
-                                    self.old_one_eye_pos = (-2, hq_pos)
-                        elif primary_player.headquarters[hq_pos].get_ability() == "Adamant Hive Guard":
-                            hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
-                            if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or \
-                                    primary_player.get_has_hive_mind_given_pos(hurt_planet, hurt_pos):
-                                damage = self.stored_damage[0].get_amount_that_can_be_blocked()
-                                primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage)
-                                primary_player.assign_damage_to_pos_hq(hq_pos, damage, can_shield=False)
-                                primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
-                                await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                        elif ability == "Lurking Hormagaunt":
+                            if self.damage_moved_to_old_one_eye == 0:
+                                self.choices_available = ["0", "1", "2"]
+                                if self.stored_damage[0].get_amount_that_can_be_blocked() == 1:
+                                    self.choices_available = ["0", "1"]
+                                self.choice_context = "Move how much damage to Old One Eye?"
+                                self.name_player_making_choices = primary_player.name_player
                         elif planet_pos == hurt_planet and hurt_pos == unit_pos:
                             if primary_player.our_last_stand_bonus_active and self.may_block_with_ols and \
                                     primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord" and \
@@ -5051,7 +5037,7 @@ class Game:
                                 self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                 self.may_block_with_ols = False
-                            elif primary_player.get_ability_given_pos(-2, hq_pos) == "Blood Angels Veterans" and \
+                            elif ability == "Blood Angels Veterans" and \
                                     primary_player.get_ready_given_pos(hurt_planet, hurt_pos) and not \
                                     primary_player.headquarters[hurt_pos].misc_ability_used:
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
@@ -5062,8 +5048,7 @@ class Game:
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
                                 amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
-                                if primary_player.get_ability_given_pos(
-                                        hurt_planet, hurt_pos) == "Fanatical Sister Repentia":
+                                if ability == "Fanatical Sister Repentia":
                                     amount_to_remove = amount_to_remove * 2
                                 if amount_to_remove > self.stored_damage[0].get_amount_that_can_be_blocked():
                                     amount_to_remove = self.stored_damage[0].get_amount_that_can_be_blocked()
@@ -5084,6 +5069,7 @@ class Game:
                         planet_pos = int(game_update_string[2])
                         unit_pos = int(game_update_string[3])
                         hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
+                        ability = primary_player.get_ability_given_pos(planet_pos, unit_pos)
                         if self.starmist_raiment:
                             if hurt_planet == planet_pos and hurt_pos != unit_pos:
                                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
@@ -5151,18 +5137,14 @@ class Game:
                                         self.choices_available[i] = str(self.choices_available[i])
                                         i = i + 1
                                     self.create_choices(self.choices_available)
-                        elif primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name() == "Old One Eye":
-                            if primary_player.get_ability_given_pos(hurt_planet, hurt_pos) == "Lurking Hormagaunt":
-                                if self.damage_moved_to_old_one_eye == 0:
-                                    self.choices_available = ["0", "1", "2"]
-                                    if self.stored_damage[0].get_amount_that_can_be_blocked() == 1:
-                                        self.choices_available = ["0", "1"]
-                                    self.choice_context = "Move how much damage to Old One Eye?"
-                                    self.name_player_making_choices = primary_player.name_player
-                                    self.misc_target_planet = hurt_planet
-                                    self.misc_target_unit = hurt_pos
-                                    self.old_one_eye_pos = (planet_pos, unit_pos)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Expendable Pawn":
+                        elif ability == "Lurking Hormagaunt":
+                            if self.damage_moved_to_old_one_eye == 0:
+                                self.choices_available = ["0", "1", "2"]
+                                if self.stored_damage[0].get_amount_that_can_be_blocked() == 1:
+                                    self.choices_available = ["0", "1"]
+                                self.choice_context = "Move how much damage to Old One Eye?"
+                                self.name_player_making_choices = primary_player.name_player
+                        elif ability == "Expendable Pawn":
                             if planet_pos != hurt_planet or unit_pos != hurt_pos:
                                 if planet_pos == hurt_planet or abs(planet_pos - hurt_planet) == 1:
                                     damage_to_remove = 2
@@ -5176,7 +5158,7 @@ class Game:
                                     if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
                                         primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Praetorian Shadow":
+                        elif ability == "Praetorian Shadow":
                             if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                 if primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Warlord":
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -5185,7 +5167,7 @@ class Game:
                                     if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                         primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Noble Shining Spears":
+                        elif ability == "Noble Shining Spears":
                             if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                 if primary_player.get_mobile_given_pos(hurt_planet, hurt_pos):
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
@@ -5214,8 +5196,7 @@ class Game:
                                 self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                 self.may_block_with_ols = False
-                            elif primary_player.get_ability_given_pos(planet_pos,
-                                                                      unit_pos) == "Blood Angels Veterans" and \
+                            elif ability == "Blood Angels Veterans" and \
                                     primary_player.get_ready_given_pos(planet_pos, unit_pos) and not \
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
@@ -5227,7 +5208,7 @@ class Game:
                                 if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                     primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                            elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Deff Dread" and not \
+                            elif ability == "Deff Dread" and not \
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                 if self.stored_damage[0].get_position_attacker():
                                     primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, preventable=False,
@@ -5238,8 +5219,7 @@ class Game:
                                                              (int(primary_player.number), planet_pos, unit_pos))
                                     _, att_pla, att_pos = self.stored_damage[0].get_position_attacker()
                                     secondary_player.assign_damage_to_pos(att_pla, att_pos, 3, rickety_warbuggy=True)
-                            elif primary_player.get_ability_given_pos(
-                                    hurt_planet, hurt_pos) == "Evanescent Players" and not \
+                            elif ability and not \
                                     primary_player.get_once_per_phase_used_given_pos(hurt_planet, hurt_pos) and \
                                     self.stored_damage[0].get_amount_that_can_be_blocked() > 2 and \
                                     self.stored_damage[0].get_position_attacker():
@@ -5262,15 +5242,13 @@ class Game:
                                 self.last_shield_string = game_update_string
                             elif can_faith:
                                 amount_to_remove = primary_player.get_faith_given_pos(hurt_planet, hurt_pos)
-                                if primary_player.get_ability_given_pos(
-                                        hurt_planet, hurt_pos) == "Fanatical Sister Repentia":
+                                if ability == "Fanatical Sister Repentia":
                                     amount_to_remove = amount_to_remove * 2
                                 if amount_to_remove > self.stored_damage[0].get_amount_that_can_be_blocked():
                                     amount_to_remove = self.stored_damage[0].get_amount_that_can_be_blocked()
                                 if self.stored_damage[0].get_position_attacker():
                                     num_atk, pla_atk, pos_atk = self.stored_damage[0].get_position_attacker()
-                                    if primary_player.get_ability_given_pos(
-                                            planet_pos, unit_pos) == "Sororitas Command Squad":
+                                    if ability == "Sororitas Command Squad":
                                         if secondary_player.get_card_type_given_pos(pla_atk, pos_atk) != "Warlord":
                                             if not primary_player.get_once_per_phase_used_given_pos(planet_pos,
                                                                                                     unit_pos):
@@ -5289,8 +5267,8 @@ class Game:
                                         ].get_ability() == "Spray and Pray":
                                             self.create_reaction(
                                                 "Spray and Pray", secondary_player.name_player,
-                                                (num_atk, pla_atk,
-                                                 pos_atk))
+                                                (num_atk, pla_atk, pos_atk)
+                                            )
                                             self.spray_and_pray_amounts.append(amount_to_remove)
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
                                 self.queued_sound = "shield"
@@ -5312,7 +5290,7 @@ class Game:
                                                                       shadow_field_possible=shadow_field)
                                 primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                                 await self.shield_cleanup(primary_player, secondary_player, planet_pos)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Follower of Gork":
+                        elif ability == "Follower of Gork":
                             hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                             if planet_pos == hurt_planet:
                                 if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait("Elite"):
@@ -5331,7 +5309,7 @@ class Game:
                                         if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
                                             primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                             await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Enginseer Mechanic":
+                        elif ability == "Enginseer Mechanic":
                             hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                             if planet_pos == hurt_planet:
                                 if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait(
@@ -5349,7 +5327,7 @@ class Game:
                                         if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
                                             primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                             await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Protective Horrors":
+                        elif ability == "Protective Horrors":
                             hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                             if planet_pos == hurt_planet:
                                 if primary_player.get_card_type_given_pos(hurt_planet, hurt_pos) == "Synapse":
@@ -5359,7 +5337,7 @@ class Game:
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_to_remove)
                                     primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                        elif primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Steel Legion Chimera":
+                        elif ability == "Steel Legion Chimera":
                             if self.stored_damage[0].get_position_attacker():
                                 hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                                 if planet_pos == hurt_planet:
@@ -5378,8 +5356,7 @@ class Game:
                                             if self.stored_damage[0].get_amount_that_can_be_blocked() < 1:
                                                 primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                                 await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
-                        elif primary_player.cards_in_play[planet_pos + 1][unit_pos] \
-                                .get_ability() == "Adamant Hive Guard":
+                        elif ability == "Adamant Hive Guard":
                             hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                             if primary_player.get_name_given_pos(hurt_planet, hurt_pos) == "Termagant" or \
                                     primary_player.get_has_hive_mind_given_pos(hurt_planet, hurt_pos):
