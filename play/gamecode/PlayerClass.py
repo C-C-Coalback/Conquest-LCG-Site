@@ -551,50 +551,51 @@ class Player:
                     if not self.can_play_pledge:
                         return "unplayable"
                 if card.get_card_type() in ["Army", "Support", "Attachment"] and self.game.phase == "DEPLOY":
-                    if self.determine_lowest_possible_cost_of_card(card) <= self.get_resources():
-                        if card.get_card_type() == "Attachment":
-                            if card.planet_attachment:
-                                return "playable"
-                            non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre",
-                                                                        "Escort Drone"]
-                            army_unit_as_attach = False
-                            if card.get_name() in non_attachs_that_can_be_played_as_attach:
-                                army_unit_as_attach = True
-                            not_own_attach = False
-                            for i in range(len(self.headquarters)):
-                                if self.check_if_can_attach_card(
-                                        card, -2, i,
-                                        not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
-                                ):
+                    if self.check_if_card_can_enter_play(card):
+                        if self.determine_lowest_possible_cost_of_card(card) <= self.get_resources():
+                            if card.get_card_type() == "Attachment":
+                                if card.planet_attachment:
                                     return "playable"
-                            for i in range(7):
-                                for j in range(len(self.cards_in_play[i + 1])):
+                                non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre",
+                                                                            "Escort Drone"]
+                                army_unit_as_attach = False
+                                if card.get_name() in non_attachs_that_can_be_played_as_attach:
+                                    army_unit_as_attach = True
+                                not_own_attach = False
+                                for i in range(len(self.headquarters)):
                                     if self.check_if_can_attach_card(
-                                            card, i, j,
-                                            not_own_attachment=not_own_attach,
-                                            army_unit_as_attachment=army_unit_as_attach
+                                            card, -2, i,
+                                            not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
                                     ):
                                         return "playable"
-                            not_own_attach = True
-                            other_player = self.get_other_player()
-                            for i in range(len(other_player.headquarters)):
-                                if other_player.check_if_can_attach_card(
-                                        card, -2, i,
-                                        not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
-                                ):
-                                    return "playable"
-                            for i in range(7):
-                                for j in range(len(other_player.cards_in_play[i + 1])):
+                                for i in range(7):
+                                    for j in range(len(self.cards_in_play[i + 1])):
+                                        if self.check_if_can_attach_card(
+                                                card, i, j,
+                                                not_own_attachment=not_own_attach,
+                                                army_unit_as_attachment=army_unit_as_attach
+                                        ):
+                                            return "playable"
+                                not_own_attach = True
+                                other_player = self.get_other_player()
+                                for i in range(len(other_player.headquarters)):
                                     if other_player.check_if_can_attach_card(
-                                            card, i, j,
-                                            not_own_attachment=not_own_attach,
-                                            army_unit_as_attachment=army_unit_as_attach
+                                            card, -2, i,
+                                            not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
                                     ):
                                         return "playable"
-                            return "unplayable"
-                        return "playable"
-                    else:
+                                for i in range(7):
+                                    for j in range(len(other_player.cards_in_play[i + 1])):
+                                        if other_player.check_if_can_attach_card(
+                                                card, i, j,
+                                                not_own_attachment=not_own_attach,
+                                                army_unit_as_attachment=army_unit_as_attach
+                                        ):
+                                            return "playable"
+                                return "unplayable"
+                            return "playable"
                         return ""
+                    return "unplayable"
                 if card.get_has_action_while_in_hand():
                     if card.allowed_phases_while_in_hand == "ALL" or \
                             card.allowed_phases_while_in_hand == self.game.phase:
@@ -2886,6 +2887,12 @@ class Player:
                 if self.get_ability_given_pos(self.game.last_planet_checked_for_battle, i) == "Iyanden Farseer":
                     return True
         return False
+
+    def check_if_card_can_enter_play(self, card):
+        if card.get_unique():
+            if self.search_for_unique_card(card.name):
+                return False
+        return True
 
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
                            is_owner_of_card=True, triggered_card_effect=True, deepstrike=False):
