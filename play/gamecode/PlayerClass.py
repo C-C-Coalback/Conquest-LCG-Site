@@ -1238,11 +1238,9 @@ class Player:
 
     def determine_border(self, planet_pos, unit_pos):
         if self.game.mode == "DISCOUNT":
-            if self.game.determine_player_with_discounts() == self.name_player:
-                for i in range(7):
-                    for j in range(len(self.cards_in_play[i + 1])):
-                        if self.get_aiming_reticle_in_play(i, j) == "green":
-                            return "playable"
+            if self.game.determine_player_with_discounts()[0].name_player == self.name_player:
+                if self.get_aiming_reticle_in_play(planet_pos, unit_pos) == "green":
+                    return "playable"
             return "unplayable"
         if self.game.stored_damage:
             if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
