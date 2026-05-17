@@ -1,8 +1,12 @@
+ability_targets_dictionary = {
+    "Exterminatus": "Non-first planet"
+}
+
+
 def update_automated_attributes(self):
     if self.debug_mode is not None:
         self.what_is_required_automated = "None"
         self.automated_player_waited_on = ""
-        valid_moves = []
     elif self.choosing_unit_for_nullify:
         self.what_is_required_automated = "Nullify"
         self.automated_player_waited_on = self.name_player_using_nullify
@@ -59,6 +63,16 @@ def update_automated_attributes(self):
     elif self.battle_ability_to_resolve:
         self.what_is_required_automated = "Battle Ability"
         self.automated_player_waited_on = self.player_resolving_battle_ability
+        if self.battle_ability_to_resolve == "Y'varn":
+            if not self.p1_triggered_yvarn and not self.p2_triggered_yvarn:
+                self.automated_player_waited_on = self.name_1
+            elif self.p1_triggered_yvarn and not self.p2_triggered_yvarn:
+                self.automated_player_waited_on = self.name_2
+            else:
+                self.automated_player_waited_on = self.name_1
+    elif self.action_chosen:
+        self.what_is_required_automated = "Action"
+        self.automated_player_waited_on = self.player_with_action
     elif self.phase == "DEPLOY":
         self.what_is_required_automated = "Deploy Turn"
         self.automated_player_waited_on = self.player_with_deploy_turn
@@ -132,6 +146,14 @@ def add_active_planets_as_valid_moves(self, valid_moves):
     return valid_moves
 
 
+def add_active_non_first_planets_as_valid_moves(self, valid_moves):
+    for i in range(len(self.planets_in_play_array)):
+        if self.round_number != i:
+            if self.planets_in_play_array[i]:
+                valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
+    return valid_moves
+
+
 def determine_valid_moves(self):
     valid_moves = []
     primary_player, secondary_player = self.get_players_given_name(self.automated_player_waited_on)
@@ -191,6 +213,15 @@ def determine_valid_moves(self):
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Headquarters Action":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Planet Ability":
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Action":
+            if self.action_chosen in ability_targets_dictionary:
+                type_of_targets = ability_targets_dictionary[self.action_chosen]
+                if type_of_targets == "Non-first planet":
+                    valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         else:
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
     return valid_moves

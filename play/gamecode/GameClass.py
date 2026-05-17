@@ -7264,9 +7264,9 @@ class Game:
         message_to_send += "|||"
         for i in range(len(self.clickable_items_automated)):
             message_to_send += self.clickable_items_automated[i] + "|||"
-        if message_to_send != self.last_automated_data_string or force:
-            self.last_automated_data_string = message_to_send
-            await self.send_update_message(message_to_send)
+        # if message_to_send != self.last_automated_data_string or force:
+        self.last_automated_data_string = message_to_send
+        await self.send_update_message(message_to_send)
 
     def get_player_given_name(self, name_player):
         if name_player == self.name_1:
