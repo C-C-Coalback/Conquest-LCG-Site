@@ -110,6 +110,9 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                                                       current_reaction + " can only target non-Necron units.")
     elif current_reaction == "Shrieking Basilisk":
         if player_owning_card.get_card_type_given_pos(-2, unit_pos) == "Support":
+            if player_owning_card.get_ability_given_pos(planet_pos, unit_pos) == "Reveal The Blade":
+                primary_player.discard_card_at_random()
+                primary_player.discard_card_at_random()
             player_owning_card.exhaust_given_pos(-2, unit_pos, card_effect=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()

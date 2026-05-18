@@ -1553,13 +1553,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Card is not an army unit.")
     elif self.action_chosen == "To Arms!":
-        if game_update_string[1] == "1":
-            target_player = self.p1
-        else:
-            target_player = self.p2
-        if target_player.get_card_type_given_pos(-2, unit_pos) == "Support":
-            if not target_player.get_ready_given_pos(-2, unit_pos):
-                target_player.ready_given_pos(-2, unit_pos)
+        if player_owning_card.get_card_type_given_pos(-2, unit_pos) == "Support":
+            if not player_owning_card.get_ready_given_pos(-2, unit_pos):
+                if player_owning_card.get_ability_given_pos(planet_pos, unit_pos) == "Reveal The Blade":
+                    primary_player.discard_card_at_random()
+                    primary_player.discard_card_at_random()
+                player_owning_card.ready_given_pos(-2, unit_pos)
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_chosen == "Doombolt":
@@ -1694,14 +1693,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     secondary_player.assign_damage_to_pos(-2, unit_pos, 3, by_enemy_unit=False)
                     self.action_cleanup()
         if not resolved_something:
-            print("support check")
-            if game_update_string[1] == "1":
-                player_being_hit = self.p1
-            else:
-                player_being_hit = self.p2
-            if player_being_hit.get_card_type_given_pos(-2, unit_pos) == "Support":
-                print('interrupt check')
-                if player_being_hit.name_player == secondary_player.name_player:
+            if player_owning_card.get_card_type_given_pos(-2, unit_pos) == "Support":
+                if player_owning_card.name_player == secondary_player.name_player:
                     possible_interrupts = secondary_player.interrupt_cancel_target_check(
                         -2, unit_pos, targeting_support=True)
                     if possible_interrupts:
@@ -1717,7 +1710,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "In Play Action"
                 if can_continue:
-                    player_being_hit.destroy_card_in_hq(unit_pos)
+                    if player_owning_card.get_ability_given_pos(planet_pos, unit_pos) == "Reveal The Blade":
+                        primary_player.discard_card_at_random()
+                        primary_player.discard_card_at_random()
+                    player_owning_card.destroy_card_in_hq(unit_pos)
                     self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -2263,13 +2259,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not a Space Marines or Astra Militarum unit.")
     elif self.action_chosen == "Subdual":
-        if game_update_string[1] == "1":
-            target_player = self.p1
-        else:
-            target_player = self.p2
-        if target_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
             can_continue = True
-            if target_player.name_player == secondary_player.name_player:
+            if player_owning_card.name_player == secondary_player.name_player:
                 is_support = True
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
                     -2, unit_pos, targeting_support=is_support, event=True)
@@ -2289,12 +2281,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Event Action"
             if can_continue:
-                target_player.deck.insert(0, target_player.get_name_given_pos(planet_pos, unit_pos))
-                target_player.remove_card_from_hq(unit_pos, proper_remove=False)
-                primary_player.resolve_played_any_event()
-                self.action_cleanup()
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+                if player_owning_card.get_ability_given_pos(planet_pos, unit_pos) == "Reveal The Blade":
+                    primary_player.discard_card_at_random()
+                    primary_player.discard_card_at_random()
+                player_owning_card.deck.insert(0, player_owning_card.get_name_given_pos(planet_pos, unit_pos))
+                player_owning_card.remove_card_from_hq(unit_pos, proper_remove=False)
+                primary_player.resolve_played_any_event()
+                self.action_cleanup()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not a Support or Attachment.")
@@ -2399,11 +2394,14 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Event Action"
                     if can_continue:
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                        if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reveal The Blade":
+                            primary_player.discard_card_at_random()
+                            primary_player.discard_card_at_random()
                         secondary_player.destroy_card_in_hq(unit_pos)
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-                        primary_player.aiming_reticle_coords_hand = None
                         self.misc_counter = 0
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -2832,14 +2830,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                         self.position_of_actioned_card[1])
             self.action_cleanup()
     elif self.action_chosen == "Squig Bombin'":
-        if game_update_string[1] == "1":
-            player_destroying_support = self.p1
-        else:
-            player_destroying_support = self.p2
-        if player_destroying_support.headquarters[unit_pos].get_card_type() == "Support":
+        if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
             can_continue = True
             is_support = True
-            if player_destroying_support.name_player == secondary_player.name_player:
+            if player_owning_card.name_player == secondary_player.name_player:
                 possible_interrupts = secondary_player.interrupt_cancel_target_check(
                     -2, unit_pos, targeting_support=is_support, event=True)
                 if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
@@ -2858,9 +2852,12 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Event Action"
             if can_continue:
-                player_destroying_support.destroy_card_in_hq(unit_pos)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+                if player_owning_card.get_ability_given_pos(planet_pos, unit_pos) == "Reveal The Blade":
+                    primary_player.discard_card_at_random()
+                    primary_player.discard_card_at_random()
+                player_owning_card.destroy_card_in_hq(unit_pos)
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_chosen == "Supply Line Incursion":
