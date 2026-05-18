@@ -42,6 +42,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             if primary_player.number_cards_to_search > len(primary_player.deck):
                 primary_player.number_cards_to_search = len(primary_player.deck)
             self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+            self.create_choices(self.choices_available, "All")
             self.choice_context = "First Line Rhinos Rally"
             self.name_player_making_choices = primary_player.name_player
         elif current_reaction == "Gladius Strike Force":
