@@ -140,7 +140,7 @@ def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, h
         if planet_pos == -2:
             valid_moves.append("ATTACHMENT/HQ/" + player.number + "/" + str(unit_pos) + "/" + str(attachment_pos))
         elif card_zone == "IN_PLAY":
-            valid_moves.append("IN_PLAY/HQ/" + player.number + "/" + str(planet_pos) + "/" + str(unit_pos) + "/" + str(attachment_pos))
+            valid_moves.append("ATTACHMENT/IN_PLAY/" + player.number + "/" + str(planet_pos) + "/" + str(unit_pos) + "/" + str(attachment_pos))
     return valid_moves
 
 
