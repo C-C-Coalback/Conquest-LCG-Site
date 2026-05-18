@@ -1186,7 +1186,7 @@ class Player:
             if self.get_retaliate_given_pos(planet_pos, unit_pos) > 0 and \
                     self.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord" and \
                     self.game.may_use_retaliate:
-                if (att_pla != -1 and att_pos != -1) or self.stored_damage[0].get_position_attacker() is not None:
+                if (att_pla != -1 and att_pos != -1) or self.game.stored_damage[0].get_position_attacker() is not None:
                     can_retaliate = True
             if self.our_last_stand_bonus_active and self.game.may_block_with_ols and \
                     self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord" and \
