@@ -2064,7 +2064,6 @@ class Player:
         self.game.rng.shuffle(self.deck)
 
     def search_for_existing_relic(self):
-        print("performing relic search")
         for i in range(len(self.headquarters)):
             if self.headquarters[i].check_for_a_trait("Relic"):
                 if self.headquarters[i].name_owner == self.name_player:
@@ -2073,7 +2072,6 @@ class Player:
                 if self.headquarters[i].get_attachments()[j].check_for_a_trait("Relic"):
                     if self.headquarters[i].get_attachments()[j].name_owner == self.name_player:
                         return True
-        print("not own hq")
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Relic"):
@@ -2139,7 +2137,6 @@ class Player:
         return None
 
     def search_for_unique_card(self, name):
-        print("performing uniques search")
         for i in range(len(self.headquarters)):
             if self.headquarters[i].name == name:
                 return True
