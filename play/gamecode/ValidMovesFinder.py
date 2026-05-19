@@ -213,7 +213,7 @@ def determine_valid_moves(self):
                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", battle_planet, i)
             else:
                 for i in range(len(secondary_player.cards_in_play[battle_planet + 1])):
-                    if self.check_if_unit_can_be_declared_as_defender(secondary_player, primary_player, battle_planet, i):
+                    if self.check_if_unit_can_be_declared_as_defender(primary_player, secondary_player, battle_planet, i):
                         valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
         elif self.what_is_required_automated == "Retreat Turn":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
