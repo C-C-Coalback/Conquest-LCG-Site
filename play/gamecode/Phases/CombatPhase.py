@@ -896,9 +896,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     if i != self.defender_position:
                                         if secondary_player.get_ability_given_pos(self.defender_planet,
                                                                                   i) == "Fire Warrior Elite":
-                                            if not self.fire_warrior_elite_active \
-                                                    and not secondary_player.hit_by_gorgul:
-                                                self.fire_warrior_elite_active = True
+                                            if not secondary_player.hit_by_gorgul:
                                                 can_continue = False
                                                 self.create_reaction("Fire Warrior Elite", secondary_player.name_player,
                                                                      (int(secondary_player.number),
@@ -934,7 +932,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                             == "Deathwing Interceders":
                                         if secondary_player.resources > 1:
                                             if not secondary_player.hit_by_gorgul:
-                                                self.fire_warrior_elite_active = True
                                                 can_continue = False
                                                 self.create_reaction("Deathwing Interceders",
                                                                      secondary_player.name_player,

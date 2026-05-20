@@ -267,7 +267,6 @@ class Game:
         self.banshee_power_sword_extra_attack = 0
         self.may_move_defender = True
         self.additional_attack_effects_allowed = True
-        self.fire_warrior_elite_active = False
         self.before_command_struggle = False
         self.after_command_struggle = True
         self.amount_spend_for_tzeentch_firestorm = -1
