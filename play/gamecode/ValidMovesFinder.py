@@ -117,6 +117,12 @@ def update_automated_attributes(self):
             self.automated_player_waited_on = self.name_1
         else:
             self.automated_player_waited_on = self.name_2
+    elif self.phase == "SETUP":
+        self.what_is_required_automated = "SETUP"
+        if not self.p1.deck_loaded:
+            self.automated_player_waited_on = self.name_1
+        else:
+            self.automated_player_waited_on = self.name_2
     self.clickable_items_automated = determine_valid_moves(self)
 
 

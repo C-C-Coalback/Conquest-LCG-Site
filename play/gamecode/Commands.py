@@ -49,9 +49,13 @@ async def resolve_command(self, name, message):
                         if self.name_1 == name_player:
                             if not self.p1.deck_loaded:
                                 await self.p1.setup_player(deck_content, self.planet_array)
+                                await self.update_automated_info()
+                                await self.send_automated_info(force=True)
                         elif self.name_2 == name_player:
                             if not self.p2.deck_loaded:
                                 await self.p2.setup_player(deck_content, self.planet_array)
+                                await self.update_automated_info()
+                                await self.send_automated_info(force=True)
     elif message[1] == "concede" or message[1] == "resign":
         if name == self.name_1:
             await self.send_victory_proper(self.name_2, "concession")
