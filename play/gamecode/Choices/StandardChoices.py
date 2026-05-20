@@ -1793,13 +1793,16 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     self.reactions_needing_resolving[0].get_reaction_name() == "War Walker Squadron" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Fake Ooman Base" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Kaptin's Hook" or \
-                    self.reactions_needing_resolving[0].get_reaction_name() == "Dripping Scythes":
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Dripping Scythes" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Fire Warrior Elite":
                 self.shadow_thorns_body_allowed = False
                 _, current_planet, current_unit = self.last_defender_position
                 last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet),
                                            str(current_unit)]
                 await CombatPhase.update_game_event_combat_section(
                     self, secondary_player.name_player, last_game_update_string)
+                self.may_move_defender = True
+                self.shadow_thorns_body_allowed = True
             elif self.reactions_needing_resolving[0].get_reaction_name() == "Firedrake Terminators" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Rampaging Knarloc" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Neurotic Obliterator":
