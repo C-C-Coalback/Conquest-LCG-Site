@@ -26,8 +26,7 @@ async def resolve_command(self, name, message):
         decks_lists = os.listdir(os.getcwd() + "/decks/DeckStorage/" + name)
         if decks_lists:
             random.shuffle(decks_lists)
-            path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + name + "/" + decks_lists[
-                0]
+            path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + name + "/" + decks_lists[0]
             if os.path.exists(path_to_player_decks):
                 with open(path_to_player_decks, 'r') as f:
                     deck_content = f.read()
@@ -37,6 +36,22 @@ async def resolve_command(self, name, message):
                     elif self.name_2 == name:
                         if not self.p2.deck_loaded:
                             await self.p2.setup_player(deck_content, self.planet_array)
+    elif message[1] == "loadrandombot":
+        name_player = message[2]
+        if name_player == self.name_1 or name_player == self.name_2 and self.bot_is_present:
+            decks_lists = os.listdir(os.getcwd() + "/decks/DeckStorage/" + name_player)
+            if decks_lists:
+                random.shuffle(decks_lists)
+                path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + name_player + "/" + decks_lists[0]
+                if os.path.exists(path_to_player_decks):
+                    with open(path_to_player_decks, 'r') as f:
+                        deck_content = f.read()
+                        if self.name_1 == name_player:
+                            if not self.p1.deck_loaded:
+                                await self.p1.setup_player(deck_content, self.planet_array)
+                        elif self.name_2 == name_player:
+                            if not self.p2.deck_loaded:
+                                await self.p2.setup_player(deck_content, self.planet_array)
     elif message[1] == "concede" or message[1] == "resign":
         if name == self.name_1:
             await self.send_victory_proper(self.name_2, "concession")

@@ -591,7 +591,30 @@ class GameConsumer(AsyncWebsocketConsumer):
             del message[0]
             try:
                 print(message)
-                if len(message) == 3:
+                if len(message) == 2:
+                    if message[0] == "" and message[1] == "reset-game" and active_games[self.game_position].bot_is_present:
+                        game_id = active_games[self.game_position].game_id
+                        player_one_name = active_games[self.game_position].name_1
+                        player_two_name = active_games[self.game_position].name_2
+                        card_array_game = active_games[self.game_position].card_array
+                        cards_dict_game = active_games[self.game_position].cards_dict
+                        planet_array_game = active_games[self.game_position].planet_cards_array
+                        errata = "No Errata"
+                        if active_games[self.game_position].apoka:
+                            errata = "Apoka"
+                        elif active_games[self.game_position].blackstone:
+                            errata = "Blackstone"
+                        apoka_errata_cards_game = active_games[self.game_position].apoka_errata_cards
+                        game = GameClass.Game(game_id, player_one_name, player_two_name, card_array_game,
+                                              planet_array_game, cards_dict_game, errata,
+                                              apoka_errata_cards_game)
+                        game.game_sockets.append(self)
+                        game.bot_is_present = True
+                        active_games[self.game_position] = game
+                        await game.send_everything()
+                    else:
+                        await active_games[self.game_position].resolve_chat_message(self.name, message)
+                elif len(message) == 3:
                     if message[0] == "" and message[1] == "Load-Game" and active_games[self.game_position].phase == "SETUP":
                         game_id = message[2]
                         cwd = os.getcwd()
@@ -675,7 +698,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 await active_games[self.game_position].update_game_event("", [])
                         else:
                             await self.send_update_message("Game does not exist")
-
                     else:
                         await active_games[self.game_position].resolve_chat_message(self.name, message)
                 else:
