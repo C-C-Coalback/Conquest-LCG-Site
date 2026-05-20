@@ -604,6 +604,8 @@ class Player:
                                 if self.game.check_if_battle_taking_place():
                                     return "playable"
                                 return "unplayable"
+                            if card.get_ability() == "Exterminatus" and self.game.round_number == 6:
+                                return "unplayable"
                             return "playable"
                         return ""
                     return "unplayable"
