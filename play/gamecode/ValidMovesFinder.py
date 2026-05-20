@@ -145,7 +145,7 @@ def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, h
     elif card_zone == "ATTACHMENT":
         if planet_pos == -2:
             valid_moves.append("ATTACHMENT/HQ/" + player.number + "/" + str(unit_pos) + "/" + str(attachment_pos))
-        elif card_zone == "IN_PLAY":
+        else:
             valid_moves.append("ATTACHMENT/IN_PLAY/" + player.number + "/" + str(planet_pos) + "/" + str(unit_pos) + "/" + str(attachment_pos))
     return valid_moves
 
@@ -235,7 +235,9 @@ def determine_valid_moves(self):
                     if playability == "playable":
                         valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
                 hurt_num, hurt_pla, hurt_pos = self.stored_damage[0].get_position_unit()
+                print("attachment check")
                 for i in range(len(primary_player.get_all_attachments_at_pos(hurt_pla, hurt_pos))):
+                    print(primary_player.get_attachment_at_pos(hurt_pla, hurt_pos, i).get_ability())
                     if primary_player.check_if_attachment_ability_usable_during_shield(hurt_pla, hurt_pos, i):
                         valid_moves = add_valid_move(
                             valid_moves, primary_player, "ATTACHMENT",
