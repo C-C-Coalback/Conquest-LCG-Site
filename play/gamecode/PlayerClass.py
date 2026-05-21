@@ -2142,9 +2142,11 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.headquarters[i].name == name:
                 return True
-            for j in range(len(self.headquarters[i].get_attachments())):
-                if self.headquarters[i].get_attachments()[j].name == name:
-                    return True
+            ability = self.get_ability_given_pos(-2, i)
+            if ability != "Holding Cell" and ability != "Support Fleet":
+                for j in range(len(self.headquarters[i].get_attachments())):
+                    if self.headquarters[i].get_attachments()[j].name == name:
+                        return True
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.cards_in_play[planet_pos + 1][unit_pos].name == name:

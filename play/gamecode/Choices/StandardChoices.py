@@ -81,6 +81,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             del primary_player.deck[int(game_update_string[1])]
             primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
             self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
+            self.create_choices(self.choices_available, general_imaging_format="All")
             self.misc_counter = self.misc_counter - 1
             if self.misc_counter < 1:
                 self.reset_choices_available()
