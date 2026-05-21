@@ -8449,7 +8449,6 @@ class Player:
         return None
 
     def move_unit_at_planet_to_hq(self, planet_id, unit_id):
-        print("calling move unit to planet")
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.defense_battery_check(planet_id):
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
@@ -8457,6 +8456,7 @@ class Player:
         for i in range(len(other_player.cards_in_play[planet_id + 1])):
             if other_player.get_ability_given_pos(planet_id, i) == "Hydra Flak Tank":
                 if not other_player.get_once_per_phase_used_given_pos(planet_id, i):
+                    self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
                     if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", planet_id, i):
                         self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
                                                   (int(other_player.number), planet_id, i))
