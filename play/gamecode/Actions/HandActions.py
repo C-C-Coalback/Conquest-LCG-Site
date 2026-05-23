@@ -1116,11 +1116,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     primary_player.add_resources(1)
                                     primary_player.can_play_limited = False
                                     primary_player.discard_card_from_hand(int(game_update_string[2]))
-                                    self.mode = self.stored_mode
-                                    self.player_with_action = ""
-                                    self.player_with_deploy_turn = secondary_player.name_player
-                                    self.number_with_deploy_turn = secondary_player.number
+                                    self.action_cleanup()
                                     await primary_player.dark_eldar_event_played()
+                                    primary_player.resolve_played_any_event(ability)
                             else:
                                 await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                                   "Resource requirement for Raid not met.")
