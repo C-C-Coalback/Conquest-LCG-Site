@@ -499,7 +499,7 @@
                                         attachment_style += "transform:rotate(90deg); ";
                                     }
                                     attachment_style += "margin-left:";
-                                    attachment_style += (j).toString();
+                                    attachment_style += (8.4 - (attachments_p2_data.length - j)).toString();
                                     attachment_style += "vw; '";
                                     full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style + ` onclick="testImageButton(this.id);" class=` + attachment_class + ` onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                                 }
