@@ -1105,6 +1105,10 @@ class Game:
                 info_string += "Imperial Blockades: " + str(self.imperial_blockades_active[i]) + ".\n"
             if self.p1.rok_bombardment_active and i == self.last_planet_checked_for_battle:
                 info_string += self.name_1 + ": " + str(len(self.p1.rok_bombardment_active)) + " Rok Bombardments.\n"
+            if not self.p1.valid_aunlen_planets[i]:
+                info_string += self.name_1 + ": Used by Aun'Len.\n"
+            if not self.p2.valid_aunlen_planets[i]:
+                info_string += self.name_2 + ": Used by Aun'Len.\n"
             if self.p2.rok_bombardment_active and i == self.last_planet_checked_for_battle:
                 info_string += self.name_2 + ": " + str(len(self.p2.rok_bombardment_active)) + " Rok Bombardments.\n"
             if self.p1.mork_blessings_count and i == self.last_planet_checked_for_battle:
