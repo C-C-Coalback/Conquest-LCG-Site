@@ -955,6 +955,15 @@ class Game:
         elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
             if self.start_battle_deepstrike:
                 info_string += self.name_player_deepstriking + "/"
+            elif not self.check_if_battle_taking_place():
+                active_player = self.name_1
+                if self.p1.has_initiative and not self.p1.has_passed:
+                    active_player = self.name_1
+                elif not self.p2.has_passed:
+                    active_player = self.name_2
+                else:
+                    active_player = self.name_1
+                info_string += active_player + "/"
             else:
                 info_string += self.player_with_combat_turn + "/"
         elif self.phase == "DEPLOY":
@@ -1027,6 +1036,8 @@ class Game:
         elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
             if self.start_battle_deepstrike:
                 info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
+            elif not self.check_if_battle_taking_place():
+                info_string += "Outside Battle/"
             elif self.ranged_skirmish_active:
                 info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
             else:
