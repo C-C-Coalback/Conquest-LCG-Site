@@ -2042,6 +2042,8 @@ class Game:
                     print(valid_card)
                     if valid_card:
                         card_chosen = self.preloaded_find_card(primary_player.deck[int(game_update_string[1])])
+                        if not self.no_restrictions_on_chosen_card:
+                            await self.send_update_message(card_chosen.get_name() + " revealed from the search.")
                         if self.what_to_do_with_searched_card == "DRAW":
                             primary_player.draw_card_at_location_deck(int(game_update_string[1]))
                         elif self.what_to_do_with_searched_card == "PLAY TO HQ" and card_chosen is not None:
