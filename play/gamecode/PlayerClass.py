@@ -2574,10 +2574,6 @@ class Player:
         else:
             target_attachment = self.cards_in_play[origin_planet + 1][origin_position]. \
                 get_attachments()[origin_attachment_position]
-        # if destination_planet == -2:
-        #     target_card = self.headquarters[destination_position]
-        # else:
-        #     target_card = self.cards_in_play[destination_planet + 1][destination_position]
         print("Moving attachment code")
         army_unit_as_attachment = False
         if target_attachment.get_ability() == "Gun Drones" or \

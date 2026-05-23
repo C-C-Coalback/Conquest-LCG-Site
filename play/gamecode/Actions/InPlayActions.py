@@ -87,6 +87,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.action_chosen = ability
                             self.position_of_actioned_card = (planet_pos, unit_pos)
                             self.chosen_second_card = False
+                            self.chosen_first_card = False
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
                                                               "Card is not ready.")
@@ -1357,6 +1358,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Units are not at the same planet.")
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "No Attachment Chosen",
+                                              "You need to select an attachment to move first.")
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if primary_player.sacrifice_card_in_play(int(game_update_string[2]), int(game_update_string[3])):
