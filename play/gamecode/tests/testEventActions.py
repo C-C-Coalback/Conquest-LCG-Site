@@ -110,7 +110,7 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
         await test_game.update_game_event("P1", ["PLANETS", "0"])
-        self.assertEqual(len(test_game.p1.cards), 1)
+        self.assertEqual(test_game.mode, "ACTION")
         await test_game.update_game_event("P1", ["PLANETS", "1"])
         self.assertEqual(test_game.p1.resources, 4)
         self.assertEqual(len(test_game.p1.cards), 0)

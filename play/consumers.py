@@ -712,6 +712,31 @@ class GameConsumer(AsyncWebsocketConsumer):
                     self.room_group_name, {"type": "chat.message", "message": "server: "
                                                                               "Something went wrong during command"}
                 )
+        elif message[0] == "REARRANGE_HAND":
+            current_game_id = -1
+            for i in range(len(active_games)):
+                if active_games[i].game_id == self.room_name:
+                    print("Found room")
+                    current_game_id = i
+            if current_game_id != -1:
+                if self.name == active_games[current_game_id].name_1 or self.name == active_games[current_game_id].name_2:
+                    if active_games[current_game_id].safety_check():
+                        if self.name == active_games[current_game_id].name_1:
+                            active_games[current_game_id].p1.reorder_card_in_hand(int(message[1]), int(message[2]))
+                            await active_games[current_game_id].p1.send_hand()
+                        else:
+                            active_games[current_game_id].p2.reorder_card_in_hand(int(message[1]), int(message[2]))
+                            await active_games[current_game_id].p2.send_hand()
+                    else:
+                        await active_games[current_game_id].send_mistarget_message(
+                            self.name, "Cannot Rearrange", "Rearranging your hand is not permitted right now. "
+                                                           "Please wait for the current effect to resolve."
+                        )
+                        if self.name == active_games[current_game_id].name_1:
+                            await active_games[current_game_id].p1.send_hand(force=True)
+                        elif self.name == active_games[current_game_id].name_2:
+                            await active_games[current_game_id].p2.send_hand(force=True)
+
         elif message[0] == "UPDATE_CHOICE_BOX_LOCATION" and len(message) == 3:
             if self.name != "Anonymous":
                 pref_path = "user_preferences_storage/" + self.name + ".txt"

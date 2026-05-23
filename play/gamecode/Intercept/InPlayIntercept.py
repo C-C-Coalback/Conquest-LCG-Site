@@ -91,10 +91,6 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Deception":
         primary_player.return_card_to_hand(planet_pos, unit_pos)
-        secondary_player.aiming_reticle_color = None
-        secondary_player.aiming_reticle_coords_hand = None
-        secondary_player.discard_card_from_hand(self.card_pos_to_deploy)
-        self.card_pos_to_deploy = -1
         self.action_cleanup()
     elif name_effect == "Ferrin":
         primary_player.rout_unit(planet_pos, unit_pos)

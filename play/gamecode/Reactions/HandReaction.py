@@ -138,11 +138,10 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                 if card is None:
                     return None
                 if card.get_is_unit():
-                    self.card_pos_to_deploy = hand_pos
                     self.card_to_deploy = card
                     print("card name: ", self.card_to_deploy.get_name())
                     self.card_type_of_selected_card_in_hand = card.get_card_type()
-                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                    primary_player.aiming_reticle_coords_hand = hand_pos
                     primary_player.aiming_reticle_color = "blue"
                     self.chosen_first_card = True
         elif current_reaction == "Shard of the Deceiver":

@@ -134,7 +134,6 @@ class Game:
         self.bloodthirst_active = [False, False, False, False, False, False, False]
         self.player_with_deploy_turn = self.name_1
         self.number_with_deploy_turn = "1"
-        self.card_pos_to_deploy = -1
         self.planet_pos_to_deploy = -1
         self.all_traits = []
         self.most_recently_revealed_planet = -1
@@ -1251,8 +1250,6 @@ class Game:
                                     self.discounts_applied += discount_received
                                     player.optimized_landing_used = True
                                     player.discard_card_from_hand(int(game_update_string[2]))
-                                    if self.card_pos_to_deploy > int(game_update_string[2]):
-                                        self.card_pos_to_deploy -= 1
                                     if damage > 0:
                                         self.damage_for_unit_to_take_on_play.append(damage)
                                     if self.discounts_applied >= self.available_discounts:
@@ -2485,8 +2482,6 @@ class Game:
             else:
                 if self.nullified_card_pos != -1:
                     primary_player.discard_card_from_hand(self.nullified_card_pos)
-                    if self.card_pos_to_deploy > self.nullified_card_pos:
-                        self.card_pos_to_deploy -= 1
                 elif self.nullified_card_name != "":
                     primary_player.discard_card_name_from_hand(self.nullified_card_name)
                 primary_player.spend_resources(self.cost_card_nullified)
@@ -2555,9 +2550,6 @@ class Game:
                             if self.p2.aiming_reticle_coords_hand > card_pos_discard:
                                 self.p2.aiming_reticle_coords_hand -= 1
                         self.nullify_count -= 1
-                if self.card_pos_to_deploy != -1 and (self.nullify_context == "Bigga Is Betta" or
-                                                      self.nullify_context == "Optimized Landing"):
-                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
         self.nullify_count = 0
         if self.choice_context != "Use Interrupt?" and self.nullify_context != "Foretell":
             self.nullify_context = ""
@@ -3417,20 +3409,19 @@ class Game:
             if not self.discard_fully_prevented:
                 secondary_player.discard_card_at_random()
                 secondary_player.discard_card_at_random()
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif effect == "Unconquerable Fear":
             if not self.discard_fully_prevented:
                 secondary_player.discard_card_at_random()
                 secondary_player.discard_card_at_random()
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            primary_player.resolve_played_any_event()
+            await primary_player.dark_eldar_event_played()
             self.delete_reaction()
         elif effect == "Pact of the Haemonculi":
             if not self.discard_fully_prevented:
                 secondary_player.discard_card_at_random()
             primary_player.draw_card()
             primary_player.draw_card()
-            self.card_pos_to_deploy = -1
             primary_player.resolve_played_any_event()
             self.action_cleanup()
             await primary_player.dark_eldar_event_played()
@@ -7173,7 +7164,7 @@ class Game:
                                 else:
                                     self.chosen_first_card = False
                                     first_pos = primary_player.aiming_reticle_coords_hand
-                                    primary_player.reorder_can_in_hand(first_pos, hand_pos)
+                                    primary_player.reorder_card_in_hand(first_pos, hand_pos)
                                     primary_player.aiming_reticle_coords_hand = None
                 elif game_update_string[0] == "IN_DISCARD":
                     discard_pos = int(game_update_string[2])

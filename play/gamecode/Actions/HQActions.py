@@ -1080,7 +1080,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
-                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
                 interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
                 primary_player.aiming_reticle_coords_hand = None
                 if interrupts:
@@ -1095,9 +1094,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     secondary_player.discard_card_at_random()
                     primary_player.draw_card()
                     primary_player.draw_card()
-                    self.card_pos_to_deploy = -1
                     self.action_cleanup()
                     await primary_player.dark_eldar_event_played()
+                    primary_player.resolve_played_any_event()
     elif self.action_chosen == "Painboy Surjery":
         if game_update_string[1] == primary_player.get_number():
             if self.misc_target_unit == (-1, -1) or self.misc_target_unit == (planet_pos, unit_pos):
@@ -2770,12 +2769,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Card is not a Hive-Mind unit.")
     elif self.action_chosen == "Deception":
-        if game_update_string[1] == "1":
-            player_returning = self.p1
-        else:
-            player_returning = self.p2
         can_continue = True
-        if player_returning.name_player == secondary_player.name_player:
+        if player_owning_card.name_player == secondary_player.name_player:
             possible_interrupts = secondary_player.interrupt_cancel_target_check(-2, unit_pos, event=True)
             if secondary_player.get_immune_to_enemy_events(-2, unit_pos):
                 can_continue = False
@@ -2793,18 +2788,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
         if can_continue:
-            card = player_returning.headquarters[unit_pos]
-            if card.get_card_type() == "Army":
-                if not card.check_for_a_trait("Elite"):
-                    player_returning.return_card_to_hand(-2, unit_pos)
-                    primary_player.aiming_reticle_color = None
-                    primary_player.aiming_reticle_coords_hand = None
-                    self.card_pos_to_deploy = -1
-                    self.player_with_action = ""
-                    self.action_chosen = ""
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.number
-                    self.mode = self.stored_mode
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    player_owning_card.return_card_to_hand(-2, unit_pos)
+                    self.action_cleanup()
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Card is an Elite unit.")

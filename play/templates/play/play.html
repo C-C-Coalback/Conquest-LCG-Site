@@ -395,13 +395,20 @@
 
         document.querySelector('#chat-log').value += ('Use \"/loaddeck/{deck_name}\" to load a deck\n');
 
+        var draggableHand = [];
+
         cardHeight = 100;
         cardWidth = 63;
         var inPlayPlanets = ["true", "true", "true", "true", "true", "true", "true"];
         var tokenNames = ["Cultist", "Guardsman", "Khymera", "Snotlings", "Termagant"]
         var mouse_x = 0;
         var mouse_y = 0;
+        var last_initial_hand_pos_x = 0;
+        var last_moved_hand_id = "-1";
         var helper_is_large = "F";
+        var own_player_number = "0";
+        var dist_between_two_hand_cards = 0;
+        var num_cards_in_hand = 0;
 
         function playSound(url) {
             console.log(url);
@@ -1137,6 +1144,9 @@
                     var current_card_count = `<legend>CARDS P` + split_data[2] + `: ` + (split_data.length-4).toString() + ` CARDS</legend>`;
                     document.getElementById(target_id).innerHTML = current_card_count;
                     if (split_data[3] === "{{ user.username }}") {
+                        own_player_number = split_data[2];
+                        draggableHand = [];
+                        num_cards_in_hand = 0;
                         for (var i = 4; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
@@ -1152,14 +1162,27 @@
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="` + card_class + `" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="` + card_class + `" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                             if (card_data_split[1] === "") {
                                 full_string += `</div>`
                             } else {
                                 full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img></div>`;
                             }
-                            document.getElementById(target_id).innerHTML += full_string;
+                            document.getElementById(target_id).insertAdjacentHTML("beforeend", full_string);
+
+                            element = document.getElementById(string_id);
+                            draggableHand.push(element);
+                            num_cards_in_hand = num_cards_in_hand + 1;
                         }
+                        if (split_data.length > 4) {
+                            var first_id = "HAND/" + split_data[2] + "/0";
+                            var second_id = "HAND/" + split_data[2] + "/1";
+                            var first_card_left = parseInt(document.getElementById(first_id).getBoundingClientRect().left);
+                            var second_card_left = parseInt(document.getElementById(second_id).getBoundingClientRect().left);
+                            dist_between_two_hand_cards = second_card_left - first_card_left;
+                        }
+                        console.log("hand eventer")
+                        updateDraggableHand();
                     } else {
                         for (var i = 4; i < split_data.length; i++) {
                             var string_id = (i-4).toString();
@@ -1282,6 +1305,66 @@
                     'message': 'UPDATE_CHOICE_BOX_LOCATION/' + newLeftValue + '/' + newTopValue
                 }));
             }
+        }
+
+        function onMouseDragHand(event, element) {
+            let leftValue = parseInt(window.getComputedStyle(element).left);
+
+            var newLeftValue = `${leftValue + event.movementX}`;
+
+            element.style.left = newLeftValue + `px`;
+        }
+
+        function onMouseStopDrag(event, element, onMoveHand) {
+            document.removeEventListener("mousemove", onMoveHand);
+            new_hand_pos_x = parseInt(window.getComputedStyle(element).left);
+            var movement_hand = new_hand_pos_x - last_initial_hand_pos_x
+            if (Math.abs(movement_hand) > 30) {
+                var target_hand_id = 'current-hand-player-' + own_player_number;
+                var hand = document.getElementById(target_hand_id);
+                handChildren = hand.querySelectorAll(".hand-card");
+                var replaced_card_id = "-1";
+                num_cards_moved = 0;
+                if (dist_between_two_hand_cards > 0) {
+                    num_cards_moved = Math.round(movement_hand / dist_between_two_hand_cards);
+                    replaced_card_id = (parseInt(last_moved_hand_id) + num_cards_moved).toString()
+                }
+                console.log(num_cards_moved);
+                console.log(replaced_card_id);
+                console.log(last_moved_hand_id);
+                if (num_cards_moved === 0) {
+                    element.style.left = last_initial_hand_pos_x + `px`;
+                } else if (parseInt(replaced_card_id) > num_cards_in_hand - 1) {
+                    element.style.left = last_initial_hand_pos_x + `px`;
+                } else if (replaced_card_id !== "-1") {
+                    if (last_moved_hand_id !== "-1") {
+                        gameSocket.send(JSON.stringify({
+                            'message': 'REARRANGE_HAND/' + last_moved_hand_id + '/' + replaced_card_id
+                        }));
+                    }
+                }
+            } else {
+                element.style.left = last_initial_hand_pos_x + `px`;
+                testImageButton(element.id);
+            }
+        }
+
+        function updateDraggableHand() {
+            draggableHand.forEach((element, index) => {
+                console.log(index, element.id, element === draggableHand[0]);
+            });
+            draggableHand.forEach((element) => {
+                console.log(element.id);
+                element.addEventListener("mousedown", (e) => {
+                    last_initial_hand_pos_x = parseInt(window.getComputedStyle(element).left);
+                    last_moved_hand_id = element.id.split('/')[2];
+                    const onMoveHand = (event) => onMouseDragHand(event, element);
+                    document.addEventListener("mousemove", onMoveHand);
+                    document.addEventListener("mouseup", () => {
+                        onMouseStopDrag(event, element, onMoveHand);
+                    }, { once: true });
+                });
+            });
         }
 
         dragElements.forEach((element) => {

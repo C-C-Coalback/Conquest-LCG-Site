@@ -18,15 +18,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.ready_given_pos(chosen_planet, i)
         self.action_cleanup()
     elif self.action_chosen == "Ambush":
-        if self.card_pos_to_deploy != -1 and \
+        if self.card_to_deploy and \
                 (not self.omega_ambush_active or self.infested_planets[chosen_planet]) and \
                 (not self.sanguinary_ambush_active or primary_player.check_for_warlord(chosen_planet)) and \
                 (not primary_player.followers_of_asuryan_relevant or self.round_number != chosen_planet):
             self.planet_pos_to_deploy = int(game_update_string[1])
-            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
-            if card is None:
-                return None
-            self.card_to_deploy = card
+            card = self.card_to_deploy
             print("Trying to discount: ", card.get_name())
             self.discounts_applied = 0
             hand_dis = primary_player.search_hand_for_discounts(card.get_faction(), card.get_traits())
@@ -59,7 +56,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 await DeployPhase.deploy_card_routine(self, name, game_update_string[1],
                                                       discounts=self.discounts_applied)
                 self.action_cleanup()
-                self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Theater of War":
         primary_player.resolve_played_any_event()
@@ -150,7 +146,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                       discounts=self.discounts_applied)
                 self.action_cleanup()
-                self.card_pos_to_deploy = -1
                 self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Decaying Warrior Squad":
         self.planet_pos_to_deploy = int(game_update_string[1])
@@ -173,17 +168,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
                                                   discounts=self.discounts_applied)
             self.action_cleanup()
-            self.card_pos_to_deploy = -1
             self.planet_pos_to_deploy = -1
     elif self.action_chosen == "Exterminatus":
         if self.round_number != chosen_planet:
             primary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=False)
             secondary_player.destroy_all_cards_at_planet(chosen_planet, enemy_event=True)
-            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             await self.complete_destruction_checks()
-            primary_player.aiming_reticle_color = None
-            primary_player.aiming_reticle_coords_hand = None
-            self.card_pos_to_deploy = -1
             primary_player.resolve_played_any_event()
             self.action_cleanup()
         else:
@@ -202,7 +192,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 adj_2_infested = True
         if adj_1_infested or adj_2_infested:
             self.infest_planet(chosen_planet, primary_player)
-            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
             primary_player.resolve_played_any_event()
             self.action_cleanup()
             primary_player.aiming_reticle_coords_hand = None
@@ -239,9 +228,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.aiming_reticle_coords_hand_2 = None
                 primary_player.discard_card_from_hand(pos_hand)
-                if pos_hand < self.card_pos_to_deploy:
-                    self.card_pos_to_deploy -= 1
-                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
                 self.action_cleanup()
     elif self.action_chosen == "Khymera Den":
         primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
@@ -942,11 +928,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Behind Enemy Lines":
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])
-            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+            card = self.game.card_to_deploy
             await self.discount_begin_routine(planet_chosen, card, primary_player)
             if card.check_for_a_trait("Elite"):
                 primary_player.master_warpsmith_count = 0
-            self.card_to_deploy = card
             if self.available_discounts > self.discounts_applied:
                 self.stored_mode = self.mode
                 self.mode = "DISCOUNT"
@@ -958,13 +943,12 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_chosen == "Staging Ground" or self.action_chosen == "Launch Pads":
         if self.chosen_first_card:
             planet_chosen = int(game_update_string[1])
-            card = primary_player.get_card_in_hand(self.card_pos_to_deploy)
+            card = self.card_to_deploy
             if card is None:
                 return None
             await self.discount_begin_routine(planet_chosen, card, primary_player)
             if card.check_for_a_trait("Elite"):
                 primary_player.master_warpsmith_count = 0
-            self.card_to_deploy = card
             if self.available_discounts > self.discounts_applied:
                 self.stored_mode = self.mode
                 self.mode = "DISCOUNT"
@@ -1000,10 +984,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 card_found = True
                 if primary_player.add_card_to_planet(card, chosen_planet, sacrifice_end_of_phase=True) != -1:
                     del discard[i]
-                    primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-                    primary_player.aiming_reticle_color = None
-                    primary_player.aiming_reticle_coords_hand = None
-                    self.card_pos_to_deploy = -1
                     primary_player.resolve_played_any_event()
                     self.action_cleanup()
                 i = -1
@@ -1049,8 +1029,5 @@ async def update_game_event_action_planet(self, name, game_update_string):
         primary_player.summon_token_at_planet("Snotlings", int(game_update_string[1]))
         self.misc_counter = self.misc_counter - 1
         if self.misc_counter == 0:
-            primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-            primary_player.aiming_reticle_color = None
-            primary_player.aiming_reticle_coords_hand = None
             primary_player.resolve_played_any_event()
             self.action_cleanup()

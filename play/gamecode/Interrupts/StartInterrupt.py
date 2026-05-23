@@ -196,7 +196,6 @@ async def start_resolving_interrupt(self, name, game_update_string):
                         primary_player.aiming_reticle_coords_hand = i
                 card = self.preloaded_find_card("Catachan Devils Patrol")
                 self.card_to_deploy = card
-                self.card_pos_to_deploy = primary_player.aiming_reticle_coords_hand
                 self.planet_pos_to_deploy = planet_pos
                 print("Trying to discount: ", card.get_name())
                 self.discounts_applied = 0

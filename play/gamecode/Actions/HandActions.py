@@ -19,16 +19,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     print(card.get_allowed_phases_while_in_hand(), self.phase)
     print(card.get_has_action_while_in_hand())
     if not self.action_chosen:
-        self.card_pos_to_deploy = int(game_update_string[2])
         can_continue = True
         if primary_player.subject_omega_relevant and self.phase == "COMBAT":
             if primary_player.get_ambush_of_card(card):
                 if not primary_player.enemy_holding_cell_check(card.get_name()):
-                    self.card_pos_to_deploy = int(game_update_string[2])
                     self.action_chosen = "Ambush"
                     self.card_to_deploy = card
                     self.card_type_of_selected_card_in_hand = card.get_card_type()
-                    primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                    primary_player.aiming_reticle_coords_hand = hand_pos
                     primary_player.aiming_reticle_color = "blue"
                     self.omega_ambush_active = True
                     can_continue = False
@@ -36,11 +34,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     await self.send_mistarget_message(primary_player.name_player, "Cannot Deploy Unit", "Enemy Holding Cell is preventing the deploy.")
         if card.get_ability() == "Sanguinary Guard" and self.phase == "COMBAT" and can_continue:
             if not primary_player.enemy_holding_cell_check(card.get_name()):
-                self.card_pos_to_deploy = int(game_update_string[2])
                 self.action_chosen = "Ambush"
                 self.card_to_deploy = card
                 self.card_type_of_selected_card_in_hand = card.get_card_type()
-                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                primary_player.aiming_reticle_coords_hand = hand_pos
                 primary_player.aiming_reticle_color = "blue"
                 self.sanguinary_ambush_active = True
             else:
@@ -48,11 +45,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                                   "Enemy Holding Cell is preventing the deploy.")
         elif primary_player.get_ambush_of_card(card) and self.phase == "COMBAT" and can_continue:
             if not primary_player.enemy_holding_cell_check(card.get_name()):
-                self.card_pos_to_deploy = int(game_update_string[2])
                 self.action_chosen = "Ambush"
                 self.card_to_deploy = card
                 self.card_type_of_selected_card_in_hand = card.get_card_type()
-                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                primary_player.aiming_reticle_coords_hand = hand_pos
                 primary_player.aiming_reticle_color = "blue"
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Cannot Deploy Unit",
@@ -62,11 +58,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     card.get_allowed_phases_while_in_hand() == "ALL":
                 if primary_player.get_ambush_of_card(card):
                     if not primary_player.enemy_holding_cell_check(card.get_name()):
-                        self.card_pos_to_deploy = int(game_update_string[2])
                         self.action_chosen = "Ambush"
                         self.card_to_deploy = card
                         self.card_type_of_selected_card_in_hand = card.get_card_type()
-                        primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                        primary_player.aiming_reticle_coords_hand = hand_pos
                         primary_player.aiming_reticle_color = "blue"
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Cannot Deploy Unit",
@@ -626,15 +621,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.chosen_first_card = False
                     elif ability == "Smash 'n Bash":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        primary_player.aiming_reticle_coords_hand = None
+                        primary_player.discard_card_from_hand(hand_pos)
                         self.chosen_first_card = False
                     elif ability == "Fetid Haze":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        primary_player.aiming_reticle_coords_hand = None
+                        primary_player.discard_card_from_hand(hand_pos)
                         self.chosen_first_card = False
                     elif ability == "Indescribable Horror":
                         self.action_chosen = ability
@@ -642,8 +633,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Predation":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Doombolt":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -1006,8 +996,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.amount_spend_for_tzeentch_firestorm = -1
                     elif ability == "Infernal Gateway":
                         self.action_chosen = "Infernal Gateway"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Promise of Glory":
                         print("Resolve Promise of Glory")
                         primary_player.summon_token_at_hq("Cultist", amount=2)
@@ -1065,21 +1054,19 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.chosen_first_card = False
                         self.misc_target_planet = -1
                     elif ability == "Pact of the Haemonculi":
+                        primary_player.discard_card_from_hand(hand_pos)
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Empower":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Gift of Isha":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Deception":
                         self.action_chosen = "Deception"
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Rally the Charge":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -1087,11 +1074,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Exterminatus":
                         self.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Snotling Attack":
                         self.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                        primary_player.discard_card_from_hand(hand_pos)
                         self.misc_counter = 4
                     elif ability == "Preemptive Barrage":
                         self.action_chosen = ability
@@ -1452,10 +1438,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             return None
         if card.get_is_unit():
             self.chosen_first_card = True
-            self.card_pos_to_deploy = int(game_update_string[2])
             self.card_to_deploy = card
             primary_player.aiming_reticle_color = "blue"
-            primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+            primary_player.aiming_reticle_coords_hand = hand_pos
             self.card_type_of_selected_card_in_hand = "Army"
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1467,10 +1452,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         if card.get_is_unit():
             if card.get_cost() < 3:
                 self.chosen_first_card = True
-                self.card_pos_to_deploy = int(game_update_string[2])
                 self.card_to_deploy = card
                 primary_player.aiming_reticle_color = "blue"
-                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                primary_player.aiming_reticle_coords_hand = hand_pos
                 self.card_type_of_selected_card_in_hand = "Army"
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1485,10 +1469,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         if card.get_is_unit():
             if card.get_cost() == 3 and card.get_faction() == "Space Marines":
                 self.chosen_first_card = True
-                self.card_pos_to_deploy = int(game_update_string[2])
                 self.card_to_deploy = card
                 primary_player.aiming_reticle_color = "blue"
-                primary_player.aiming_reticle_coords_hand = self.card_pos_to_deploy
+                primary_player.aiming_reticle_coords_hand = hand_pos
                 self.card_type_of_selected_card_in_hand = "Army"
     elif self.action_chosen == "Kwik' Konstruckshun":
         card = primary_player.get_card_in_hand(hand_pos)

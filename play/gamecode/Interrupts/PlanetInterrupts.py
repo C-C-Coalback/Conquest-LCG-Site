@@ -15,7 +15,6 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             card = FindCard.find_card("Berzerker Warriors", self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             self.card_to_deploy = card
-            self.card_pos_to_deploy = primary_player.aiming_reticle_coords_hand
             self.planet_pos_to_deploy = chosen_planet
             print("Trying to discount: ", card.get_name())
             self.discounts_applied = 0

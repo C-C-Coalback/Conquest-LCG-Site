@@ -1359,9 +1359,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                       "Units are not at the same planet.")
     elif self.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
-            if primary_player.sacrifice_card_in_play(int(game_update_string[2]),
-                                                     int(game_update_string[3])):
-                primary_player.discard_card_from_hand(self.card_pos_to_deploy)
+            if primary_player.sacrifice_card_in_play(int(game_update_string[2]), int(game_update_string[3])):
                 interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
                 primary_player.aiming_reticle_coords_hand = None
                 if interrupts:
@@ -1376,8 +1374,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     secondary_player.discard_card_at_random()
                     primary_player.draw_card()
                     primary_player.draw_card()
-                    primary_player.aiming_reticle_color = None
-                    self.card_pos_to_deploy = -1
                     primary_player.resolve_played_any_event()
                     self.action_cleanup()
                     await primary_player.dark_eldar_event_played()
@@ -4543,10 +4539,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "No Psyker army unit is present.")
     elif self.action_chosen == "Deception":
-        if game_update_string[1] == "1":
-            player_returning = self.p1
-        else:
-            player_returning = self.p2
         can_continue = True
         possible_interrupts = []
         if player_owning_card.name_player == primary_player.name_player:
@@ -4573,14 +4565,9 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             self.first_player_nullified = primary_player.name_player
             self.nullify_context = "Event Action"
         if can_continue:
-            card = player_returning.cards_in_play[planet_pos + 1][unit_pos]
-            if card.get_card_type() == "Army":
-                if not card.check_for_a_trait("Elite"):
-                    player_returning.return_card_to_hand(planet_pos, unit_pos)
-                    primary_player.aiming_reticle_color = None
-                    primary_player.aiming_reticle_coords_hand = None
-                    primary_player.discard_card_from_hand(self.card_pos_to_deploy)
-                    self.card_pos_to_deploy = -1
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                    player_owning_card.return_card_to_hand(planet_pos, unit_pos)
                     primary_player.resolve_played_any_event()
                     self.action_cleanup()
                 else:
