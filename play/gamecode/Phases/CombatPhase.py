@@ -680,6 +680,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 self.unit_will_move_after_attack = True
                                 player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
                                     ethereal_movement_active = True
+                                if player.get_card_type_given_pos(
+                                        self.attacker_planet, self.attacker_position
+                                ) == "Warlord":
+                                    if player.get_bloodied_given_pos(self.attacker_planet, self.attacker_position):
+                                        player.cards_in_play[self.attacker_planet + 1][self.attacker_position].\
+                                            ethereal_movement_active = False
+                                        self.unit_will_move_after_attack = False
                             if player.get_card_type_given_pos(self.attacker_planet,
                                                               self.attacker_position) != "Warlord":
                                 i = 0
