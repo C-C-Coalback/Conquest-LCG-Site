@@ -2138,18 +2138,19 @@ class Game:
         self.number_resolving_battle_ability = -1
 
     async def resolve_battle_conclusion(self, name, game_string):
-        self.battle_in_progress = False
+        if not self.tense_negotiations_active:
+            self.battle_in_progress = False
+            self.ranged_skirmish_active = False
+            self.p1.rok_bombardment_active = []
+            self.p2.rok_bombardment_active = []
+            self.p1.has_passed = False
+            self.p2.has_passed = False
         self.p1.foretell_permitted = True
         self.p2.foretell_permitted = True
-        self.ranged_skirmish_active = False
         self.cult_duplicity_available = True
-        self.p1.rok_bombardment_active = []
-        self.p2.rok_bombardment_active = []
         self.nectavus_active = False
         self.nectavus_target = -1
         self.resolving_search_box = False
-        self.p1.has_passed = False
-        self.p2.has_passed = False
         self.p1.cegorach_jesters_active = False
         self.p1.cegorach_jesters_permitted = []
         self.p2.cegorach_jesters_active = False
