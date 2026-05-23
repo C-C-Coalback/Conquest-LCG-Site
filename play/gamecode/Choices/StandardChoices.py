@@ -1849,7 +1849,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 self.nullify_context = "Foretell"
             else:
                 primary_player.draw_card()
-                await primary_player.resolve_played_any_event("Foretell")
+                primary_player.resolve_played_any_event("Foretell")
                 await self.resolve_battle_conclusion(name, game_update_string)
         else:
             primary_player.foretell_permitted = False
