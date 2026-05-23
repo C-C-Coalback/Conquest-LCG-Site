@@ -295,6 +295,7 @@ class Game:
         self.nullified_card_name = ""
         self.nullify_enabled = True
         self.nullify_string = ""
+        self.active_debug_user = ""
         self.intercept_active = False
         self.name_player_intercept = ""
         self.communications_relay_enabled = True
@@ -7108,6 +7109,13 @@ class Game:
 
     async def debug_event(self, name, game_update_string):
         try:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1":
+                    if self.debug_mode == "rearrange-hand":
+                        self.p1.aiming_reticle_coords_hand = None
+                        self.p2.aiming_reticle_coords_hand = None
+                        self.debug_mode = None
+                        await self.send_update_message("Finished rearranging hand.")
             if len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
                     chosen_planet = int(game_update_string[1])
@@ -7156,6 +7164,17 @@ class Game:
                     if self.debug_mode == "discard-hand":
                         primary_player.discard_card_from_hand(hand_pos)
                         self.debug_mode = None
+                    elif self.debug_mode == "rearrange-hand":
+                        if name == self.active_debug_user:
+                            if primary_player.name_player == self.active_debug_user:
+                                if not self.chosen_first_card:
+                                    primary_player.aiming_reticle_coords_hand = hand_pos
+                                    self.chosen_first_card = True
+                                else:
+                                    self.chosen_first_card = False
+                                    first_pos = primary_player.aiming_reticle_coords_hand
+                                    primary_player.reorder_can_in_hand(first_pos, hand_pos)
+                                    primary_player.aiming_reticle_coords_hand = None
                 elif game_update_string[0] == "IN_DISCARD":
                     discard_pos = int(game_update_string[2])
                     primary_player = self.p2

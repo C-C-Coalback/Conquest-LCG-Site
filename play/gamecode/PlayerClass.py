@@ -8448,6 +8448,9 @@ class Player:
                 self.game.create_reaction("Aun'la Prince", self.name_player, (int(self.number), planet_pos, unit_pos))
         return None
 
+    def reorder_can_in_hand(self, old_pos, new_pos):
+        self.cards.insert(new_pos, self.cards.pop(old_pos))
+
     def move_unit_at_planet_to_hq(self, planet_id, unit_id):
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.defense_battery_check(planet_id):

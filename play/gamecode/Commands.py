@@ -314,6 +314,12 @@ async def resolve_command(self, name, message):
         elif self.name == self.name_2:
             self.p2.sort_hand()
             await self.p2.send_hand()
+    elif message[1] == "rearrange-hand":
+        if name == self.name_1 or name == self.name_2:
+            await self.send_update_message(name + " is rearranging their hand.")
+            self.debug_mode = "rearrange-hand"
+            self.active_debug_user = name
+            self.chosen_first_card = False
     elif message[1] == "shuffle-deck" and len(message) == 3:
         if message[2] == "1":
             self.p1.shuffle_deck()
