@@ -4927,6 +4927,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if played_card:
                 if card.get_limited():
                     primary_player.can_play_limited = False
+                if card.check_for_a_trait("Wargear"):
+                    for i in range(len(primary_player.headquarters)):
+                        if primary_player.get_ability_given_pos(-2, i) == "Children of the Stars":
+                            self.create_reaction("Children of the Stars", primary_player.name_player,
+                                                 (int(primary_player.number), -2, i))
                 primary_player.remove_card_from_hand(hand_pos)
                 print("Succeeded (?) in playing attachment")
                 primary_player.aiming_reticle_coords_hand_2 = None
