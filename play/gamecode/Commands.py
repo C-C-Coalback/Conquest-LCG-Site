@@ -318,9 +318,11 @@ async def resolve_command(self, name, message):
         if message[2] == "1":
             self.p1.shuffle_deck()
             await self.send_decks()
+            await self.send_update_message("Deck shuffled")
         elif message[2] == "2":
             self.p2.shuffle_deck()
             await self.send_decks()
+            await self.send_update_message("Deck shuffled")
     elif message[1] == "rearrange-deck" and len(message) == 4:
         try:
             print("got here")
