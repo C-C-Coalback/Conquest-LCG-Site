@@ -82,7 +82,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.nullified_card_name = ability
                         self.cost_card_nullified = cost
                         self.first_player_nullified = primary_player.name_player
-                        self.nullify_context = "Regular Action"
+                        self.nullify_context = "Event Action"
                     elif ability == "Spawn Termagants":
                         for i in range(7):
                             if self.planets_in_play_array[i]:

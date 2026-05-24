@@ -6668,6 +6668,8 @@ class Game:
                                 primary_player.spend_resources(1)
                             self.nullify_count += 1
                             if secondary_player.nullify_check():
+                                self.choosing_unit_for_nullify = False
+                                self.name_player_using_nullify = ""
                                 self.choices_available = ["Yes", "No"]
                                 self.name_player_making_choices = secondary_player.name_player
                                 self.choice_context = "Use Nullify?"
@@ -6685,6 +6687,8 @@ class Game:
                                 primary_player.spend_resources(1)
                             self.nullify_count += 1
                             if secondary_player.nullify_check():
+                                self.choosing_unit_for_nullify = False
+                                self.name_player_using_nullify = ""
                                 self.choices_available = ["Yes", "No"]
                                 self.name_player_making_choices = secondary_player.name_player
                                 self.choice_context = "Use Nullify?"
