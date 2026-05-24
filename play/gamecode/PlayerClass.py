@@ -4095,6 +4095,10 @@ class Player:
                 self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
                 if not self.check_if_already_have_reaction("Cry of the Wind"):
                     self.game.create_reaction("Cry of the Wind", self.name_player, (int(self.number), -1, -1))
+            if other_player.search_hand_for_card("Cry of the Wind"):
+                self.cards_in_play[destination + 1][new_pos].valid_target_ashen_banner = True
+                if not other_player.check_if_already_have_reaction("Cry of the Wind"):
+                    self.game.create_reaction("Cry of the Wind", other_player.name_player, (int(other_player.number), -1, -1))
             for i in range(len(self.cards_in_play[destination + 1])):
                 if self.get_ability_given_pos(destination, i) == "Acquisition Phalanx":
                     self.game.create_reaction("Acquisition Phalanx", self.name_player,

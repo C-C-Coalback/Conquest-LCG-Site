@@ -3213,14 +3213,14 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       current_reaction + " cannot target unique units.")
         elif current_reaction == "Cry of the Wind":
             if not self.chosen_first_card:
-                if game_update_string[1] == primary_player.number:
-                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
-                        self.misc_target_unit = (planet_pos, unit_pos)
-                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        self.chosen_first_card = True
-                    else:
-                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
-                                                          current_reaction + " cannot target that unit.")
+                if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                    self.misc_target_unit = (planet_pos, unit_pos)
+                    player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
+                    self.chosen_first_card = True
+                    self.misc_target_player = player_owning_card.name_player
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                      current_reaction + " cannot target that unit.")
         elif current_reaction == "Galvax the Bloated":
             if planet_pos == og_pla:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)

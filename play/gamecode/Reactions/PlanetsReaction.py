@@ -320,9 +320,13 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
     elif current_reaction == "Cry of the Wind":
         if self.chosen_first_card:
             origin_planet, origin_pos = self.misc_target_unit
+            target_player = primary_player
+            if self.misc_target_player != target_player.name_player:
+                target_player = secondary_player
             if abs(origin_planet - chosen_planet) == 1:
-                primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-                primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+                target_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                target_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+                primary_player.resolve_played_any_event()
                 self.delete_reaction()
     elif current_reaction == "Heretek Inventor":
         p_num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()

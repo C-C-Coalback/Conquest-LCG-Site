@@ -1955,6 +1955,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.exhaust_card_in_hq_given_name("Banner of the Ashen Sky")
         elif current_reaction == "Cry of the Wind":
             self.chosen_first_card = False
+            self.misc_target_player = ""
             can_continue = True
             if self.nullify_enabled:
                 if secondary_player.nullify_check():
