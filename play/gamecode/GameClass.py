@@ -2273,7 +2273,7 @@ class Game:
             if self.nullifying_backlash:
                 self.nullifying_backlash = False
                 await self.complete_backlash(primary_player, secondary_player)
-            elif self.nullify_context == "Regular Action":
+            elif self.nullify_context == "Regular Action" or self.nullify_context == "Event Action":
                 num_player = "1"
                 if self.player_with_action == self.name_2:
                     num_player = "2"
