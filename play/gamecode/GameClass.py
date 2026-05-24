@@ -592,7 +592,6 @@ class Game:
             print("rearranging deck")
             return False
         if self.mode != "Normal":
-            print("mode is not normal")
             return False
         return True
 

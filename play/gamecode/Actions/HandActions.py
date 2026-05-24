@@ -1041,7 +1041,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Doom":
-                        print("Resolve Doom")
                         primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=False)
                         secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=True)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
