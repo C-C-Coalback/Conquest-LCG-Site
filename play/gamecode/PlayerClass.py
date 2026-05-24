@@ -5032,11 +5032,12 @@ class Player:
                         if actual_discounts:
                             self.set_aiming_reticle_in_play(-2, i, "green")
             elif self.headquarters[i].get_ability() == "Bonesinger Choir":
-                if faction_of_card == "Eldar":
-                    if "Vehicle" in traits or "Drone" in traits:
-                        discounts_available += 2
-                        if actual_discounts:
-                            self.set_aiming_reticle_in_play(-2, i, "green")
+                if self.get_ready_given_pos(-2, i):
+                    if faction_of_card == "Eldar":
+                        if "Vehicle" in traits or "Drone" in traits:
+                            discounts_available += 2
+                            if actual_discounts:
+                                self.set_aiming_reticle_in_play(-2, i, "green")
             if "Daemon" in traits:
                 if self.headquarters[i].get_ability() == "Cultist" and not self.search_card_in_hq("Myriad Excesses"):
                     discounts_available += 1
@@ -5404,9 +5405,10 @@ class Player:
                     if self.game.apoka:
                         self.game.deploy_exhausted = True
             if self.headquarters[pos].get_ability() == "Bonesinger Choir":
-                self.exhaust_given_pos(-2, pos)
-                discount += 2
-                self.reset_aiming_reticle_in_play(-2, pos)
+                if self.get_ready_given_pos(-2, pos):
+                    self.exhaust_given_pos(-2, pos)
+                    discount += 2
+                    self.reset_aiming_reticle_in_play(-2, pos)
             if self.headquarters[pos].get_ability() == "Cultist":
                 self.reset_aiming_reticle_in_play(-2, pos)
                 if self.sacrifice_card_in_hq(pos):
