@@ -591,7 +591,6 @@ async def update_game_event_command_section(self, name, game_update_string):
 
 async def interpret_command_state(self, ret_val):
     if ret_val == "COMPLETE":
-        receive_winnings(self)
         self.planet_aiming_reticle_position = -1
         if not self.nectavus_active:
             self.after_command_struggle = True
@@ -726,8 +725,14 @@ def try_entire_command(self, planet_pos):
     winnings = None
     if name_winner == self.name_1:
         winnings = resolve_winnings(self, self.p1, self.p2, planet_pos)
+        self.p1.add_resources(winnings[1])
+        for _ in range(winnings[2]):
+            self.p1.draw_card()
     elif name_winner == self.name_2:
         winnings = resolve_winnings(self, self.p2, self.p1, planet_pos)
+        self.p2.add_resources(winnings[1])
+        for _ in range(winnings[2]):
+            self.p2.draw_card()
     self.total_gains_command_struggle[planet_pos] = winnings
     self.last_planet_checked_command_struggle += 1
     self.interrupts_during_cs_allowed = True
@@ -738,23 +743,6 @@ def try_entire_command(self, planet_pos):
         return try_entire_command(self, self.last_planet_checked_command_struggle)
     self.resolve_remaining_cs_after_reactions = True
     return "REACTIONS"
-
-
-def receive_winnings(self):
-    for i in range(len(self.total_gains_command_struggle)):
-        if self.total_gains_command_struggle[i] is not None:
-            if (self.total_gains_command_struggle[i][0] == "1" and not self.nectavus_active) or\
-                    (self.total_gains_command_struggle[i][0] == "2" and self.nectavus_active):
-                self.p1.command_struggles_won_this_phase += 1
-                self.p1.add_resources(self.total_gains_command_struggle[i][1])
-                for _ in range(self.total_gains_command_struggle[i][2]):
-                    self.p1.draw_card()
-            elif (self.total_gains_command_struggle[i][0] == "2" and not self.nectavus_active) or\
-                    (self.total_gains_command_struggle[i][0] == "1" and self.nectavus_active):
-                self.p2.command_struggles_won_this_phase += 1
-                self.p2.add_resources(self.total_gains_command_struggle[i][1])
-                for _ in range(self.total_gains_command_struggle[i][2]):
-                    self.p2.draw_card()
 
 
 def resolve_winnings(self, winner, loser, planet_id):
