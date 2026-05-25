@@ -1527,6 +1527,10 @@ class Player:
                 self.game.anything_changed_since_last_send = True
             await self.game.send_update_message(joined_string)
 
+    def put_hand_pos_on_deck(self, hand_pos):
+        self.deck.insert(0, self.cards[hand_pos])
+        del self.cards[hand_pos]
+
     async def send_discard(self, force=False):
         joined_string = "GAME_INFO/DISCARD/" + str(self.number)
         if self.discard:

@@ -7174,6 +7174,8 @@ class Game:
                                     first_pos = primary_player.aiming_reticle_coords_hand
                                     primary_player.reorder_card_in_hand(first_pos, hand_pos)
                                     primary_player.aiming_reticle_coords_hand = None
+                    elif self.debug_mode == "return":
+                        primary_player.put_hand_pos_on_deck(hand_pos)
                 elif game_update_string[0] == "IN_DISCARD":
                     discard_pos = int(game_update_string[2])
                     primary_player = self.p2
