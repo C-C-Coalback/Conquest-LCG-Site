@@ -153,6 +153,7 @@ class Game:
                         done_trimming = True
                 if trait not in self.all_traits and trait:
                     self.all_traits.append(trait)
+        self.all_traits.sort()
         self.last_planet_checked_for_battle = -1
         self.number_with_combat_turn = "1"
         self.herald_of_the_waagh_active = False
