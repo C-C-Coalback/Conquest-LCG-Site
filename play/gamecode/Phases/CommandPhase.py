@@ -475,7 +475,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.faction_of_searched_card = None
                                 self.max_cost_of_searched_card = 999
                                 self.all_conditions_searched_card_required = True
-                                self.no_restrictions_on_chosen_card = False
+                                self.no_restrictions_on_chosen_card = True
                                 self.canceled_card_bonuses[self.last_planet_checked_command_struggle] = True
                                 primary_player.number_cards_to_search = 2
                                 for i in range(len(primary_player.headquarters)):
@@ -511,7 +511,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                                 self.faction_of_searched_card = None
                                 self.max_cost_of_searched_card = 999
                                 self.all_conditions_searched_card_required = True
-                                self.no_restrictions_on_chosen_card = False
+                                self.no_restrictions_on_chosen_card = True
                                 primary_player.number_cards_to_search = 2
                                 for i in range(len(primary_player.headquarters)):
                                     if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
