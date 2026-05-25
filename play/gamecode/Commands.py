@@ -128,7 +128,7 @@ async def resolve_command(self, name, message):
                     print(move_details_split)
                     if move_details[0] == "/":
                         await self.resolve_chat_message(name_user, move_details.split(sep="/"))
-                    elif move_details_split[0] == "REARRANGE_HAND": # TJUAnzbxNBAqzwSg
+                    elif move_details_split[0] == "REARRANGE_HAND":
                         if name_user == self.name_1:
                             player = self.p1
                         else:
