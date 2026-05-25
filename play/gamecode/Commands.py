@@ -564,7 +564,7 @@ async def resolve_command(self, name, message):
                     self.p2.reset_aiming_reticle_in_play(
                         planet_pos, unit_pos)
                     await self.p2.send_units_at_planet(planet_pos)
-    elif message[1] == "infest-planet" and len(message) > 2:
+    elif (message[1] == "infest-planet" or message[1] == "infest") and len(message) > 2:
         planet_pos = int(message[2])
         self.infested_planets[planet_pos] = True
         await self.send_planet_array()
@@ -575,7 +575,7 @@ async def resolve_command(self, name, message):
     elif message[1] == "return" and len(message) == 2:
         self.debug_mode = "return"
         await self.send_update_message("Click card to return it to your hand.")
-    elif message[1] == "ready-card":
+    elif message[1] == "ready-card" or message[1] == "ready":
         if len(message) == 2:
             self.debug_mode = "ready-card"
             await self.send_update_message("Click card in play to ready it.")
@@ -593,7 +593,7 @@ async def resolve_command(self, name, message):
                 elif unit_position[1] == "2":
                     self.p2.ready_given_pos(planet_pos, unit_pos)
                     await self.p2.send_units_at_planet(planet_pos)
-    elif message[1] == "exhaust-card":
+    elif message[1] == "exhaust-card" or message[1] == "exhaust":
         if len(message) == 2:
             self.debug_mode = "exhaust-card"
             await self.send_update_message("Click card in play to exhaust it.")
