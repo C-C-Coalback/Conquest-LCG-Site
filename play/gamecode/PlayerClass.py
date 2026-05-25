@@ -2356,6 +2356,11 @@ class Player:
             if self.search_for_unique_card(card_object.name):
                 self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "The card is unique, and you already control a copy of that card.")
                 return False
+        if self.warlord_faction == "Necrons":
+            if card_object.get_card_type() == "Army":
+                if card_object.get_faction() not in ["Necrons", "Neutral"]:
+                    if card_object.get_faction() != self.enslaved_faction:
+                        return -1
         if card_object.check_for_a_trait("Relic"):
             if self.search_for_existing_relic():
                 self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "The card is a Relic, and you already control a Relic.")
@@ -2906,6 +2911,11 @@ class Player:
             if self.search_for_unique_card(card.name):
                 self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", "The card is unique, and you already control a copy of that card.")
                 return -1
+        if self.warlord_faction == "Necrons":
+            if card.get_card_type() == "Army":
+                if card.get_faction() not in ["Necrons", "Neutral"]:
+                    if card.get_faction() != self.enslaved_faction:
+                        return -1
         if triggered_card_effect and not card.check_for_a_trait("Runt", etekh_trait=self.etekh_trait):
             resources_to_spend = self.game.imperial_blockades_active[position]
             if resources_to_spend:

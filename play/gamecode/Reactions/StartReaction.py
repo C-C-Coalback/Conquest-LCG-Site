@@ -2869,11 +2869,11 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Elysian Assault Team":
             if primary_player.search_hand_for_card("Elysian Assault Team"):
                 card = self.preloaded_find_card("Elysian Assault Team")
-                primary_player.add_card_to_planet(card, planet_pos)
-                primary_player.remove_card_name_from_hand("Elysian Assault Team")
-                if primary_player.search_hand_for_card("Elysian Assault Team"):
-                    self.create_reaction("Elysian Assault Team", primary_player.name_player,
-                                         (int(primary_player.number), planet_pos, -1))
+                if primary_player.add_card_to_planet(card, planet_pos) != -1:
+                    primary_player.remove_card_name_from_hand("Elysian Assault Team")
+                    if primary_player.search_hand_for_card("Elysian Assault Team"):
+                        self.create_reaction("Elysian Assault Team", primary_player.name_player,
+                                             (int(primary_player.number), planet_pos, -1))
             self.delete_reaction()
         elif current_reaction == "The Emperor Protects":
             if secondary_player.nullify_check() and self.nullify_enabled:
