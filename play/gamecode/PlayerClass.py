@@ -3673,7 +3673,7 @@ class Player:
                                                     "Death Guard Preachers", position, i):
                                                 self.game.create_reaction("Death Guard Preachers", self.name_player,
                                                                           (int(self.number), position, i))
-                            if card.get_faction() != "Necrons":
+                            if card.get_faction() != "Necrons" and card.get_faction() != "Neutral":
                                 if self.count_units_of_faction(card.get_faction()) == 1:
                                     for i in range(len(self.headquarters)):
                                         if self.headquarters[i].get_ability() == "Sautekh Complex":
