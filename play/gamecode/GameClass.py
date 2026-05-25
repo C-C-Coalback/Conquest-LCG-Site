@@ -1921,9 +1921,9 @@ class Game:
         if self.no_restrictions_on_chosen_card:
             return True
         card_chosen = self.preloaded_find_card(player.deck[search_pos])
-        return self.check_if_card_searched_satisfies_conditions(card_chosen)
+        return self.check_if_card_searched_satisfies_conditions(card_chosen, player)
 
-    def check_if_card_searched_satisfies_conditions(self, card):
+    def check_if_card_searched_satisfies_conditions(self, card, player):
         if not self.all_conditions_searched_card_required:
             if self.faction_of_searched_card is not None:
                 if card.get_faction() == self.faction_of_searched_card:
@@ -1932,7 +1932,7 @@ class Game:
                 if card.get_card_type() == self.card_type_of_searched_card:
                     return True
             if self.traits_of_searched_card is not None:
-                if self.traits_of_searched_card in card.get_traits():
+                if card.check_for_a_trait(self.traits_of_searched_card, etekh_trait=player.etekh_trait):
                     return True
             if self.max_cost_of_searched_card is not None:
                 if card.get_cost() > self.max_cost_of_searched_card:
