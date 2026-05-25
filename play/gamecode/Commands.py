@@ -124,10 +124,19 @@ async def resolve_command(self, name, message):
                 else:
                     self.saved_move_id = move_id + 1
                     name_user, move_details = move_string.split(sep="|||")
-                    if move_details[0] != "/":
-                        await self.update_game_event(name_user, move_details.split(sep="/"))
-                    else:
+                    move_details_split = move_details.split(sep="/")
+                    print(move_details_split)
+                    if move_details[0] == "/":
                         await self.resolve_chat_message(name_user, move_details.split(sep="/"))
+                    elif move_details_split[0] == "REARRANGE_HAND": # TJUAnzbxNBAqzwSg
+                        if name_user == self.name_1:
+                            player = self.p1
+                        else:
+                            player = self.p2
+                        player.reorder_card_in_hand(int(move_details_split[1]), int(move_details_split[2]))
+                        await player.send_hand()
+                    else:
+                        await self.update_game_event(name_user, move_details.split(sep="/"))
         end_time = datetime.datetime.now()
         print("TIME\n\n\n", end_time - start_time, "\n\n\n")
     elif message[1] == "Error":

@@ -697,7 +697,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                                 active_games[self.game_position].saved_move_id = 0
                                 await active_games[self.game_position].update_game_event("", [])
                         else:
-                            await self.send_update_message("Game does not exist")
+                            await self.channel_layer.group_send(
+                                self.room_group_name, {"type": "chat.message", "message": "Game does not exist"}
+                            )
                     else:
                         await active_games[self.game_position].resolve_chat_message(self.name, message)
                 else:
@@ -723,9 +725,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                     if active_games[current_game_id].safety_check():
                         if self.name == active_games[current_game_id].name_1:
                             active_games[current_game_id].p1.reorder_card_in_hand(int(message[1]), int(message[2]))
+                            active_games[current_game_id].game_events_as_mono_string += self.name + "|||REARRANGE_HAND/" + message[1] + "/" + message[2] + "\n"
                             await active_games[current_game_id].p1.send_hand()
                         else:
                             active_games[current_game_id].p2.reorder_card_in_hand(int(message[1]), int(message[2]))
+                            active_games[current_game_id].game_events_as_mono_string += self.name + "|||REARRANGE_HAND/" + message[1] + "/" + message[2] + "\n"
                             await active_games[current_game_id].p2.send_hand()
                     else:
                         await active_games[current_game_id].send_mistarget_message(
