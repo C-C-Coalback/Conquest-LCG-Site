@@ -137,7 +137,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         primary_player.aiming_reticle_coords_discard = pos_discard
                         self.chosen_first_card = True
         elif current_reaction == "Scavenging Kroot Rider":
-            if self.chosen_first_card:
+            if not self.chosen_second_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Attachment":
@@ -145,8 +145,10 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                             if primary_player.attach_card(card, planet_pos, unit_pos):
                                 primary_player.remove_card_from_discard(pos_discard)
-                                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-                                self.delete_reaction()
+                                self.chosen_second_card = True
+                                if self.chosen_first_card and self.chosen_second_card:
+                                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                                    self.delete_reaction()
         elif current_reaction == "Commander Shadowsun discard":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)

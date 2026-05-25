@@ -5686,7 +5686,7 @@ class Game:
                     elif reaction_name == "Scavenging Kroot Rider":
                         if not self.chosen_first_card:
                             self.chosen_first_card = True
-                            await self.send_update_message("Skipping enemy support exhaustion.")
+                            await self.send_update_message("Skipping taking attachment from discard.")
                         else:
                             self.delete_reaction()
                     elif reaction_name != "Warlock Destructor":

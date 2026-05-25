@@ -346,7 +346,9 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                             if can_continue:
                                 secondary_player.exhaust_given_pos(-2, unit_pos)
                                 self.chosen_first_card = True
-                                await self.send_update_message("Choose attachment.")
+                                if self.chosen_first_card and self.chosen_second_card:
+                                    self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                                    self.delete_reaction()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target Limited supports.")

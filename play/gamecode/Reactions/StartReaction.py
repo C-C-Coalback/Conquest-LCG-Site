@@ -3132,7 +3132,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Scavenging Kroot Rider":
             self.chosen_first_card = False
-            await self.send_update_message("Exhaust enemy Limited support first.")
+            self.chosen_second_card = False
+            await self.send_update_message("Choose support and attachment (any order).")
         elif current_reaction == "The Dawnsinger":
             self.choices_available = ["Lose 2 cards", "Opponent draws 2 cards"]
             self.choice_context = "The Dawnsinger Choice"
