@@ -284,16 +284,14 @@ async def resolve_command(self, name, message):
             self.reset_combat_positions()
             await self.send_update_message("Unpassed both players")
     elif message[1] == "toggle-command-rewards":
-        if self.name == self.name_1:
-            self.p1.automated_command_rewards = not active_games[
-                self.game_position].p1.automated_command_rewards
+        if name == self.name_1:
+            self.p1.automated_command_rewards = not self.p1.automated_command_rewards
             if self.p1.automated_command_rewards:
                 await self.send_update_message("Accepting command results")
             else:
                 await self.send_update_message("Declining command results")
-        if self.name == self.name_2:
-            self.p2.automated_command_rewards = not active_games[
-                self.game_position].p2.automated_command_rewards
+        if name == self.name_2:
+            self.p2.automated_command_rewards = not self.p2.automated_command_rewards
             if self.p2.automated_command_rewards:
                 await self.send_update_message("Accepting command results")
             else:
