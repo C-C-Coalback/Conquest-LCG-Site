@@ -16,6 +16,9 @@ async def start_resolving_reaction(self, name, game_update_string):
     current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
     if not self.resolving_search_box:
         if current_reaction == "Enginseer Augur":
+            self.enginseer_augur_starts_formosan_allowed = False
+            if extra_info:
+                self.enginseer_augur_starts_formosan_allowed = True
             self.resolving_search_box = True
             self.what_to_do_with_searched_card = "PLAY TO HQ"
             self.traits_of_searched_card = None

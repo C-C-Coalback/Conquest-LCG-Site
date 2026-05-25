@@ -7398,12 +7398,13 @@ class Player:
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() == "Warlord":
             return False
         if self.cards_in_play[planet_num + 1][card_pos].get_card_type() != "Token":
+            self.last_planet_sacrifice = planet_num
             for i in range(len(self.headquarters)):
                 if self.headquarters[i].get_ability() == "Formosan Black Ship":
                     if self.headquarters[i].get_ready():
+                        extra_info = None
                         self.game.create_reaction("Formosan Black Ship", self.name_player,
-                                                  (int(self.number), -2, -1))
-                        self.last_planet_sacrifice = planet_num
+                                                  (int(self.number), -2, -1), additional_info=extra_info)
         if self.cards_in_play[planet_num + 1][card_pos].get_name() == "Cultist":
             if self.search_card_in_hq("Myriad Excesses"):
                 return False
@@ -7428,7 +7429,7 @@ class Player:
                             self.master_warpsmith_count += 1
         if self.get_ability_given_pos(planet_num, card_pos) == "Desperate Captives":
             self.game.create_interrupt("Desperate Captives", self.name_player, (int(self.number), -1, -1))
-        self.add_card_in_play_to_discard(planet_num, card_pos)
+        self.add_card_in_play_to_discard(planet_num, card_pos, src="Sacrifice")
         return True
 
     def destroy_card_in_hq(self, card_pos):
@@ -8183,7 +8184,7 @@ class Player:
         self.adjust_own_damage(-2, card_pos)
         return None
 
-    def add_card_in_play_to_discard(self, planet_num, card_pos):
+    def add_card_in_play_to_discard(self, planet_num, card_pos, src=""):
         if planet_num == -2:
             self.add_card_in_hq_to_discard(card_pos)
             return None
@@ -8319,7 +8320,10 @@ class Player:
                         if not self.check_if_already_have_reaction("Murder Cogitator"):
                             self.game.create_reaction("Murder Cogitator", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Enginseer Augur":
-            self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1))
+            extra_info = None
+            if src == "Sacrifice":
+                extra_info = "Sacrifice"
+            self.game.create_reaction("Enginseer Augur", self.name_player, (int(self.number), -1, -1), additional_info=extra_info)
         if card.get_ability() == "3rd Company Tactical Squad":
             self.game.create_interrupt("3rd Company Tactical Squad", self.name_player, (int(self.number), -1, -1))
         if card.get_ability() == "Shok Troopa":

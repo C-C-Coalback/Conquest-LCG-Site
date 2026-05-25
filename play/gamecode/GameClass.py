@@ -170,6 +170,7 @@ class Game:
         self.player_with_initiative = self.name_1
         self.number_reset_combat_turn = "1"
         self.player_reset_combat_turn = self.name_1
+        self.enginseer_augur_starts_formosan_allowed = False
         self.number_who_is_shielding = None
         self.player_who_is_shielding = None
         self.planet_of_damaged_unit = None
@@ -2063,6 +2064,10 @@ class Game:
                             del primary_player.deck[int(game_update_string[1])]
                             if self.resolving_search_box:
                                 self.resolving_search_box = False
+                            if self.enginseer_augur_starts_formosan_allowed:
+                                if card_chosen.get_name() == "Formosan Black Ship":
+                                    self.create_reaction("Formosan Black Ship", primary_player.name_player,
+                                                         (int(primary_player.number), -2, -1))
                         elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
                             primary_player.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                                 int(game_update_string[1]), card_chosen)
