@@ -1863,12 +1863,15 @@ class Player:
             self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = color
 
     def reset_aiming_reticle_in_play(self, planet_id, unit_id):
-        if planet_id == -1 or unit_id == -1:
-            return None
-        if planet_id == -2:
-            self.headquarters[unit_id].aiming_reticle_color = None
-        else:
-            self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
+        try:
+            if planet_id == -1 or unit_id == -1:
+                return None
+            if planet_id == -2:
+                self.headquarters[unit_id].aiming_reticle_color = None
+            else:
+                self.cards_in_play[planet_id + 1][unit_id].aiming_reticle_color = None
+        except:
+            pass
         return None
 
     def discard_card_name_from_hand(self, card_name):
