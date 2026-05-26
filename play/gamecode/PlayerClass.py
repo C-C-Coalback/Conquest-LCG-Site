@@ -912,7 +912,9 @@ class Player:
         else:
             ability = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
         if ability == "The Prince's Might":
-            self.the_princes_might_active[planet_id] = True
+            if not self.game.apoka:
+                self.game.set_queued_mistarget_message(self.name_player, "Event Not Resolved", "The Prince's Might is banned under this ruleset.")
+                self.the_princes_might_active[planet_id] = True
         if ability == "Webway Schemes":
             self.game.create_reaction("Webway Schemes", self.name_player, (int(self.number), planet_id, -1))
         if ability == "Unseen Strike":
@@ -2359,7 +2361,11 @@ class Player:
             if card_object.get_card_type() == "Army":
                 if card_object.get_faction() not in ["Necrons", "Neutral"]:
                     if card_object.get_faction() != self.enslaved_faction:
-                        return -1
+                        return False
+        if self.game.banned_cards:
+            if card_object.get_name() in self.game.banned_cards:
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", card_object.get_name() + " is banned in this ruleset.")
+                return False
         if card_object.check_for_a_trait("Relic"):
             if self.search_for_existing_relic():
                 self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "The card is a Relic, and you already control a Relic.")
@@ -2661,6 +2667,11 @@ class Player:
                         self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
                                                                "Already controlling a Relic.")
                     return False
+        if self.game.banned_cards:
+            if card.get_name() in self.game.banned_cards:
+                if actual_check:
+                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Attach Card", card.get_name() + " is banned in this ruleset.")
+                return False
         if card.get_unique():
             if self.search_for_unique_card(card.get_name()):
                 if actual_check:
@@ -2915,6 +2926,10 @@ class Player:
                 if card.get_faction() not in ["Necrons", "Neutral"]:
                     if card.get_faction() != self.enslaved_faction:
                         return -1
+        if self.game.banned_cards:
+            if card.get_name() in self.game.banned_cards:
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", card.get_name() + " is banned in this ruleset.")
+                return -1
         if triggered_card_effect and not card.check_for_a_trait("Runt", etekh_trait=self.etekh_trait):
             resources_to_spend = self.game.imperial_blockades_active[position]
             if resources_to_spend:

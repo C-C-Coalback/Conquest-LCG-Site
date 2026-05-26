@@ -23,12 +23,15 @@ from . import Commands
 class Game:
     def __init__(self, game_id, player_one_name, player_two_name, card_array, planet_array, cards_dict, errata,
                  apoka_errata_cards, sector="Traxis", deck_1="", deck_2="", forced_planet_array=None, random_seed=None,
-                 raw_deck_text_1="", raw_deck_text_2="", first_to_load="", bot_is_present=False):
+                 raw_deck_text_1="", raw_deck_text_2="", first_to_load="", bot_is_present=False, banned_cards=None):
         self.game_sockets = []
         self.chat_messages = []
         self.card_array = card_array
         self.cards_dict = cards_dict
         self.apoka_errata_cards = apoka_errata_cards
+        self.banned_cards = banned_cards
+        if banned_cards is None:
+            self.banned_cards = []
         self.cards_that_have_errata = []
         for i in range(len(self.apoka_errata_cards)):
             self.cards_that_have_errata.append(self.apoka_errata_cards[i].get_name())

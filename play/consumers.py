@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 ban_list_apoka = [
     "Bonesinger Choir", "Squiggoth Brute", "Corrupted Teleportarium", "Gun Drones", "Archon's Palace",
     "Land Speeder Vengeance", "Sowing Chaos", "Smasha Gun Battery", "The Prince's Might", "Purveyor of Hubris", "Doom",
-    "Exterminatus", "Mind Shackle Scarab", "Crypt of Saint Camila", "Warp Storm"
+    "Exterminatus", "Mind Shackle Scarab", "Crypt of Saint Camila", "Warpstorm"
 ]
 card_array = Initfunctions.init_player_cards()
 ffg_only_cards_list = Initfunctions.init_ffg_only_cards()
@@ -78,13 +78,15 @@ def create_game(name_1, name_2, game_id, errata, sector="Traxis", deck_1="", dec
             return create_game(name_1, name_2, new_game_id, errata, sector=sector, deck_1=deck_1, deck_2=deck_2,
                                bots_present=bots_present)
     card_errata = []
+    banned_cards = []
     if errata == "Apoka":
         card_errata = apoka_errata_cards_array
+        banned_cards = ban_list_apoka
     elif errata == "Blackstone":
         card_errata = blackstone_errata_cards_array
     active_games.append(GameClass.Game(game_id, name_1, name_2, card_array, planet_array, cards_dict,
                                        errata, card_errata, sector=sector, deck_1=deck_1, deck_2=deck_2,
-                                       bot_is_present=bots_present))
+                                       bot_is_present=bots_present, banned_cards=banned_cards))
     return game_id
 
 

@@ -982,8 +982,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_object.chosen_first_card = False
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Warpstorm":
-                        self.action_object.action_chosen = "Warpstorm"
-                        primary_player.discard_card_from_hand(hand_pos)
+                        if self.apoka:
+                            self.set_queued_mistarget_message(primary_player.name_player, "Cannot Play " + ability, ability + " is banned under this ruleset.")
+                        else:
+                            self.action_object.action_chosen = "Warpstorm"
+                            primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Tzeentch's Firestorm":
                         self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -1041,11 +1044,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Doom":
-                        primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=False)
-                        secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=True)
-                        primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        primary_player.resolve_played_any_event()
-                        self.action_cleanup()
+                        if self.apoka:
+                            self.set_queued_mistarget_message(primary_player.name_player, "Cannot Play " + ability, ability + " is banned under this ruleset.")
+                        else:
+                            primary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=False)
+                            secondary_player.destroy_all_cards_in_hq(ignore_uniques=True, units_only=True, enemy_event=True)
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            primary_player.resolve_played_any_event()
+                            self.action_cleanup()
                     elif ability == "Warp Rift":
                         self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
@@ -1071,9 +1077,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Exterminatus":
-                        self.action_object.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.discard_card_from_hand(hand_pos)
+                        if self.apoka:
+                            self.set_queued_mistarget_message(primary_player.name_player, "Cannot Play " + ability, ability + " is banned under this ruleset.")
+                        else:
+                            self.action_object.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Snotling Attack":
                         self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
