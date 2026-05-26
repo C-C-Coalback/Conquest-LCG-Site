@@ -8692,7 +8692,7 @@ class Player:
                     return True
         return False
 
-    def retreat_unit(self, planet_id, unit_id, exhaust=False):
+    def check_if_unit_can_retreat(self, planet_id, unit_id):
         if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
             if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
                 every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
@@ -8721,6 +8721,11 @@ class Player:
                     if other_player.search_attachments_at_pos(planet_id, i, "Necrotoxin Missile"):
                         return False
         if not self.cards_in_play[planet_id + 1][unit_id].can_retreat:
+            return False
+        return True
+
+    def retreat_unit(self, planet_id, unit_id, exhaust=False):
+        if not self.check_if_unit_can_retreat(planet_id, unit_id):
             return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.defense_battery_check(planet_id):

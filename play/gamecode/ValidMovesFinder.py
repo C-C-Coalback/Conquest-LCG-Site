@@ -68,9 +68,12 @@ def update_automated_attributes(self):
                 self.automated_player_waited_on = self.name_2
             else:
                 self.automated_player_waited_on = self.name_1
-    elif self.action_chosen:
+    elif self.action_object.action_chosen:
         self.what_is_required_automated = "Action"
-        self.automated_player_waited_on = self.player_with_action
+        self.automated_player_waited_on = self.action_object.player_with_action
+    elif self.mode == "RETREAT":
+        self.what_is_required_automated = "Retreat Turn"
+        self.automated_player_waited_on = self.player_with_combat_turn
     elif self.phase == "DEPLOY":
         self.what_is_required_automated = "Deploy Turn"
         self.automated_player_waited_on = self.player_with_deploy_turn
@@ -285,6 +288,10 @@ def determine_valid_moves(self):
                     if self.check_if_unit_can_be_declared_as_defender(primary_player, secondary_player, battle_planet, i):
                         valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
         elif self.what_is_required_automated == "Retreat Turn":
+            battle_planet = self.last_planet_checked_for_battle
+            for i in range(len(primary_player.cards_in_play[battle_planet + 1])):
+                if primary_player.check_if_unit_can_retreat(battle_planet, i):
+                    valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", battle_planet, i)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Headquarters Action":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
@@ -308,8 +315,8 @@ def determine_valid_moves(self):
                         )
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Action":
-            if self.action_chosen in ability_targets_dictionary:
-                target_restriction_data = ability_targets_dictionary[self.action_chosen]
+            if self.action_object.action_chosen in ability_targets_dictionary:
+                target_restriction_data = ability_targets_dictionary[self.action_object.action_chosen]
                 type_target = target_restriction_data["Type"]
                 target_restrictions = target_restriction_data["Restrictions"]
                 if type_target == "Planet":
