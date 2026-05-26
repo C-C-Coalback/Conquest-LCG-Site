@@ -10,9 +10,10 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
         player_owning_card = self.p2
     print("Check what player")
     print(self.reactions_needing_resolving[0].get_player_resolving_reaction())
-    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+    reaction = self.reactions_needing_resolving[0]
+    current_reaction = reaction.get_reaction_name()
     if current_reaction == "Junk Chucka Kommando":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if game_update_string[2] == primary_player.get_number():
                 og_num, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                 if og_pla == planet_pos and og_pos == unit_pos:
@@ -20,8 +21,8 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     attachment_name = primary_player.cards_in_play[
                         og_pla + 1][og_pos].get_attachments()[attachment_pos].get_name()
                     await self.send_update_message(attachment_name + " selected for Junk Chucka Kommando!")
-                    self.chosen_first_card = True
-                    self.misc_target_attachment = (og_pla, og_pos, attachment_pos)
+                    reaction.chosen_first_card = True
+                    reaction.misc_target_attachment = (og_pla, og_pos, attachment_pos)
     elif current_reaction == "Neurotic Obliterator":
         og_num, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         if primary_player.get_number() == game_update_string[2]:
@@ -49,9 +50,9 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     self.delete_reaction()
     elif current_reaction == "Farsight Vanguard":
         if game_update_string[2] == primary_player.get_number():
-            if self.chosen_first_card:
+            if reaction.chosen_first_card:
                 _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-                second_pla, second_pos = self.misc_target_unit
+                second_pla, second_pos = reaction.misc_target_unit
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].name_owner == primary_player.name_player:
                     if not primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].check_for_a_trait("Drone"):
                         if og_pla == planet_pos and og_pos == unit_pos:

@@ -6,7 +6,8 @@ import copy
 
 async def resolve_planet_reaction(self, name, game_update_string, primary_player, secondary_player):
     chosen_planet = int(game_update_string[1])
-    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+    reaction = self.reactions_needing_resolving[0]
+    current_reaction = reaction.get_reaction_name()
     num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
     if current_reaction == "Blackmane's Hunt":
         warlord_planet = primary_player.warlord_commit_location
@@ -24,8 +25,8 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
         self.delete_reaction()
     elif current_reaction == "The Emperor's Retribution":
-        if self.chosen_first_card:
-            og_pla, og_pos = self.misc_target_unit
+        if reaction.chosen_first_card:
+            og_pla, og_pos = reaction.misc_target_unit
             if chosen_planet != self.round_number:
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
@@ -33,7 +34,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.cards_in_play[chosen_planet + 1][last_el_index].command_until_combat += 1
                 self.delete_reaction()
     elif current_reaction == "Shadow Hunt":
-        card_name = primary_player.cards_removed_from_game[self.misc_counter]
+        card_name = primary_player.cards_removed_from_game[reaction.misc_counter]
         card = self.preloaded_find_card(card_name)
         primary_player.add_card_to_planet(card, chosen_planet)
         target_index = -1
@@ -69,7 +70,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 else:
                     self.delete_reaction()
     elif current_reaction == "Tras the Corrupter":
-        self.misc_target_planet = chosen_planet
+        reaction.misc_target_planet = chosen_planet
         await self.send_update_message("Replacing " + self.planet_array[chosen_planet] + ". Choose new planet.")
         self.choices_available = self.available_breach_planets
         if not self.choices_available:
@@ -118,7 +119,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.torture_event_played("Catatonic Pain")
             self.delete_reaction()
     elif current_reaction == "Vamii Industrial Complex":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             if chosen_planet != self.round_number:
                 card = self.card_to_deploy
                 await self.discount_begin_routine(chosen_planet, card, primary_player)
@@ -133,7 +134,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 else:
                     await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=self.discounts_applied)
     elif current_reaction == "Interceptor Squad":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             p_num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if abs(origin_planet - chosen_planet) == 1:
                 can_move = False
@@ -147,8 +148,8 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 if can_move:
                     primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
                     primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
-                    self.chosen_first_card = True
-                    self.misc_target_planet = chosen_planet
+                    reaction.chosen_first_card = True
+                    reaction.misc_target_planet = chosen_planet
     elif current_reaction == "Heralding Cherubim":
         p_num, origin_planet, origin_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
@@ -167,9 +168,9 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
     elif current_reaction == "Dark Allegiance":
         if self.card_to_deploy is not None:
             if self.card_to_deploy.get_card_type() == "Army":
-                self.misc_player_storage = "RESOLVING DARK ALLEGIANCE"
+                reaction.misc_player_storage = "RESOLVING DARK ALLEGIANCE"
                 await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
-                self.misc_player_storage = ""
+                reaction.misc_player_storage = ""
                 self.delete_reaction()
     elif current_reaction == "The Flayed Mask":
         if chosen_planet != 0:
@@ -198,16 +199,16 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 card = copy.deepcopy(self.preloaded_find_card(self.misc_target_choice))
                 card.deepstrike = 99
                 primary_player.cards_in_reserve[chosen_planet].append(card)
-                self.misc_counter = self.misc_counter - 1
-                if self.misc_counter > 0:
-                    self.choices_available = copy.deepcopy(self.misc_misc)
+                reaction.misc_counter = reaction.misc_counter - 1
+                if reaction.misc_counter > 0:
+                    self.choices_available = copy.deepcopy(reaction.misc_misc)
                     self.choice_context = "ND: Faction"
                     self.name_player_making_choices = primary_player.name_player
                     self.resolving_search_box = True
                 else:
                     self.delete_reaction()
     elif current_reaction == "Leviathan Hive Ship":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             card = primary_player.get_card_in_discard(primary_player.aiming_reticle_coords_discard)
             primary_player.add_card_to_planet(card, chosen_planet, already_exhausted=True)
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
@@ -223,17 +224,17 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
     elif current_reaction == "Myriad Excesses":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             self.reactions_needing_resolving[0].set_player_resolving_reaction(secondary_player.name_player)
-            self.misc_counter = chosen_planet
-            self.chosen_first_card = True
+            reaction.misc_counter = chosen_planet
+            reaction.chosen_first_card = True
             await self.send_update_message("Planet confirmed. Opponent choose planet.")
         else:
-            secondary_player.summon_token_at_planet("Cultist", self.misc_counter)
-            secondary_player.summon_token_at_planet("Cultist", self.misc_counter)
-            if self.misc_counter == chosen_planet:
+            secondary_player.summon_token_at_planet("Cultist", reaction.misc_counter)
+            secondary_player.summon_token_at_planet("Cultist", reaction.misc_counter)
+            if reaction.misc_counter == chosen_planet:
                 last_el = len(secondary_player.cards_in_play[chosen_planet + 1]) - 1
-                self.misc_target_unit = (chosen_planet, last_el)
+                reaction.misc_target_unit = (chosen_planet, last_el)
                 self.choices_available = ["Take Control", "Destroy", "Do Nothing"]
                 self.choice_context = "Myriad Excesses Correct"
                 self.name_player_making_choices = primary_player.name_player
@@ -258,16 +259,16 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.choice_context = "Agra's Preachings choices"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
-                self.misc_counter = 0
-                self.misc_target_planet = chosen_planet
+                reaction.misc_counter = 0
+                reaction.misc_target_planet = chosen_planet
             else:
                 self.delete_reaction()
     elif current_reaction == "Luring Troupe":
-        if self.chosen_first_card:
-            planet_pos, unit_pos = self.misc_target_unit
+        if reaction.chosen_first_card:
+            planet_pos, unit_pos = reaction.misc_target_unit
             if abs(planet_pos - chosen_planet) == 1:
                 target_player = self.p1
-                if self.misc_target_player == self.name_2:
+                if reaction.misc_target_player == self.name_2:
                     target_player = self.p2
                 target_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                 target_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
@@ -311,17 +312,17 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.create_reaction("Banshee Assault Squad", primary_player.name_player,
                                  (int(primary_player.number), -1, -1))
     elif current_reaction == "Tactical Withdrawal":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if abs(planet_pos - chosen_planet) == 1:
-                self.misc_target_planet = chosen_planet
-                self.chosen_first_card = True
+                reaction.misc_target_planet = chosen_planet
+                reaction.chosen_first_card = True
                 planet_name = self.planet_array[chosen_planet]
                 await self.send_update_message("You may now move units to " + planet_name + ".")
     elif current_reaction == "Cry of the Wind":
-        if self.chosen_first_card:
-            origin_planet, origin_pos = self.misc_target_unit
+        if reaction.chosen_first_card:
+            origin_planet, origin_pos = reaction.misc_target_unit
             target_player = primary_player
-            if self.misc_target_player != target_player.name_player:
+            if reaction.misc_target_player != target_player.name_player:
                 target_player = secondary_player
             if abs(origin_planet - chosen_planet) == 1:
                 target_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
@@ -339,20 +340,20 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet, card_effect=True)
             self.delete_reaction()
     elif current_reaction == "Obedience":
-        if self.chosen_first_card:
-            origin_planet, origin_pos = self.misc_target_unit
+        if reaction.chosen_first_card:
+            origin_planet, origin_pos = reaction.misc_target_unit
             new_planet = int(game_update_string[1])
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, new_planet)
             self.delete_reaction()
     elif current_reaction == "Tomb Blade Squadron":
-        if self.chosen_first_card and not self.chosen_second_card:
-            current_planet, current_position = self.misc_target_unit
+        if reaction.chosen_first_card and not reaction.chosen_second_card:
+            current_planet, current_position = reaction.misc_target_unit
             if current_planet != chosen_planet:
                 primary_player.move_unit_to_planet(current_planet, current_position, chosen_planet, card_effect=True)
-                self.chosen_second_card = True
+                reaction.chosen_second_card = True
                 new_pos = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
-                self.misc_target_unit = (chosen_planet, new_pos)
+                reaction.misc_target_unit = (chosen_planet, new_pos)
                 self.reactions_needing_resolving[0].set_position_unit_triggering((int(primary_player.number), chosen_planet, new_pos))
     elif current_reaction == "Sacaellum's Finest":
         if self.get_green_icon(chosen_planet):
@@ -363,10 +364,10 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             self.sacaellums_finest_active = True
             self.delete_reaction()
     elif current_reaction == "Raiding Portal":
-        if self.chosen_first_card:
-            if chosen_planet != self.misc_target_planet:
+        if reaction.chosen_first_card:
+            if chosen_planet != reaction.misc_target_planet:
                 if self.get_red_icon(chosen_planet):
-                    og_pla, og_pos = self.misc_target_unit
+                    og_pla, og_pos = reaction.misc_target_unit
                     primary_player.cards_in_play[og_pla + 1][og_pos].increase_extra_command_until_end_of_phase(1)
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
@@ -375,14 +376,14 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                                              (int(primary_player.get_number()), og_pla, -1))
                     self.delete_reaction()
     elif current_reaction == "Shadowed Thorns Venom":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             if self.get_red_icon(chosen_planet):
-                og_pla, og_pos = self.misc_target_unit
+                og_pla, og_pos = reaction.misc_target_unit
                 if og_pla != chosen_planet:
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
-                    self.chosen_first_card = False
-                    self.misc_target_unit = (-1, -1)
+                    reaction.chosen_first_card = False
+                    reaction.misc_target_unit = (-1, -1)
     elif current_reaction == "Sautekh Royal Crypt":
         secondary_player.sautekh_royal_crypt = chosen_planet
         await self.send_update_message(self.planet_array[chosen_planet] +
@@ -390,7 +391,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         self.delete_reaction()
         await CommandPhase.update_game_event_command_section(self, secondary_player.name_player, game_update_string)
     elif current_reaction == "Endless Legions":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             if self.apoka or self.blackstone:
                 if chosen_planet != self.last_planet_checked_for_battle:
                     card_name = self.misc_target_choice
@@ -431,15 +432,15 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.delete_reaction()
     elif current_reaction == "Klan Totem":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             if chosen_planet != self.round_number:
-                card = self.preloaded_find_card(self.misc_player_storage)
+                card = self.preloaded_find_card(reaction.misc_player_storage)
                 primary_player.put_card_into_reserve(card, chosen_planet, payment=False)
                 del primary_player.discard[primary_player.aiming_reticle_coords_discard]
                 primary_player.aiming_reticle_coords_discard = None
                 self.delete_reaction()
     elif current_reaction == "Salvaged Battlewagon":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             if abs(chosen_planet - planet_pos) == 1:
                 card_name = primary_player.cards[primary_player.aiming_reticle_coords_hand]
                 card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
@@ -450,26 +451,26 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
     elif current_reaction == "Mordatyne":
-        og_pla, og_pos = self.misc_target_unit
-        if self.chosen_first_card:
+        og_pla, og_pos = reaction.misc_target_unit
+        if reaction.chosen_first_card:
             if abs(chosen_planet - og_pla) == 1:
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
                 self.delete_reaction()
     elif current_reaction == "Hive Ship Tendrils":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             card = primary_player.get_card_in_discard(primary_player.aiming_reticle_coords_discard)
             primary_player.add_card_to_planet(card, chosen_planet)
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
             primary_player.aiming_reticle_coords_discard = None
             self.delete_reaction()
     elif current_reaction == "Drifting Spore Mines":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if abs(chosen_planet - planet_pos) == 1:
                 secondary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
                 last_element_index = len(secondary_player.cards_in_play[chosen_planet + 1]) - 1
-                self.misc_target_unit = (chosen_planet, last_element_index)
+                reaction.misc_target_unit = (chosen_planet, last_element_index)
                 self.reactions_needing_resolving[0].set_player_resolving_reaction(secondary_player.name_player)
                 self.choices_available = ["Yes", "No"]
                 self.choice_context = "Damage Drifting Spore Mines?"
@@ -483,10 +484,10 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         self.planet_array[chosen_planet] = planet_to_add
         self.delete_reaction()
     elif current_reaction == "Inspirational Fervor":
-        if self.chosen_first_card:
-            if chosen_planet != self.misc_target_planet:
+        if reaction.chosen_first_card:
+            if chosen_planet != reaction.misc_target_planet:
                 i = 0
-                og_planet = self.misc_target_planet
+                og_planet = reaction.misc_target_planet
                 while i < len(primary_player.cards_in_play[og_planet + 1]):
                     if primary_player.cards_in_play[og_planet + 1][i].aiming_reticle_color == "blue":
                         primary_player.reset_aiming_reticle_in_play(og_planet, i)
@@ -508,9 +509,9 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                             primary_player.set_once_per_phase_used_given_pos(i, j, True)
                 self.delete_reaction()
     elif current_reaction == "Third Eye of Trazyn":
-        if self.chosen_first_card:
-            if abs(self.misc_target_planet - chosen_planet) == 1:
-                og_pla, og_pos = self.misc_target_unit
+        if reaction.chosen_first_card:
+            if abs(reaction.misc_target_planet - chosen_planet) == 1:
+                og_pla, og_pos = reaction.misc_target_unit
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
                 self.delete_reaction()

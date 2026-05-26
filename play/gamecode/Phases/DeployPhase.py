@@ -17,17 +17,17 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                 if self.player_with_deploy_turn == name:
                     self.stored_mode = self.mode
                     self.mode = "ACTION"
-                    self.player_with_action = name
+                    self.action_object.player_with_action = name
                     print("Special deploy action")
                     await self.send_update_message(name + " wants to take an action.")
-                    if self.player_with_action == self.name_1 and self.p1.dark_possession_active:
+                    if self.action_object.player_with_action == self.name_1 and self.p1.dark_possession_active:
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
-                        self.name_player_making_choices = self.player_with_action
-                    elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
+                        self.name_player_making_choices = self.action_object.player_with_action
+                    elif self.action_object.player_with_action == self.name_2 and self.p2.dark_possession_active:
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
-                        self.name_player_making_choices = self.player_with_action
+                        self.name_player_making_choices = self.action_object.player_with_action
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
             print("Need to pass")
             continue_to_warlord = True
@@ -223,7 +223,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                                     )
                                     self.choice_context = "Munitorum Support Take"
                                     self.name_player_making_choices = player.name_player
-                                    self.position_of_actioned_card = (-2, int(game_update_string[2]))
+                                    self.action_object.position_of_actioned_card = (-2, int(game_update_string[2]))
                                     self.resolving_search_box = True
                                 is_munitorum = True
                     if self.card_to_deploy and not is_munitorum:
@@ -422,7 +422,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 secondary_player = self.p1
         else:
             if self.phase != "DEPLOY":
-                if self.player_with_action == self.name_1:
+                if self.action_object.player_with_action == self.name_1:
                     primary_player = self.p1
                     secondary_player = self.p2
                 else:
@@ -442,7 +442,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     damage_to_take = sum(self.damage_for_unit_to_take_on_play)
     self.bigga_is_betta_active = True
     own_card = True
-    if self.action_chosen == "Anrakyr the Traveller":
+    if self.action_object.action_chosen == "Anrakyr the Traveller":
         if self.anrakyr_deck_choice == secondary_player.get_name_player():
             own_card = False
     if (primary_player.bluddflagg_relevant or secondary_player.bluddflagg_relevant) and not primary_player.bluddflagg_used:
@@ -460,19 +460,19 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         for i in range(primary_player.guardsman_tracker_apf):
             if planet_pos != -2:
                 primary_player.summon_token_at_planet("Guardsman", planet_pos)
-        if self.action_chosen == "Ambush":
+        if self.action_object.action_chosen == "Ambush":
             for i in range(len(primary_player.headquarters)):
                 if primary_player.get_ability_given_pos(-2, i) == "Followers of Asuryan":
                     self.create_reaction("Followers of Asuryan", primary_player.name_player,
                                          (int(primary_player.number), -2, i))
-        if (not self.action_chosen or self.action_chosen == "Ambush" or self.action_chosen == "Staging Ground" or
-                self.action_chosen == "Behind Enemy Lines") \
+        if (not self.action_object.action_chosen or self.action_object.action_chosen == "Ambush" or self.action_object.action_chosen == "Staging Ground" or
+                self.action_object.action_chosen == "Behind Enemy Lines") \
                 and not self.misc_player_storage == "RESOLVING MAGUS HARID" \
                 and not self.misc_player_storage == "RESOLVING Ice World Hydras IV" \
                 and not self.misc_player_storage == "RESOLVING DARK ALLEGIANCE" \
                 and not self.misc_player_storage == "ZADRUK PRIME":
             primary_player.cards.remove(self.card_to_deploy.get_name())
-        elif self.action_chosen == "Decaying Warrior Squad":
+        elif self.action_object.action_chosen == "Decaying Warrior Squad":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
             primary_player.aiming_reticle_coords_discard = -1
             primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
@@ -484,19 +484,19 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             if primary_player.optimized_protocol_check():
                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                      (int(primary_player.get_number()), planet_pos, position_of_unit))
-        elif self.action_chosen == "Triumvirate of Ynnead":
+        elif self.action_object.action_chosen == "Triumvirate of Ynnead":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
             primary_player.aiming_reticle_coords_discard = -1
             self.chosen_first_card = False
             self.trium_tracker = (self.card_to_deploy.get_name(), planet_pos)
             self.trium_count += 1
-        elif self.action_chosen == "Anrakyr the Traveller":
+        elif self.action_object.action_chosen == "Anrakyr the Traveller":
             if self.anrakyr_deck_choice == primary_player.name_player:
                 del primary_player.discard[self.anrakyr_unit_position]
             else:
                 del secondary_player.discard[self.anrakyr_unit_position]
-            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                        self.position_of_actioned_card[1])
+            primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                        self.action_object.position_of_actioned_card[1])
             primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
                 valid_target_dynastic_weaponry = True
             if own_card:
@@ -507,7 +507,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 if primary_player.optimized_protocol_check():
                     self.create_reaction("Optimized Protocol", primary_player.name_player,
                                          (int(primary_player.get_number()), planet_pos, position_of_unit))
-        elif self.action_chosen == "Merciless Reclamation":
+        elif self.action_object.action_chosen == "Merciless Reclamation":
             del primary_player.discard[self.anrakyr_unit_position]
             primary_player.aiming_reticle_coords_discard = None
             primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
@@ -519,7 +519,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             if primary_player.optimized_protocol_check():
                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                      (int(primary_player.get_number()), planet_pos, position_of_unit))
-        elif self.action_chosen == "Accelerated Gestation":
+        elif self.action_object.action_chosen == "Accelerated Gestation":
             og_pla, og_pos, og_att = self.misc_target_attachment
             num = self.misc_target_player
             if num == int(primary_player.get_number()):
@@ -536,19 +536,19 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
     if played_card == "SUCCESS":
         if damage_to_take > 0:
             self.damage_is_taken_one_at_a_time = True
-        if not self.action_chosen:
+        if not self.action_object.action_chosen:
             self.action_cleanup()
-    if self.action_chosen == "Triumvirate of Ynnead":
+    if self.action_object.action_chosen == "Triumvirate of Ynnead":
         if self.trium_count > 1:
             primary_player.resolve_played_any_event()
             self.action_cleanup()
-    elif self.action_chosen == "Behind Enemy Lines":
+    elif self.action_object.action_chosen == "Behind Enemy Lines":
         self.chosen_second_card = True
         self.misc_target_planet = planet_pos
     elif is_a_reaction:
         pass
     else:
-        if self.action_chosen:
+        if self.action_object.action_chosen:
             self.action_cleanup()
     if self.interrupts_waiting_on_resolution and self.already_resolving_interrupt:
         if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Berzerker Warriors":
@@ -603,7 +603,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         primary_player = self.p2
         secondary_player = self.p1
     if special_action:
-        if self.player_with_action == self.name_1:
+        if self.action_object.player_with_action == self.name_1:
             primary_player = self.p1
             secondary_player = self.p2
         else:

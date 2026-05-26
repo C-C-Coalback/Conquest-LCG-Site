@@ -10,7 +10,8 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
         player_owning_card = primary_player
     else:
         player_owning_card = secondary_player
-    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+    interrupt = self.interrupts_waiting_on_resolution[0]
+    current_interrupt = interrupt.get_interrupt_name()
     if current_interrupt == "Vanguard Soldiers":
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -52,10 +53,10 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
             player_owning_card.destroy_card_in_hq(unit_pos)
             self.delete_interrupt()
     elif current_interrupt == "Transcendent Blessing":
-        if not self.chosen_first_card:
+        if not interrupt.chosen_first_card:
             if game_update_string[1] == primary_player.number:
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                    self.chosen_first_card = True
+                    interrupt.chosen_first_card = True
                     await self.send_update_message("Select target for the attachment.")
         else:
             card = self.preloaded_find_card("Transcendent Blessing")
@@ -142,8 +143,8 @@ async def resolve_hq_interrupt(self, name, game_update_string, primary_player, s
                     self.nullify_context = "Interrupt"
                 if can_continue:
                     secondary_player.destroy_card_in_hq(unit_pos)
-                    self.misc_counter += 1
-                    if self.misc_counter > 1:
+                    interrupt.misc_counter += 1
+                    if interrupt.misc_counter > 1:
                         self.delete_interrupt()
 
 

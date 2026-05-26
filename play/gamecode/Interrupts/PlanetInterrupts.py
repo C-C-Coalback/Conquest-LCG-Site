@@ -8,7 +8,8 @@ from .. import CardClasses
 async def resolve_planet_interrupt(self, name, game_update_string, primary_player, secondary_player):
     print("planets interrupt")
     chosen_planet = int(game_update_string[1])
-    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+    interrupt = self.interrupts_waiting_on_resolution[0]
+    current_interrupt = interrupt.get_interrupt_name()
     if current_interrupt == "Berzerker Warriors":
         print("check planet")
         if primary_player.valid_planets_berzerker_warriors[chosen_planet]:
@@ -64,7 +65,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             primary_player.cards.remove("Shas'el Lyst")
         self.delete_interrupt()
     elif current_interrupt == "The Shadow Suit":
-        if not self.chosen_first_card:
+        if not interrupt.chosen_first_card:
             if not secondary_player.search_ready_card_at_planet(chosen_planet):
                 card = self.preloaded_find_card("The Shadow Suit")
                 if "The Shadow Suit" in primary_player.discard:
@@ -77,8 +78,8 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
                                                self.planet_array[chosen_planet] + ". You may exhaust a " +
                                                "unit at that planet to cancel this effect.")
                 self.interrupts_waiting_on_resolution[0].set_player_resolving_interrupt(secondary_player.name_player)
-                self.chosen_first_card = True
-                self.misc_target_planet = chosen_planet
+                interrupt.chosen_first_card = True
+                interrupt.misc_target_planet = chosen_planet
     elif current_interrupt == "Trazyn the Infinite":
         origin_planet, origin_pos = primary_player.get_location_of_warlord()
         if chosen_planet != origin_planet:
@@ -108,12 +109,12 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             self.choice_context = "Use Reanimating Warriors?"
             self.name_player_making_choices = name
         else:
-            if self.chosen_first_card:
-                origin_planet, origin_pos = self.misc_target_unit
+            if interrupt.chosen_first_card:
+                origin_planet, origin_pos = interrupt.misc_target_unit
                 target_planet = int(game_update_string[1])
                 if abs(origin_planet - target_planet) == 1:
                     primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
                     primary_player.move_unit_to_planet(origin_planet, origin_pos, target_planet)
                     self.delete_interrupt()
                     self.asked_if_resolve_effect = False
-                    self.chosen_first_card = False
+                    interrupt.chosen_first_card = False

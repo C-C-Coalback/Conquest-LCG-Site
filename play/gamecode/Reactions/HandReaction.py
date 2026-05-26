@@ -3,7 +3,8 @@ from ..Phases import DeployPhase
 
 
 async def resolve_hand_reaction(self, name, game_update_string, primary_player, secondary_player):
-    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+    reaction = self.reactions_needing_resolving[0]
+    current_reaction = reaction.get_reaction_name()
     hand_pos = int(game_update_string[2])
     if game_update_string[1] == primary_player.get_number():
         print("hand reaction num ok")
@@ -32,30 +33,30 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
         elif current_reaction == "Awakened Geomancer":
             primary_player.discard_card_from_hand(hand_pos)
             primary_player.add_resources(1)
-            self.misc_counter = self.misc_counter - 1
-            if self.misc_counter < 1:
+            reaction.misc_counter = reaction.misc_counter - 1
+            if reaction.misc_counter < 1:
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
         elif current_reaction == "Adaptative Thorax Swarm":
-            if hand_pos not in self.misc_player_storage:
+            if hand_pos not in reaction.misc_player_storage:
                 primary_player.aiming_reticle_coords_hand_2 = hand_pos
-                self.misc_player_storage.append(hand_pos)
-                if len(self.misc_player_storage) > 2:
+                reaction.misc_player_storage.append(hand_pos)
+                if len(reaction.misc_player_storage) > 2:
                     names_list = []
                     i = 0
-                    while i < len(self.misc_player_storage):
-                        names_list.append(primary_player.cards[self.misc_player_storage[i]])
-                        primary_player.remove_card_from_hand(self.misc_player_storage[i])
+                    while i < len(reaction.misc_player_storage):
+                        names_list.append(primary_player.cards[reaction.misc_player_storage[i]])
+                        primary_player.remove_card_from_hand(reaction.misc_player_storage[i])
                         primary_player.deck.append(names_list[i])
                         j = i + 1
-                        while j < len(self.misc_player_storage):
-                            if self.misc_player_storage[j] > self.misc_player_storage[i]:
-                                self.misc_player_storage[j] = self.misc_player_storage[j] - 1
+                        while j < len(reaction.misc_player_storage):
+                            if reaction.misc_player_storage[j] > reaction.misc_player_storage[i]:
+                                reaction.misc_player_storage[j] = reaction.misc_player_storage[j] - 1
                             j = j + 1
                         i = i + 1
                     cards_removed = ", ".join(names_list)
                     await self.send_update_message("Cards put on bottom of deck: " + cards_removed)
-                    for _ in range(len(self.misc_player_storage)):
+                    for _ in range(len(reaction.misc_player_storage)):
                         primary_player.draw_card()
                     primary_player.aiming_reticle_coords_hand = None
                     primary_player.aiming_reticle_coords_hand_2 = None
@@ -64,32 +65,32 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                                              (int(primary_player.number), -1, -1))
                     self.delete_reaction()
         elif current_reaction == "Magus Harid":
-            if not self.chosen_first_card:
-                self.misc_player_storage = hand_pos
-                self.chosen_first_card = True
+            if not reaction.chosen_first_card:
+                reaction.misc_player_storage = hand_pos
+                reaction.chosen_first_card = True
                 primary_player.aiming_reticle_coords_hand = hand_pos
                 primary_player.aiming_reticle_color = "blue"
         elif current_reaction == "Seething Mycetic Spore":
             card = primary_player.get_card_in_hand(hand_pos)
             if card is None:
                 return None
-            if card.get_card_type() == "Army" and card.get_cost() < 2 and card.get_name() != self.misc_player_storage:
-                primary_player.add_card_to_planet(card, self.misc_target_planet)
+            if card.get_card_type() == "Army" and card.get_cost() < 2 and card.get_name() != reaction.misc_player_storage:
+                primary_player.add_card_to_planet(card, reaction.misc_target_planet)
                 primary_player.remove_card_from_hand(hand_pos)
-                self.misc_counter += 1
-                self.misc_player_storage = card.get_name()
-                if self.misc_counter > 1:
+                reaction.misc_counter += 1
+                reaction.misc_player_storage = card.get_name()
+                if reaction.misc_counter > 1:
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "The Dance Without End":
             chosen_planet = self.reactions_needing_resolving[0].get_planet_pos()
-            if self.chosen_first_card:
+            if reaction.chosen_first_card:
                 card = primary_player.get_card_in_hand(hand_pos)
                 if card is None:
                     return None
                 if card.get_name() != self.misc_target_choice and card.get_card_type() == "Army" and \
                         card.check_for_a_trait("Harlequin"):
-                    self.chosen_second_card = True
+                    reaction.chosen_second_card = True
                     secondary_player.aiming_reticle_coords_hand = hand_pos
                     secondary_player.aiming_reticle_color = "blue"
                     await self.discount_begin_routine(chosen_planet, card, primary_player)
@@ -107,11 +108,11 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
         elif current_reaction == "Inquisitor Caius Wroth":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
         elif current_reaction == "Cegorach's Jesters":
-            if hand_pos not in self.misc_misc:
-                self.misc_misc.append(hand_pos)
+            if hand_pos not in reaction.misc_misc:
+                reaction.misc_misc.append(hand_pos)
             else:
-                self.misc_misc.remove(hand_pos)
-            await self.send_update_message("Currently revealing " + str(len(self.misc_misc)) + " cards.")
+                reaction.misc_misc.remove(hand_pos)
+            await self.send_update_message("Currently revealing " + str(len(reaction.misc_misc)) + " cards.")
         elif current_reaction == "Elusive Escort":
             _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             if planet_pos == -2:
@@ -125,15 +126,15 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
         elif current_reaction == "The Dawnsinger":
             primary_player.deck.insert(0, primary_player.cards[hand_pos])
             del primary_player.cards[hand_pos]
-            self.misc_counter += 1
-            if self.misc_counter > 1:
+            reaction.misc_counter += 1
+            if reaction.misc_counter > 1:
                 self.delete_reaction()
         elif current_reaction == "Jaricho Commit":
             await self.send_update_message(primary_player.name_player + " reveals a " +
                                            primary_player.cards[hand_pos] + " from their hand.")
             self.delete_reaction()
         elif current_reaction == "Vamii Industrial Complex":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 card = primary_player.get_card_in_hand(hand_pos)
                 if card is None:
                     return None
@@ -143,7 +144,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.card_type_of_selected_card_in_hand = card.get_card_type()
                     primary_player.aiming_reticle_coords_hand = hand_pos
                     primary_player.aiming_reticle_color = "blue"
-                    self.chosen_first_card = True
+                    reaction.chosen_first_card = True
         elif current_reaction == "Shard of the Deceiver":
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             if not primary_player.cards:
@@ -154,14 +155,14 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             self.delete_reaction()
         elif current_reaction == "Salvaged Battlewagon":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 card = primary_player.get_card_in_hand(int(game_update_string[2]))
                 if card is None:
                     return None
                 if card.get_faction() == "Orks" and card.get_cost() < 4 and card.get_card_type() == "Army":
                     primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     primary_player.aiming_reticle_color = "blue"
-                    self.chosen_first_card = True
+                    reaction.chosen_first_card = True
         elif current_reaction == "Blood Claw Pack":
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card is None:

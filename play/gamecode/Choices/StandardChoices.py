@@ -30,11 +30,11 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         await self.send_update_message("Select unit for World Engine Beam")
     elif self.choice_context == "Amount of damage (WEB)":
         amount_damage = int(self.choices_available[int(game_update_string[1])])
-        planet_pos, unit_pos = self.misc_target_unit
+        planet_pos, unit_pos = self.action_object.misc_target_unit
         primary_player.assign_damage_to_pos(planet_pos, unit_pos, amount_damage, preventable=False,
                                             by_enemy_unit=False)
-        player_with_web = self.misc_target_player
-        og_pla, og_pos = self.position_of_actioned_card
+        player_with_web = self.action_object.misc_target_player
+        og_pla, og_pos = self.action_object.position_of_actioned_card
         target_player = self.p2
         if player_with_web == self.name_1:
             target_player = self.p1
@@ -82,8 +82,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
             self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
             self.create_choices(self.choices_available, general_imaging_format="All")
-            self.misc_counter = self.misc_counter - 1
-            if self.misc_counter < 1:
+            self.reactions_needing_resolving[0].misc_counter = self.reactions_needing_resolving[0].misc_counter - 1
+            if self.reactions_needing_resolving[0].misc_counter < 1:
                 self.reset_choices_available()
                 self.resolving_search_box = False
                 self.delete_reaction()
@@ -118,7 +118,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
         self.delete_reaction()
     elif self.choice_context == "Nurgling Bomb Choice:":
-        planet, unit = self.misc_target_unit
+        planet, unit = self.action_object.misc_target_unit
         primary_player.reset_aiming_reticle_in_play(planet, unit)
         if game_update_string[1] == "0":
             primary_player.cards_in_play[planet + 1][unit].need_to_resolve_nurgling_bomb = False
@@ -134,7 +134,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             )
         self.reset_choices_available()
         if not self.scan_planet_for_nurgling_bomb(primary_player, secondary_player, planet):
-            if self.player_with_action == self.name_1:
+            if self.action_object.player_with_action == self.name_1:
                 nurgling_player = self.p1
             else:
                 nurgling_player = self.p2
@@ -398,7 +398,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.resolving_search_box = False
         await self.resolve_battle_conclusion(name, game_update_string)
     elif self.choice_context == "Thundering Wraith Choice":
-        pla, pos = self.misc_target_unit
+        pla, pos = self.reactions_needing_resolving[0].misc_target_unit
         primary_player.reset_aiming_reticle_in_play(pla, pos)
         if chosen_choice == "Rout Unit":
             primary_player.rout_unit(pla, pos)
@@ -559,19 +559,19 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.resolving_search_box = False
         await self.resolve_battle_conclusion(name, game_update_string)
     elif self.choice_context == "Tras Replacement":
-        self.most_recently_revealed_planet = self.misc_target_planet
+        self.most_recently_revealed_planet = self.reactions_needing_resolving[0].misc_target_planet
         for i in range(len(primary_player.headquarters)):
             if primary_player.get_ability_given_pos(-2, i) == "War Cabal":
                 self.create_reaction("War Cabal", primary_player.name_player,
                                      (int(primary_player.number), -2, i))
         for i in range(7):
-            if i != self.misc_target_planet:
+            if i != self.reactions_needing_resolving[0].misc_target_planet:
                 for j in range(len(primary_player.cards_in_play[i + 1])):
                     if primary_player.get_ability_given_pos(i, j) == "War Cabal":
                         self.create_reaction("War Cabal", primary_player.name_player,
                                              (int(primary_player.number), i, j))
-        self.replaced_planets[self.misc_target_planet] = True
-        self.planet_array[self.misc_target_planet] = chosen_choice
+        self.replaced_planets[self.reactions_needing_resolving[0].misc_target_planet] = True
+        self.planet_array[self.reactions_needing_resolving[0].misc_target_planet] = chosen_choice
         self.available_breach_planets.remove(chosen_choice)
         self.reset_choices_available()
         self.resolving_search_box = False
@@ -609,9 +609,9 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Big Mek Kagdrak Keyword":
         primary_player.last_kagrak_trait = chosen_choice
         target_player = primary_player
-        if self.misc_target_player != target_player.name_player:
+        if self.action_object.misc_target_player != target_player.name_player:
             target_player = secondary_player
-        planet_pos, unit_pos = self.misc_target_unit
+        planet_pos, unit_pos = self.action_object.misc_target_unit
         if planet_pos == -2:
             if chosen_choice == "Area Effect (1)":
                 target_player.headquarters[unit_pos].area_effect_eor += 1
@@ -640,7 +640,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 target_player.cards_in_play[planet_pos + 1][unit_pos].retaliate_eor += 3
         self.reset_choices_available()
         self.resolving_search_box = False
-        og_pla, og_pos = self.position_of_actioned_card
+        og_pla, og_pos = self.action_object.position_of_actioned_card
         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
         self.mask_jain_zar_check_actions(primary_player, secondary_player)
         self.action_cleanup()
@@ -731,7 +731,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 self.choices_available,
                 general_imaging_format="All"
             )
-            self.misc_counter = 0
+            self.action_object.misc_counter = 0
         elif chosen_choice == "Backlash":
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Use Backlash?"
@@ -808,7 +808,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.intercept_enabled = True
     elif self.choice_context == "Dark Lance Raider Damage":
         self.misc_target_choice = chosen_choice
-        self.misc_misc = []
+        self.reactions_needing_resolving[0].misc_misc = []
         self.reset_choices_available()
         self.resolving_search_box = False
     elif self.choice_context == "Urien's Oubliette":
@@ -955,7 +955,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             del primary_player.deck[int(game_update_string[1])]
             del self.choices_available[int(game_update_string[1])]
     elif self.choice_context == "Munitorum Support Take":
-        planet_pos, unit_pos = self.position_of_actioned_card
+        planet_pos, unit_pos = self.action_object.position_of_actioned_card
         primary_player.return_attachment_to_hand(-2, unit_pos, int(game_update_string[1]))
         self.reset_choices_available()
         self.resolving_search_box = False
@@ -973,20 +973,20 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             await self.shield_cleanup(primary_player, secondary_player, planet_pos)
     elif self.choice_context == "Access to the Black Library":
-        if not self.chosen_first_card:
+        if not self.action_object.chosen_first_card:
             self.misc_target_choice = chosen_choice
-            self.chosen_first_card = True
-            self.chosen_second_card = False
+            self.action_object.chosen_first_card = True
+            self.action_object.chosen_second_card = False
             self.choices_available.remove(chosen_choice)
             self.create_choices(
                 self.choices_available,
                 general_imaging_format="All"
             )
-        elif not self.chosen_second_card:
+        elif not self.action_object.chosen_second_card:
             await self.send_update_message("Please decide which card to give your opponent.")
             self.choices_available = [chosen_choice, self.misc_target_choice]
             self.name_player_making_choices = secondary_player.name_player
-            self.chosen_second_card = True
+            self.action_object.chosen_second_card = True
             self.create_choices(
                 self.choices_available,
                 general_imaging_format="All"
@@ -1144,17 +1144,17 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.choice_context = "Bottom card (CotS)"
     elif self.choice_context == "Rout or Exhaust (SS)":
         chosen_choice = self.choices_available[int(game_update_string[1])]
-        planet_pos, unit_pos = self.misc_target_unit
+        planet_pos, unit_pos = self.reactions_needing_resolving[0].misc_target_unit
         if chosen_choice == "Rout":
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             primary_player.rout_unit(planet_pos, unit_pos)
             if len(primary_player.cards_in_play[planet_pos + 1]) > unit_pos:
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
-            elif not self.chosen_first_card:
+            elif not self.reactions_needing_resolving[0].chosen_first_card:
                 if secondary_player.cards_in_play[planet_pos + 1]:
                     secondary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
-                    self.chosen_first_card = True
-                    self.misc_target_unit = (planet_pos, 0)
+                    self.reactions_needing_resolving[0].chosen_first_card = True
+                    self.reactions_needing_resolving[0].misc_target_unit = (planet_pos, 0)
                     self.choices_available = ["Exhaust", "Rout"]
                     self.choice_context = "Rout or Exhaust (SS)"
                     self.name_player_making_choices = secondary_player.name_player
@@ -1188,12 +1188,12 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
             if len(primary_player.cards_in_play[planet_pos + 1]) > unit_pos + 1:
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos + 1, "red")
-                self.misc_target_unit = (planet_pos, unit_pos + 1)
-            elif not self.chosen_first_card:
+                self.reactions_needing_resolving[0].misc_target_unit = (planet_pos, unit_pos + 1)
+            elif not self.reactions_needing_resolving[0].chosen_first_card:
                 if secondary_player.cards_in_play[planet_pos + 1]:
                     secondary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
-                    self.chosen_first_card = True
-                    self.misc_target_unit = (planet_pos, 0)
+                    self.reactions_needing_resolving[0].chosen_first_card = True
+                    self.reactions_needing_resolving[0].misc_target_unit = (planet_pos, 0)
                     self.choices_available = ["Exhaust", "Rout"]
                     self.choice_context = "Rout or Exhaust (SS)"
                     self.name_player_making_choices = secondary_player.name_player
@@ -1241,11 +1241,11 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Lost in the Webway":
         if chosen_choice == "Harlequin":
             await self.send_update_message("Swapping Harlequins")
-            self.action_chosen = "Lost in the Webway Harlequin"
+            self.action_object.action_chosen = "Lost in the Webway Harlequin"
         else:
             await self.send_update_message("Opponent must swap two army units.")
-            self.action_chosen = "Lost in the Webway Opponent"
-            self.player_with_action = secondary_player.name_player
+            self.action_object.action_chosen = "Lost in the Webway Opponent"
+            self.action_object.player_with_action = secondary_player.name_player
         self.reset_choices_available()
         self.resolving_search_box = False
     elif self.choice_context == "Select new synapse (RSN):":
@@ -1329,8 +1329,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
         self.resolving_search_box = False
     elif self.choice_context == "Tempting Ceasefire Number":
-        if not self.chosen_first_card:
-            self.chosen_first_card = True
+        if not self.action_object.chosen_first_card:
+            self.action_object.chosen_first_card = True
             self.misc_target_choice = chosen_choice
             self.name_player_making_choices = secondary_player.name_player
         else:
@@ -1381,7 +1381,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.action_cleanup()
     elif self.choice_context == "WillSub: Draw Card for Damage?":
         if chosen_choice == "Yes":
-            self.chosen_first_card = False
+            self.reactions_needing_resolving[0].chosen_first_card = False
             self.reactions_needing_resolving[0].set_player_resolving_reaction(primary_player.name_player)
         else:
             self.delete_reaction()
@@ -1559,7 +1559,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.resolving_search_box = False
             self.reset_choices_available()
     elif self.choice_context == "Ymgarl Factor gains:":
-        planet_pos, unit_pos = self.misc_target_unit
+        planet_pos, unit_pos = self.action_object.misc_target_unit
         if self.choices_available[int(game_update_string[1])] == "+2 ATK":
             primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOP")
             if planet_pos == -2:
@@ -1600,10 +1600,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         await self.send_update_message("Choose planet to remove from play")
     elif self.choice_context == "Sacrifice Hive Ship Tendrils?":
         self.reset_choices_available()
-        self.chosen_first_card = False
+        self.reactions_needing_resolving[0].chosen_first_card = False
         if game_update_string[1] == "0":
             num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-            self.misc_counter = primary_player.headquarters[unit_pos].counter
+            self.reactions_needing_resolving[0].misc_counter = primary_player.headquarters[unit_pos].counter
             primary_player.sacrifice_card_in_hq(unit_pos)
         else:
             self.delete_reaction()
@@ -1667,38 +1667,38 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
             self.resolving_search_box = False
     elif self.choice_context == "Attachment from Deck: (Sweep Attack)":
-        self.misc_player_storage = self.choices_available[int(game_update_string[1])]
+        self.reactions_needing_resolving[0].misc_player_storage = self.choices_available[int(game_update_string[1])]
         self.reset_choices_available()
-        self.chosen_first_card = True
+        self.reactions_needing_resolving[0].chosen_first_card = True
         self.resolving_search_box = False
-        self.misc_counter = 0
-        await self.send_update_message("Attaching a " + self.misc_player_storage + ".")
+        self.reactions_needing_resolving[0].misc_counter = 0
+        await self.send_update_message("Attaching a " + self.reactions_needing_resolving[0].misc_player_storage + ".")
     elif self.choice_context == "Attachment from Deck: (PoM)":
-        self.misc_player_storage = self.choices_available[int(game_update_string[1])]
+        self.reactions_needing_resolving[0].misc_player_storage = self.choices_available[int(game_update_string[1])]
         self.reset_choices_available()
-        self.chosen_first_card = True
+        self.reactions_needing_resolving[0].chosen_first_card = True
         self.resolving_search_box = False
-        self.misc_counter = 0
-        await self.send_update_message("Attaching a " + self.misc_player_storage + ".")
+        self.reactions_needing_resolving[0].misc_counter = 0
+        await self.send_update_message("Attaching a " + self.reactions_needing_resolving[0].misc_player_storage + ".")
     elif self.choice_context == "Choose a new Synapse: (PotW)":
         chosen_synapse = self.choices_available[int(game_update_string[1])]
         card = FindCard.find_card(chosen_synapse, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         primary_player.add_to_hq(card)
-        og_pla, og_pos = self.position_of_actioned_card
+        og_pla, og_pos = self.action_object.position_of_actioned_card
         primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
         self.action_cleanup()
         self.reset_choices_available()
         self.resolving_search_box = False
     elif self.choice_context == "Choose card to discard for Searing Brand":
         primary_player.discard_card_from_hand(int(game_update_string[1]))
-        self.misc_counter += 1
+        self.action_object.misc_counter += 1
         self.choices_available = primary_player.cards
         self.create_choices(
             self.choices_available,
             general_imaging_format="All"
         )
-        if self.misc_counter > 1:
+        if self.action_object.misc_counter > 1:
             if "Searing Brand" in secondary_player.cards:
                 secondary_player.discard_card_name_from_hand("Searing Brand")
             secondary_player.aiming_reticle_coords_hand = None
@@ -1712,7 +1712,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 self.choices_available,
                 general_imaging_format="All"
             )
-            self.misc_counter = 0
+            self.action_object.misc_counter = 0
             self.choice_context = "Choose card to discard for Searing Brand"
         elif game_update_string[1] == "1":
             self.reset_choices_available()
@@ -1736,7 +1736,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Swap Warlord with Khymera?":
         if chosen_choice == "Yes":
             _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-            other_pla, other_pos = self.misc_target_unit
+            other_pla, other_pos = self.reactions_needing_resolving[0].misc_target_unit
             primary_player.switch_locations_of_units(planet_pos, unit_pos, other_pla, other_pos)
         self.reset_choices_available()
         self.resolving_search_box = False
@@ -1966,9 +1966,9 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Use Reanimating Warriors?":
         self.reset_choices_available()
         if game_update_string[1] == "0":
-            self.chosen_first_card = False
+            self.interrupts_waiting_on_resolution[0].chosen_first_card = False
             self.asked_if_resolve_effect = True
-            self.misc_target_unit = (-1, -1)
+            self.interrupts_waiting_on_resolution[0].misc_target_unit = (-1, -1)
         if game_update_string[1] == "1":
             self.delete_interrupt()
     elif self.choice_context == "Prophetic Farseer Discard":
@@ -2057,8 +2057,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         elif game_update_string[1] == "1":
             self.canceled_resource_bonuses[self.misc_target_planet] = True
         self.reset_choices_available()
-        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                    self.position_of_actioned_card[1])
+        primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                    self.action_object.position_of_actioned_card[1])
         self.action_cleanup()
     elif self.choice_context == "Agra's Preachings choices":
         card_name = primary_player.deck[int(game_update_string[1])]
@@ -2068,7 +2068,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             card_at_planet = CardClasses.AttachmentCard(
                 card_name, "", "", -1, "", "", -1, False, planet_attachment=True
             )
-            primary_player.add_attachment_to_planet(self.misc_target_planet, card_at_planet)
+            primary_player.add_attachment_to_planet(self.reactions_needing_resolving[0].misc_target_planet, card_at_planet)
             del primary_player.deck[int(game_update_string[1])]
             primary_player.number_cards_to_search = primary_player.number_cards_to_search - 1
             primary_player.bottom_remaining_cards()
@@ -2084,8 +2084,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             if card.get_cost() < 3:
                 if primary_player.attach_card(card, planet_pos, unit_pos):
                     del primary_player.deck[int(game_update_string[1])]
-                    self.misc_counter += 1
-                    if self.misc_counter == 1:
+                    self.reactions_needing_resolving[0].misc_counter += 1
+                    if self.reactions_needing_resolving[0].misc_counter == 1:
                         self.choices_available = primary_player.deck[:8]
                         self.create_choices(
                             self.choices_available,
@@ -2142,10 +2142,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.resolve_played_any_event()
             self.action_cleanup()
         else:
-            self.chosen_first_card = False
-            self.action_chosen = target_choice
+            self.action_object.chosen_first_card = False
+            self.action_object.action_chosen = target_choice
     elif self.choice_context == "ND: Faction":
-        self.misc_misc.remove(chosen_choice)
+        self.reactions_needing_resolving[0].misc_misc.remove(chosen_choice)
         self.choices_available = []
         self.choice_context = "ND: Unit"
         for i in range(len(self.card_array)):
@@ -2180,7 +2180,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
     elif self.choice_context == "Target Dread Monolith:":
         target_choice = self.choices_available[int(game_update_string[1])]
-        planet, pos = self.position_of_actioned_card
+        planet, pos = self.action_object.position_of_actioned_card
         primary_player.reset_aiming_reticle_in_play(planet, pos)
         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
@@ -2358,8 +2358,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 await self.send_update_message(
                     "Can not play the topmost unit in that discard pile!"
                 )
-                primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                            self.position_of_actioned_card[1])
+                primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                            self.action_object.position_of_actioned_card[1])
                 self.action_cleanup()
             else:
                 await self.send_update_message(
@@ -2368,19 +2368,19 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 if card_name == "Shrieking Exarch":
                     if len(primary_player.cards) > 1:
                         await self.send_update_message("You must discard 2 cards for Shrieking Exarch")
-                        self.action_chosen = "Shrieking Exarch Anrakyr Discard"
+                        self.action_object.action_chosen = "Shrieking Exarch Anrakyr Discard"
                         self.misc_counter = 2
                     else:
                         await self.send_update_message("Cannot play Shrieking Exarch!")
-                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                    self.position_of_actioned_card[1])
+                        primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                                    self.action_object.position_of_actioned_card[1])
                         self.action_cleanup()
         else:
             await self.send_update_message(
                 "Did not find a valid card!"
             )
-            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                        self.position_of_actioned_card[1])
+            primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                        self.action_object.position_of_actioned_card[1])
             self.action_cleanup()
         self.reset_choices_available()
 
@@ -2393,7 +2393,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         target = self.choices_available[int(game_update_string[1])]
         card = FindCard.find_card(target, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
-        self.misc_counter = card.attack
+        self.reactions_needing_resolving[0].misc_counter = card.attack
         self.reset_choices_available()
         self.resolving_search_box = False
     elif self.choice_context == "The Flayed Mask Choice:":
@@ -2464,10 +2464,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.resolving_search_box = False
     elif self.choice_context == "Autarch Celachia":
         self.reset_choices_available()
-        self.action_chosen = ""
-        self.player_with_action = ""
+        self.action_object.action_chosen = ""
+        self.action_object.player_with_action = ""
         self.mode = "Normal"
-        planet_pos, unit_pos = self.position_of_actioned_card
+        planet_pos, unit_pos = self.action_object.position_of_actioned_card
         primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
         if game_update_string[1] == "0":
             primary_player.increase_eor_value("Area Effect", 1, planet_pos, unit_pos)
@@ -2484,7 +2484,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             await self.send_update_message(
                 "Autarch Celachia gained Mobile."
             )
-        self.position_of_actioned_card = (-1, -1)
+        self.action_object.position_of_actioned_card = (-1, -1)
     elif self.choice_context == "Keyword copied from Brood Chamber" or \
             self.choice_context == "Evolutionary Adaptation":
         self.misc_target_choice = self.choices_available[int(game_update_string[1])]
@@ -2525,7 +2525,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 primary_player.number_cards_to_search += -1
                 primary_player.bottom_remaining_cards()
     elif self.choice_context == "Myriad Excesses Correct":
-        planet_pos, unit_pos = self.misc_target_unit
+        planet_pos, unit_pos = self.reactions_needing_resolving[0].misc_target_unit
         if chosen_choice == "Take Control":
             self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
         elif chosen_choice == "Destroy":
@@ -2534,9 +2534,9 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.resolving_search_box = False
         self.delete_reaction()
     elif self.choice_context == "Damage Drifting Spore Mines?":
-        planet_pos, unit_pos = self.misc_target_unit
+        planet_pos, unit_pos = self.reactions_needing_resolving[0].misc_target_unit
         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-        self.chosen_first_card = True
+        self.reactions_needing_resolving[0].chosen_first_card = True
         self.resolving_search_box = False
         self.reset_choices_available()
         if game_update_string[1] == "0":
@@ -2544,10 +2544,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         else:
             self.delete_reaction()
     elif self.choice_context == "Heavy Venom Cannon":
-        planet, unit, att = self.misc_target_attachment
+        planet, unit, att = self.action_object.misc_target_attachment
         self.reset_choices_available()
         target_player = primary_player
-        if self.misc_target_player == secondary_player.name_player:
+        if self.action_object.misc_target_player == secondary_player.name_player:
             target_player = secondary_player
         if game_update_string[1] == "0":
             if planet == -2:
@@ -2675,19 +2675,17 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         else:
             self.reset_choices_available()
     elif self.choice_context == "Use Crushing Blow?":
-        planet_pos, unit_pos = self.furiable_unit_position
         if game_update_string[1] == "0":
             self.reset_choices_available()
         elif game_update_string[1] == "1":
             self.reset_choices_available()
     elif self.choice_context == "Brutal Cunning: amount of damage":
         if game_update_string[1] == "0":
-            self.misc_counter = 1
+            self.action_object.misc_counter = 1
         elif game_update_string[1] == "1":
-            self.misc_counter = 2
+            self.action_object.misc_counter = 2
         self.reset_choices_available()
     elif self.choice_context == "Use The Fury of Sicarius?":
-        planet_pos, unit_pos = self.furiable_unit_position
         if game_update_string[1] == "0":
             self.reset_choices_available()
         elif game_update_string[1] == "1":

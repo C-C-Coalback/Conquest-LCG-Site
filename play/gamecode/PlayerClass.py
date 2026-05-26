@@ -3881,7 +3881,7 @@ class Player:
                 self.cards_in_play[i + 1][j].card_moved_recently = False
 
     def clear_aiming_reticle_actioned_card(self):
-        pla, pos = self.game.position_of_actioned_card
+        pla, pos = self.game.action_object.position_of_actioned_card
         self.reset_aiming_reticle_in_play(pla, pos)
 
     def reset_defense_batteries(self):

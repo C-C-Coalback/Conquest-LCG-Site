@@ -12,7 +12,8 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         player_owning_card = primary_player
     else:
         player_owning_card = secondary_player
-    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+    interrupt = self.interrupts_waiting_on_resolution[0]
+    current_interrupt = interrupt.get_interrupt_name()
     if current_interrupt == "Prudent Fire Warriors":
         og_num, og_pla, og_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
         if og_pla == planet_pos and og_pos != unit_pos:
@@ -50,8 +51,8 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             self.delete_interrupt()
     elif current_interrupt == "The Shadow Suit":
         if game_update_string[1] == primary_player.number:
-            if self.chosen_first_card:
-                if planet_pos == self.misc_target_planet:
+            if interrupt.chosen_first_card:
+                if planet_pos == interrupt.misc_target_planet:
                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
                         self.delete_interrupt()
@@ -201,53 +202,53 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 self.delete_interrupt()
     elif current_interrupt == "Blood of Martyrs":
         if game_update_string[1] == primary_player.number:
-            if not self.chosen_first_card:
+            if not interrupt.chosen_first_card:
                 if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum"):
                     if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                        self.misc_misc = []
-                        self.misc_counter = 3
-                        self.chosen_first_card = True
-                        self.chosen_second_card = False
-                        self.misc_target_unit = (planet_pos, unit_pos)
-                        self.misc_target_planet = planet_pos
+                        interrupt.misc_misc = []
+                        interrupt.misc_counter = 3
+                        interrupt.chosen_first_card = True
+                        interrupt.chosen_second_card = False
+                        interrupt.misc_target_unit = (planet_pos, unit_pos)
+                        interrupt.misc_target_planet = planet_pos
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, color="red")
                         await self.send_update_message("Now select up to three army units.")
-            elif not self.chosen_second_card:
+            elif not interrupt.chosen_second_card:
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                    if planet_pos == self.misc_target_planet:
-                        if (planet_pos, unit_pos) != self.misc_target_unit:
-                            if (planet_pos, unit_pos) not in self.misc_misc:
-                                self.misc_misc.append((planet_pos, unit_pos))
+                    if planet_pos == interrupt.misc_target_planet:
+                        if (planet_pos, unit_pos) != interrupt.misc_target_unit:
+                            if (planet_pos, unit_pos) not in interrupt.misc_misc:
+                                interrupt.misc_misc.append((planet_pos, unit_pos))
                                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
-                                self.misc_counter = self.misc_counter - 1
-                                if self.misc_counter < 1:
-                                    self.chosen_second_card = True
-                                    if primary_player.get_faith_given_pos(self.misc_target_unit[0],
-                                                                          self.misc_target_unit[1]) < 1:
+                                interrupt.misc_counter = interrupt.misc_counter - 1
+                                if interrupt.misc_counter < 1:
+                                    interrupt.chosen_second_card = True
+                                    if primary_player.get_faith_given_pos(interrupt.misc_target_unit[0],
+                                                                          interrupt.misc_target_unit[1]) < 1:
                                         await self.send_update_message("No faith to move; skipping directly to "
                                                                        "increasing the attack of the units step.")
-                                        for i in range(len(self.misc_misc)):
-                                            primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
-                                                                                          self.misc_misc[i][1], 1,
+                                        for i in range(len(interrupt.misc_misc)):
+                                            primary_player.increase_attack_of_unit_at_pos(interrupt.misc_misc[i][0],
+                                                                                          interrupt.misc_misc[i][1], 1,
                                                                                           expiration="NEXT")
                                         if primary_player.check_for_trait_given_pos(
-                                                self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                                                interrupt.misc_target_unit[0], interrupt.misc_target_unit[1], "Martyr"):
                                             primary_player.draw_card()
                                         primary_player.reset_all_aiming_reticles_play_hq()
                                         self.delete_interrupt()
             else:
-                if (planet_pos, unit_pos) in self.misc_misc:
+                if (planet_pos, unit_pos) in interrupt.misc_misc:
                     primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
-                    primary_player.spend_faith_given_pos(self.misc_target_unit[0], self.misc_target_unit[1], 1)
-                    if primary_player.get_faith_given_pos(self.misc_target_unit[0],
-                                                          self.misc_target_unit[1]) < 1:
+                    primary_player.spend_faith_given_pos(interrupt.misc_target_unit[0], interrupt.misc_target_unit[1], 1)
+                    if primary_player.get_faith_given_pos(interrupt.misc_target_unit[0],
+                                                          interrupt.misc_target_unit[1]) < 1:
                         await self.send_update_message("No faith left, increasing the attack of the units.")
-                        for i in range(len(self.misc_misc)):
-                            primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
-                                                                          self.misc_misc[i][1], 1,
+                        for i in range(len(interrupt.misc_misc)):
+                            primary_player.increase_attack_of_unit_at_pos(interrupt.misc_misc[i][0],
+                                                                          interrupt.misc_misc[i][1], 1,
                                                                           expiration="NEXT")
                         if primary_player.check_for_trait_given_pos(
-                                self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                                interrupt.misc_target_unit[0], interrupt.misc_target_unit[1], "Martyr"):
                             primary_player.draw_card()
                         primary_player.reset_all_aiming_reticles_play_hq()
                         self.delete_interrupt()
@@ -295,23 +296,23 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             self.choices_available = ["Yes", "No"]
             self.choice_context = "Use Reanimating Warriors?"
             self.name_player_making_choices = name
-        elif not self.chosen_first_card:
+        elif not interrupt.chosen_first_card:
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == \
                         "Reanimating Warriors" \
                         and not primary_player.cards_in_play[planet_pos + 1][unit_pos] \
                         .once_per_phase_used:
                     if primary_player.check_damage_too_great_given_pos(planet_pos, unit_pos) == 0:
-                        self.chosen_first_card = True
-                        self.misc_target_unit = (planet_pos, unit_pos)
+                        interrupt.chosen_first_card = True
+                        interrupt.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
                         primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
     elif current_interrupt == "Transcendent Blessing":
-        if not self.chosen_first_card:
+        if not interrupt.chosen_first_card:
             if game_update_string[1] == primary_player.number:
                 if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                    self.chosen_first_card = True
+                    interrupt.chosen_first_card = True
                     await self.send_update_message("Select target for the attachment.")
         else:
             card = self.preloaded_find_card("Transcendent Blessing")
@@ -369,7 +370,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 except ValueError:
                     pass
     elif current_interrupt == "Magus Harid":
-        if planet_pos == self.misc_target_planet:
+        if planet_pos == interrupt.misc_target_planet:
             await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string)
     elif current_interrupt == "No Mercy":
         if game_update_string[1] == primary_player.number:

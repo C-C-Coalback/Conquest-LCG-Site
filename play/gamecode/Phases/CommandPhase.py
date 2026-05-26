@@ -456,13 +456,13 @@ async def update_game_event_command_section(self, name, game_update_string):
                             if primary_player.get_ready_given_pos(-2, unit_pos):
                                 primary_player.exhaust_given_pos(-2, unit_pos, card_effect=True)
                                 self.mode = "ACTION"
-                                self.action_chosen = "Archon's Palace"
-                                self.player_with_action = primary_player.name_player
+                                self.action_object.action_chosen = "Archon's Palace"
+                                self.action_object.player_with_action = primary_player.name_player
                                 self.misc_target_planet = self.last_planet_checked_command_struggle
                                 self.choices_available = ["Cards", "Resources"]
                                 self.choice_context = "Archon's Palace"
                                 self.name_player_making_choices = primary_player.name_player
-                                self.position_of_actioned_card = (-2, unit_pos)
+                                self.action_object.position_of_actioned_card = (-2, unit_pos)
                                 primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
                         elif primary_player.get_ability_given_pos(-2, unit_pos) == "The Duke of Debris":
                             if not primary_player.get_once_per_phase_used_given_pos(-2, unit_pos):
@@ -537,16 +537,16 @@ async def update_game_event_command_section(self, name, game_update_string):
                 if self.get_actions_allowed():
                     self.stored_mode = self.mode
                     self.mode = "ACTION"
-                    self.player_with_action = name
+                    self.action_object.player_with_action = name
                     await self.send_update_message(name + " wants to take an action.")
-                    if self.player_with_action == self.name_1 and self.p1.dark_possession_active:
+                    if self.action_object.player_with_action == self.name_1 and self.p1.dark_possession_active:
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
-                        self.name_player_making_choices = self.player_with_action
-                    elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
+                        self.name_player_making_choices = self.action_object.player_with_action
+                    elif self.action_object.player_with_action == self.name_2 and self.p2.dark_possession_active:
                         self.choices_available = ["Dark Possession", "Regular Action"]
                         self.choice_context = "Use Dark Possession?"
-                        self.name_player_making_choices = self.player_with_action
+                        self.name_player_making_choices = self.action_object.player_with_action
     if self.p1.has_passed and self.p2.has_passed:
         print("Both passed")
         if self.before_command_struggle:

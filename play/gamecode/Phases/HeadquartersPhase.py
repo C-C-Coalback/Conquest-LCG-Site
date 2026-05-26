@@ -7,17 +7,17 @@ async def update_game_event_headquarters_section(self, name, game_update_string)
                 print("Need to run action code")
                 self.stored_mode = self.mode
                 self.mode = "ACTION"
-                self.player_with_action = name
+                self.action_object.player_with_action = name
                 print("Special HQ action")
                 await self.send_update_message(name + " wants to take an action.")
-                if self.player_with_action == self.name_1 and self.p1.dark_possession_active:
+                if self.action_object.player_with_action == self.name_1 and self.p1.dark_possession_active:
                     self.choices_available = ["Dark Possession", "Regular Action"]
                     self.choice_context = "Use Dark Possession?"
-                    self.name_player_making_choices = self.player_with_action
-                elif self.player_with_action == self.name_2 and self.p2.dark_possession_active:
+                    self.name_player_making_choices = self.action_object.player_with_action
+                elif self.action_object.player_with_action == self.name_2 and self.p2.dark_possession_active:
                     self.choices_available = ["Dark Possession", "Regular Action"]
                     self.choice_context = "Use Dark Possession?"
-                    self.name_player_making_choices = self.player_with_action
+                    self.name_player_making_choices = self.action_object.player_with_action
         elif game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
             if name == self.name_1:
                 self.p1.has_passed = True

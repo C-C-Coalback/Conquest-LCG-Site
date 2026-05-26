@@ -6,7 +6,8 @@ from .. import CardClasses
 async def resolve_hq_reaction(self, name, game_update_string, primary_player, secondary_player):
     planet_pos = -2
     unit_pos = int(game_update_string[2])
-    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+    reaction = self.reactions_needing_resolving[0]
+    current_reaction = reaction.get_reaction_name()
     player_owning_card = self.p1
     if game_update_string[1] == "2":
         player_owning_card = self.p2
@@ -102,8 +103,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if game_update_string[1] == primary_player.number:
             if primary_player.headquarters[unit_pos].get_is_unit():
                 if primary_player.get_faction_given_pos(-2, unit_pos) != "Necrons":
-                    self.chosen_first_card = True
-                    self.misc_target_unit = (-2, unit_pos)
+                    reaction.chosen_first_card = True
+                    reaction.misc_target_unit = (-2, unit_pos)
                     primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -145,7 +146,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
     elif current_reaction == "Burst Forth":
         card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
         if card_type == "Warlord" or card_type == "Synapse":
-            primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, reaction.misc_target_planet)
             self.delete_reaction()
     elif current_reaction == "Imperial Fists Legion":
         if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
@@ -161,16 +162,16 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
     elif current_reaction == "Tunneling Mawloc":
         card_type = primary_player.get_card_type_given_pos(planet_pos, unit_pos)
         if card_type == "Army":
-            if not self.chosen_first_card:
-                primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
-                self.infest_planet(self.misc_target_planet, primary_player)
+            if not reaction.chosen_first_card:
+                primary_player.move_unit_to_planet(planet_pos, unit_pos, reaction.misc_target_planet)
+                self.infest_planet(reaction.misc_target_planet, primary_player)
                 self.delete_reaction()
         elif card_type == "Token":
-            primary_player.move_unit_to_planet(planet_pos, unit_pos, self.misc_target_planet)
-            self.misc_counter += 1
-            self.chosen_first_card = True
-            if self.misc_counter > 3:
-                self.infest_planet(self.misc_target_planet, primary_player)
+            primary_player.move_unit_to_planet(planet_pos, unit_pos, reaction.misc_target_planet)
+            reaction.misc_counter += 1
+            reaction.chosen_first_card = True
+            if reaction.misc_counter > 3:
+                self.infest_planet(reaction.misc_target_planet, primary_player)
                 self.delete_reaction()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Invalid target for " + current_reaction + ".")
@@ -178,8 +179,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if game_update_string[1] == primary_player.number:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
-                self.misc_counter = self.misc_counter - 1
-                if self.misc_counter < 1:
+                reaction.misc_counter = reaction.misc_counter - 1
+                if reaction.misc_counter < 1:
                     self.delete_reaction()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -200,15 +201,15 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 if not more:
                     self.delete_reaction()
     elif current_reaction == "Devoted Hospitaller":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if primary_player.get_number() == game_update_string[1]:
                 primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
-                self.misc_counter += 1
-                if self.misc_counter > 1:
-                    self.chosen_first_card = True
+                reaction.misc_counter += 1
+                if reaction.misc_counter > 1:
+                    reaction.chosen_first_card = True
     elif current_reaction == "Patron Saint":
         if game_update_string[1] == primary_player.get_number():
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 if (primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army" and
                     primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum")) or \
                         primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Ecclesiarchy"):
@@ -216,10 +217,10 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                     primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
                     after_damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
                     if after_damage < before_damage:
-                        self.misc_counter = self.misc_counter - 1
-                    if self.misc_counter < 1:
-                        self.chosen_first_card = True
-                        self.misc_counter = 3
+                        reaction.misc_counter = reaction.misc_counter - 1
+                    if reaction.misc_counter < 1:
+                        reaction.chosen_first_card = True
+                        reaction.misc_counter = 3
                         await self.send_update_message("Now place 3 faith.")
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -227,8 +228,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             else:
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
-                    self.misc_counter = self.misc_counter - 1
-                    if self.misc_counter < 1:
+                    reaction.misc_counter = reaction.misc_counter - 1
+                    if reaction.misc_counter < 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
                 else:
@@ -238,8 +239,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         if game_update_string[1] == primary_player.get_number():
             if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
                 primary_player.increase_faith_given_pos(planet_pos, unit_pos, 1)
-                self.misc_counter = self.misc_counter - 1
-                if self.misc_counter < 1:
+                reaction.misc_counter = reaction.misc_counter - 1
+                if reaction.misc_counter < 1:
                     self.delete_reaction()
     elif current_reaction == "The Flayed Mask Surprise":
         if game_update_string[1] == primary_player.get_number():
@@ -274,7 +275,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
     elif current_reaction == "Saint Erika":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                self.chosen_first_card = True
+                reaction.chosen_first_card = True
                 await self.send_update_message("Select card in discard to bring back.")
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -293,15 +294,15 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "That unit is not a valid target for Defense Battery.")
     elif current_reaction == "Magus Harid":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             if game_update_string[1] == secondary_player.number:
                 if secondary_player.headquarters[unit_pos].valid_target_magus_harid:
-                    card = primary_player.get_card_in_hand(self.misc_player_storage)
+                    card = primary_player.get_card_in_hand(reaction.misc_player_storage)
                     if card is None:
                         return None
                     secondary_player.headquarters[unit_pos].add_attachment(card, name_owner=primary_player.name_player,
                                                                            is_magus=True)
-                    primary_player.remove_card_from_hand(self.misc_player_storage)
+                    primary_player.remove_card_from_hand(reaction.misc_player_storage)
                     primary_player.draw_card()
                     primary_player.aiming_reticle_coords_hand = None
                     warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
@@ -323,7 +324,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "That unit is not a valid target for Vow of Honor.")
     elif current_reaction == "Scavenging Kroot Rider":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if game_update_string[1] == secondary_player.number:
                 if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                     if secondary_player.headquarters[unit_pos].get_limited():
@@ -345,8 +346,8 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                                 self.nullify_context = "In Play Reaction"
                             if can_continue:
                                 secondary_player.exhaust_given_pos(-2, unit_pos)
-                                self.chosen_first_card = True
-                                if self.chosen_first_card and self.chosen_second_card:
+                                reaction.chosen_first_card = True
+                                if reaction.chosen_first_card and reaction.chosen_second_card:
                                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                     self.delete_reaction()
                     else:
@@ -369,14 +370,14 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   current_reaction + " can only target Location supports.")
     elif current_reaction == "Pain Crafter":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Pain Crafter":
                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                            self.chosen_first_card = True
+                            reaction.chosen_first_card = True
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                               current_reaction + " has already use its ability this phase.")
@@ -470,13 +471,13 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               current_reaction + " can only target army units.")
     elif current_reaction == "Shadowed Thorns Venom":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if primary_player.headquarters[unit_pos].shadowed_thorns_venom_valid:
-                    self.chosen_first_card = True
+                    reaction.chosen_first_card = True
                     primary_player.headquarters[unit_pos].shadowed_thorns_venom_valid = False
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
-                    self.misc_target_unit = (planet_pos, unit_pos)
+                    reaction.misc_target_unit = (planet_pos, unit_pos)
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Not a valid target for " + current_reaction + ".")
@@ -510,16 +511,16 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             else:
                 self.delete_reaction()
     elif current_reaction == "Tomb Blade Squadron":
-        if not self.chosen_first_card and not self.chosen_second_card:
+        if not reaction.chosen_first_card and not reaction.chosen_second_card:
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.headquarters[unit_pos].get_ability() == "Tomb Blade Squadron":
                     if not primary_player.headquarters[unit_pos].misc_ability_used:
                         primary_player.headquarters[unit_pos].misc_ability_used = True
-                        self.chosen_first_card = True
-                        self.misc_target_unit = (-2, unit_pos)
+                        reaction.chosen_first_card = True
+                        reaction.misc_target_unit = (-2, unit_pos)
                         primary_player.set_aiming_reticle_in_play(-2, unit_pos, "blue")
     elif current_reaction == "Defense Battery":
-        if self.chosen_first_card:
+        if reaction.chosen_first_card:
             if game_update_string[1] == secondary_player.get_number():
                 if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
                     if secondary_player.headquarters[unit_pos].valid_defense_battery_target:
@@ -582,24 +583,24 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
             _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
             damage = primary_player.get_damage_given_pos(og_pla, og_pos)
             primary_player.set_damage_given_pos(og_pla, og_pos, damage + 1)
-            self.misc_counter += 1
-            if self.misc_counter > 1:
+            reaction.misc_counter += 1
+            if reaction.misc_counter > 1:
                 self.delete_reaction()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target Chaos army units and Khorne units.")
     elif current_reaction == "Castellan Crowe":
         if game_update_string[1] == primary_player.number:
             if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
-                self.misc_counter += 1
-                await self.send_update_message("Total faith spent: " + str(self.misc_counter))
+                reaction.misc_counter += 1
+                await self.send_update_message("Total faith spent: " + str(reaction.misc_counter))
     elif current_reaction == "The Emperor's Retribution":
-        if not self.chosen_first_card:
+        if not reaction.chosen_first_card:
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
                     if primary_player.check_if_faction_given_pos(-2, unit_pos, "Space Marines", own_event=True):
                         if not primary_player.check_for_trait_given_pos(-2, unit_pos, "Elite"):
-                            self.chosen_first_card = True
-                            self.misc_target_unit = (-2, unit_pos)
+                            reaction.chosen_first_card = True
+                            reaction.misc_target_unit = (-2, unit_pos)
                             primary_player.set_aiming_reticle_in_play(-2, unit_pos)
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -625,16 +626,16 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   current_reaction + " cannot target itself.")
     elif current_reaction == "Willing Submission":
-        if not self.chosen_first_card or not self.chosen_second_card:
+        if not reaction.chosen_first_card or not reaction.chosen_second_card:
             if primary_player.get_number() == game_update_string[1]:
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or \
                         primary_player.headquarters[unit_pos].aiming_reticle_color != "blue":
                     primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                    if not self.chosen_first_card:
-                        self.chosen_first_card = True
-                        self.chosen_second_card = False
+                    if not reaction.chosen_first_card:
+                        reaction.chosen_first_card = True
+                        reaction.chosen_second_card = False
                     else:
-                        self.chosen_second_card = True
+                        reaction.chosen_second_card = True
                         self.reactions_needing_resolving[0].set_player_resolving_reaction(secondary_player.name_player)
                         primary_player.draw_card()
                         await self.send_update_message(secondary_player.name_player +

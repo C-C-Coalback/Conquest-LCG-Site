@@ -5,7 +5,7 @@ from .Phases import DeployPhase, CommandPhase, CombatPhase, HeadquartersPhase, P
 from . import FindCard
 import threading
 from .Actions import AttachmentHQActions, AttachmentInPlayActions, HandActions, HQActions, \
-    InPlayActions, PlanetActions, DiscardActions
+    InPlayActions, PlanetActions, DiscardActions, ActionClass
 from .Choices import StandardChoices
 from .Reactions import StartReaction, PlanetsReaction, HandReaction, HQReaction, InPlayReaction, DiscardReaction, \
     AttachmentInPlayReaction, AttachmentHQReaction, ReactionsClass
@@ -231,6 +231,7 @@ class Game:
         self.choice_context = ""
         self.damage_from_atrox = False
         self.ghost_ark_of_orikan = -1
+        self.action_object = ActionClass.Action()
         self.damage_on_units_hq_before_new_damage = []
         self.yvarn_active = False
         self.p1_triggered_yvarn = False
@@ -587,7 +588,7 @@ class Game:
         if self.interrupts_waiting_on_resolution:
             print("interrupts are being done")
             return False
-        if self.action_chosen:
+        if self.action_object.action_chosen:
             print("action being done")
             return False
         if self.rearranging_deck:
@@ -693,9 +694,9 @@ class Game:
         :return: None
         """
         self.mode = "Normal"
-        self.action_chosen = ""
-        self.player_with_action = ""
-        self.position_of_actioned_card = (-1, -1)
+        self.action_object.action_chosen = ""
+        self.action_object.player_with_action = ""
+        self.action_object.position_of_actioned_card = (-1, -1)
 
     def reset_damage_data(self):
         """
@@ -922,8 +923,8 @@ class Game:
             info_string += self.name_player_who_is_searching + "/"
         elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
             info_string += "Unspecified/"
-        elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
-            info_string += self.player_with_action + "/"
+        elif self.action_object.action_chosen == "Ambush" and self.mode == "DISCOUNT":
+            info_string += self.action_object.player_with_action + "/"
         elif self.choices_available:
             info_string += self.name_player_making_choices + "/"
         elif self.interrupts_waiting_on_resolution:
@@ -1001,9 +1002,9 @@ class Game:
         elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
             info_string += "Indirect damage: P1: " + str(self.p1.total_indirect_damage) + " P2: " + \
                            str(self.p2.total_indirect_damage) + "/"
-        elif self.action_chosen == "Ambush" and self.mode == "DISCOUNT":
+        elif self.action_object.action_chosen == "Ambush" and self.mode == "DISCOUNT":
             info_string += "Ambush discounts/God help you/"
-            info_string += self.player_with_action + "/"
+            info_string += self.action_object.player_with_action + "/"
         elif self.choices_available:
             info_string += "Choice: " + self.choice_context + "/"
             info_string += "User: " + self.name_player_making_choices + "/"
@@ -1177,7 +1178,7 @@ class Game:
             await self.send_update_message(planet_string)
 
     def determine_player_with_discounts(self):
-        if self.player_with_action == self.name_1:
+        if self.action_object.player_with_action == self.name_1:
             player = self.p1
             secondary_player = self.p2
         else:
@@ -1319,7 +1320,7 @@ class Game:
             secondary_player.get_number_of_units_at_planet(chosen_planet)
 
     async def update_game_event_action(self, name, game_update_string):
-        if name == self.player_with_action:
+        if name == self.action_object.player_with_action:
             if name == self.name_1:
                 primary_player = self.p1
                 secondary_player = self.p2
@@ -1332,115 +1333,115 @@ class Game:
                     game_update_string = ["HAND", "2", str(self.p2.pos_card_dark_possession)]
             if len(game_update_string) == 1:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                    if self.action_chosen == "":
+                    if self.action_object.action_chosen == "":
                         self.mode = self.stored_mode
-                        self.player_with_action = ""
+                        self.action_object.player_with_action = ""
                         print("Canceled special action")
                         await self.send_update_message(name + " canceled their action request")
-                    elif self.action_chosen == "Smash 'n Bash":
+                    elif self.action_object.action_chosen == "Smash 'n Bash":
                         print("Try to stop smash n bash")
-                        if self.chosen_first_card:
+                        if self.action_object.chosen_first_card:
                             await self.send_update_message("Stopping Smash 'n Bash early")
                             primary_player.resolve_played_any_event()
                             self.action_cleanup()
-                    elif self.action_chosen == "Seer's Exodus":
+                    elif self.action_object.action_chosen == "Seer's Exodus":
                         await self.send_update_message("Stopping Seer's Exodus")
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Rapid Evolution":
+                    elif self.action_object.action_chosen == "Rapid Evolution":
                         await self.send_update_message("Stopping Rapid Evolution")
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Despise":
+                    elif self.action_object.action_chosen == "Despise":
                         await self.send_update_message(
-                            self.player_with_action + " does not sacrifice a card for Despise."
+                            self.action_object.player_with_action + " does not sacrifice a card for Despise."
                         )
-                        if self.player_with_action == self.name_1:
-                            self.player_with_action = self.name_2
+                        if self.action_object.player_with_action == self.name_1:
+                            self.action_object.player_with_action = self.name_2
                             self.p1.sacced_card_for_despise = True
                         else:
-                            self.player_with_action = self.name_1
+                            self.action_object.player_with_action = self.name_1
                             self.p2.sacced_card_for_despise = True
                         if self.p1.sacced_card_for_despise and self.p2.sacced_card_for_despise:
                             secondary_player.resolve_played_any_event()
                             self.action_cleanup()
                             await secondary_player.dark_eldar_event_played()
-                    elif self.action_chosen == "Preemptive Barrage":
+                    elif self.action_object.action_chosen == "Preemptive Barrage":
                         await self.send_update_message("Stopping Preemptive Barrage early")
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Rapid Assault":
-                        if self.chosen_second_card:
+                    elif self.action_object.action_chosen == "Rapid Assault":
+                        if self.action_object.chosen_second_card:
                             await self.send_update_message("Rapid Assault ended early")
                             primary_player.resolve_played_any_event()
                             await primary_player.dark_eldar_event_played()
                             self.action_cleanup()
-                    elif self.action_chosen == "Inevitable Betrayal":
+                    elif self.action_object.action_chosen == "Inevitable Betrayal":
                         await self.send_update_message("Finished resolving Inevitable Betrayal")
                         self.p1.reset_all_aiming_reticles_play_hq()
                         self.p2.reset_all_aiming_reticles_play_hq()
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
                         await primary_player.dark_eldar_event_played()
-                    elif self.action_chosen == "Cathedral of Saint Camila" or self.action_chosen == "Eldritch Storm":
-                        await self.send_update_message("Finished " + self.action_chosen)
-                        self.misc_counter = 0
+                    elif self.action_object.action_chosen == "Cathedral of Saint Camila" or self.action_object.action_chosen == "Eldritch Storm":
+                        await self.send_update_message("Finished " + self.action_object.action_chosen)
+                        self.action_object.misc_counter = 0
                         self.action_cleanup()
-                    elif self.action_chosen == "Daring Assault" and not self.chosen_first_card:
+                    elif self.action_object.action_chosen == "Daring Assault" and not self.action_object.chosen_first_card:
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Pattern IX Immolator":
-                        if not self.chosen_first_card:
-                            self.chosen_first_card = True
-                            self.misc_counter = secondary_player.command_struggles_won_this_phase - 1
-                            await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
+                    elif self.action_object.action_chosen == "Pattern IX Immolator":
+                        if not self.action_object.chosen_first_card:
+                            self.action_object.chosen_first_card = True
+                            self.action_object.misc_counter = secondary_player.command_struggles_won_this_phase - 1
+                            await self.send_update_message("Now place " + str(self.action_object.misc_counter) + " faith.")
                         else:
                             self.action_cleanup()
-                    elif self.action_chosen == "Indiscriminate Bombing":
-                        if not self.chosen_second_card:
-                            self.chosen_second_card = True
-                            self.player_with_action = secondary_player.name_player
+                    elif self.action_object.action_chosen == "Indiscriminate Bombing":
+                        if not self.action_object.chosen_second_card:
+                            self.action_object.chosen_second_card = True
+                            self.action_object.player_with_action = secondary_player.name_player
                             await self.send_update_message("Indiscriminate Bombing passed.")
                         else:
                             secondary_player.resolve_played_any_event()
                             self.action_cleanup()
                             await self.send_update_message("Indiscriminate Bombing passed.")
-                    elif self.action_chosen == "Biomass Sacrifice":
-                        await self.send_update_message("Finished " + self.action_chosen)
+                    elif self.action_object.action_chosen == "Biomass Sacrifice":
+                        await self.send_update_message("Finished " + self.action_object.action_chosen)
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Crown of Control":
-                        await self.send_update_message("Finished " + self.action_chosen)
+                    elif self.action_object.action_chosen == "Crown of Control":
+                        await self.send_update_message("Finished " + self.action_object.action_chosen)
                         self.action_cleanup()
-                    elif self.action_chosen == "Piercing Wail":
-                        await self.send_update_message("Finished " + self.action_chosen)
+                    elif self.action_object.action_chosen == "Piercing Wail":
+                        await self.send_update_message("Finished " + self.action_object.action_chosen)
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Know No Fear":
+                    elif self.action_object.action_chosen == "Know No Fear":
                         await self.send_update_message("Stopping Know No Fear early")
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Soot-Blackened Axe":
+                    elif self.action_object.action_chosen == "Soot-Blackened Axe":
                         self.action_cleanup()
-                    elif self.action_chosen == "Guerrilla Tactics Move":
+                    elif self.action_object.action_chosen == "Guerrilla Tactics Move":
                         self.action_cleanup()
-                    elif self.action_chosen == "Iridescent Wand":
+                    elif self.action_object.action_chosen == "Iridescent Wand":
                         self.action_cleanup()
-                    elif self.action_chosen == "Unshrouded Truth":
-                        num_revealed = len(self.misc_misc)
+                    elif self.action_object.action_chosen == "Unshrouded Truth":
+                        num_revealed = len(self.action_object.misc_misc)
                         num_cards = len(primary_player.cards)
                         resources = num_cards - num_revealed
                         secondary_player.add_resources(resources)
                         await self.send_update_message("Gained " + str(resources) + " resources for unrevealed cards.")
-                        self.misc_misc = None
+                        self.action_object.misc_misc = None
                         secondary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Attuned Gyrinx":
+                    elif self.action_object.action_chosen == "Attuned Gyrinx":
                         await self.send_update_message("Stopping Attuned Gyrinx early")
                         self.action_cleanup()
-                    elif self.action_chosen == "Biomass Extraction":
+                    elif self.action_object.action_chosen == "Biomass Extraction":
                         self.action_cleanup()
-                    elif self.action_chosen == "Awake the Sleepers":
+                    elif self.action_object.action_chosen == "Awake the Sleepers":
                         if not primary_player.harbinger_of_eternity_active:
                             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                         primary_player.harbinger_of_eternity_active = False
@@ -1448,25 +1449,25 @@ class Game:
                         primary_player.shuffle_deck()
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Whirling Death":
+                    elif self.action_object.action_chosen == "Whirling Death":
                         await self.send_update_message("Stopping Whirling Death")
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Force Reallocation":
+                    elif self.action_object.action_chosen == "Force Reallocation":
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Boast of Strength":
-                        if not self.chosen_first_card:
+                    elif self.action_object.action_chosen == "Boast of Strength":
+                        if not self.action_object.chosen_first_card:
                             primary_player.resolve_played_any_event()
                         else:
                             secondary_player.draw_card()
                             secondary_player.add_resources(2)
                             secondary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "The Wolf Within":
+                    elif self.action_object.action_chosen == "The Wolf Within":
                         await self.send_update_message("Stopping The Wolf Within early")
                         self.action_cleanup()
-                    elif self.action_chosen == "Memories of Fallen Comrades":
+                    elif self.action_object.action_chosen == "Memories of Fallen Comrades":
                         await self.send_update_message("Stopping Memories of Fallen Comrades early")
                         self.action_cleanup()
                     else:
@@ -1476,9 +1477,9 @@ class Game:
                     await PlanetActions.update_game_event_action_planet(self, name, game_update_string)
             elif len(game_update_string) == 3:
                 if game_update_string[0] == "HAND":
-                    if self.player_with_action == self.name_1 and game_update_string[1] == "1":
+                    if self.action_object.player_with_action == self.name_1 and game_update_string[1] == "1":
                         await HandActions.update_game_event_action_hand(self, name, game_update_string)
-                    elif self.player_with_action == self.name_2 and game_update_string[1] == "2":
+                    elif self.action_object.player_with_action == self.name_2 and game_update_string[1] == "2":
                         await HandActions.update_game_event_action_hand(self, name, game_update_string)
                 elif game_update_string[0] == "HQ":
                     await HQActions.update_game_event_action_hq(self, name, game_update_string)
@@ -1487,13 +1488,13 @@ class Game:
                 elif game_update_string[0] == "REMOVED":
                     chosen_removed = int(game_update_string[1])
                     pos_removed = int(game_update_string[2])
-                    if self.player_with_action == self.name_1:
+                    if self.action_object.player_with_action == self.name_1:
                         primary_player = self.p1
                         secondary_player = self.p2
                     else:
                         primary_player = self.p2
                         secondary_player = self.p1
-                    if not self.action_chosen:
+                    if not self.action_object.action_chosen:
                         if chosen_removed == int(primary_player.number):
                             ability = primary_player.cards_removed_from_game[pos_removed]
                             if ability == "The Orgiastic Feast":
@@ -1536,7 +1537,7 @@ class Game:
                                                 self.misc_target_choice = ""
                                                 self.name_player_making_choices = primary_player.name_player
                                                 self.resolving_search_box = True
-                                                self.action_chosen = ability
+                                                self.action_object.action_chosen = ability
                             elif ability == "Test of Faith":
                                 vael_relevant = False
                                 vael_bloodied = False
@@ -1561,15 +1562,15 @@ class Game:
                                         else:
                                             primary_player.set_once_per_round_used_given_pos(warlord_pla,
                                                                                              warlord_pos, True)
-                                        self.action_chosen = ability
-                    elif self.action_chosen == "Reveal The Blade":
-                        if not self.chosen_first_card:
+                                        self.action_object.action_chosen = ability
+                    elif self.action_object.action_chosen == "Reveal The Blade":
+                        if not self.action_object.chosen_first_card:
                             if chosen_removed == int(primary_player.number):
                                 if primary_player.cards_removed_from_game_hidden[pos_removed] == "H":
                                     card_name = primary_player.cards_removed_from_game[pos_removed]
                                     card = self.preloaded_find_card(card_name)
                                     if card.get_shields() == 0:
-                                        self.chosen_first_card = True
+                                        self.action_object.chosen_first_card = True
                                         primary_player.cards_removed_from_game_hidden[pos_removed] = "N"
                                         if card_name == "Connoisseur of Terror":
                                             self.create_reaction("Connoisseur of Terror", primary_player.name_player,
@@ -1583,7 +1584,7 @@ class Game:
                 elif game_update_string[0] == "RESERVE":
                     planet_pos = int(game_update_string[2])
                     unit_pos = int(game_update_string[3])
-                    if not self.action_chosen:
+                    if not self.action_object.action_chosen:
                         if game_update_string[1] == primary_player.number:
                             if primary_player.cards_in_reserve[planet_pos][unit_pos].get_ability() \
                                     == "XV25 Stealth Squad" and self.phase == "COMBAT":
@@ -1603,26 +1604,26 @@ class Game:
                                 if primary_player.spend_resources(cost):
                                     primary_player.deepstrike_unit(planet_pos, unit_pos)
                                     self.action_cleanup()
-                    elif self.action_chosen == "Korporal Snagbrat":
-                        if not self.chosen_first_card:
+                    elif self.action_object.action_chosen == "Korporal Snagbrat":
+                        if not self.action_object.chosen_first_card:
                             if game_update_string[1] == primary_player.get_number():
-                                self.chosen_first_card = True
+                                self.action_object.chosen_first_card = True
                                 primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
                                 self.misc_target_choice = "RESERVE"
-                                self.misc_target_unit = (planet_pos, unit_pos)
-                    elif self.action_chosen == "Daring Assault":
-                        if not self.chosen_first_card:
+                                self.action_object.misc_target_unit = (planet_pos, unit_pos)
+                    elif self.action_object.action_chosen == "Daring Assault":
+                        if not self.action_object.chosen_first_card:
                             if game_update_string[1] == primary_player.get_number():
-                                self.chosen_first_card = True
+                                self.action_object.chosen_first_card = True
                                 primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
-                                self.misc_target_unit = (planet_pos, unit_pos)
-                    elif self.action_chosen == "The Dawn Blade":
+                                self.action_object.misc_target_unit = (planet_pos, unit_pos)
+                    elif self.action_object.action_chosen == "The Dawn Blade":
                         if self.misc_target_choice == "Move":
-                            if not self.chosen_first_card:
+                            if not self.action_object.chosen_first_card:
                                 if game_update_string[1] == primary_player.get_number():
-                                    self.chosen_first_card = True
+                                    self.action_object.chosen_first_card = True
                                     primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
-                                    self.misc_target_unit = (planet_pos, unit_pos)
+                                    self.action_object.misc_target_unit = (planet_pos, unit_pos)
                         else:
                             if primary_player.get_number() == game_update_string[1]:
                                 actual_card = primary_player.cards_in_reserve[planet_pos][unit_pos]
@@ -1636,13 +1637,13 @@ class Game:
                                             primary_player.deepstrike_attachment_extras(planet_pos)
                                             self.action_cleanup()
                                         else:
-                                            self.chosen_first_card = True
+                                            self.action_object.chosen_first_card = True
                                             primary_player.cards_in_reserve[planet_pos][
                                                 unit_pos].aiming_reticle_color = "blue"
-                                            self.misc_target_unit = (planet_pos, unit_pos)
+                                            self.action_object.misc_target_unit = (planet_pos, unit_pos)
                                             self.misc_target_choice = "RESERVE"
-                    elif self.action_chosen == "Kommando Cunning":
-                        if not self.chosen_first_card:
+                    elif self.action_object.action_chosen == "Kommando Cunning":
+                        if not self.action_object.chosen_first_card:
                             if primary_player.get_number() == game_update_string[1]:
                                 actual_card = primary_player.cards_in_reserve[planet_pos][unit_pos]
                                 if actual_card.get_card_type() == "Army":
@@ -1662,28 +1663,28 @@ class Game:
                                         primary_player.resolve_played_any_event()
                                         self.action_cleanup()
                                     else:
-                                        self.chosen_first_card = True
+                                        self.action_object.chosen_first_card = True
                                         primary_player.cards_in_reserve[planet_pos][
                                             unit_pos].aiming_reticle_color = "blue"
-                                        self.misc_target_unit = (planet_pos, unit_pos)
+                                        self.action_object.misc_target_unit = (planet_pos, unit_pos)
                                         self.misc_target_choice = "RESERVE"
-                    elif self.action_chosen == "Vanguarding Horror":
-                        if not self.chosen_first_card:
+                    elif self.action_object.action_chosen == "Vanguarding Horror":
+                        if not self.action_object.chosen_first_card:
                             if primary_player.get_number() == game_update_string[1]:
-                                if planet_pos == self.misc_target_planet:
+                                if planet_pos == self.action_object.misc_target_planet:
                                     primary_player.cards_in_reserve[planet_pos][unit_pos].aiming_reticle_color = "blue"
-                                    self.chosen_first_card = True
-                                    self.misc_target_unit = (planet_pos, unit_pos)
-                                elif abs(planet_pos - self.misc_target_planet) == 1:
-                                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                                self.position_of_actioned_card[1])
-                                    primary_player.cards_in_reserve[self.misc_target_planet].append(
+                                    self.action_object.chosen_first_card = True
+                                    self.action_object.misc_target_unit = (planet_pos, unit_pos)
+                                elif abs(planet_pos - self.action_object.misc_target_planet) == 1:
+                                    primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                                                self.action_object.position_of_actioned_card[1])
+                                    primary_player.cards_in_reserve[self.action_object.misc_target_planet].append(
                                         primary_player.cards_in_reserve[planet_pos][unit_pos]
                                     )
                                     del primary_player.cards_in_reserve[planet_pos][unit_pos]
                                     self.mask_jain_zar_check_actions(primary_player, secondary_player)
                                     self.action_cleanup()
-                    elif self.action_chosen == "No Surprises":
+                    elif self.action_object.action_chosen == "No Surprises":
                         if game_update_string[1] == "1":
                             target = self.p1
                         else:
@@ -1706,7 +1707,7 @@ class Game:
                         player_with_attach = self.p1
                     else:
                         player_with_attach = self.p2
-                    if not self.action_chosen:
+                    if not self.action_object.action_chosen:
                         if player_with_attach.attachments_at_planet[pos_planet][
                             pos_attachment].allowed_phases_while_in_play == self.phase or\
                             player_with_attach.attachments_at_planet[pos_planet][
@@ -1737,8 +1738,8 @@ class Game:
                                                 self.action_cleanup()
                                             else:
                                                 await self.send_update_message("Infest adjacent planet")
-                                                self.action_chosen = "Rain of Mycetic Spores"
-                                                self.misc_target_planet = pos_planet
+                                                self.action_object.action_chosen = "Rain of Mycetic Spores"
+                                                self.action_object.misc_target_planet = pos_planet
                             elif player_with_attach.attachments_at_planet[pos_planet][
                                     pos_attachment].get_ability() == "Call The Storm":
                                 if primary_player.number == game_update_string[2]:
@@ -1748,9 +1749,9 @@ class Game:
                                                                                   primary_player.name_player):
                                             player_with_attach.attachments_at_planet[pos_planet][
                                                 pos_attachment].exhaust_card()
-                                            self.action_chosen = "Call The Storm"
-                                            self.chosen_first_card = False
-                                            self.misc_target_planet = pos_planet
+                                            self.action_object.action_chosen = "Call The Storm"
+                                            self.action_object.chosen_first_card = False
+                                            self.action_object.misc_target_planet = pos_planet
                             elif player_with_attach.attachments_at_planet[pos_planet][
                                     pos_attachment].get_ability() == "Planetary Devastation":
                                 if primary_player.number == game_update_string[2]:
@@ -1758,11 +1759,11 @@ class Game:
                                     primary_player.summon_token_at_planet("Termagant", pos_planet)
                                     del player_with_attach.attachments_at_planet[pos_planet][pos_attachment]
                                     self.action_cleanup()
-                    elif self.action_chosen == "Subdual":
+                    elif self.action_object.action_chosen == "Subdual":
                         player_with_attach.deck.insert(
                             0, player_with_attach.attachments_at_planet[pos_planet][pos_attachment].get_name())
                         del player_with_attach.attachments_at_planet[pos_planet][pos_attachment]
-                        if self.player_with_action == self.name_1:
+                        if self.action_object.player_with_action == self.name_1:
                             primary_player = self.p1
                         else:
                             primary_player = self.p2
@@ -1770,8 +1771,8 @@ class Game:
                         primary_player.aiming_reticle_coords_hand = None
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
-                    elif self.action_chosen == "Smuggler's Den":
-                        if self.player_with_action == self.name_1:
+                    elif self.action_object.action_chosen == "Smuggler's Den":
+                        if self.action_object.player_with_action == self.name_1:
                             primary_player = self.p1
                         else:
                             primary_player = self.p2
@@ -1787,11 +1788,11 @@ class Game:
             self.p1.dark_possession_remove_after_play = True
         if self.p2.force_due_to_dark_possession:
             self.p2.dark_possession_remove_after_play = True
-        if not self.action_chosen and self.p1.dark_possession_remove_after_play:
+        if not self.action_object.action_chosen and self.p1.dark_possession_remove_after_play:
             if self.p1.discard:
                 del self.p1.discard[-1]
             self.p1.dark_possession_remove_after_play = False
-        if not self.action_chosen and self.p2.dark_possession_remove_after_play:
+        if not self.action_object.action_chosen and self.p2.dark_possession_remove_after_play:
             if self.p2.discard:
                 del self.p2.discard[-1]
             self.p2.dark_possession_remove_after_play = False
@@ -1977,7 +1978,7 @@ class Game:
                 if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                     if self.number_who_is_searching == "1":
                         self.p1.bottom_remaining_cards()
-                        if self.action_chosen == "Drop Pod Assault":
+                        if self.action_object.action_chosen == "Drop Pod Assault":
                             self.p1.resolve_played_any_event()
                             self.action_cleanup()
                         if self.reactions_needing_resolving:
@@ -1991,7 +1992,7 @@ class Game:
                                 self.delete_reaction()
                     else:
                         self.p2.bottom_remaining_cards()
-                        if self.action_chosen == "Drop Pod Assault":
+                        if self.action_object.action_chosen == "Drop Pod Assault":
                             self.p2.resolve_played_any_event()
                             self.action_cleanup()
                         if self.reactions_needing_resolving:
@@ -2072,7 +2073,7 @@ class Game:
                         elif self.what_to_do_with_searched_card == "PLAY TO BATTLE" and card_chosen is not None:
                             primary_player.play_card_to_battle_at_location_deck(self.last_planet_checked_for_battle,
                                                                                 int(game_update_string[1]), card_chosen)
-                            if self.action_chosen == "Drop Pod Assault":
+                            if self.action_object.action_chosen == "Drop Pod Assault":
                                 primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                         elif self.what_to_do_with_searched_card == "STORE":
@@ -2281,10 +2282,10 @@ class Game:
                 await self.complete_backlash(primary_player, secondary_player)
             elif self.nullify_context == "Regular Action" or self.nullify_context == "Event Action":
                 num_player = "1"
-                if self.player_with_action == self.name_2:
+                if self.action_object.player_with_action == self.name_2:
                     num_player = "2"
                 string = ["HAND", num_player, str(self.nullified_card_pos)]
-                await HandActions.update_game_event_action_hand(self, self.player_with_action, string,
+                await HandActions.update_game_event_action_hand(self, self.action_object.player_with_action, string,
                                                                 may_nullify=False)
             elif self.nullify_context == "Indomitable":
                 await self.resolve_indomitable(primary_player, secondary_player)
@@ -2618,18 +2619,18 @@ class Game:
                 secondary_player.draw_card()
             if self.nullified_card_name == "Breach and Clear":
                 secondary_player.add_resources(2)
-            self.action_chosen = ""
-            self.player_with_action = ""
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
             self.mode = "Normal"
             self.amount_spend_for_tzeentch_firestorm = 0
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
         elif self.nullify_context == "In Play Action":
-            secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                          self.position_of_actioned_card[1])
-            self.action_chosen = ""
-            self.player_with_action = ""
+            secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                          self.action_object.position_of_actioned_card[1])
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
             self.mode = "Normal"
-            self.position_of_actioned_card = (-1, -1)
+            self.action_object.position_of_actioned_card = (-1, -1)
         elif self.nullify_context == "Reaction":
             self.delete_reaction()
         elif self.nullify_context == "Reaction Event":
@@ -2660,15 +2661,15 @@ class Game:
             secondary_player.resolve_played_any_event()
             self.action_cleanup()
         elif self.nullify_context == "In Play Action":
-            secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                          self.position_of_actioned_card[1])
-            self.action_chosen = ""
-            self.player_with_action = ""
+            secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                          self.action_object.position_of_actioned_card[1])
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
             self.mode = "Normal"
             if self.nullified_card_name in self.dies_to_backlash:
-                secondary_player.destroy_card_in_play(self.position_of_actioned_card[0],
-                                                      self.position_of_actioned_card[1])
-            self.position_of_actioned_card = (-1, -1)
+                secondary_player.destroy_card_in_play(self.action_object.position_of_actioned_card[0],
+                                                      self.action_object.position_of_actioned_card[1])
+            self.action_object.position_of_actioned_card = (-1, -1)
         elif self.nullify_context == "Reaction":
             if self.nullified_card_name in self.dies_to_backlash:
                 secondary_player.destroy_card_in_play(self.reactions_needing_resolving[0].get_planet_pos(),
@@ -2682,7 +2683,7 @@ class Game:
             await self.resolve_battle_conclusion(secondary_player, game_string="")
 
     def mask_jain_zar_check_actions(self, primary_player, secondary_player):
-        planet_pos, unit_pos = self.position_of_actioned_card
+        planet_pos, unit_pos = self.action_object.position_of_actioned_card
         if planet_pos != -1 and planet_pos != -2 and unit_pos != -1:
             if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
@@ -2777,18 +2778,18 @@ class Game:
             if self.nullify_context == "Event Action":
                 secondary_player.aiming_reticle_coords_hand = None
                 secondary_player.aiming_reticle_coords_hand_2 = None
-                self.action_chosen = ""
-                self.player_with_action = ""
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
                 self.amount_spend_for_tzeentch_firestorm = 0
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
             elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                              self.position_of_actioned_card[1])
-                self.action_chosen = ""
-                self.player_with_action = ""
+                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                              self.action_object.position_of_actioned_card[1])
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
-                self.position_of_actioned_card = (-1, -1)
+                self.action_object.position_of_actioned_card = (-1, -1)
             elif self.nullify_context == "Reaction":
                 self.delete_reaction()
             elif self.nullify_context == "Reaction Event":
@@ -2815,18 +2816,18 @@ class Game:
                     secondary_player.draw_card()
                 if self.nullified_card_name == "Breach and Clear":
                     secondary_player.add_resources(2)
-                self.action_chosen = ""
-                self.player_with_action = ""
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
                 self.amount_spend_for_tzeentch_firestorm = 0
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
             elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                              self.position_of_actioned_card[1])
-                self.action_chosen = ""
-                self.player_with_action = ""
+                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                              self.action_object.position_of_actioned_card[1])
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
-                self.position_of_actioned_card = (-1, -1)
+                self.action_object.position_of_actioned_card = (-1, -1)
             elif self.nullify_context == "Reaction":
                 self.delete_reaction()
             elif self.nullify_context == "Reaction Event":
@@ -2857,18 +2858,18 @@ class Game:
                     secondary_player.draw_card()
                 if self.nullified_card_name == "Breach and Clear":
                     secondary_player.add_resources(2)
-                self.action_chosen = ""
-                self.player_with_action = ""
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
                 self.amount_spend_for_tzeentch_firestorm = 0
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
             elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                              self.position_of_actioned_card[1])
-                self.action_chosen = ""
-                self.player_with_action = ""
+                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                              self.action_object.position_of_actioned_card[1])
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
-                self.position_of_actioned_card = (-1, -1)
+                self.action_object.position_of_actioned_card = (-1, -1)
             elif self.nullify_context == "Reaction":
                 self.delete_reaction()
             elif self.nullify_context == "Reaction Event":
@@ -2898,18 +2899,18 @@ class Game:
                     secondary_player.draw_card()
                 if self.nullified_card_name == "Breach and Clear":
                     secondary_player.add_resources(2)
-                self.action_chosen = ""
-                self.player_with_action = ""
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
                 self.amount_spend_for_tzeentch_firestorm = 0
                 secondary_player.discard_card_name_from_hand(self.nullified_card_name)
             elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                              self.position_of_actioned_card[1])
-                self.action_chosen = ""
-                self.player_with_action = ""
+                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                              self.action_object.position_of_actioned_card[1])
+                self.action_object.action_chosen = ""
+                self.action_object.player_with_action = ""
                 self.mode = "Normal"
-                self.position_of_actioned_card = (-1, -1)
+                self.action_object.position_of_actioned_card = (-1, -1)
             elif self.nullify_context == "Reaction":
                 self.delete_reaction()
             elif self.nullify_context == "Reaction Event":
@@ -2926,10 +2927,11 @@ class Game:
             self.communications_relay_enabled = True
 
     def action_cleanup(self):
-        self.action_chosen = ""
-        self.player_with_action = ""
+        self.action_object.reset_action_data()
+        self.action_object.action_chosen = ""
+        self.action_object.player_with_action = ""
         self.mode = "Normal"
-        self.position_of_actioned_card = (-1, -1)
+        self.action_object.position_of_actioned_card = (-1, -1)
         self.omega_ambush_active = False
         self.sanguinary_ambush_active = False
         self.p1.harbinger_of_eternity_active = False
@@ -5548,11 +5550,11 @@ class Game:
                     if reaction_name == "Alaitoc Shrine":
                         primary_player.allowed_units_alaitoc_shrine = []
                     if reaction_name == "The Blood Pits":
-                        if self.misc_misc:
-                            for i in range(len(self.misc_misc)):
-                                pla, pos = self.misc_misc[i]
+                        if self.reactions_needing_resolving[0].misc_misc:
+                            for i in range(len(self.reactions_needing_resolving[0].misc_misc)):
+                                pla, pos = self.reactions_needing_resolving[0].misc_misc[i]
                                 secondary_player.assign_damage_to_pos(pla, pos, 2)
-                        self.misc_misc = None
+                        self.reactions_needing_resolving[0].misc_misc = None
                         primary_player.drammask_nane_check()
                     if reaction_name == "The Inevitable Decay":
                         primary_player.drammask_nane_check()
@@ -5560,8 +5562,8 @@ class Game:
                         primary_player.reset_all_aiming_reticles_play_hq()
                     if reaction_name == "Castellan Crowe":
                         num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-                        if self.misc_counter > 0:
-                            secondary_player.assign_damage_to_pos(pla, pos, self.misc_counter)
+                        if self.reactions_needing_resolving[0].misc_counter > 0:
+                            secondary_player.assign_damage_to_pos(pla, pos, self.reactions_needing_resolving[0].misc_counter)
                     if reaction_name == "Fire Warrior Elite" or \
                             reaction_name == "Deathwing Interceders" or \
                             reaction_name == "Runts to the Front":
@@ -5573,24 +5575,24 @@ class Game:
                         await CombatPhase.update_game_event_combat_section(
                             self, secondary_player.name_player, last_game_update_string)
                     if reaction_name == "Tomb Blade Squadron":
-                        planet_pos, unit_pos = self.misc_target_unit
+                        planet_pos, unit_pos = self.reactions_needing_resolving[0].misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     if reaction_name == "Adaptative Thorax Swarm":
                         i = 0
                         names_list = []
-                        while i < len(self.misc_player_storage):
-                            names_list.append(primary_player.cards[self.misc_player_storage[i]])
-                            primary_player.remove_card_from_hand(self.misc_player_storage[i])
+                        while i < len(self.reactions_needing_resolving[0].misc_player_storage):
+                            names_list.append(primary_player.cards[self.reactions_needing_resolving[0].misc_player_storage[i]])
+                            primary_player.remove_card_from_hand(self.reactions_needing_resolving[0].misc_player_storage[i])
                             primary_player.deck.append(names_list[i])
                             j = i + 1
-                            while j < len(self.misc_player_storage):
-                                if self.misc_player_storage[j] > self.misc_player_storage[i]:
-                                    self.misc_player_storage[j] = self.misc_player_storage[j] - 1
+                            while j < len(self.reactions_needing_resolving[0].misc_player_storage):
+                                if self.reactions_needing_resolving[0].misc_player_storage[j] > self.reactions_needing_resolving[0].misc_player_storage[i]:
+                                    self.reactions_needing_resolving[0].misc_player_storage[j] = self.reactions_needing_resolving[0].misc_player_storage[j] - 1
                                 j = j + 1
                             i = i + 1
                         cards_removed = ", ".join(names_list)
                         await self.send_update_message("Cards put on bottom of deck: " + cards_removed)
-                        for _ in range(len(self.misc_player_storage)):
+                        for _ in range(len(self.reactions_needing_resolving[0].misc_player_storage)):
                             primary_player.draw_card()
                         primary_player.aiming_reticle_coords_hand = None
                         primary_player.aiming_reticle_coords_hand_2 = None
@@ -5606,9 +5608,9 @@ class Game:
                         secondary_player.reset_all_aiming_reticles_play_hq()
                     if reaction_name == "Cegorach's Jesters":
                         primary_player.cegorach_jesters_permitted = []
-                        for i in range(len(self.misc_misc)):
-                            primary_player.cegorach_jesters_permitted.append(primary_player.cards[self.misc_misc[i]])
-                        self.misc_misc = []
+                        for i in range(len(self.reactions_needing_resolving[0].misc_misc)):
+                            primary_player.cegorach_jesters_permitted.append(primary_player.cards[self.reactions_needing_resolving[0].misc_misc[i]])
+                        self.reactions_needing_resolving[0].misc_misc = []
                         total_string = "Cards Revealed: "
                         for i in range(len(primary_player.cegorach_jesters_permitted)):
                             total_string += primary_player.cegorach_jesters_permitted[i] + ", "
@@ -5616,57 +5618,57 @@ class Game:
                         await self.send_update_message(total_string)
                         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
                     if reaction_name == "Tunneling Mawloc":
-                        self.infest_planet(self.misc_target_planet, primary_player)
+                        self.infest_planet(self.reactions_needing_resolving[0].misc_target_planet, primary_player)
                     if reaction_name == "Awakened Geomancer":
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     if reaction_name == "Dark Lance Raider":
-                        if self.misc_misc is not None:
-                            for i in range(len(self.misc_misc)):
-                                og_pla, og_pos = self.misc_misc[i]
+                        if self.reactions_needing_resolving[0].misc_misc is not None:
+                            for i in range(len(self.reactions_needing_resolving[0].misc_misc)):
+                                og_pla, og_pos = self.reactions_needing_resolving[0].misc_misc[i]
                                 secondary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                                 secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     if reaction_name == "Sautekh Royal Crypt Damage":
-                        for i in range(len(self.misc_misc_2)):
-                            planet_pos, unit_pos = self.misc_misc_2[i]
+                        for i in range(len(self.reactions_needing_resolving[0].misc_misc_2)):
+                            planet_pos, unit_pos = self.reactions_needing_resolving[0].misc_misc_2[i]
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
-                        self.misc_misc = None
-                        self.misc_misc_2 = None
+                        self.reactions_needing_resolving[0].misc_misc = None
+                        self.reactions_needing_resolving[0].misc_misc_2 = None
                     if reaction_name == "Sacred Rose Immolator":
-                        if self.misc_misc is not None:
-                            for i in range(len(self.misc_misc)):
-                                current_pla, current_pos = self.misc_misc[i]
+                        if self.reactions_needing_resolving[0].misc_misc is not None:
+                            for i in range(len(self.reactions_needing_resolving[0].misc_misc)):
+                                current_pla, current_pos = self.reactions_needing_resolving[0].misc_misc[i]
                                 secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
                                                                       rickety_warbuggy=True)
-                        self.misc_misc = None
+                        self.reactions_needing_resolving[0].misc_misc = None
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         primary_player.reset_all_aiming_reticles_play_hq()
                     if reaction_name == "Fierce Purgator":
-                        if self.misc_misc_2 is not None:
-                            for i in range(len(self.misc_misc_2)):
-                                current_num, current_pla, current_pos = self.misc_misc_2[i]
+                        if self.reactions_needing_resolving[0].misc_misc_2 is not None:
+                            for i in range(len(self.reactions_needing_resolving[0].misc_misc_2)):
+                                current_num, current_pla, current_pos = self.reactions_needing_resolving[0].misc_misc_2[i]
                                 if current_num == 1:
                                     self.p1.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
                                                                  rickety_warbuggy=True)
                                 else:
                                     self.p2.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
                                                                  rickety_warbuggy=True)
-                        self.misc_misc = None
-                        self.misc_misc_2 = None
+                        self.reactions_needing_resolving[0].misc_misc = None
+                        self.reactions_needing_resolving[0].misc_misc_2 = None
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         primary_player.reset_all_aiming_reticles_play_hq()
                     if reaction_name == "Heavy Flamer Retributor":
-                        for i in range(len(self.misc_misc)):
-                            current_pla, current_pos = self.misc_misc[i]
+                        for i in range(len(self.reactions_needing_resolving[0].misc_misc)):
+                            current_pla, current_pos = self.reactions_needing_resolving[0].misc_misc[i]
                             secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
                                                                   rickety_warbuggy=True)
-                        self.misc_misc = None
+                        self.reactions_needing_resolving[0].misc_misc = None
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     if reaction_name == "Howling Exarch":
                         primary_player.reset_all_aiming_reticles_play_hq()
-                        if self.misc_misc is not None:
-                            for i in range(len(self.misc_misc)):
-                                num, planet_pos, unit_pos = self.misc_misc[i]
+                        if self.reactions_needing_resolving[0].misc_misc is not None:
+                            for i in range(len(self.reactions_needing_resolving[0].misc_misc)):
+                                num, planet_pos, unit_pos = self.reactions_needing_resolving[0].misc_misc[i]
                                 if num == 1:
                                     self.p1.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1)
@@ -5677,19 +5679,13 @@ class Game:
                         await self.complete_nullify()
 
                     # Decide whether to delete the reaction.
-                    if reaction_name == "Patron Saint" and not self.chosen_first_card:
-                        self.chosen_first_card = True
-                        self.misc_counter = 3 - self.misc_counter
-                        if self.misc_counter < 1:
+                    if reaction_name == "Patron Saint" and not self.reactions_needing_resolving[0].chosen_first_card:
+                        self.reactions_needing_resolving[0].chosen_first_card = True
+                        self.reactions_needing_resolving[0].misc_counter = 3 - self.reactions_needing_resolving[0].misc_counter
+                        if self.reactions_needing_resolving[0].misc_counter < 1:
                             self.delete_reaction()
                         else:
-                            await self.send_update_message("Now place " + str(self.misc_counter) + " faith.")
-                    elif reaction_name == "Scavenging Kroot Rider":
-                        if not self.chosen_first_card:
-                            self.chosen_first_card = True
-                            await self.send_update_message("Skipping taking attachment from discard.")
-                        else:
-                            self.delete_reaction()
+                            await self.send_update_message("Now place " + str(self.reactions_needing_resolving[0].misc_counter) + " faith.")
                     elif reaction_name != "Warlock Destructor":
                         self.delete_reaction()
             elif len(game_update_string) == 2:
@@ -5715,7 +5711,7 @@ class Game:
                     print(self.reactions_needing_resolving[0].get_player_resolving_reaction())
                     current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
                     if current_reaction == "Shadow Hunt":
-                        if not self.chosen_first_card:
+                        if not self.reactions_needing_resolving[0].chosen_first_card:
                             if chosen_removed == int(primary_player.get_number()):
                                 card_name = primary_player.cards_removed_from_game[pos_removed]
                                 if primary_player.cards_removed_from_game_hidden[pos_removed] == "H":
@@ -5728,8 +5724,8 @@ class Game:
                                                     "Connoisseur of Terror", primary_player.name_player,
                                                     (int(primary_player.number), -1, -1)
                                                 )
-                                            self.chosen_first_card = True
-                                            self.misc_counter = pos_removed
+                                            self.reactions_needing_resolving[0].chosen_first_card = True
+                                            self.reactions_needing_resolving[0].misc_counter = pos_removed
                     elif current_reaction == "Liatha's Loyal Hound":
                         if chosen_removed == int(primary_player.get_number()):
                             if primary_player.cards_removed_from_game_hidden[pos_removed] == "H":
@@ -5806,7 +5802,7 @@ class Game:
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
                     elif current_reaction == "Impulsive Loota Reserve":
-                        if not self.chosen_first_card:
+                        if not self.reactions_needing_resolving[0].chosen_first_card:
                             if game_update_string[1] == primary_player.number:
                                 if primary_player.cards_in_reserve[int(game_update_string[2])][
                                     int(game_update_string[3])].get_ability() == "Impulsive Loota":
@@ -5820,8 +5816,8 @@ class Game:
                                                 "Could not Deep Strike the Impulsive Loota! Cancelling...")
                                             self.delete_reaction()
                                         else:
-                                            self.chosen_first_card = True
-                                            self.misc_target_unit = (int(game_update_string[2]), last_el_index)
+                                            self.reactions_needing_resolving[0].chosen_first_card = True
+                                            self.reactions_needing_resolving[0].misc_target_unit = (int(game_update_string[2]), last_el_index)
                                             await self.send_update_message("Please choose the card to attach.")
                                     else:
                                         await self.send_update_message(
@@ -5835,7 +5831,7 @@ class Game:
                         attachment_pos = int(game_update_string[4])
                         if int(primary_player.number) == player_num:
                             if self.reactions_needing_resolving[0].get_reaction_name() == "Defense Battery":
-                                if not self.chosen_first_card:
+                                if not self.reactions_needing_resolving[0].chosen_first_card:
                                     if primary_player.attachments_at_planet[planet_pos][attachment_pos].get_ability() \
                                             == "Defense Battery":
                                         if primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
@@ -5844,7 +5840,7 @@ class Game:
                                                     get_ready():
                                                 primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
                                                     exhaust_card()
-                                                self.chosen_first_card = True
+                                                self.reactions_needing_resolving[0].chosen_first_card = True
                                                 primary_player.attachments_at_planet[planet_pos][attachment_pos]. \
                                                     defense_battery_activated = False
                     elif game_update_string[1] == "HQ":
@@ -6021,38 +6017,40 @@ class Game:
                         await self.send_update_message("Did not pay the additional cost; "
                                                        "card added to discard.")
                     if current_interrupt == "The Shadow Suit":
-                        if self.chosen_first_card:
+                        if self.interrupts_waiting_on_resolution[0].chosen_first_card:
                             card = self.preloaded_find_card("The Shadow Suit")
                             if "The Shadow Suit" in secondary_player.discard:
                                 secondary_player.discard.remove("The Shadow Suit")
-                            secondary_player.put_card_into_reserve(card, self.misc_target_planet, payment=False)
+                            secondary_player.put_card_into_reserve(card, self.interrupts_waiting_on_resolution[0].misc_target_planet, payment=False)
                     if current_interrupt == "Blood of Martyrs":
-                        if not self.chosen_first_card:
+                        if not self.interrupts_waiting_on_resolution[0].chosen_first_card:
                             self.delete_interrupt()
-                        elif not self.chosen_second_card:
-                            self.chosen_second_card = True
+                        elif not self.interrupts_waiting_on_resolution[0].chosen_second_card:
+                            self.interrupts_waiting_on_resolution[0].chosen_second_card = True
                             await self.send_update_message("Targeted less than the maximum number of units.")
-                            if primary_player.get_faith_given_pos(self.misc_target_unit[0],
-                                                                  self.misc_target_unit[1]) < 1:
+                            if primary_player.get_faith_given_pos(self.interrupts_waiting_on_resolution[0].misc_target_unit[0],
+                                                                  self.interrupts_waiting_on_resolution[0].misc_target_unit[1]) < 1:
                                 await self.send_update_message("No faith to move; skipping directly to "
                                                                "increasing the attack of the units step.")
-                                for i in range(len(self.misc_misc)):
-                                    primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
-                                                                                  self.misc_misc[i][1], 1,
+                                for i in range(len(self.interrupts_waiting_on_resolution[0].misc_misc)):
+                                    primary_player.increase_attack_of_unit_at_pos(self.interrupts_waiting_on_resolution[0].misc_misc[i][0],
+                                                                                  self.interrupts_waiting_on_resolution[0].misc_misc[i][1], 1,
                                                                                   expiration="NEXT")
                                 if primary_player.check_for_trait_given_pos(
-                                        self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                                        self.interrupts_waiting_on_resolution[0].misc_target_unit[0],
+                                        self.interrupts_waiting_on_resolution[0].misc_target_unit[1], "Martyr"):
                                     primary_player.draw_card()
                                 self.delete_interrupt()
                                 primary_player.reset_all_aiming_reticles_play_hq()
                         else:
                             await self.send_update_message("Increasing the attack of the units.")
-                            for i in range(len(self.misc_misc)):
-                                primary_player.increase_attack_of_unit_at_pos(self.misc_misc[i][0],
-                                                                              self.misc_misc[i][1], 1,
+                            for i in range(len(self.interrupts_waiting_on_resolution[0].misc_misc)):
+                                primary_player.increase_attack_of_unit_at_pos(self.interrupts_waiting_on_resolution[0].misc_misc[i][0],
+                                                                              self.interrupts_waiting_on_resolution[0].misc_misc[i][1], 1,
                                                                               expiration="NEXT")
                             if primary_player.check_for_trait_given_pos(
-                                    self.misc_target_unit[0], self.misc_target_unit[1], "Martyr"):
+                                    self.interrupts_waiting_on_resolution[0].misc_target_unit[0],
+                                    self.interrupts_waiting_on_resolution[0].misc_target_unit[1], "Martyr"):
                                 primary_player.draw_card()
                             self.delete_interrupt()
                             primary_player.reset_all_aiming_reticles_play_hq()
@@ -6438,7 +6436,7 @@ class Game:
                 if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
                     self.create_delayed_reaction("Penitent Engine", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, i))
-        if self.action_chosen == "Painboy Surjery":
+        if self.action_object.action_chosen == "Painboy Surjery":
             player_num, planet_pos, unit_pos = self.stored_damage[0].get_position_unit()
             if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                 primary_player.resolve_played_any_event()
@@ -6729,8 +6727,8 @@ class Game:
                 self.p2.consumption_sacs_list == [True, True, True, True, True, True, True]:
             self.resolving_consumption = False
             await self.send_update_message("Consumption Finished")
-            self.action_chosen = ""
-            self.player_with_action = ""
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
             self.mode = "Normal"
             if self.player_with_deploy_turn == self.name_1:
                 self.player_with_deploy_turn = self.name_2
@@ -6847,11 +6845,11 @@ class Game:
     def scan_planet_for_nurgling_bomb(self, pri, sec, planet_id):
         for i in range(len(pri.cards_in_play[planet_id + 1])):
             if pri.cards_in_play[planet_id + 1][i].need_to_resolve_nurgling_bomb:
-                self.player_with_action = pri.name_player
+                self.action_object.player_with_action = pri.name_player
                 return True
         for i in range(len(sec.cards_in_play[planet_id + 1])):
             if sec.cards_in_play[planet_id + 1][i].need_to_resolve_nurgling_bomb:
-                self.player_with_action = sec.name_player
+                self.action_object.player_with_action = sec.name_player
                 return True
         return False
 

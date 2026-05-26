@@ -7,7 +7,8 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
     pos_discard = int(game_update_string[2])
     print("Check what player")
     print(self.reactions_needing_resolving[0].get_player_resolving_reaction())
-    current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+    reaction = self.reactions_needing_resolving[0]
+    current_reaction = reaction.get_reaction_name()
     if name == self.reactions_needing_resolving[0].get_player_resolving_reaction():
         if current_reaction == "Sathariel the Invokator":
             if chosen_discard == int(primary_player.number):
@@ -28,14 +29,14 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             del primary_player.discard[pos_discard]
                             self.delete_reaction()
         elif current_reaction == "Parasite of Mortrex":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.check_for_a_trait("Condition") and card.get_card_type() == "Attachment":
                         primary_player.aiming_reticle_coords_discard = pos_discard
-                        self.misc_player_storage = card.get_name()
-                        self.chosen_first_card = True
-                        self.misc_counter = 1
+                        reaction.misc_player_storage = card.get_name()
+                        reaction.chosen_first_card = True
+                        reaction.misc_counter = 1
         elif current_reaction == "Bloodied Kabal":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
@@ -51,19 +52,19 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                 if card.get_card_type() == "Attachment":
                     primary_player.cards.append(card.get_name())
                     del primary_player.discard[pos_discard]
-                    if not self.chosen_first_card:
-                        self.chosen_first_card = True
+                    if not reaction.chosen_first_card:
+                        reaction.chosen_first_card = True
                     else:
                         self.delete_reaction()
         elif current_reaction == "Klan Totem":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_name() in primary_player.cards_recently_destroyed:
                         if card.get_has_deepstrike():
                             primary_player.aiming_reticle_coords_discard = pos_discard
-                            self.misc_player_storage = card.get_name()
-                            self.chosen_first_card = True
+                            reaction.misc_player_storage = card.get_name()
+                            reaction.chosen_first_card = True
         elif current_reaction == "Holy Sepulchre":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
@@ -94,15 +95,15 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             primary_player.remove_card_from_discard(pos_discard)
                         self.delete_reaction()
         elif current_reaction == "Endless Legions":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_is_unit():
-                        self.misc_counter += 1
+                        reaction.misc_counter += 1
                         primary_player.deck.append(card.get_name())
                         primary_player.remove_card_from_discard(pos_discard)
-                        if self.misc_counter > 1:
-                            self.chosen_first_card = True
+                        if reaction.misc_counter > 1:
+                            reaction.chosen_first_card = True
                             self.resolving_search_box = True
                             self.what_to_do_with_searched_card = "STORE"
                             self.traits_of_searched_card = None
@@ -120,12 +121,12 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             self.number_who_is_searching = primary_player.number
         elif current_reaction == "Impulsive Loota Reserve" or current_reaction == "Impulsive Loota In Play":
             if chosen_discard == int(primary_player.number):
-                if self.chosen_first_card:
+                if reaction.chosen_first_card:
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Attachment" and \
                             (card.get_name() in primary_player.cards_recently_discarded):
                         if not card.planet_attachment:
-                            planet_pos, unit_pos = self.misc_target_unit
+                            planet_pos, unit_pos = reaction.misc_target_unit
                             self.card_to_deploy = card
                             new_game_update_string = ["IN_PLAY", primary_player.number, str(planet_pos), str(unit_pos)]
                             await DeployPhase.deploy_card_routine_attachment(self, name, new_game_update_string)
@@ -135,9 +136,9 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                 if card.get_name() in primary_player.cards_recently_destroyed:
                     if card.get_has_hive_mind() and card.get_card_type() == "Army" and card.get_cost() < 4:
                         primary_player.aiming_reticle_coords_discard = pos_discard
-                        self.chosen_first_card = True
+                        reaction.chosen_first_card = True
         elif current_reaction == "Scavenging Kroot Rider":
-            if not self.chosen_second_card:
+            if not reaction.chosen_second_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Attachment":
@@ -145,8 +146,8 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             _, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                             if primary_player.attach_card(card, planet_pos, unit_pos):
                                 primary_player.remove_card_from_discard(pos_discard)
-                                self.chosen_second_card = True
-                                if self.chosen_first_card and self.chosen_second_card:
+                                reaction.chosen_second_card = True
+                                if reaction.chosen_first_card and reaction.chosen_second_card:
                                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                     self.delete_reaction()
         elif current_reaction == "Commander Shadowsun discard":
@@ -157,7 +158,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     self.location_attachment_discard_shadowsun = pos_discard
                     primary_player.aiming_reticle_coords_discard = pos_discard
         elif current_reaction == "The Dance Without End":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Army" and card.check_for_a_trait("Harlequin") and \
@@ -166,7 +167,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         primary_player.remove_card_from_discard(pos_discard)
                         self.misc_target_choice = card.get_name()
                         await self.send_update_message("Choose card to deploy. Must have a different name.")
-                        self.chosen_first_card = True
+                        reaction.chosen_first_card = True
         elif current_reaction == "Optimized Protocol":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
@@ -190,21 +191,21 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
                 if card.get_card_type() == "Army" and card.get_cost() < 2\
-                        and card.get_name() != self.misc_player_storage:
-                    primary_player.add_card_to_planet(card, self.misc_target_planet)
+                        and card.get_name() != reaction.misc_player_storage:
+                    primary_player.add_card_to_planet(card, reaction.misc_target_planet)
                     primary_player.remove_card_from_discard(pos_discard)
-                    self.misc_counter += 1
-                    self.misc_player_storage = card.get_name()
-                    if self.misc_counter > 1:
+                    reaction.misc_counter += 1
+                    reaction.misc_player_storage = card.get_name()
+                    if reaction.misc_counter > 1:
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Hive Ship Tendrils":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.get_card_type() == "Army" and card.get_has_hive_mind():
                         primary_player.aiming_reticle_coords_discard = pos_discard
-                        self.chosen_first_card = True
+                        reaction.chosen_first_card = True
         elif current_reaction == "Spreading Genestealer Brood":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)
@@ -214,14 +215,14 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Sweep Attack":
-            if not self.chosen_first_card:
+            if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):
                     card = primary_player.get_card_in_discard(pos_discard)
                     if card.check_for_a_trait("Condition") and card.get_card_type() == "Attachment":
                         primary_player.aiming_reticle_coords_discard = pos_discard
-                        self.misc_player_storage = card.get_name()
-                        self.chosen_first_card = True
-                        self.misc_counter = 1
+                        reaction.misc_player_storage = card.get_name()
+                        reaction.chosen_first_card = True
+                        reaction.misc_counter = 1
         elif current_reaction == "Clearing the Path":
             if chosen_discard == int(primary_player.number):
                 card = primary_player.get_card_in_discard(pos_discard)

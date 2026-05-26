@@ -12,7 +12,8 @@ async def start_resolving_interrupt(self, name, game_update_string):
         primary_player = self.p2
         secondary_player = self.p1
     num, planet_pos, unit_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
-    current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+    interrupt = self.interrupts_waiting_on_resolution[0]
+    current_interrupt = interrupt.get_interrupt_name()
     if not self.resolving_search_box:
         if current_interrupt == "Interrogator Acolyte":
             primary_player.draw_card()
@@ -81,7 +82,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.aiming_reticle_coords_hand = primary_player.cards.index("Berzerker Warriors")
                 primary_player.aiming_reticle_color = "blue"
         elif current_interrupt == "Mucolid Spores":
-            self.misc_counter = 0
+            interrupt.misc_counter = 0
         elif current_interrupt == "Fairly 'Quipped Kommando":
             attachment_name = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             if attachment_name in primary_player.discard:
@@ -89,15 +90,15 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.discard.remove(attachment_name)
             self.delete_interrupt()
         elif current_interrupt == "Blood of Martyrs":
-            self.misc_counter = 3
-            self.misc_misc = []
+            interrupt.misc_counter = 3
+            interrupt.misc_misc = []
             primary_player.exhaust_card_in_hq_given_name("Blood of Martyrs")
-            self.chosen_first_card = False
-            self.misc_target_planet = -1
-            self.misc_target_unit = (-1, -1)
+            interrupt.chosen_first_card = False
+            interrupt.misc_target_planet = -1
+            interrupt.misc_target_unit = (-1, -1)
             await self.send_update_message("Select which unit to move faith from.")
         elif current_interrupt == "The Shadow Suit":
-            self.chosen_first_card = False
+            interrupt.chosen_first_card = False
         elif current_interrupt == "First Line Rhinos":
             extra_info = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             if extra_info is not None:
@@ -238,7 +239,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
                 primary_player.discard_card_name_from_hand("Death Serves the Emperor")
             self.delete_interrupt()
         elif current_interrupt == "Transcendent Blessing":
-            self.chosen_first_card = False
+            interrupt.chosen_first_card = False
             await self.send_update_message("Please pay 1 faith.")
         elif current_interrupt == "Surrogate Host":
             can_continue = True
@@ -351,7 +352,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.choices_available = ["Discard Cards", "Pay Resources"]
             self.choice_context = "Flayed Ones Revenants additional costs"
             self.name_player_making_choices = primary_player.name_player
-            self.misc_counter = 0
+            interrupt.misc_counter = 0
             self.resolving_search_box = True
         elif current_interrupt == "World Engine Beam":
             primary_player.sacrifice_card_in_hq(unit_pos)
@@ -387,13 +388,13 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
             self.delete_interrupt()
         elif current_interrupt == "Magus Harid":
-            self.misc_player_storage = "RESOLVING MAGUS HARID"
+            interrupt.misc_player_storage = "RESOLVING MAGUS HARID"
             card_name = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             await self.send_update_message("Magus is deploying a " + card_name)
             card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             self.card_to_deploy = card
-            self.misc_target_planet = planet_pos
+            interrupt.misc_target_planet = planet_pos
             if card.get_card_type() == "Army":
                 self.planet_pos_to_deploy = planet_pos
                 self.discounts_applied = 0

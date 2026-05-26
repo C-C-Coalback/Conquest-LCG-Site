@@ -4,6 +4,19 @@ class Reaction:
         self.name_player_resolving_reaction = player_name_resolving
         self.position_unit_triggering_reaction = position_trigger
         self.additional_reaction_info = additional_info
+        self.chosen_first_card = False
+        self.chosen_second_card = False
+        self.misc_target_planet = -1
+        self.misc_target_unit = (-1, -1)
+        self.misc_counter = 0
+        self.misc_counter_2 = 0
+        self.misc_target_unit_2 = (-1, -1)
+        self.misc_target_attachment = (-1, -1, -1)
+        self.misc_player_storage = ""
+        self.misc_target_player = ""
+        self.misc_misc = None
+        self.misc_misc_2 = None
+        self.misc_list = []
 
     def get_reaction_name(self):
         return self.reaction_name

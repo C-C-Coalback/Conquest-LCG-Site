@@ -3,7 +3,7 @@ import copy
 
 
 async def update_game_event_action_hand(self, name, game_update_string, may_nullify=True):
-    if self.player_with_action == self.name_1:
+    if self.action_object.player_with_action == self.name_1:
         primary_player = self.p1
         secondary_player = self.p2
     else:
@@ -18,12 +18,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
     cost = card.get_cost(urien_rel)
     print(card.get_allowed_phases_while_in_hand(), self.phase)
     print(card.get_has_action_while_in_hand())
-    if not self.action_chosen:
+    if not self.action_object.action_chosen:
         can_continue = True
         if primary_player.subject_omega_relevant and self.phase == "COMBAT":
             if primary_player.get_ambush_of_card(card):
                 if not primary_player.enemy_holding_cell_check(card.get_name()):
-                    self.action_chosen = "Ambush"
+                    self.action_object.action_chosen = "Ambush"
                     self.card_to_deploy = card
                     self.card_type_of_selected_card_in_hand = card.get_card_type()
                     primary_player.aiming_reticle_coords_hand = hand_pos
@@ -34,7 +34,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     await self.send_mistarget_message(primary_player.name_player, "Cannot Deploy Unit", "Enemy Holding Cell is preventing the deploy.")
         if card.get_ability() == "Sanguinary Guard" and self.phase == "COMBAT" and can_continue:
             if not primary_player.enemy_holding_cell_check(card.get_name()):
-                self.action_chosen = "Ambush"
+                self.action_object.action_chosen = "Ambush"
                 self.card_to_deploy = card
                 self.card_type_of_selected_card_in_hand = card.get_card_type()
                 primary_player.aiming_reticle_coords_hand = hand_pos
@@ -45,7 +45,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                                   "Enemy Holding Cell is preventing the deploy.")
         elif primary_player.get_ambush_of_card(card) and self.phase == "COMBAT" and can_continue:
             if not primary_player.enemy_holding_cell_check(card.get_name()):
-                self.action_chosen = "Ambush"
+                self.action_object.action_chosen = "Ambush"
                 self.card_to_deploy = card
                 self.card_type_of_selected_card_in_hand = card.get_card_type()
                 primary_player.aiming_reticle_coords_hand = hand_pos
@@ -53,12 +53,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Cannot Deploy Unit",
                                                   "Enemy Holding Cell is preventing the deploy.")
-        elif card.get_has_action_while_in_hand() and not self.action_chosen and can_continue:
+        elif card.get_has_action_while_in_hand() and not self.action_object.action_chosen and can_continue:
             if card.get_allowed_phases_while_in_hand() == self.phase or \
                     card.get_allowed_phases_while_in_hand() == "ALL":
                 if primary_player.get_ambush_of_card(card):
                     if not primary_player.enemy_holding_cell_check(card.get_name()):
-                        self.action_chosen = "Ambush"
+                        self.action_object.action_chosen = "Ambush"
                         self.card_to_deploy = card
                         self.card_type_of_selected_card_in_hand = card.get_card_type()
                         primary_player.aiming_reticle_coords_hand = hand_pos
@@ -92,7 +92,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_cleanup()
                     elif ability == "Test of Faith":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Putrescent Corpulence":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         primary_player.number_cards_to_search = 12
@@ -107,7 +107,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.misc_target_choice = ""
                             self.name_player_making_choices = primary_player.name_player
                             self.resolving_search_box = True
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                     elif ability == "The Orgiastic Feast":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         primary_player.number_cards_to_search = 12
@@ -122,63 +122,63 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.misc_target_choice = ""
                             self.name_player_making_choices = primary_player.name_player
                             self.resolving_search_box = True
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                     elif ability == "Triumvirate of Ynnead":
-                        self.action_chosen = "Triumvirate of Ynnead"
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = "Triumvirate of Ynnead"
+                        self.action_object.chosen_first_card = False
                         self.trium_count = 0
                         self.trium_tracker = ("name", -1)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Rakarth's Experimentations":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.choices_available = ["Army", "Support", "Attachment", "Event"]
                         self.choice_context = "Rakarth's Experimentations card type"
                         self.name_player_making_choices = primary_player.name_player
                     elif ability == "Force Reallocation":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                         await self.send_update_message("Pass to stop exhausting units.")
                     elif ability == "Whirling Death":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         primary_player.misc_counter = 0
                         secondary_player.misc_counter = 0
                     elif ability == "Boast of Strength":
-                        self.chosen_first_card = False
-                        self.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        await self.send_update_message(self.player_with_action + " may sacrifice a unit.")
+                        await self.send_update_message(self.action_object.player_with_action + " may sacrifice a unit.")
                     elif ability == "Biomass Extraction":
                         if primary_player.can_play_limited:
                             primary_player.can_play_limited = True
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Limited keyword prevents the card from being played.")
                     elif ability == "Guided Fire":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Final Expiration":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Medusae Pact":
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         if len(primary_player.cards) < 6:
-                            self.chosen_first_card = True
+                            self.action_object.chosen_first_card = True
                             if len(secondary_player.cards) < 6:
                                 primary_player.torture_event_played(ability)
                                 await primary_player.dark_eldar_event_played()
                                 primary_player.resolve_played_any_event()
                                 self.action_cleanup()
                             else:
-                                self.player_with_action = secondary_player.name_player
+                                self.action_object.player_with_action = secondary_player.name_player
                                 await self.send_update_message("Please discard down to 5 cards.")
                     elif ability == "Access to the Black Library":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.choices_available = []
                         for i in range(len(primary_player.deck)):
@@ -195,28 +195,28 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             )
                             self.choice_context = "Access to the Black Library"
                             self.name_player_making_choices = primary_player.name_player
-                            self.chosen_first_card = False
+                            self.action_object.chosen_first_card = False
                             self.misc_target_choice = ""
                     elif ability == "Tempting Ceasefire":
                         if not primary_player.tempting_ceasefire_used:
                             primary_player.tempting_ceasefire_used = True
                             primary_player.discard_card_from_hand(hand_pos)
-                            self.action_chosen = ability
-                            self.chosen_first_card = False
+                            self.action_object.action_chosen = ability
+                            self.action_object.chosen_first_card = False
                             self.choices_available = ["1", "2", "3", "4", "5"]
                             self.choice_context = "Tempting Ceasefire Number"
                             self.name_player_making_choices = primary_player.name_player
                             self.resolving_search_box = True
                     elif ability == "Guerrilla Tactics":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
-                        self.misc_target_planet = -1
+                        self.action_object.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.misc_target_planet = -1
                     elif ability == "Breach and Clear":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Kwik' Konstruckshun":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Clash of Wings":
                         warlord_pla, _ = primary_player.get_location_of_warlord()
@@ -240,18 +240,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                                               "Warlord is not ready.")
                     elif ability == "Keep Firing!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Consumed by the Kindred":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.action_chosen = ability
-                        self.misc_target_unit = (-1, -1)
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = ability
+                        self.action_object.misc_target_unit = (-1, -1)
+                        self.action_object.chosen_first_card = False
                     elif ability == "Supply Line Incursion":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "The Siege Masters":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Looted Skrap":
                         if primary_player.can_play_limited:
                             if self.check_if_battle_taking_place():
@@ -278,18 +278,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.add_resources(1, refund=True)
                     elif ability == "Brutal Cunning":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.misc_counter = 0
-                        self.misc_target_planet = -1
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = ability
+                        self.action_object.misc_counter = 0
+                        self.action_object.misc_target_planet = -1
+                        self.action_object.chosen_first_card = False
                         self.choices_available = ["1", "2"]
                         self.choice_context = "Brutal Cunning: amount of damage"
                         self.name_player_making_choices = primary_player.name_player
                     elif ability == "Lost in the Webway":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.misc_target_unit = (-1, -1)
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = ability
+                        self.action_object.misc_target_unit = (-1, -1)
+                        self.action_object.chosen_first_card = False
                         self.choices_available = ["Harlequin", "Opponent"]
                         self.choice_context = "Lost in the Webway"
                         self.name_player_making_choices = primary_player.name_player
@@ -300,7 +300,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 secondary_player.get_ready_given_pos(enemy_pla, enemy_pos):
                             primary_player.exhaust_given_pos(warlord_pla, warlord_pos)
                             primary_player.discard_card_from_hand(hand_pos)
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             await self.send_update_message("Choose planet.")
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -310,7 +310,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         if not primary_player.everlasting_rage_used:
                             primary_player.everlasting_rage_used = True
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             self.choices_available = []
                             copies_khorne = primary_player.count_units_with_trait("Khorne")
                             if copies_khorne < 1:
@@ -323,19 +323,19 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 self.name_player_making_choices = primary_player.name_player
                     elif ability == "Indiscriminate Bombing":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
-                        self.chosen_second_card = False
+                        self.action_object.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.chosen_second_card = False
                     elif ability == "Daring Assault":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.draw_card()
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                     elif ability == "Torturer of Worlds":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.chosen_first_card = False
-                        self.misc_target_unit = (-1, -1)
-                        self.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.misc_target_unit = (-1, -1)
+                        self.action_object.action_chosen = ability
                     elif ability == "Our Last Stand":
                         if not primary_player.our_last_stand_used:
                             primary_player.our_last_stand_used = True
@@ -364,8 +364,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Summary Execution":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
-                            self.action_chosen = ability
-                            self.misc_target_planet = warlord_planet
+                            self.action_object.action_chosen = ability
+                            self.action_object.misc_target_planet = warlord_planet
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -381,44 +381,44 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                                               "Already played a Limited card.")
                     elif ability == "Eldritch Storm":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.misc_counter = [False, False, False, False, False, False, False]
+                        self.action_object.action_chosen = ability
+                        self.action_object.misc_counter = [False, False, False, False, False, False, False]
                         for i in range(7):
                             if self.get_green_icon(i):
-                                self.misc_counter[i] = True
+                                self.action_object.misc_counter[i] = True
                     elif ability == "Sudden Adaptation":
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.misc_counter = 0
-                        self.misc_target_planet = -1
+                        self.action_object.action_chosen = ability
+                        self.action_object.misc_counter = 0
+                        self.action_object.misc_target_planet = -1
                     elif ability == "Seer's Exodus":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
-                            self.misc_target_planet = warlord_planet
+                            self.action_object.misc_target_planet = warlord_planet
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Warlord is in the HQ.")
                     elif ability == "To Arms!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Nurgling Bomb":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = ability
+                        self.action_object.chosen_first_card = False
                     elif ability == "Blood For The Blood God!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Inevitable Betrayal":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.misc_target_planet = -1
+                        self.action_object.action_chosen = ability
+                        self.action_object.misc_target_planet = -1
                     elif ability == "Imperial Blockade":
                         if self.blackstone:
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                         else:
                             extra_cost = 0
                             for i in range(len(primary_player.discard)):
@@ -427,7 +427,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if primary_player.spend_resources(extra_cost):
                                 primary_player.discard_card_from_hand(int(game_update_string[2]))
                                 primary_player.draw_card()
-                                self.action_chosen = ability
+                                self.action_object.action_chosen = ability
                     elif ability == "Rok Bombardment":
                         if self.check_if_battle_taking_place():
                             secondary_player.rok_bombardment_active.append("Enemy")
@@ -440,34 +440,34 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_cleanup()
                     elif ability == "Behind Enemy Lines":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.chosen_first_card = False
-                        self.chosen_second_card = False
-                        self.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.chosen_second_card = False
+                        self.action_object.action_chosen = ability
                     elif ability == "Mind War":
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Mont'ka Strike":
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "No Surprises":
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Biomass Sacrifice":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Bond of Brotherhood":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Piercing Wail":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.misc_counter = primary_player.get_highest_cost_units()
+                        self.action_object.action_chosen = ability
+                        self.action_object.misc_counter = primary_player.get_highest_cost_units()
                         await self.send_update_message("You many exhaust units with a "
-                                                       "maximum cost of " + str(self.misc_counter))
-                        self.chosen_first_card = False
+                                                       "maximum cost of " + str(self.action_object.misc_counter))
+                        self.action_object.chosen_first_card = False
                     elif ability == "Daemonic Incursion":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.resolving_search_box = True
@@ -488,11 +488,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "A Thousand Cuts":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.deck.append(primary_player.cards[hand_pos])
                         primary_player.remove_card_from_hand(hand_pos)
                     elif ability == "Overrun":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Eldritch Reaping":
@@ -501,17 +501,17 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choice_context = "Eldritch Reaping: Enemy Announce"
                         self.name_player_making_choices = secondary_player.name_player
                         self.misc_target_choice = ""
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "The Strength of the Enemy":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = ability
+                        self.action_object.chosen_first_card = False
                         await self.send_update_message("Please choose an enemy unit first.")
                     elif ability == "Rapid Evolution":
                         if primary_player.can_play_limited:
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             primary_player.can_play_limited = True
-                            self.misc_counter = [0, 0, 0]
+                            self.action_object.misc_counter = [0, 0, 0]
                             primary_player.discard_card_from_hand(hand_pos)
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
@@ -520,22 +520,22 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
                             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            self.misc_counter = 3
+                            self.action_object.misc_counter = 3
                             self.planets_free_for_know_no_fear = [True, True, True, True, True, True, True]
-                            self.chosen_first_card = False
+                            self.action_object.chosen_first_card = False
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Warlord is not ready.")
                     elif ability == "Rapid Assault":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
-                        self.chosen_second_card = False
-                        self.misc_counter = 0
+                        self.action_object.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.chosen_second_card = False
+                        self.action_object.misc_counter = 0
                     elif ability == "Despise":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.sacced_card_for_despise = False
                         secondary_player.sacced_card_for_despise = False
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
@@ -573,73 +573,73 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.action_cleanup()
                     elif ability == "Power from Pain":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
-                        self.player_with_action = secondary_player.name_player
+                        self.action_object.action_chosen = ability
+                        self.action_object.player_with_action = secondary_player.name_player
                     elif ability == "Soul Seizure":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                         primary_player.soul_seizure_value = primary_player.count_tortures_in_discard()
                     elif ability == "Suppressive Fire":
-                        self.chosen_first_card = False
-                        self.chosen_second_card = False
-                        self.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.chosen_second_card = False
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Death from Above":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Unshrouded Truth":
-                        self.action_chosen = ability
-                        self.player_with_action = secondary_player.name_player
+                        self.action_object.action_chosen = ability
+                        self.action_object.player_with_action = secondary_player.name_player
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.misc_misc = []
+                        self.action_object.misc_misc = []
                         await self.send_update_message(secondary_player.name_player +
                                                        ", choose which cards in hand to reveal. Press pass to stop.")
                     elif ability == "Calculated Strike":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Counteroffensive":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Kommando Cunning":
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = ability
+                        self.action_object.chosen_first_card = False
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Painboy Surjery":
                         await self.send_update_message("For safety, you are required to click the "
                                                        "unit again after every instance of damage.")
-                        self.misc_target_unit = (-1, -1)
-                        self.action_chosen = ability
+                        self.action_object.misc_target_unit = (-1, -1)
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Noble Deed":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                     elif ability == "Smash 'n Bash":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                     elif ability == "Fetid Haze":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                     elif ability == "Indescribable Horror":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Predation":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Doombolt":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Searing Brand":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = hand_pos
                     elif ability == "Cacophonic Choir":
@@ -676,9 +676,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     current_count += 1
                             if highest_num < current_count:
                                 highest_num = current_count
-                        self.misc_counter = highest_num
+                        self.action_object.misc_counter = highest_num
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "Tense Negotiations":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if warlord_planet != -2:
@@ -706,38 +706,38 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Warlord is in the HQ.")
                     elif ability == "Clogged with Corpses":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.misc_counter = 0
+                        self.action_object.misc_counter = 0
                     elif ability == "Reanimation Protocol":
                         if not primary_player.used_reanimation_protocol:
                             primary_player.used_reanimation_protocol = True
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Already played a Reanimation Protocol.")
                     elif ability == "Mechanical Enhancement":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Extermination":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Recycle":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.misc_counter = 0
+                        self.action_object.misc_counter = 0
                     elif ability == "Ecstatic Seizures":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Awake the Sleepers":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         await self.send_update_message(
@@ -746,9 +746,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Drudgery":
                         if primary_player.can_play_limited:
                             primary_player.can_play_limited = False
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             primary_player.discard_card_from_hand(hand_pos)
-                            self.chosen_first_card = False
+                            self.action_object.chosen_first_card = False
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Already played a Limited card.")
@@ -761,7 +761,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         await primary_player.dark_eldar_event_played()
                         primary_player.torture_event_played()
                     elif ability == "Sudden Reinforcements":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Blessing of Mork":
                         if self.check_if_battle_taking_place():
@@ -773,7 +773,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "No battle taking place.")
                     elif ability == "Mob Up!":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                         snotlings_total = 0
                         for i in range(len(primary_player.headquarters)):
@@ -787,42 +787,42 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     if primary_player.get_ready_given_pos(i, j):
                                         primary_player.exhaust_given_pos(i, j, card_effect=True)
                                         snotlings_total += 1
-                        self.misc_counter = snotlings_total
+                        self.action_object.misc_counter = snotlings_total
                     elif ability == "Unending Barrage":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.misc_counter = 0
-                        self.chosen_first_card = False
+                        self.action_object.misc_counter = 0
+                        self.action_object.chosen_first_card = False
                     elif ability == "Lucky Shot":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Hate":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Omnissiah's Blessing":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Squiggify":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Subdual":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Path of the Leader":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.choices_available = ["Gain 1 Resource", "+1 ATK Warrior", "Move Psyker"]
                         self.choice_context = "Path of the Leader choice"
                         self.name_player_making_choices = primary_player.name_player
                     elif ability == "The Emperor's Warrant":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.chosen_first_card = False
-                        self.misc_target_planet = -1
-                        self.misc_counter = -1
+                        self.action_object.chosen_first_card = False
+                        self.action_object.misc_target_planet = -1
+                        self.action_object.misc_counter = -1
                     elif ability == "Sowing Chaos":
                         for i in range(7):
                             if self.get_blue_icon(i):
@@ -850,25 +850,25 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Accelerated Gestation":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Ominous Wind":
-                        self.misc_counter = primary_player.get_highest_cost_units()
+                        self.action_object.misc_counter = primary_player.get_highest_cost_units()
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        for _ in range(self.misc_counter):
+                        for _ in range(self.action_object.misc_counter):
                             primary_player.draw_card()
-                        self.misc_counter = 4
-                        self.action_chosen = ability
+                        self.action_object.misc_counter = 4
+                        self.action_object.action_chosen = ability
                         await self.send_update_message("4 cards left to discard")
                     elif ability == "Repent!":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.misc_counter = primary_player.get_highest_cost_units()
-                        self.action_chosen = ability
-                        self.chosen_first_card = False
-                        self.misc_target_unit = (-1, -1)
+                        self.action_object.misc_counter = primary_player.get_highest_cost_units()
+                        self.action_object.action_chosen = ability
+                        self.action_object.chosen_first_card = False
+                        self.action_object.misc_target_unit = (-1, -1)
                     elif ability == "Vivisection":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                     elif ability == "For the Tau'va":
                         if not self.apoka:
                             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
@@ -889,10 +889,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                                                   "Warlord is not ready.")
                                 primary_player.add_resources(2, refund=True)
                         else:
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Consumption":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.resolving_consumption = True
                         primary_player.consumption_sacs_list = self.planets_in_play_array
@@ -903,53 +903,53 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if self.infested_planets and self.planets_in_play_array:
                                 any_infested = True
                         if any_infested:
-                            self.chosen_first_card = False
+                            self.action_object.chosen_first_card = False
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "No infested planets.")
                             primary_player.add_resources(2, refund=True)
                     elif ability == "Ferocious Strength":
                         if self.phase == "COMBAT":
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         else:
                             primary_player.add_resources(cost, refund=True)
                     elif ability == "Dark Cunning":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Kauyon Strike":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.chosen_first_card = False
+                        self.action_object.chosen_first_card = False
                         self.khymera_to_move_positions = []
                     elif ability == "Ethereal Wisdom":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Even the Odds":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.chosen_second_card = False
-                        self.chosen_first_card = False
-                        self.misc_target_attachment = (-1, -1, -1)
-                        self.misc_player_storage = ""
+                        self.action_object.chosen_second_card = False
+                        self.action_object.chosen_first_card = False
+                        self.action_object.misc_target_attachment = (-1, -1, -1)
+                        self.action_object.misc_player_storage = ""
                     elif ability == "Squig Bombin'":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Archon's Terror":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Drop Pod Assault":
                         if self.check_if_battle_taking_place():
-                            self.action_chosen = ability
+                            self.action_object.action_chosen = ability
                             self.choice_context = ability
                             primary_player.discard_card_from_hand(hand_pos)
                             primary_player.number_cards_to_search = 6
@@ -977,15 +977,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "No battle taking place.")
                     elif ability == "Squadron Redeployment":
-                        self.action_chosen = "Squadron Redeployment"
-                        self.misc_target_unit = (-1, -1)
-                        self.chosen_first_card = False
+                        self.action_object.action_chosen = "Squadron Redeployment"
+                        self.action_object.misc_target_unit = (-1, -1)
+                        self.action_object.chosen_first_card = False
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Warpstorm":
-                        self.action_chosen = "Warpstorm"
+                        self.action_object.action_chosen = "Warpstorm"
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Tzeentch's Firestorm":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         self.choices_available = []
@@ -995,14 +995,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.choice_context = "Amount to spend for Tzeentch's Firestorm:"
                         self.amount_spend_for_tzeentch_firestorm = -1
                     elif ability == "Infernal Gateway":
-                        self.action_chosen = "Infernal Gateway"
+                        self.action_object.action_chosen = "Infernal Gateway"
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Promise of Glory":
                         print("Resolve Promise of Glory")
                         primary_player.summon_token_at_hq("Cultist", amount=2)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.mode = self.stored_mode
-                        self.player_with_action = ""
+                        self.action_object.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
                     elif ability == "Calamity":
@@ -1047,51 +1047,51 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
                     elif ability == "Warp Rift":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.chosen_first_card = False
-                        self.misc_target_planet = -1
+                        self.action_object.chosen_first_card = False
+                        self.action_object.misc_target_planet = -1
                     elif ability == "Pact of the Haemonculi":
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                     elif ability == "Empower":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Gift of Isha":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Deception":
-                        self.action_chosen = "Deception"
+                        self.action_object.action_chosen = "Deception"
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Rally the Charge":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Exterminatus":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Snotling Attack":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.misc_counter = 4
+                        self.action_object.misc_counter = 4
                     elif ability == "Preemptive Barrage":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
-                        self.misc_target_planet = -1
-                        self.misc_counter = 3
+                        self.action_object.misc_target_planet = -1
+                        self.action_object.misc_counter = 3
                     elif ability == "Core Destabilization":
-                        self.action_chosen = ability
+                        self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Promise of Glory":
                         print("Resolve Promise of Glory")
                         primary_player.summon_token_at_hq("Cultist", amount=2)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.mode = self.stored_mode
-                        self.player_with_action = ""
+                        self.action_object.player_with_action = ""
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
                     elif ability == "Raid":
@@ -1177,8 +1177,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 await self.send_mistarget_message(
                     primary_player.name_player, "Invalid Phase", "That cannot be played in this phase."
                 )
-    elif self.action_chosen == "Ambush Platform":
-        if self.player_with_action == self.name_1:
+    elif self.action_object.action_chosen == "Ambush Platform":
+        if self.action_object.player_with_action == self.name_1:
             primary_player = self.p1
         else:
             primary_player = self.p2
@@ -1196,18 +1196,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             await self.send_mistarget_message(primary_player.name_player, "Cannot Deploy Card",
                                               "Card cannot be deployed as an Attachment.")
-    elif self.action_chosen == "Starblaze's Outpost":
-        if self.chosen_first_card:
+    elif self.action_object.action_chosen == "Starblaze's Outpost":
+        if self.action_object.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card is None:
                 return None
             if card.get_card_type() == "Army":
                 if card.get_faction() == "Tau":
-                    if card.get_cost() <= self.misc_counter:
-                        primary_player.add_card_to_planet(card, self.misc_target_planet)
+                    if card.get_cost() <= self.action_object.misc_counter:
+                        primary_player.add_card_to_planet(card, self.action_object.misc_target_planet)
                         primary_player.remove_card_from_hand(int(game_update_string[2]))
-                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                    self.position_of_actioned_card[1])
+                        primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                                    self.action_object.position_of_actioned_card[1])
                         self.action_cleanup()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1218,90 +1218,90 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not an army unit.")
-    elif self.action_chosen == "Medusae Pact":
+    elif self.action_object.action_chosen == "Medusae Pact":
         primary_player.discard_card_from_hand(hand_pos)
         if len(primary_player.cards) < 6:
-            if not self.chosen_first_card:
-                self.chosen_first_card = True
+            if not self.action_object.chosen_first_card:
+                self.action_object.chosen_first_card = True
                 if len(secondary_player.cards) > 5:
-                    self.player_with_action = secondary_player.name_player
+                    self.action_object.player_with_action = secondary_player.name_player
                     await self.send_update_message("Please discard down to 5 cards.")
                 else:
                     await primary_player.dark_eldar_event_played()
-                    primary_player.torture_event_played(self.action_chosen)
+                    primary_player.torture_event_played(self.action_object.action_chosen)
                     primary_player.resolve_played_any_event()
                     self.action_cleanup()
             else:
                 await secondary_player.dark_eldar_event_played()
-                secondary_player.torture_event_played(self.action_chosen)
+                secondary_player.torture_event_played(self.action_object.action_chosen)
                 secondary_player.resolve_played_any_event()
                 self.action_cleanup()
-    elif self.action_chosen == "Rapid Evolution":
+    elif self.action_object.action_chosen == "Rapid Evolution":
         if card.get_card_type() == "Army":
-            if self.misc_counter[0] < 2:
-                self.misc_counter[0] = self.misc_counter[0] + 1
+            if self.action_object.misc_counter[0] < 2:
+                self.action_object.misc_counter[0] = self.action_object.misc_counter[0] + 1
                 primary_player.discard_card_from_hand(hand_pos)
-                self.action_chosen = "Rapid Evolution Termagant"
+                self.action_object.action_chosen = "Rapid Evolution Termagant"
                 await self.send_update_message("Please choose a planet to place a Termagant")
         elif card.get_card_type() == "Attachment":
-            if self.misc_counter[1] < 2:
-                self.misc_counter[1] = self.misc_counter[1] + 1
+            if self.action_object.misc_counter[1] < 2:
+                self.action_object.misc_counter[1] = self.action_object.misc_counter[1] + 1
                 primary_player.discard_card_from_hand(hand_pos)
                 primary_player.draw_card()
         elif card.get_card_type() == "Support":
-            if self.misc_counter[2] < 2:
-                self.misc_counter[2] = self.misc_counter[2] + 1
+            if self.action_object.misc_counter[2] < 2:
+                self.action_object.misc_counter[2] = self.action_object.misc_counter[2] + 1
                 primary_player.discard_card_from_hand(hand_pos)
                 primary_player.add_resources(1)
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Rapid Evolution cannot discard Events.")
-    elif self.action_chosen == "Shrieking Exarch Anrakyr Discard":
+    elif self.action_object.action_chosen == "Shrieking Exarch Anrakyr Discard":
         primary_player.discard_card_from_hand(hand_pos)
-        self.misc_counter = self.misc_counter - 1
-        if self.misc_counter < 1:
-            self.action_chosen = "Anrakyr the Traveller"
+        self.action_object.misc_counter = self.action_object.misc_counter - 1
+        if self.action_object.misc_counter < 1:
+            self.action_object.action_chosen = "Anrakyr the Traveller"
             await self.send_update_message("Continue with the deployment.")
-    elif self.action_chosen == "Dread Command Barge":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Dread Command Barge":
+        if not self.action_object.chosen_first_card:
             if card.get_faction() != "Necrons":
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
-                self.chosen_first_card = True
+                self.action_object.chosen_first_card = True
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not a non-Necrons unit.")
-    elif self.action_chosen == "Saint Celestine":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Saint Celestine":
+        if not self.action_object.chosen_first_card:
             if card.get_is_unit():
                 if not card.check_for_a_trait("Elite"):
                     primary_player.aiming_reticle_coords_hand = hand_pos
                     primary_player.aiming_reticle_color = "blue"
-                    self.chosen_first_card = True
-                    self.misc_counter = card.get_cost()
-                    if self.misc_counter < 1:
-                        target_planet = self.position_of_actioned_card[0]
+                    self.action_object.chosen_first_card = True
+                    self.action_object.misc_counter = card.get_cost()
+                    if self.action_object.misc_counter < 1:
+                        target_planet = self.action_object.position_of_actioned_card[0]
                         del primary_player.cards[hand_pos]
                         primary_player.add_card_to_planet(card, target_planet)
                         primary_player.aiming_reticle_coords_hand = None
-                        primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0], self.position_of_actioned_card[1])
+                        primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0], self.action_object.position_of_actioned_card[1])
                         self.action_cleanup()
                     else:
-                        await self.send_update_message("Please pay " + str(self.misc_counter) + " faith.")
+                        await self.send_update_message("Please pay " + str(self.action_object.misc_counter) + " faith.")
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Saint Celestine cannot put Elite units into play.")
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not an army unit.")
-    elif self.action_chosen == "Rapid Assault":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Rapid Assault":
+        if not self.action_object.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card is None:
                 return None
             if card.get_card_type() == "Army":
                 if card.check_for_a_trait("Kabalite", primary_player.etekh_trait):
                     if card.get_cost() < 4:
-                        self.chosen_first_card = True
+                        self.action_object.chosen_first_card = True
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
                     else:
@@ -1313,45 +1313,45 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not an army unit.")
-    elif self.action_chosen == "Canoptek Spyder":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Canoptek Spyder":
+        if not self.action_object.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card is None:
                 return None
             if card.get_card_type() == "Army":
                 primary_player.discard_card_from_hand(int(game_update_string[2]))
-                self.chosen_first_card = True
+                self.action_object.chosen_first_card = True
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not an army unit.")
-    elif self.action_chosen == "Guerrilla Tactics Discard":
+    elif self.action_object.action_chosen == "Guerrilla Tactics Discard":
         primary_player.discard_card_from_hand(hand_pos)
-        self.misc_counter = self.misc_counter - 1
-        if self.misc_counter < 1:
-            self.action_chosen = "Guerrilla Tactics Move"
-            self.chosen_first_card = False
-            self.misc_target_unit = (-1, -1)
-            self.player_with_action = secondary_player.name_player
-    elif self.action_chosen == "Twisted Wracks":
+        self.action_object.misc_counter = self.action_object.misc_counter - 1
+        if self.action_object.misc_counter < 1:
+            self.action_object.action_chosen = "Guerrilla Tactics Move"
+            self.action_object.chosen_first_card = False
+            self.action_object.misc_target_unit = (-1, -1)
+            self.action_object.player_with_action = secondary_player.name_player
+    elif self.action_object.action_chosen == "Twisted Wracks":
         card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         if card.check_for_a_trait("Torture"):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
-            planet_pos, unit_pos = self.position_of_actioned_card
+            planet_pos, unit_pos = self.action_object.position_of_actioned_card
             primary_player.ready_given_pos(planet_pos, unit_pos)
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             self.action_cleanup()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is does not have Torture trait.")
-    elif self.action_chosen == "Cenobyte Servitor":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Cenobyte Servitor":
+        if not self.action_object.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card is None:
                 return None
             if card.get_card_type() == "Attachment":
                 if card.check_for_a_trait("Relic"):
-                    self.chosen_first_card = True
+                    self.action_object.chosen_first_card = True
                     primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     primary_player.aiming_reticle_color = "blue"
                 else:
@@ -1360,16 +1360,16 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not an attachment.")
-    elif self.action_chosen == "Sudden Adaptation":
-        if self.chosen_first_card:
+    elif self.action_object.action_chosen == "Sudden Adaptation":
+        if self.action_object.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card is None:
                 return None
-            if card.get_cost() <= self.misc_counter:
+            if card.get_cost() <= self.action_object.misc_counter:
                 if card.get_card_type() == "Army":
                     if card.get_faction() == "Tyranids":
                         if self.misc_target_choice != card.get_name():
-                            primary_player.add_card_to_planet(card, self.misc_target_planet)
+                            primary_player.add_card_to_planet(card, self.action_object.misc_target_planet)
                             primary_player.remove_card_from_hand(int(game_update_string[2]))
                             primary_player.resolve_played_any_event()
                             self.action_cleanup()
@@ -1386,44 +1386,44 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Cost of the card is greater than the cost of the unit returned.")
 
-    elif self.action_chosen == "Merciless Reclamation":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Merciless Reclamation":
+        if not self.action_object.chosen_first_card:
             card = primary_player.get_card_in_hand(int(game_update_string[2]))
             if card is None:
                 return None
             if card.get_card_type() == "Army" and card.get_faction() == "Necrons":
                 if card.check_for_a_trait("Soldier", primary_player.etekh_trait) or \
                         card.check_for_a_trait("Warrior", primary_player.etekh_trait):
-                    self.misc_counter = card.get_cost()
+                    self.action_object.misc_counter = card.get_cost()
                     primary_player.discard_card_from_hand(hand_pos)
-                    self.chosen_first_card = True
-    elif self.action_chosen == "Unshrouded Truth":
-        if hand_pos not in self.misc_misc:
-            self.misc_misc.append(hand_pos)
+                    self.action_object.chosen_first_card = True
+    elif self.action_object.action_chosen == "Unshrouded Truth":
+        if hand_pos not in self.action_object.misc_misc:
+            self.action_object.misc_misc.append(hand_pos)
             await self.send_update_message(primary_player.name_player + " reveals a " + primary_player.cards[hand_pos])
-            if len(self.misc_misc) == len(primary_player.cards):
+            if len(self.action_object.misc_misc) == len(primary_player.cards):
                 await self.send_update_message("Revealed everything. Ending.")
-                self.misc_misc = None
+                self.action_object.misc_misc = None
                 self.action_cleanup()
-    elif self.action_chosen == "Abomination Workshop":
+    elif self.action_object.action_chosen == "Abomination Workshop":
         primary_player.discard_card_from_hand(hand_pos)
-        if self.misc_counter >= len(primary_player.cards):
-            if self.chosen_first_card:
-                self.player_with_action = primary_player.name_player
+        if self.action_object.misc_counter >= len(primary_player.cards):
+            if self.action_object.chosen_first_card:
+                self.action_object.player_with_action = primary_player.name_player
                 self.action_cleanup()
-            self.chosen_first_card = True
-            self.player_with_action = secondary_player.name_player
-            self.misc_counter = secondary_player.get_highest_cost_units()
-            if self.misc_counter >= len(secondary_player.cards):
-                self.player_with_action = primary_player.name_player
+            self.action_object.chosen_first_card = True
+            self.action_object.player_with_action = secondary_player.name_player
+            self.action_object.misc_counter = secondary_player.get_highest_cost_units()
+            if self.action_object.misc_counter >= len(secondary_player.cards):
+                self.action_object.player_with_action = primary_player.name_player
                 self.action_cleanup()
-    elif self.action_chosen == "Talyesin's Warlocks":
+    elif self.action_object.action_chosen == "Talyesin's Warlocks":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card is None:
             return None
         if card.check_for_a_trait("Warrior", primary_player.etekh_trait):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
-            planet_pos, unit_pos = self.position_of_actioned_card
+            planet_pos, unit_pos = self.action_object.position_of_actioned_card
             primary_player.ready_given_pos(planet_pos, unit_pos)
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             self.mask_jain_zar_check_actions(primary_player, secondary_player)
@@ -1431,12 +1431,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card does not have Warrior trait.")
-    elif self.action_chosen == "Behind Enemy Lines":
+    elif self.action_object.action_chosen == "Behind Enemy Lines":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card is None:
             return None
         if card.get_is_unit():
-            self.chosen_first_card = True
+            self.action_object.chosen_first_card = True
             self.card_to_deploy = card
             primary_player.aiming_reticle_color = "blue"
             primary_player.aiming_reticle_coords_hand = hand_pos
@@ -1444,13 +1444,13 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not an army unit.")
-    elif self.action_chosen == "Staging Ground":
+    elif self.action_object.action_chosen == "Staging Ground":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card is None:
             return None
         if card.get_is_unit():
             if card.get_cost() < 3:
-                self.chosen_first_card = True
+                self.action_object.chosen_first_card = True
                 self.card_to_deploy = card
                 primary_player.aiming_reticle_color = "blue"
                 primary_player.aiming_reticle_coords_hand = hand_pos
@@ -1461,18 +1461,18 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not an army unit.")
-    elif self.action_chosen == "Launch Pads":
+    elif self.action_object.action_chosen == "Launch Pads":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card is None:
             return None
         if card.get_is_unit():
             if card.get_cost() == 3 and card.get_faction() == "Space Marines":
-                self.chosen_first_card = True
+                self.action_object.chosen_first_card = True
                 self.card_to_deploy = card
                 primary_player.aiming_reticle_color = "blue"
                 primary_player.aiming_reticle_coords_hand = hand_pos
                 self.card_type_of_selected_card_in_hand = "Army"
-    elif self.action_chosen == "Kwik' Konstruckshun":
+    elif self.action_object.action_chosen == "Kwik' Konstruckshun":
         card = primary_player.get_card_in_hand(hand_pos)
         if card is None:
             return None
@@ -1490,15 +1490,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not a Support.")
-    elif self.action_chosen == "Crypt of Saint Camila":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Crypt of Saint Camila":
+        if not self.action_object.chosen_first_card:
             card = primary_player.get_card_in_hand(hand_pos)
             if card is None:
                 return None
             if not card.check_for_a_trait("Elite"):
                 if card.get_faction() == "Space Marines":
                     if card.get_card_type() == "Army":
-                        self.chosen_first_card = True
+                        self.action_object.chosen_first_card = True
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         primary_player.aiming_reticle_color = "blue"
                     else:
@@ -1510,14 +1510,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Crypt of Saint Camila cannot put Elite units into play.")
-    elif self.action_chosen == "Slumbering Tomb":
+    elif self.action_object.action_chosen == "Slumbering Tomb":
         primary_player.discard_card_from_hand(int(game_update_string[2]))
-        self.misc_counter += 1
-        if self.misc_counter >= 2:
-            primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                        self.position_of_actioned_card[1])
+        self.action_object.misc_counter += 1
+        if self.action_object.misc_counter >= 2:
+            primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                        self.action_object.position_of_actioned_card[1])
             self.action_cleanup()
-    elif self.action_chosen == "Death from Above":
+    elif self.action_object.action_chosen == "Death from Above":
         if card.get_is_unit():
             if card.get_mobile() and not card.check_for_a_trait("Elite"):
                 last_planet = self.determine_last_planet()
@@ -1535,38 +1535,38 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not an army unit.")
-    elif self.action_chosen == "Biomass Sacrifice":
+    elif self.action_object.action_chosen == "Biomass Sacrifice":
         if card.get_is_unit():
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             primary_player.add_resources(1)
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not an army unit.")
-    elif self.action_chosen == "Veteran Brother Maxos":
+    elif self.action_object.action_chosen == "Veteran Brother Maxos":
         if card.get_is_unit() and card.get_faction() == "Space Marines":
             if primary_player.spend_resources(card.get_cost()):
-                if primary_player.add_card_to_planet(card, self.position_of_actioned_card[0]) != -1:
+                if primary_player.add_card_to_planet(card, self.action_object.position_of_actioned_card[0]) != -1:
                     primary_player.remove_card_from_hand(int(game_update_string[2]))
-                    primary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
-                                                                self.position_of_actioned_card[1])
+                    primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                                self.action_object.position_of_actioned_card[1])
                     self.action_cleanup()
-                    self.position_of_actioned_card = (-1, -1)
+                    self.action_object.position_of_actioned_card = (-1, -1)
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Insufficient Resources for that unit.")
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not a Space Marines army unit.")
-    elif self.action_chosen == "Hyperphase Sword":
-        if not self.chosen_first_card:
+    elif self.action_object.action_chosen == "Hyperphase Sword":
+        if not self.action_object.chosen_first_card:
             primary_player.discard_card_from_hand(int(game_update_string[2]))
-            self.chosen_first_card = True
-    elif self.action_chosen == "Bolster the Defense":
+            self.action_object.chosen_first_card = True
+    elif self.action_object.action_chosen == "Bolster the Defense":
         card = primary_player.get_card_in_hand(int(game_update_string[2]))
         if card is None:
             return None
         if card.get_card_type() == "Support":
-            if card.get_cost() <= self.misc_counter:
+            if card.get_cost() <= self.action_object.misc_counter:
                 primary_player.add_to_hq(card)
                 primary_player.remove_card_from_hand(int(game_update_string[2]))
                 primary_player.resolve_played_any_event()
@@ -1577,22 +1577,22 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Card is not a Support.")
-    elif self.action_chosen == "Ominous Wind":
+    elif self.action_object.action_chosen == "Ominous Wind":
         primary_player.discard_card_from_hand(int(game_update_string[2]))
-        self.misc_counter = self.misc_counter - 1
-        if self.misc_counter > 0:
-            await self.send_update_message(str(self.misc_counter) + " cards left to discard")
+        self.action_object.misc_counter = self.action_object.misc_counter - 1
+        if self.action_object.misc_counter > 0:
+            await self.send_update_message(str(self.action_object.misc_counter) + " cards left to discard")
         else:
             primary_player.resolve_played_any_event()
             self.action_cleanup()
-    elif self.action_chosen == "Recycle":
+    elif self.action_object.action_chosen == "Recycle":
         if primary_player.aiming_reticle_coords_hand != int(game_update_string[2]):
             primary_player.discard_card_from_hand(int(game_update_string[2]))
             if primary_player.aiming_reticle_coords_hand is not None:
                 if primary_player.aiming_reticle_coords_hand > int(game_update_string[2]):
                     primary_player.aiming_reticle_coords_hand -= 1
-            self.misc_counter += 1
-            if self.misc_counter > 1:
+            self.action_object.misc_counter += 1
+            if self.action_object.misc_counter > 1:
                 if not primary_player.harbinger_of_eternity_active:
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
@@ -1600,8 +1600,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     primary_player.draw_card()
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
-    elif self.action_chosen == "Infernal Gateway":
-        if self.player_with_action == self.name_1:
+    elif self.action_object.action_chosen == "Infernal Gateway":
+        if self.action_object.player_with_action == self.name_1:
             primary_player = self.p1
         else:
             primary_player = self.p2
