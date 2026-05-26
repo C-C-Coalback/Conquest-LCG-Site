@@ -283,6 +283,29 @@ async def resolve_command(self, name, message):
             self.p2.has_passed = False
             self.reset_combat_positions()
             await self.send_update_message("Unpassed both players")
+    elif message[1] == "restore-warlord":
+        if len(message) == 2:
+            if name == self.name_1:
+                warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
+                if warlord_pla != -1:
+                    self.p1.make_warlord_hale_given_pos(warlord_pla, warlord_pos)
+                    await self.p1.send_units_at_planet(warlord_pla)
+            elif name == self.name_2:
+                warlord_pla, warlord_pos = self.p2.get_location_of_warlord()
+                if warlord_pla != -1:
+                    self.p2.make_warlord_hale_given_pos(warlord_pla, warlord_pos)
+                    await self.p2.send_units_at_planet(warlord_pla)
+        if len(message) == 3:
+            if message[2] == "1":
+                warlord_pla, warlord_pos = self.p1.get_location_of_warlord()
+                if warlord_pla != -1:
+                    self.p1.make_warlord_hale_given_pos(warlord_pla, warlord_pos)
+                    await self.p1.send_units_at_planet(warlord_pla)
+            elif message[2] == "2":
+                warlord_pla, warlord_pos = self.p2.get_location_of_warlord()
+                if warlord_pla != -1:
+                    self.p2.make_warlord_hale_given_pos(warlord_pla, warlord_pos)
+                    await self.p2.send_units_at_planet(warlord_pla)
     elif message[1] == "toggle-command-rewards":
         if name == self.name_1:
             self.p1.automated_command_rewards = not self.p1.automated_command_rewards
