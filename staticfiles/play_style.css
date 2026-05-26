@@ -608,9 +608,9 @@ h4 {
     max-height: 20vh;
     overflow-y:auto;
     overflow-x:auto;
-    white-space:nowrap;
     display: flex;
     flex-direction: row;
+    justify-content: center;
     pointer-events: auto;
     z-index: 1001;
     background: rgb(210, 210, 210);
@@ -790,6 +790,24 @@ h4 {
 
 .generic-blue-border {
     border: 2px solid aqua;
+}
+
+#header-choices-container {
+    overflow-wrap: break-word;
+    text-align: center;
+}
+
+.choice {
+    background-color: aliceblue;
+    border-color: gray;
+    border-width: 3px;
+    border-style: inset;
+    font-size: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    padding: 2px 5px;
+    width: 100%;
 }
 
 .hand-card {

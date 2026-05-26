@@ -1061,14 +1061,20 @@
                         document.getElementById(target_headquarters).innerHTML += full_string;
                     }
                 } else if (split_data[1] === "CHOICE") {
-                    var full_string = `<div id="choices-container"><div id="header-choices-container">` + split_data[3] + `</div>`;
+                    var full_string = `<div id="choices-container"><div id="header-choices-container">`;
+                    if (split_data[2] === "{{ user.username }}") {
+                        full_string = full_string + split_data[3];
+                    } else {
+                        full_string = full_string + `Choice Hidden`;
+                    }
+                    full_string = full_string + `</div>`;
                     console.log(split_data)
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
                             var choice_data = split_data[i].split("|");
                             if (choice_data.length === 2) {
                                 if (choice_data[1] === "N") {
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
                                 } else if (choice_data[1] === "P") {
                                     var card_name = choice_data[0];
                                     var string_id = (i-4).toString();
@@ -1091,6 +1097,7 @@
                     }
                     full_string += `</div>`;
                     document.getElementById("search-collapse").innerHTML = full_string;
+                    document.getElementById("search-collapse").style.maxWidth = `10vw`;
                 } else if (split_data[1] === "SOUND") {
                     console.log("trying to play sound")
                     var soundUrl = "/static/sounds/" + split_data[2] + ".wav";
@@ -1138,6 +1145,11 @@
                     }
                     full_string += `</div>`;
                     document.getElementById("search-collapse").innerHTML = full_string;
+                    if (split_data[3] === "Nothing here") {
+                        document.getElementById("search-collapse").style.maxWidth = `10vw`;
+                    } else {
+                        document.getElementById("search-collapse").style.maxWidth = `25vw`;
+                    }
                 } else if (split_data[1] === "HAND") {
                     var target_id = 'current-hand-player-' + split_data[2];
                     document.getElementById(target_id).innerHTML = ``;
