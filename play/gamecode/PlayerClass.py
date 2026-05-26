@@ -137,7 +137,6 @@ class Player:
         self.dark_possession_remove_after_play = False
         self.enslaved_faction = ""
         self.chosen_enslaved_faction = False
-        self.allowed_planets_cato_stronghold = []
         self.erekiels_queued = 0
         self.nahumekh_value = 0
         self.last_hand_string = ""
@@ -7996,7 +7995,10 @@ class Player:
                 if not other_player.check_if_already_have_reaction("Cato's Stronghold"):
                     self.game.create_reaction("Cato's Stronghold", other_player.name_player,
                                               (int(other_player.number), -1, -1))
-                other_player.allowed_planets_cato_stronghold.append(planet_num)
+                for reaction_pos in range(len(self.game.reactions_needing_resolving)):
+                    if self.game.reactions_needing_resolving[reaction_pos].get_reaction_name() == "Cato's Stronghold":
+                        if self.game.reactions_needing_resolving[reaction_pos].get_player_resolving_reaction() != self.name_player:
+                            self.game.reactions_needing_resolving[reaction_pos].misc_list.append(planet_num)
             if other_player.search_card_in_hq("Shrine of Warpflame", ready_relevant=True):
                 if not other_player.check_if_already_have_reaction("Shrine of Warpflame"):
                     self.game.create_reaction("Shrine of Warpflame", other_player.name_player,

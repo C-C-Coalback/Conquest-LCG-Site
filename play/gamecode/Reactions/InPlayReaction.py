@@ -2463,7 +2463,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       "Invalid target for Alaitoc Shrine.")
         elif current_reaction == "Cato's Stronghold":
             if int(primary_player.get_number()) == int(og_num):
-                if planet_pos in primary_player.allowed_planets_cato_stronghold:
+                if planet_pos in reaction.misc_list:
                     if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines"):
                             can_continue = True
@@ -2491,7 +2491,6 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             if can_continue:
                                 primary_player.ready_given_pos(planet_pos, unit_pos)
                                 self.delete_reaction()
-                                primary_player.allowed_planets_cato_stronghold = []
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Unit is not a Space Marines unit.")
                     else:

@@ -5543,8 +5543,6 @@ class Game:
                                          "Zadruk Prime", "Hostaryn XXI", "Deltadurne", "Caldera",
                                          "Hangyz", "Forge World Dagon"]:
                         self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
-                    if reaction_name == "Cato's Stronghold":
-                        primary_player.allowed_planets_cato_stronghold = []
                     if reaction_name == "Foresight":
                         primary_player.aiming_reticle_coords_hand = None
                     if reaction_name == "Alaitoc Shrine":
