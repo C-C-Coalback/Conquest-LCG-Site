@@ -1,6 +1,4 @@
-ability_targets_dictionary = {
-    "Exterminatus": "Non-first planet"
-}
+from .AbilityTargetsDictionary import ability_targets_dictionary
 
 
 def update_automated_attributes(self):
@@ -165,6 +163,71 @@ def add_active_non_first_planets_as_valid_moves(self, valid_moves):
     return valid_moves
 
 
+def check_if_single_card_in_play_is_valid_target(self, player, planet_pos, unit_pos, target_restrictions):
+    unit_only = target_restrictions["Unit Only"]
+    unique_required = target_restrictions["Unique"]
+    ready_required = target_restrictions["Ready"]
+    exhaust_required = target_restrictions["Exhaust"]
+    faction_required = target_restrictions["Faction"]
+    card_type_required = target_restrictions["Card Type"]
+    forbidden_card_type = target_restrictions["Forbidden Card Type"]
+    required_traits = target_restrictions["Required Traits"]
+    forbidden_traits = target_restrictions["Forbidden Traits"]
+    if unit_only:
+        if not player.check_is_unit_at_pos(planet_pos, unit_pos):
+            return False
+    if unique_required:
+        if not player.get_unique_given_pos(planet_pos, unit_pos):
+            return False
+    if ready_required:
+        if not player.get_ready_given_pos(planet_pos, unit_pos):
+            return False
+    elif exhaust_required:
+        if player.get_ready_given_pos(planet_pos, unit_pos):
+            return False
+    if faction_required:
+        if not player.check_if_faction_given_pos(planet_pos, unit_pos, faction_required):
+            return False
+    if card_type_required:
+        if player.get_card_type_given_pos(planet_pos, unit_pos) != card_type_required:
+            return False
+    if forbidden_card_type:
+        if player.get_card_type_given_pos(planet_pos, unit_pos) == forbidden_card_type:
+            return False
+    if required_traits:
+        for trait in required_traits:
+            if not player.check_for_trait_given_pos(planet_pos, unit_pos, trait):
+                return False
+    if forbidden_traits:
+        for trait in forbidden_traits:
+            if player.check_for_trait_given_pos(planet_pos, unit_pos, trait):
+                return False
+    return True
+
+
+def find_all_valid_unit_locations_given_restrictions(self, primary_player, secondary_player, target_restrictions):
+    valid_moves = []
+    own_unit = target_restrictions["Own Unit"]
+    enemy_unit = target_restrictions["Enemy Unit"]
+    if own_unit:
+        for i in range(len(primary_player.headquarters)):
+            if check_if_single_card_in_play_is_valid_target(self, primary_player, -2, i, target_restrictions):
+                valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
+        for i in range(7):
+            for j in range(len(primary_player.cards_in_play[i + 1])):
+                if check_if_single_card_in_play_is_valid_target(self, primary_player, i, j, target_restrictions):
+                    valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+    if enemy_unit:
+        for i in range(len(secondary_player.headquarters)):
+            if check_if_single_card_in_play_is_valid_target(self, secondary_player, -2, i, target_restrictions):
+                valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
+        for i in range(7):
+            for j in range(len(secondary_player.cards_in_play[i + 1])):
+                if check_if_single_card_in_play_is_valid_target(self, secondary_player, i, j, target_restrictions):
+                    valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+    return valid_moves
+
+
 def determine_valid_moves(self):
     valid_moves = []
     primary_player, secondary_player = self.get_players_given_name(self.automated_player_waited_on)
@@ -246,9 +309,44 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Action":
             if self.action_chosen in ability_targets_dictionary:
-                type_of_targets = ability_targets_dictionary[self.action_chosen]
-                if type_of_targets == "Non-first planet":
-                    valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
+                target_restriction_data = ability_targets_dictionary[self.action_chosen]
+                type_target = target_restriction_data["Type"]
+                target_restrictions = target_restriction_data["Restrictions"]
+                if type_target == "Planet":
+                    if target_restrictions["Non-first"]:
+                        valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
+                    else:
+                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Reaction":
+            current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
+            if current_reaction in ability_targets_dictionary:
+                target_restriction_data = ability_targets_dictionary[current_reaction]
+                type_target = target_restriction_data["Type"]
+                target_restrictions = target_restriction_data["Restrictions"]
+                if type_target == "Planet":
+                    if target_restrictions["Non-first"]:
+                        valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
+                    else:
+                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Interrupt":
+            current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+            if current_interrupt in ability_targets_dictionary:
+                target_restriction_data = ability_targets_dictionary[current_interrupt]
+                type_target = target_restriction_data["Type"]
+                target_restrictions = target_restriction_data["Restrictions"]
+                if type_target == "Unit":
+                    valid_moves = find_all_valid_unit_locations_given_restrictions(
+                        self, primary_player, secondary_player, target_restrictions
+                    )
+                if type_target == "Planet":
+                    if target_restrictions["Non-first"]:
+                        valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
+                    else:
+                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         else:
