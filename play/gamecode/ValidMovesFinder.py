@@ -287,6 +287,8 @@ def determine_valid_moves(self):
                 for i in range(len(secondary_player.cards_in_play[battle_planet + 1])):
                     if self.check_if_unit_can_be_declared_as_defender(primary_player, secondary_player, battle_planet, i):
                         valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
+                if primary_player.get_area_effect_given_pos(self.attacker_planet, self.attacker_position) > 0:
+                    valid_moves = add_valid_move(valid_moves, primary_player, "PLANETS", planet_pos=battle_planet)
         elif self.what_is_required_automated == "Retreat Turn":
             battle_planet = self.last_planet_checked_for_battle
             for i in range(len(primary_player.cards_in_play[battle_planet + 1])):
