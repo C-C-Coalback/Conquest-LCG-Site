@@ -535,6 +535,8 @@ class Game:
         self.last_initiative_string = ""
         self.what_is_required_automated = ""
         self.automated_player_waited_on = ""
+        self.automated_1_has_passed_action = False
+        self.automated_2_has_passed_action = False
         self.clickable_items_automated = []
         if deck_1:
             deck_name = deck_1
@@ -8241,6 +8243,8 @@ class Game:
                 ReactionsClass.Reaction(reaction_name, player_name, unit_tuple, additional_info))
 
     def begin_combat_round(self):
+        self.automated_1_has_passed_action = False
+        self.automated_2_has_passed_action = False
         self.bloodthirst_active = [False, False, False, False, False, False, False]
         self.p1.resolve_combat_round_begins(self.last_planet_checked_for_battle)
         self.p2.resolve_combat_round_begins(self.last_planet_checked_for_battle)

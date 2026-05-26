@@ -587,6 +587,40 @@ class GameConsumer(AsyncWebsocketConsumer):
                     await self.receive_game_update(
                         "An error has occurred on the server side. Your game may become unstable or unplayable."
                     )
+        elif message[0] == "AUTOMATED_SPECIAL_ACTION_CHOICE" and len(message) > 1:
+            current_game_id = -1
+            for i in range(len(active_games)):
+                if active_games[i].game_id == self.room_name:
+                    print("Found room")
+                    current_game_id = i
+            if current_game_id != -1:
+                try:
+                    game_relevant_string = message[1] + "|||SpecialAction/" + "/".join(message[2:])
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
+                    if message[2] == "pass-P1":
+                        if message[1] == active_games[current_game_id].name_1:
+                            active_games[current_game_id].automated_1_has_passed_action = True
+                        elif message[1] == active_games[current_game_id].name_2:
+                            active_games[current_game_id].automated_2_has_passed_action = True
+                        await active_games[current_game_id].update_automated_info()
+                        await active_games[current_game_id].send_automated_info()
+                        print("automated player special action states")
+                        print(active_games[current_game_id].automated_1_has_passed_action)
+                        print(active_games[current_game_id].automated_2_has_passed_action)
+                    else:
+                        await active_games[current_game_id].update_game_event(message[1], ["action-button"], same_thread=True)
+                        active_games[current_game_id].automated_1_has_passed_action = False
+                        active_games[current_game_id].automated_2_has_passed_action = False
+                        await active_games[current_game_id].update_game_event(message[1], message[2:])
+                except:
+                    try:
+                        with open("errorslog.txt", "a") as f:
+                            f.write(traceback.format_exc())
+                    except:
+                        pass
+                    await self.receive_game_update(
+                        "An error has occurred on the server side. Your game may become unstable or unplayable."
+                    )
         elif message[0] == "CHAT_MESSAGE" and len(message) > 1:
             del message[0]
             try:

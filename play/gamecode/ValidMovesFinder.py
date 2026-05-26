@@ -1,4 +1,5 @@
 from .AbilityTargetsDictionary import ability_targets_dictionary
+from .DetectPossibleActions import detect_possible_actions
 
 
 def update_automated_attributes(self):
@@ -75,8 +76,16 @@ def update_automated_attributes(self):
         self.what_is_required_automated = "Retreat Turn"
         self.automated_player_waited_on = self.player_with_combat_turn
     elif self.phase == "DEPLOY":
-        self.what_is_required_automated = "Deploy Turn"
-        self.automated_player_waited_on = self.player_with_deploy_turn
+        if self.check_if_battle_taking_place():
+            if self.mode == "RETREAT":
+                self.what_is_required_automated = "Retreat Turn"
+                self.automated_player_waited_on = self.player_with_combat_turn
+            else:
+                self.what_is_required_automated = "Combat Turn"
+                self.automated_player_waited_on = self.player_with_combat_turn
+        else:
+            self.what_is_required_automated = "Deploy Turn"
+            self.automated_player_waited_on = self.player_with_deploy_turn
     elif self.phase == "COMMAND":
         if self.committing_warlords:
             self.what_is_required_automated = "Commitment"
@@ -108,8 +117,17 @@ def update_automated_attributes(self):
                 self.what_is_required_automated = "Retreat Turn"
                 self.automated_player_waited_on = self.player_with_combat_turn
             else:
-                self.what_is_required_automated = "Combat Turn"
-                self.automated_player_waited_on = self.player_with_combat_turn
+                if not self.automated_1_has_passed_action or not self.automated_2_has_passed_action:
+                    if self.p1.has_initiative_for_battle and not self.automated_1_has_passed_action:
+                        self.automated_player_waited_on = self.name_1
+                    elif not self.automated_2_has_passed_action:
+                        self.automated_player_waited_on = self.name_2
+                    else:
+                        self.automated_player_waited_on = self.name_1
+                    self.what_is_required_automated = "Action Window Between Combat Turns"
+                else:
+                    self.what_is_required_automated = "Combat Turn"
+                    self.automated_player_waited_on = self.player_with_combat_turn
     elif self.phase == "HEADQUARTERS":
         self.what_is_required_automated = "Headquarters Action"
         if not self.p1.has_passed and not self.p2.has_passed:
@@ -316,6 +334,8 @@ def determine_valid_moves(self):
                             planet_pos=hurt_pla, unit_pos=hurt_pos, attachment_pos=i
                         )
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Action Window Between Combat Turns":
+            valid_moves = detect_possible_actions(self, primary_player, secondary_player)
         elif self.what_is_required_automated == "Action":
             if self.action_object.action_chosen in ability_targets_dictionary:
                 target_restriction_data = ability_targets_dictionary[self.action_object.action_chosen]
