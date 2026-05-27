@@ -184,7 +184,7 @@ def add_active_non_first_planets_as_valid_moves(self, valid_moves):
     return valid_moves
 
 
-def check_if_single_card_in_play_is_valid_target(self, player, planet_pos, unit_pos, target_restrictions):
+def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_pos, unit_pos, target_restrictions):
     unit_only = target_restrictions["Unit Only"]
     unique_required = target_restrictions["Unique"]
     ready_required = target_restrictions["Ready"]
@@ -194,6 +194,8 @@ def check_if_single_card_in_play_is_valid_target(self, player, planet_pos, unit_
     forbidden_card_type = target_restrictions["Forbidden Card Type"]
     required_traits = target_restrictions["Required Traits"]
     forbidden_traits = target_restrictions["Forbidden Traits"]
+    special_restrictions = target_restrictions["Special"]
+    ability_type = target_restrictions["Ability Type"]
     if unit_only:
         if not player.check_is_unit_at_pos(planet_pos, unit_pos):
             return False
@@ -223,28 +225,36 @@ def check_if_single_card_in_play_is_valid_target(self, player, planet_pos, unit_
         for trait in forbidden_traits:
             if player.check_for_trait_given_pos(planet_pos, unit_pos, trait):
                 return False
+    if special_restrictions:
+        if ability_type == "Reaction":
+            if ability.get_reaction_name() == "Cato's Stronghold":
+                if planet_pos not in ability.misc_list:
+                    return False
+            elif ability.get_reaction_name() == "Sicarius's Chosen":
+                if abs(ability.get_planet_pos() - planet_pos) != 1:
+                    return False
     return True
 
 
-def find_all_valid_unit_locations_given_restrictions(self, primary_player, secondary_player, target_restrictions):
+def find_all_valid_unit_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions):
     valid_moves = []
     own_unit = target_restrictions["Own Unit"]
     enemy_unit = target_restrictions["Enemy Unit"]
     if own_unit:
         for i in range(len(primary_player.headquarters)):
-            if check_if_single_card_in_play_is_valid_target(self, primary_player, -2, i, target_restrictions):
+            if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, -2, i, target_restrictions):
                 valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
         for i in range(7):
             for j in range(len(primary_player.cards_in_play[i + 1])):
-                if check_if_single_card_in_play_is_valid_target(self, primary_player, i, j, target_restrictions):
+                if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, i, j, target_restrictions):
                     valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     if enemy_unit:
         for i in range(len(secondary_player.headquarters)):
-            if check_if_single_card_in_play_is_valid_target(self, secondary_player, -2, i, target_restrictions):
+            if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, -2, i, target_restrictions):
                 valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
         for i in range(7):
             for j in range(len(secondary_player.cards_in_play[i + 1])):
-                if check_if_single_card_in_play_is_valid_target(self, secondary_player, i, j, target_restrictions):
+                if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, i, j, target_restrictions):
                     valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     return valid_moves
 
@@ -357,6 +367,10 @@ def determine_valid_moves(self):
                 target_restriction_data = ability_targets_dictionary[current_reaction]
                 type_target = target_restriction_data["Type"]
                 target_restrictions = target_restriction_data["Restrictions"]
+                if type_target == "Unit":
+                    valid_moves = find_all_valid_unit_locations_given_restrictions(
+                        self, self.reactions_needing_resolving[0], primary_player, secondary_player, target_restrictions
+                    )
                 if type_target == "Planet":
                     if target_restrictions["Non-first"]:
                         valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
@@ -372,7 +386,7 @@ def determine_valid_moves(self):
                 target_restrictions = target_restriction_data["Restrictions"]
                 if type_target == "Unit":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
-                        self, primary_player, secondary_player, target_restrictions
+                        self, self.interrupts_waiting_on_resolution[0], primary_player, secondary_player, target_restrictions
                     )
                 if type_target == "Planet":
                     if target_restrictions["Non-first"]:
