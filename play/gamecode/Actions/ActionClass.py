@@ -17,6 +17,12 @@ class Action:
         self.misc_misc_2 = None
         self.misc_list = []
 
+    def get_planet_pos(self):
+        return self.position_of_actioned_card[0]
+
+    def get_unit_pos(self):
+        return self.position_of_actioned_card[1]
+
     def reset_action_data(self):
         self.action_chosen = ""
         self.player_with_action = ""

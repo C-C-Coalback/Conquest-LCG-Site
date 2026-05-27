@@ -6,6 +6,19 @@ ability_targets_dictionary = {
             "Icons": None
         }
     },
+    "Veteran Brother Maxos": {
+        "Type": "Hand",
+        "Restrictions": {
+            "Faction": "Space Marines",
+            "Card Type": "Army",
+            "Max Cost": None,
+            "Payment": True,
+            "Payment Details": {
+                "Deploy": False
+            },
+            "Card Enters Play": True,
+        }
+    },
     "No Mercy": {
         "Type": "Unit",
         "Restrictions": {
@@ -58,6 +71,23 @@ ability_targets_dictionary = {
             "Forbidden Traits": [],
             "Special": True,
             "Ability Type": "Reaction"
+        }
+    }
+}
+
+action_ability_starts = {
+    "Veteran Brother Maxos": {
+        "Special": False,
+        "Requires Hand Card": True,
+        "Attributes Hand Card": {
+            "Faction": "Space Marines",
+            "Card Type": "Army",
+            "Max Cost": None,
+            "Payment": True,
+            "Payment Details": {
+                "Deploy": False
+            },
+            "Card Enters Play": True,
         }
     }
 }

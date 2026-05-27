@@ -236,6 +236,45 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
     return True
 
 
+def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos, target_restrictions, planet_pos=-1):
+    faction_hand_card = target_restrictions["Faction"]
+    card_type_hand_card = target_restrictions["Card Type"]
+    max_cost_hand_card = target_restrictions["Max Cost"]
+    payment_hand_card = target_restrictions["Payment"]
+    card_enters_play = target_restrictions["Card Enters Play"]
+    card = player.get_card_in_hand(hand_pos)
+    if faction_hand_card:
+        if faction_hand_card:
+            if faction_hand_card != card.get_faction():
+                return False
+        if card_type_hand_card:
+            if card_type_hand_card != card.get_card_type():
+                return False
+        if max_cost_hand_card:
+            if card.get_cost() > max_cost_hand_card:
+                return False
+        if payment_hand_card:
+            is_deploy = target_restrictions["Payment Details"]["Deploy"]
+            if is_deploy:
+                if player.determine_lowest_possible_cost_of_card(card) > player.get_resources():
+                    return False
+            else:
+                if card.get_cost() > player.get_resources():
+                    return False
+        if card_enters_play:
+            if not player.check_if_card_can_enter_play(card, planet_pos=planet_pos, triggered_card_effect=True):
+                return False
+    return True
+
+
+def find_all_valid_hand_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions):
+    valid_moves = []
+    for i in range(len(primary_player.cards)):
+        if check_if_single_card_in_hand_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=ability.get_planet_pos()):
+            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+    return valid_moves
+
+
 def find_all_valid_unit_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions):
     valid_moves = []
     own_unit = target_restrictions["Own Unit"]
@@ -357,6 +396,10 @@ def determine_valid_moves(self):
                 target_restriction_data = ability_targets_dictionary[self.action_object.action_chosen]
                 type_target = target_restriction_data["Type"]
                 target_restrictions = target_restriction_data["Restrictions"]
+                if type_target == "Hand":
+                    valid_moves = find_all_valid_hand_locations_given_restrictions(
+                        self, self.action_object, primary_player, secondary_player, target_restrictions
+                    )
                 if type_target == "Planet":
                     if target_restrictions["Non-first"]:
                         valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)

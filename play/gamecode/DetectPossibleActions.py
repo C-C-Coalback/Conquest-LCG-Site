@@ -1,9 +1,12 @@
+from .AbilityTargetsDictionary import action_ability_starts
+
+
 def detect_possible_actions(game, primary_player, secondary_player, combat_turn_action=False):
     possible_action_locations = []
     for i in range(len(primary_player.cards)):
         card = game.preloaded_find_card(primary_player.cards[i])
         if card.get_has_action_while_in_hand():
-            if card.get_allowed_phases_while_in_hand() == "All" or \
+            if card.get_allowed_phases_while_in_hand() == "ALL" or \
                     card.get_allowed_phases_while_in_hand() == game.phase:
                 if primary_player.get_ambush_of_card(card):
                     if primary_player.determine_playability(card.get_name()):
@@ -14,9 +17,61 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                             possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
                     else:
                         possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
+    for i in range(7):
+        for j in range(len(primary_player.cards_in_play[i + 1])):
+            card = primary_player.get_card_given_pos(i, j)
+            if card.get_has_action_while_in_play():
+                if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
+                    print("card has action and right phase")
+                    ability = primary_player.get_ability_given_pos(i, j)
+                    if ability in action_ability_starts:
+                        prereqs = action_ability_starts[ability]
+                        print("checking if action can start")
+                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=i):
+                            possible_action_locations = add_action(possible_action_locations, "IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j), combat_turn_action=combat_turn_action)
     if combat_turn_action:
         possible_action_locations.append("pass-P1")
     return possible_action_locations
+
+
+def check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, hand_pos):
+    faction_hand_card = prereqs["Attributes Hand Card"]["Faction"]
+    card_type_hand_card = prereqs["Attributes Hand Card"]["Card Type"]
+    max_cost_hand_card = prereqs["Attributes Hand Card"]["Max Cost"]
+    payment_hand_card = prereqs["Attributes Hand Card"]["Payment"]
+    card_enters_play = prereqs["Attributes Hand Card"]["Card Enters Play"]
+    card = primary_player.get_card_in_hand(hand_pos)
+    if faction_hand_card:
+        if faction_hand_card != card.get_faction():
+            return False
+    if card_type_hand_card:
+        if card_type_hand_card != card.get_card_type():
+            return False
+    if max_cost_hand_card:
+        if card.get_cost() > max_cost_hand_card:
+            return False
+    if payment_hand_card:
+        is_deploy = prereqs["Attributes Hand Card"]["Payment Details"]["Deploy"]
+        if is_deploy:
+            if primary_player.determine_lowest_possible_cost_of_card(card) > primary_player.get_resources():
+                return False
+        else:
+            if card.get_cost() > primary_player.get_resources():
+                return False
+    if card_enters_play:
+        if not primary_player.check_if_card_can_enter_play(card, planet_pos=planet_pos, triggered_card_effect=True):
+            return False
+    return True
+
+
+def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos):
+    requires_hand_card = prereqs["Requires Hand Card"]
+    if requires_hand_card:
+        print("requires hand")
+        for i in range(len(primary_player.cards)):
+            if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):
+                return True
+    return False
 
 
 def add_action(possible_action_locations, string_to_add, combat_turn_action=False):

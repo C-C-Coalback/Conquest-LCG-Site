@@ -550,7 +550,7 @@ class Player:
                     if not self.can_play_pledge:
                         return "unplayable"
                 if card.get_card_type() in ["Army", "Support", "Attachment"] and self.game.phase == "DEPLOY":
-                    if self.check_if_card_can_enter_play(card):
+                    if self.check_if_card_can_enter_play(card, triggered_card_effect=False):
                         if self.determine_lowest_possible_cost_of_card(card) <= self.get_resources():
                             if card.get_card_type() == "Attachment":
                                 if card.planet_attachment:
@@ -2907,9 +2907,21 @@ class Player:
                     return True
         return False
 
-    def check_if_card_can_enter_play(self, card):
+    def check_if_card_can_enter_play(self, card, planet_pos=-1, triggered_card_effect=True):
         if card.get_unique():
             if self.search_for_unique_card(card.name):
+                return False
+        if self.warlord_faction == "Necrons":
+            if card.get_card_type() == "Army":
+                if card.get_faction() not in ["Necrons", "Neutral"]:
+                    if card.get_faction() != self.enslaved_faction:
+                        return False
+        if self.game.banned_cards:
+            if card.get_name() in self.game.banned_cards:
+                return False
+        if triggered_card_effect and not card.check_for_a_trait("Runt", etekh_trait=self.etekh_trait) and planet_pos != -1:
+            resources_to_spend = self.game.imperial_blockades_active[planet_pos]
+            if self.get_resources() < resources_to_spend:
                 return False
         return True
 
