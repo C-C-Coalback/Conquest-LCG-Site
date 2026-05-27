@@ -577,9 +577,17 @@ class GameConsumer(AsyncWebsocketConsumer):
                     current_game_id = i
             if current_game_id != -1:
                 try:
-                    game_relevant_string = message[1] + "|||" + "/".join(message[2:])
-                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
-                    await active_games[current_game_id].update_game_event(message[1], message[2:])
+                    if message[2] == "SPECIAL_ACTION":
+                        game_relevant_string = message[1] + "|||" + "/".join(message[3:])
+                        active_games[current_game_id].game_events_as_mono_string += message[1] + "|||action-button"
+                        active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
+                        await active_games[current_game_id].update_game_event(message[1], ["action-button"],
+                                                                              same_thread=True)
+                        await active_games[current_game_id].update_game_event(message[1], message[3:])
+                    else:
+                        game_relevant_string = message[1] + "|||" + "/".join(message[2:])
+                        active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
+                        await active_games[current_game_id].update_game_event(message[1], message[2:])
                 except:
                     try:
                         with open("errorslog.txt", "a") as f:

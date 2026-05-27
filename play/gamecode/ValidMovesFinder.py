@@ -294,6 +294,7 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Command not Commitment":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Outside Combat":
+            valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Combat Turn":
             battle_planet = self.last_planet_checked_for_battle
@@ -335,9 +336,11 @@ def determine_valid_moves(self):
                         )
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Action Window Between Combat Turns":
-            valid_moves = detect_possible_actions(self, primary_player, secondary_player)
+            valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=True)
         elif self.what_is_required_automated == "Action":
-            if self.action_object.action_chosen in ability_targets_dictionary:
+            if self.action_object.action_chosen == "Ambush":
+                valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+            elif self.action_object.action_chosen in ability_targets_dictionary:
                 target_restriction_data = ability_targets_dictionary[self.action_object.action_chosen]
                 type_target = target_restriction_data["Type"]
                 target_restrictions = target_restriction_data["Restrictions"]
