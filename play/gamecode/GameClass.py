@@ -225,6 +225,7 @@ class Game:
         self.all_conditions_searched_card_required = False
         self.no_restrictions_on_chosen_card = False
         self.need_to_resolve_battle_ability = False
+        self.last_player_to_capture_planet = ""
         self.battle_ability_to_resolve = ""
         self.player_resolving_battle_ability = ""
         self.number_resolving_battle_ability = -1
@@ -8206,7 +8207,12 @@ class Game:
                     self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
                     if self.round_number == 6:
-                        await self.send_victory_proper("???", "not capturing the last planet...")
+                        if self.last_player_to_capture_planet == self.name_1:
+                            await self.send_victory_proper(self.name_1, "being the last player to capture a planet")
+                        elif self.last_player_to_capture_planet == self.name_2:
+                            await self.send_victory_proper(self.name_2, "being the last player to capture a planet")
+                        else:
+                            await self.send_victory_proper("???", "not capturing any planets...")
                 await self.resolve_battle_conclusion(name, ["", ""])
 
     async def check_combat_end(self, name):

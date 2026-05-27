@@ -8919,6 +8919,7 @@ class Player:
             print(planet_cards[i].get_name(), planet_name)
             if planet_cards[i].get_name() == planet_name:
                 self.victory_display.append(planet_cards[i])
+                self.game.last_player_to_capture_planet = self.name_player
                 self.print_victory_display()
                 self.print_icons_on_captured()
                 return 0
