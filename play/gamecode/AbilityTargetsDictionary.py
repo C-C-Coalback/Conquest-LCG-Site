@@ -161,7 +161,7 @@ ability_targets_dictionary = {
             "Special": False,
             "Ability Type": "Planet"
         }
-    }
+    },
 }
 
 action_ability_starts = {

@@ -1370,6 +1370,34 @@ async def manual_carnath_ability(self, name, game_update_string, primary_player,
 
 
 async def manual_ferrin_ability(self, name, game_update_string, primary_player, secondary_player):
+    if len(game_update_string) == 3:
+        if game_update_string[0] == "HQ":
+            planet_pos = -2
+            unit_pos = int(game_update_string[2])
+            player_owning_card = primary_player
+            if game_update_string[1] != player_owning_card.get_number():
+                player_owning_card = secondary_player
+            if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                can_continue = True
+                if self.player_resolving_battle_ability != player_owning_card.name_player:
+                    possible_interrupts = secondary_player.interrupt_cancel_target_check(planet_pos, unit_pos)
+                    if possible_interrupts:
+                        can_continue = False
+                        await self.send_update_message(
+                            "Some sort of interrupt may be used.")
+                        self.choices_available = possible_interrupts
+                        self.choices_available.insert(0, "No Interrupt")
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Interrupt Effect?"
+                        self.nullified_card_name = "Ferrin"
+                        self.cost_card_nullified = 0
+                        self.nullify_string = "/".join(game_update_string)
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Ferrin"
+                if can_continue:
+                    player_owning_card.rout_unit(planet_pos, unit_pos)
+                    await self.resolve_battle_conclusion(self.player_resolving_battle_ability,
+                                                         game_update_string)
     if len(game_update_string) == 4:
         if game_update_string[0] == "IN_PLAY":
             planet_pos = int(game_update_string[2])

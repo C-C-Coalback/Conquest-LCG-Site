@@ -8605,11 +8605,14 @@ class Player:
         return False
 
     def rout_unit(self, planet_id, unit_id):
-        if planet_id == -2:
-            return False
         if self.get_ability_given_pos(planet_id, unit_id) == "Heavy Flamer Retributor":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return False
+        if self.get_ability_given_pos(planet_id, unit_id) == "Mindless Pain Addict":
+            return False
+        if planet_id == -2:
+            self.exhaust_given_pos(planet_id, unit_id, card_effect=True)
+            return True
         if self.get_ability_given_pos(planet_id, unit_id) == "Mars Pattern Hellhound":
             if self.search_card_type_at_planet(planet_id, "Token"):
                 return False
@@ -8620,8 +8623,6 @@ class Player:
             if self.get_all_attachments_at_pos(planet_id, unit_id):
                 if self.game.combat_round_number < 2:
                     return False
-        if self.get_ability_given_pos(planet_id, unit_id) == "Mindless Pain Addict":
-            return False
         if self.game.imperial_blockades_active[planet_id] > 0:
             other_player = self.get_other_player()
             resources_to_spend = self.game.imperial_blockades_active[planet_id]
