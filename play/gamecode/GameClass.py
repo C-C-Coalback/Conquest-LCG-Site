@@ -3042,6 +3042,8 @@ class Game:
         elif self.battle_ability_to_resolve == "Plannum":
             self.misc_target_unit = (-1, -1)
             self.chosen_first_card = False
+        elif self.battle_ability_to_resolve == "Carnath":
+            self.misc_target_unit = (-1, -1)
         elif self.battle_ability_to_resolve == "Atrox Prime":
             self.atrox_origin = self.get_planet_location("Atrox Prime")
             if self.different_atrox_origin != -1:

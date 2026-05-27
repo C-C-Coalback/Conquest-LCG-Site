@@ -1,14 +1,17 @@
 ability_targets_dictionary = {
     "Exterminatus": {
-        "Type": "Planet",
-        "Restrictions": {
+        "Num Stages": 1,
+        "Type 1": "Planet",
+        "Restrictions 1": {
             "Non-first": True,
-            "Icons": None
+            "Icons": None,
+            "Not Same Planet": False
         }
     },
     "Veteran Brother Maxos": {
-        "Type": "Hand",
-        "Restrictions": {
+        "Num Stages": 1,
+        "Type 1": "Hand",
+        "Restrictions 1": {
             "Faction": "Space Marines",
             "Card Type": "Army",
             "Max Cost": None,
@@ -20,8 +23,9 @@ ability_targets_dictionary = {
         }
     },
     "No Mercy": {
-        "Type": "Unit",
-        "Restrictions": {
+        "Num Stages": 1,
+        "Type 1": "Unit",
+        "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
             "Enemy Unit": False,
@@ -38,8 +42,9 @@ ability_targets_dictionary = {
         }
     },
     "Cato's Stronghold": {
-        "Type": "Unit",
-        "Restrictions": {
+        "Num Stages": 1,
+        "Type 1": "Unit",
+        "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
             "Enemy Unit": False,
@@ -56,8 +61,9 @@ ability_targets_dictionary = {
         }
     },
     "Sicarius's Chosen": {
-        "Type": "Unit",
-        "Restrictions": {
+        "Num Stages": 1,
+        "Type 1": "Unit",
+        "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": False,
             "Enemy Unit": True,
@@ -71,6 +77,89 @@ ability_targets_dictionary = {
             "Forbidden Traits": [],
             "Special": True,
             "Ability Type": "Reaction"
+        }
+    },
+    "Ferrin": {
+        "Num Stages": 1,
+        "Type 1": "Unit",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Ability Type": "Planet"
+        }
+    },
+    "Plannum": {
+        "Num Stages": 2,
+        "Type 1": "Unit",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Ability Type": "Planet"
+        },
+        "Type 2": "Planet",
+        "Restrictions 2": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": True,
+        }
+    },
+    "Carnath": {
+        "Num Stages": 1,
+        "Type 1": "Planet",
+        "Restrictions 1": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": True,
+        }
+    },
+    "Y'varn": {
+        "Num Stages": 1,
+        "Type 1": "Hand",
+        "Restrictions 1": {
+            "Faction": None,
+            "Card Type": "Army",
+            "Max Cost": None,
+            "Payment": False,
+            "Card Enters Play": True,
+        }
+    },
+    "Iridial": {
+        "Num Stages": 1,
+        "Type 1": "Unit",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Ability Type": "Planet"
         }
     }
 }

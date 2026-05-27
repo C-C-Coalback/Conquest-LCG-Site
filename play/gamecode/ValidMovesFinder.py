@@ -169,6 +169,28 @@ def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, h
     return valid_moves
 
 
+def check_if_planet_is_valid_target(self, planet_pos, primary_player, secondary_player, ability, restrictions, misc_pla=-1):
+    non_first = restrictions["Non-first"]
+    icons = restrictions["Icons"]
+    not_same_planet = restrictions["Not Same Planet"]
+    if not self.planets_in_play_array[planet_pos]:
+        return False
+    if non_first:
+        if self.round_number == planet_pos:
+            return False
+    if not_same_planet:
+        if planet_pos == misc_pla:
+            return False
+    return True
+
+
+def add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player, ability, restrictions, misc_pla=-1):
+    for i in range(len(self.planets_in_play_array)):
+        if check_if_planet_is_valid_target(self, i, primary_player, secondary_player, ability, restrictions, misc_pla=misc_pla):
+            valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
+    return valid_moves
+
+
 def add_active_planets_as_valid_moves(self, valid_moves):
     for i in range(len(self.planets_in_play_array)):
         if self.planets_in_play_array[i]:
@@ -233,6 +255,8 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             elif ability.get_reaction_name() == "Sicarius's Chosen":
                 if abs(ability.get_planet_pos() - planet_pos) != 1:
                     return False
+        elif ability == "Planet":
+            pass
     return True
 
 
@@ -247,30 +271,30 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
         if faction_hand_card:
             if faction_hand_card != card.get_faction():
                 return False
-        if card_type_hand_card:
-            if card_type_hand_card != card.get_card_type():
+    if card_type_hand_card:
+        if card_type_hand_card != card.get_card_type():
+            return False
+    if max_cost_hand_card:
+        if card.get_cost() > max_cost_hand_card:
+            return False
+    if payment_hand_card:
+        is_deploy = target_restrictions["Payment Details"]["Deploy"]
+        if is_deploy:
+            if player.determine_lowest_possible_cost_of_card(card) > player.get_resources():
                 return False
-        if max_cost_hand_card:
-            if card.get_cost() > max_cost_hand_card:
+        else:
+            if card.get_cost() > player.get_resources():
                 return False
-        if payment_hand_card:
-            is_deploy = target_restrictions["Payment Details"]["Deploy"]
-            if is_deploy:
-                if player.determine_lowest_possible_cost_of_card(card) > player.get_resources():
-                    return False
-            else:
-                if card.get_cost() > player.get_resources():
-                    return False
-        if card_enters_play:
-            if not player.check_if_card_can_enter_play(card, planet_pos=planet_pos, triggered_card_effect=True):
-                return False
+    if card_enters_play:
+        if not player.check_if_card_can_enter_play(card, planet_pos=planet_pos, triggered_card_effect=True):
+            return False
     return True
 
 
-def find_all_valid_hand_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions):
+def find_all_valid_hand_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1):
     valid_moves = []
     for i in range(len(primary_player.cards)):
-        if check_if_single_card_in_hand_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=ability.get_planet_pos()):
+        if check_if_single_card_in_hand_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=planet_pos):
             valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
     return valid_moves
 
@@ -368,8 +392,32 @@ def determine_valid_moves(self):
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Headquarters Action":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
-        elif self.what_is_required_automated == "Planet Ability":
-            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Battle Ability":
+            planet_ability = self.battle_ability_to_resolve
+            if planet_ability in ability_targets_dictionary:
+                target_restriction_data = ability_targets_dictionary[planet_ability]
+                num_stages = target_restriction_data["Num Stages"]
+                stage_number = "1"
+                if self.chosen_first_card and num_stages > 1:
+                    stage_number = "2"
+                if self.chosen_second_card and num_stages > 2:
+                    stage_number = "3"
+                type_target = target_restriction_data["Type " + stage_number]
+                target_restrictions = target_restriction_data["Restrictions " + stage_number]
+                misc_pla = self.misc_target_unit[0]
+                if type_target == "Unit":
+                    valid_moves = find_all_valid_unit_locations_given_restrictions(
+                        self, planet_ability, primary_player, secondary_player, target_restrictions
+                    )
+                if type_target == "Hand":
+                    valid_moves = find_all_valid_hand_locations_given_restrictions(
+                        self, planet_ability, primary_player, secondary_player, target_restrictions, planet_pos=self.last_planet_checked_for_battle
+                    )
+                if type_target == "Planet":
+                    valid_moves = add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player,
+                                                                   planet_ability, target_restrictions, misc_pla=misc_pla)
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Damage":
             if self.stored_damage[0].get_position_unit()[0] == int(primary_player.get_number()):
                 valid_moves = primary_player.get_playable_borders()
@@ -394,11 +442,17 @@ def determine_valid_moves(self):
                 valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
             elif self.action_object.action_chosen in ability_targets_dictionary:
                 target_restriction_data = ability_targets_dictionary[self.action_object.action_chosen]
-                type_target = target_restriction_data["Type"]
-                target_restrictions = target_restriction_data["Restrictions"]
+                num_stages = target_restriction_data["Num Stages"]
+                stage_number = "1"
+                if self.action_object.chosen_first_card and num_stages > 1:
+                    stage_number = "2"
+                if self.action_object.chosen_second_card and num_stages > 2:
+                    stage_number = "3"
+                type_target = target_restriction_data["Type " + stage_number]
+                target_restrictions = target_restriction_data["Restrictions " + stage_number]
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
-                        self, self.action_object, primary_player, secondary_player, target_restrictions
+                        self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
                     )
                 if type_target == "Planet":
                     if target_restrictions["Non-first"]:
@@ -411,34 +465,42 @@ def determine_valid_moves(self):
             current_reaction = self.reactions_needing_resolving[0].get_reaction_name()
             if current_reaction in ability_targets_dictionary:
                 target_restriction_data = ability_targets_dictionary[current_reaction]
-                type_target = target_restriction_data["Type"]
-                target_restrictions = target_restriction_data["Restrictions"]
+                num_stages = target_restriction_data["Num Stages"]
+                stage_number = "1"
+                if self.reactions_needing_resolving[0].chosen_first_card and num_stages > 1:
+                    stage_number = "2"
+                if self.reactions_needing_resolving[0].chosen_second_card and num_stages > 2:
+                    stage_number = "3"
+                type_target = target_restriction_data["Type " + stage_number]
+                target_restrictions = target_restriction_data["Restrictions " + stage_number]
                 if type_target == "Unit":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, self.reactions_needing_resolving[0], primary_player, secondary_player, target_restrictions
                     )
                 if type_target == "Planet":
-                    if target_restrictions["Non-first"]:
-                        valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
-                    else:
-                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                    valid_moves = add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player,
+                                                                   current_reaction, target_restrictions, misc_pla=-1)
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Interrupt":
             current_interrupt = self.interrupts_waiting_on_resolution[0].get_interrupt_name()
             if current_interrupt in ability_targets_dictionary:
                 target_restriction_data = ability_targets_dictionary[current_interrupt]
-                type_target = target_restriction_data["Type"]
-                target_restrictions = target_restriction_data["Restrictions"]
+                num_stages = target_restriction_data["Num Stages"]
+                stage_number = "1"
+                if self.interrupts_waiting_on_resolution[0].chosen_first_card and num_stages > 1:
+                    stage_number = "2"
+                if self.interrupts_waiting_on_resolution[0].chosen_second_card and num_stages > 2:
+                    stage_number = "3"
+                type_target = target_restriction_data["Type " + stage_number]
+                target_restrictions = target_restriction_data["Restrictions " + stage_number]
                 if type_target == "Unit":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, self.interrupts_waiting_on_resolution[0], primary_player, secondary_player, target_restrictions
                     )
                 if type_target == "Planet":
-                    if target_restrictions["Non-first"]:
-                        valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
-                    else:
-                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                    valid_moves = add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player,
+                                                                   current_interrupt, target_restrictions, misc_pla=-1)
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         else:
