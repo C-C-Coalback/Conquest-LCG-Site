@@ -283,7 +283,10 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
         elif self.what_is_required_automated == "Discount":
             valid_moves = primary_player.get_playable_borders()
-            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            if self.card_to_deploy.get_cost() <= primary_player.get_resources() - self.discounts_applied:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Deploy Turn":
             if self.card_to_deploy is None:
                 for i in range(len(primary_player.cards)):
