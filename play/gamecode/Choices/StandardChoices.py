@@ -2369,7 +2369,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     if len(primary_player.cards) > 1:
                         await self.send_update_message("You must discard 2 cards for Shrieking Exarch")
                         self.action_object.action_chosen = "Shrieking Exarch Anrakyr Discard"
-                        self.misc_counter = 2
+                        self.action_object.misc_counter = 2
                     else:
                         await self.send_update_message("Cannot play Shrieking Exarch!")
                         primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
