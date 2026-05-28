@@ -5443,12 +5443,9 @@ class Game:
                                             attachment.name_owner == primary_player.name_player:
                                         attachment.exhaust_card()
                                         primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                                        self.pos_shield_card = -1
-                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999)
-                                        if primary_player.get_damage_given_pos(planet_pos, unit_pos) <= \
-                                                self.damage_on_units_list_before_new_damage[0]:
-                                            primary_player.set_damage_given_pos(
-                                                planet_pos, unit_pos, self.damage_on_units_list_before_new_damage[0])
+                                        damage = self.stored_damage[0].get_amount_that_can_be_blocked()
+                                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage)
+                                        self.stored_damage[0].set_amount_that_can_be_blocked(0)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                                     elif attachment.get_ability() == "Warhost Helmet" and attachment.get_ready() and \
                                             attachment.name_owner == primary_player.name_player and \
