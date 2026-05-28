@@ -107,6 +107,10 @@ async def resolve_command(self, name, message):
         await self.send_update_message("Saved the game!")
     elif message[1] == "request-seed":
         await self.send_update_message(str(self.random_seed))
+    elif message[1] == "force-send-auto-data":
+        if self.bot_is_present:
+            await self.update_automated_info()
+            await self.send_automated_info(force=True)
     elif message[1] == "Advance":
         num_times = 1
         if len(message) == 3:
@@ -127,7 +131,13 @@ async def resolve_command(self, name, message):
                     move_details_split = move_details.split(sep="/")
                     print(move_details_split)
                     if move_details[0] == "/":
-                        await self.resolve_chat_message(name_user, move_details.split(sep="/"))
+                        await self.resolve_chat_message(name_user, move_details_split)
+                    elif move_details_split[0] == "SpecialAction":
+                        if move_details_split[1] == "pass-P1":
+                            pass
+                        else:
+                            await self.update_game_event(name_user, ["action-button"], same_thread=True)
+                            await self.update_game_event(name_user, move_details_split[1:])
                     elif move_details_split[0] == "REARRANGE_HAND":
                         if name_user == self.name_1:
                             player = self.p1
@@ -136,7 +146,7 @@ async def resolve_command(self, name, message):
                         player.reorder_card_in_hand(int(move_details_split[1]), int(move_details_split[2]))
                         await player.send_hand()
                     else:
-                        await self.update_game_event(name_user, move_details.split(sep="/"))
+                        await self.update_game_event(name_user, move_details_split)
         end_time = datetime.datetime.now()
         print("TIME\n\n\n", end_time - start_time, "\n\n\n")
     elif message[1] == "Error":
