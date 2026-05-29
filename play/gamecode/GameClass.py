@@ -484,6 +484,7 @@ class Game:
         self.sacaellums_finest_active = False
         self.eldritch_council_value = 0
         self.last_automated_data_string = ""
+        self.last_misc_automated_state_data = ""
         self.list_reactions_on_winning_combat = ["Accept Any Challenge", "Inspirational Fervor",
                                                  "Declare the Crusade", "Gut and Pillage", "Scavenging Run"]
         self.queued_sound = ""
@@ -7286,6 +7287,18 @@ class Game:
             self.reset_queued_mistarget_message()
 
     async def send_automated_info(self, force=False):
+        message_to_send = "GAME_INFO/MISC_AUTOMATED_DATA/"
+        message_to_send += str(self.round_number) + "/"
+        message_to_send += self.phase + "/"
+        if self.what_is_required_automated == "Choice":
+            message_to_send += "CHOICE|||" + self.choice_context
+        elif self.what_is_required_automated == "Damage" and self.stored_damage:
+            message_to_send += "DAMAGE|||" + str(self.stored_damage[0].get_amount_that_can_be_blocked())
+        else:
+            message_to_send += "None|||"
+        if message_to_send != self.last_misc_automated_state_data or force or self.anything_changed_since_last_send:
+            self.last_misc_automated_state_data = message_to_send
+            await self.send_update_message(message_to_send)
         message_to_send = "GAME_INFO/AUTOMATED_DATA/"
         message_to_send += self.what_is_required_automated + "/"
         message_to_send += self.automated_player_waited_on + "/"
