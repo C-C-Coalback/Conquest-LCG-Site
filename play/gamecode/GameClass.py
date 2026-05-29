@@ -7314,6 +7314,8 @@ class Game:
         ValidMovesFinder.update_automated_attributes(self)
 
     async def update_game_event(self, name, game_update_string, same_thread=False):
+        self.automated_1_has_passed_action = False
+        self.automated_2_has_passed_action = False
         if not same_thread:
             self.condition_main_game.acquire()
         resolved_subroutine = False
