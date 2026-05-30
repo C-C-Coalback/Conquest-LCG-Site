@@ -139,7 +139,7 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
 async def manual_plannum_ability(self, name, game_update_string, primary_player, secondary_player):
     if len(game_update_string) == 2:
         if game_update_string[0] == "PLANETS":
-            if self.chosen_first_card:
+            if self.chosen_first_card and self.misc_target_unit[0] != int(game_update_string[1]):
                 primary_player.reset_aiming_reticle_in_play(self.misc_target_unit[0], self.misc_target_unit[1])
                 primary_player.move_unit_to_planet(self.misc_target_unit[0], self.misc_target_unit[1], int(game_update_string[1]))
                 await self.resolve_battle_conclusion(self.player_resolving_battle_ability, game_update_string)

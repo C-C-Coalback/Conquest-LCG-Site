@@ -120,7 +120,8 @@ ability_targets_dictionary = {
         "Restrictions 2": {
             "Non-first": False,
             "Icons": None,
-            "Not Same Planet": True,
+            "Not Same Planet": False,
+            "Not Same Planet Unit": True,
         }
     },
     "Carnath": {
@@ -130,6 +131,7 @@ ability_targets_dictionary = {
             "Non-first": False,
             "Icons": None,
             "Not Same Planet": True,
+            "Not Same Planet Unit": False
         }
     },
     "Y'varn": {

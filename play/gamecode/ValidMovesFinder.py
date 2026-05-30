@@ -169,10 +169,11 @@ def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, h
     return valid_moves
 
 
-def check_if_planet_is_valid_target(self, planet_pos, primary_player, secondary_player, ability, restrictions, misc_pla=-1):
+def check_if_planet_is_valid_target(self, planet_pos, primary_player, secondary_player, ability, restrictions, misc_pla=-1, unit_pla=-1):
     non_first = restrictions["Non-first"]
     icons = restrictions["Icons"]
     not_same_planet = restrictions["Not Same Planet"]
+    not_same_planet_unit = restrictions["Not Same Planet Unit"]
     if not self.planets_in_play_array[planet_pos]:
         return False
     if non_first:
@@ -181,12 +182,15 @@ def check_if_planet_is_valid_target(self, planet_pos, primary_player, secondary_
     if not_same_planet:
         if planet_pos == misc_pla:
             return False
+    if not_same_planet_unit:
+        if planet_pos == unit_pla:
+            return False
     return True
 
 
-def add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player, ability, restrictions, misc_pla=-1):
+def add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player, ability, restrictions, misc_pla=-1, unit_pla=-1):
     for i in range(len(self.planets_in_play_array)):
-        if check_if_planet_is_valid_target(self, i, primary_player, secondary_player, ability, restrictions, misc_pla=misc_pla):
+        if check_if_planet_is_valid_target(self, i, primary_player, secondary_player, ability, restrictions, misc_pla=misc_pla, unit_pla=unit_pla):
             valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
     return valid_moves
 
@@ -415,7 +419,8 @@ def determine_valid_moves(self):
                     )
                 if type_target == "Planet":
                     valid_moves = add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player,
-                                                                   planet_ability, target_restrictions, misc_pla=misc_pla)
+                                                                   planet_ability, target_restrictions, misc_pla=misc_pla,
+                                                                   unit_pla=self.misc_target_unit[0])
             else:
                 if planet_ability == "Atrox Prime":
                     if len(primary_player.headquarters) > 0:
