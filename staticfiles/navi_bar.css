@@ -1,9 +1,9 @@
-li {
+.navi-bar-item {
   display: inline;
   float: left;
 }
 
-ul {
+#navi-bar {
   list-style-type: none;
   margin: 0;
   padding: 0;

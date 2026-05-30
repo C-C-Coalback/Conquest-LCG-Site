@@ -7190,6 +7190,14 @@ class Game:
                     elif self.debug_mode == "return":
                         primary_player.return_discard_to_hand(discard_pos)
                         self.debug_mode = None
+                elif game_update_string[0] == "REMOVED":
+                    removed_pos = int(game_update_string[2])
+                    primary_player = self.p2
+                    if game_update_string[1] == "1":
+                        primary_player = self.p1
+                    if self.debug_mode == "return":
+                        primary_player.return_removed_to_hand(removed_pos)
+                        self.debug_mode = None
             elif len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     planet_pos = int(game_update_string[2])

@@ -13,6 +13,16 @@
     <div id="helper-text-box">
 
     </div>
+    <div id="contextMenu" class="context-menu">
+        <ul id="contextOptions">
+            <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Ready"></li>
+            <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Exhaust"></li>
+            <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Deal 1 Damage"></li>
+            <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Remove 1 Damage"></li>
+            <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Return"></li>
+            <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Destroy"></li>
+        </ul>
+    </div>
     <div id="mistarget-info">
         <p style="color:red">Invalid Target:</p><p style="color: yellow">Card must be an army unit.</p>
     </div>
@@ -229,9 +239,6 @@
 
     document.body.style = background;
 
-    console.log(cardback_1);
-    console.log(cardback_2);
-
     function replaceCardbacksText_1(original_string) {
         var result = original_string.replaceAll("Cardback", cardback_1);
         return result;
@@ -409,6 +416,7 @@
         var own_player_number = "0";
         var dist_between_two_hand_cards = 0;
         var num_cards_in_hand = 0;
+        var active_string_id = "";
 
         function playSound(url) {
             console.log(url);
@@ -433,7 +441,7 @@
                     for (var i = 2; i < split_data.length; i++) {
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
-                        var string_id = (i-2).toString();
+                        let string_id = (i-2).toString();
                         var additional_helper_text = card_data_split[5];
                         if (card_name === "CardbackRotated") {
                             if (had_in_play_planet === "false") {
@@ -513,6 +521,8 @@
                             }
                             full_string += `</div></div>`;
                             document.getElementById(container_id).innerHTML = full_string;
+                            el = document.getElementById(string_id);
+                            el.addEventListener('contextmenu', e => showContextMenu(e, string_id));
                         }
                     }
                     var planetsChanged = "false";
@@ -695,7 +705,7 @@
                     document.getElementById(target_victory_display_id).innerHTML = ``;
                     for (var i = 3; i < split_data.length; i++) {
                         var card_name = split_data[i];
-                        var string_id = (i-3).toString();
+                        let string_id = (i-3).toString();
                         string_id = "VICTORY_DISPLAY/" + split_data[2] + "/" + string_id;
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
@@ -725,7 +735,7 @@
                         for (var i = 3; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
-                            var string_id = (i-3).toString();
+                            let string_id = (i-3).toString();
                             string_id = "IN_DISCARD/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -735,10 +745,12 @@
                                 full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[1] + `.png" alt="bugged" class="aiming-reticle"></img>`;
                             }
                             full_string += `</div>`;
-                            document.getElementById(target_expanded_discard).innerHTML += full_string;
+                            document.getElementById(target_expanded_discard).insertAdjacentHTML("beforeend", full_string);
+                            el = document.getElementById(string_id);
+                            el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
                         }
                         var card_name = split_data[split_data.length - 1].split("|")[0];
-                        var string_id = "DISCARD_PILE/" + split_data[2];
+                        let string_id = "DISCARD_PILE/" + split_data[2];
                         card_name = card_name.split(' ').join('_');
                         var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                         var full_string = `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card" onmouseover="changeDef(this.src)" onclick="showDiscard(this.id);" onmouseout="changeDefOut()">`;
@@ -755,7 +767,7 @@
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
                             var hidden = card_data_split[1];
-                            var string_id = (i-4).toString();
+                            let string_id = (i-4).toString();
                             var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
                             string_id = "REMOVED/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
@@ -770,11 +782,13 @@
                             var full_string = `<div class="Card-div">`;
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="Card"` + enlarge_card_formula + ` onclick="testImageButton(this.id);" onmouseout="changeDefOut()">`;
                             full_string += `</div>`;
-                            document.getElementById(target_expanded_removed).innerHTML += full_string;
+                            document.getElementById(target_expanded_removed).insertAdjacentHTML("beforeend", full_string);
+                            el = document.getElementById(string_id);
+                            el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
                         }
                         var card_name = split_data[split_data.length - 1].split("|")[0];
                         var hidden = split_data[split_data.length - 1].split("|")[1];
-                        var string_id = "REMOVED_PILE/" + split_data[2];
+                        let string_id = "REMOVED_PILE/" + split_data[2];
                         card_name = card_name.split(' ').join('_');
                         var enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
                         var route_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -829,7 +843,7 @@
                                 card_name = replaceCardback("Cardback", split_data[2]);
                                 deepstrike = "True";
                             }
-                            var string_id = (i-5).toString();
+                            let string_id = (i-5).toString();
                             var card_class = "Card";
                             if (tokenNames.includes(card_name)) {
                                 card_class = "Token-Card";
@@ -921,7 +935,9 @@
                             } else {
                                 full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img></div>`;
                             }
-                            document.getElementById(target_planet_id).innerHTML += full_string;
+                            document.getElementById(target_planet_id).insertAdjacentHTML("beforeend", full_string);
+                            el = document.getElementById(string_id);
+                            el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
                         }
                     }
                 } else if (split_data[1] === "HQ") {
@@ -946,7 +962,7 @@
                         var additional_helper_text = card_data_split[6];
                         var attachment_start_id = 8;
                         var target = card_data_split[7];
-                        var string_id = (i-4).toString();
+                        let string_id = (i-4).toString();
                         var card_class = "Card";
                         if (tokenNames.includes(card_name)) {
                             card_class = "Token-Card";
@@ -1058,7 +1074,9 @@
                         } else {
                             full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img></div>`;
                         }
-                        document.getElementById(target_headquarters).innerHTML += full_string;
+                        document.getElementById(target_headquarters).insertAdjacentHTML("beforeend", full_string);
+                        el = document.getElementById(string_id);
+                        el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
                     }
                 } else if (split_data[1] === "CHOICE") {
                     var full_string = `<div id="choices-container"><div id="header-choices-container">`;
@@ -1077,14 +1095,14 @@
                                     full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
                                 } else if (choice_data[1] === "P") {
                                     var card_name = choice_data[0];
-                                    var string_id = (i-4).toString();
+                                    let string_id = (i-4).toString();
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
                                     full_string += `<input id="CHOICE/` + (i-4).toString() + `" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefRotate(this.dataset.cardsrc)"><br>`
                                 } else {
                                     var card_name = choice_data[0];
-                                    var string_id = (i-4).toString();
+                                    let string_id = (i-4).toString();
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -1130,7 +1148,7 @@
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
                             var card_name = split_data[i];
-                            var string_id = (i-4).toString();
+                            let string_id = (i-4).toString();
                             string_id = "SEARCH/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -1138,7 +1156,7 @@
                         }
                     } else {
                         for (var i = 4; i < split_data.length; i++) {
-                            var string_id = (i-4).toString();
+                            let string_id = (i-4).toString();
                             var route_text = "/static/images/CardImages/Cardback.jpg";
                             full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                         }
@@ -1170,7 +1188,7 @@
                                     card_class = card_class + " unplayable-hand-card";
                                 }
                             }
-                            var string_id = (i-4).toString();
+                            let string_id = (i-4).toString();
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -1184,6 +1202,7 @@
 
                             element = document.getElementById(string_id);
                             draggableHand.push(element);
+                            element.addEventListener('contextmenu', e => showContextMenu(e, string_id))
                             num_cards_in_hand = num_cards_in_hand + 1;
                         }
                         if (split_data.length > 5) {
@@ -1197,7 +1216,7 @@
                         updateDraggableHand();
                     } else {
                         for (var i = 4; i < split_data.length; i++) {
-                            var string_id = (i-4).toString();
+                            let string_id = (i-4).toString();
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
                             var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
                             document.getElementById(target_id).innerHTML +=
@@ -1273,6 +1292,66 @@
         var current_helper_width = "min(15vw, 22.1vh)";
         var current_helper_height = "30vh";
 
+        document.onclick = hideMenu;
+
+        function contextMenuUsage(value) {
+            message_to_send = "CONTEXT_MENU/" + value + "/" + active_string_id;
+            gameSocket.send(JSON.stringify({
+                'message': message_to_send
+            }));
+        }
+
+        function hideMenu() {
+            document.getElementById("contextMenu").style.display = "none"
+        }
+
+        function showContextMenu(e, string_id) {
+            e.preventDefault();
+            var contextMenu = document.getElementById("contextMenu");
+            var maxDiff = 200;
+            active_string_id = string_id;
+            if (active_string_id.includes("HAND")) {
+                maxDiff = 100;
+                contextMenu.innerHTML = `<ul id="contextOptions">
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Discard"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Return"></li>
+                </ul>`
+            } else if (active_string_id.includes("IN_DISCARD")) {
+                maxDiff = 100;
+                contextMenu.innerHTML = `<ul id="contextOptions">
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Remove"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Return"></li>
+                </ul>`
+            } else if (active_string_id.includes("REMOVED")) {
+                maxDiff = 100;
+                contextMenu.innerHTML = `<ul id="contextOptions">
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Remove"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Return"></li>
+                </ul>`
+            } else if (active_string_id.includes("PLANETS")) {
+                contextMenu.innerHTML = `<ul id="contextOptions">
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Infest"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Clear Infestation"></li>
+                </ul>`
+            } else {
+                contextMenu.innerHTML = `<ul id="contextOptions">
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Ready"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Exhaust"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Deal 1 Damage"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Remove 1 Damage"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Return"></li>
+                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Destroy"></li>
+                </ul>`
+            }
+            contextMenu.style.left = mouse_x + 'px';
+            var pos_y = mouse_y;
+            if (pos_y > window.screen.availHeight * (3 / 5)) {
+                pos_y = pos_y - maxDiff;
+            }
+            contextMenu.style.top = pos_y + 'px';
+            contextMenu.style.display = "Block";
+        }
+
         function changeHelperSize() {
             helperCard = document.getElementById("LargeHelperCard");
             if (helper_is_large === "F") {
@@ -1291,9 +1370,12 @@
         }
 
         function testImageButton(button_id) {
-            gameSocket.send(JSON.stringify({
-                'message': 'BUTTON PRESSED/' + button_id
-            }));
+            var evt = window.event;
+            if (evt.button === 0) {
+                gameSocket.send(JSON.stringify({
+                    'message': 'BUTTON PRESSED/' + button_id
+                }));
+            }
         };
 
         const dragElements = document.querySelectorAll(".draggable");

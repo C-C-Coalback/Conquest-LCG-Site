@@ -1918,6 +1918,11 @@ class Player:
         self.cards.append(self.discard[position])
         del self.discard[position]
 
+    def return_removed_to_hand(self, position):
+        self.cards.append(self.cards_removed_from_game[position])
+        del self.cards_removed_from_game[position]
+        del self.cards_removed_from_game_hidden[position]
+
     def get_shields_given_pos(self, pos_in_hand, planet_pos=None, tank=False):
         shield_card_name = self.cards[pos_in_hand]
         card_object = FindCard.find_card(shield_card_name, self.card_array, self.cards_dict,

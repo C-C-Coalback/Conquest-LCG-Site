@@ -597,6 +597,61 @@ class GameConsumer(AsyncWebsocketConsumer):
                     await self.receive_game_update(
                         "An error has occurred on the server side. Your game may become unstable or unplayable."
                     )
+        elif message[0] == "CONTEXT_MENU" and len(message) > 1:
+            current_game_id = -1
+            for i in range(len(active_games)):
+                if active_games[i].game_id == self.room_name:
+                    print("Found room")
+                    current_game_id = i
+            if current_game_id != -1:
+                command_used = message[1]
+                position_card = message[2:]
+                print(command_used)
+                print(position_card)
+                if command_used == "Ready":
+                    await active_games[current_game_id].resolve_chat_message(self.name, ["", "ready-card"])
+                    await active_games[current_game_id].update_game_event(self.name, position_card)
+                elif command_used == "Exhaust":
+                    await active_games[current_game_id].resolve_chat_message(self.name, ["", "exhaust-card"])
+                    await active_games[current_game_id].update_game_event(self.name, position_card)
+                elif command_used == "Discard":
+                    await active_games[current_game_id].resolve_chat_message(self.name, ["", "discard"])
+                    await active_games[current_game_id].update_game_event(self.name, position_card)
+                elif command_used == "Return":
+                    await active_games[current_game_id].resolve_chat_message(self.name, ["", "return"])
+                    await active_games[current_game_id].update_game_event(self.name, position_card)
+                elif command_used == "Remove":
+                    if message[2] == "IN_DISCARD":
+                        await active_games[current_game_id].resolve_chat_message(self.name, ["", "remove-discard", message[3], message[4]])
+                    elif message[2] == "REMOVED":
+                        await active_games[current_game_id].resolve_chat_message(self.name, ["", "fully-remove", message[3], message[4]])
+                elif command_used == "Destroy":
+                    await active_games[current_game_id].resolve_chat_message(self.name, ["", "destroy"])
+                    await active_games[current_game_id].update_game_event(self.name, position_card)
+                elif command_used == "Infest":
+                    await active_games[current_game_id].resolve_chat_message(self.name, ["", "infest", message[3]])
+                elif command_used == "Clear Infestation":
+                    await active_games[current_game_id].resolve_chat_message(self.name, ["", "clear-infestation", message[3]])
+                elif command_used == "Deal 1 Damage":
+                    complete_message = ["", "assign-damage", position_card[1]]
+                    if position_card[0] == "HQ":
+                        complete_message.append("-2")
+                        complete_message.append(position_card[2])
+                    else:
+                        complete_message.append(position_card[2])
+                        complete_message.append(position_card[3])
+                    complete_message.append("1")
+                    await active_games[current_game_id].resolve_chat_message(self.name, complete_message)
+                elif command_used == "Remove 1 Damage":
+                    complete_message = ["", "remove-damage", position_card[1]]
+                    if position_card[0] == "HQ":
+                        complete_message.append("-2")
+                        complete_message.append(position_card[2])
+                    else:
+                        complete_message.append(position_card[2])
+                        complete_message.append(position_card[3])
+                    complete_message.append("1")
+                    await active_games[current_game_id].resolve_chat_message(self.name, complete_message)
         elif message[0] == "AUTOMATED_SPECIAL_ACTION_CHOICE" and len(message) > 1:
             current_game_id = -1
             for i in range(len(active_games)):

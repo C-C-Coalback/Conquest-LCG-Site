@@ -705,6 +705,24 @@ async def resolve_command(self, name, message):
             elif unit_position[1] == "2":
                 self.p2.set_damage_given_pos(planet_pos, unit_pos, damage)
                 await self.p2.send_units_at_planet(planet_pos)
+    elif message[1] == "remove-damage" and len(message) > 4:
+        num_player = message[2]
+        planet_pos = int(message[3])
+        unit_pos = int(message[4])
+        damage = int(message[5])
+        unit_position = ["IN_PLAY", message[2], message[3], message[4]]
+        if message[3] == "-2":
+            unit_position = ["HQ", message[2], message[4]]
+        if self.validate_received_game_string(unit_position):
+            if num_player == "1":
+                if self.p1.check_is_unit_at_pos(planet_pos, unit_pos):
+                    self.p1.remove_damage_from_pos(planet_pos, unit_pos, damage)
+                    await self.p1.send_units_at_planet(planet_pos)
+            elif unit_position[1] == "2":
+                if self.p2.check_is_unit_at_pos(planet_pos, unit_pos):
+                    self.p2.remove_damage_from_pos(planet_pos, unit_pos, damage)
+                    await self.p2.send_units_at_planet(planet_pos)
+            await self.update_game_event(name, [])
     elif message[1] == "assign-damage" and len(message) > 4:
         num_player = message[2]
         planet_pos = int(message[3])
@@ -722,3 +740,4 @@ async def resolve_command(self, name, message):
                 if self.p2.check_is_unit_at_pos(planet_pos, unit_pos):
                     self.p2.assign_damage_to_pos(planet_pos, unit_pos, damage, by_enemy_unit=False)
                     await self.p2.send_units_at_planet(planet_pos)
+            await self.update_game_event(name, [])
