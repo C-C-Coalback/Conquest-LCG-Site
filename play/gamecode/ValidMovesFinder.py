@@ -404,7 +404,7 @@ def determine_valid_moves(self):
                     stage_number = "3"
                 type_target = target_restriction_data["Type " + stage_number]
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
-                misc_pla = self.misc_target_unit[0]
+                misc_pla = self.last_planet_checked_for_battle
                 if type_target == "Unit":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, planet_ability, primary_player, secondary_player, target_restrictions
