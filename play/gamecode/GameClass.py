@@ -7290,6 +7290,7 @@ class Game:
         message_to_send = "GAME_INFO/MISC_AUTOMATED_DATA/"
         message_to_send += str(self.round_number) + "/"
         message_to_send += self.phase + "/"
+        message_to_send += self.mode + "/"
         if self.what_is_required_automated == "Choice":
             message_to_send += "CHOICE|||" + self.choice_context
         elif self.what_is_required_automated == "Damage" and self.stored_damage:
