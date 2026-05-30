@@ -232,37 +232,45 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_object.action_chosen == "Khymera Den":
         primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
                                                     self.action_object.position_of_actioned_card[1])
-        for i in range(len(self.khymera_to_move_positions)):
-            planet_pos, unit_pos = self.khymera_to_move_positions[i]
-            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-        for i in range(len(self.khymera_to_move_positions)):
-            planet_pos, unit_pos = self.khymera_to_move_positions[i]
-            if planet_pos != int(game_update_string[1]):
-                primary_player.move_unit_to_planet(planet_pos, unit_pos, int(game_update_string[1]))
-                for j in range(len(self.khymera_to_move_positions)):
-                    planet_pos_2, unit_pos_2 = self.khymera_to_move_positions[j]
-                    if planet_pos == planet_pos_2:
-                        if unit_pos_2 > unit_pos:
-                            unit_pos_2 -= 1
-                            self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
+        i = 0
+        while i < len(primary_player.headquarters):
+            if primary_player.get_name_given_pos(-2, i) == "Khymera":
+                if primary_player.get_aiming_reticle_in_play(-2, i) == "blue":
+                    if primary_player.move_unit_to_planet(-2, i, chosen_planet):
+                        i = i - 1
+            i = i + 1
+        for i in range(7):
+            if i != chosen_planet:
+                j = 0
+                while j < len(primary_player.cards_in_play[i + 1]):
+                    if primary_player.get_aiming_reticle_in_play(i, j) == "blue":
+                        if primary_player.get_name_given_pos(i, j) == "Khymera":
+                            if primary_player.move_unit_to_planet(i, j, chosen_planet):
+                                j = j - 1
+                    j = j + 1
+        primary_player.reset_all_aiming_reticles_play_hq()
         self.action_cleanup()
     elif self.action_object.action_chosen == "Kauyon Strike":
         if self.action_object.chosen_first_card:
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = -1
-            for i in range(len(self.khymera_to_move_positions)):
-                planet_pos, unit_pos = self.khymera_to_move_positions[i]
-                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-            for i in range(len(self.khymera_to_move_positions)):
-                planet_pos, unit_pos = self.khymera_to_move_positions[i]
-                if planet_pos != int(game_update_string[1]):
-                    primary_player.move_unit_to_planet(planet_pos, unit_pos, int(game_update_string[1]))
-                    for j in range(len(self.khymera_to_move_positions)):
-                        planet_pos_2, unit_pos_2 = self.khymera_to_move_positions[j]
-                        if planet_pos == planet_pos_2:
-                            if unit_pos_2 > unit_pos:
-                                unit_pos_2 -= 1
-                                self.khymera_to_move_positions[j] = (planet_pos_2, unit_pos_2)
+            i = 0
+            while i < len(primary_player.headquarters):
+                if primary_player.get_aiming_reticle_in_play(-2, i) == "blue":
+                    if primary_player.check_for_trait_given_pos(-2, i, "Ethereal"):
+                        if primary_player.move_unit_to_planet(-2, i, chosen_planet):
+                            i = i - 1
+                i = i + 1
+            for i in range(7):
+                if i != chosen_planet:
+                    j = 0
+                    while j < len(primary_player.cards_in_play[i + 1]):
+                        if primary_player.get_aiming_reticle_in_play(i, j) == "blue":
+                            if primary_player.check_for_trait_given_pos(i, j, "Ethereal"):
+                                if primary_player.move_unit_to_planet(i, j, chosen_planet):
+                                    j = j - 1
+                        j = j + 1
+            primary_player.reset_all_aiming_reticles_play_hq()
             primary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.action_object.action_chosen == "Wildrider Squadron":

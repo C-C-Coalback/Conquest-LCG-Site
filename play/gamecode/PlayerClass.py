@@ -3925,6 +3925,8 @@ class Player:
                 self.cards_in_play[i + 1][j].valid_defense_battery_target = False
 
     def move_unit_to_planet(self, origin_planet, origin_position, destination, force=False, card_effect=True):
+        if origin_planet == destination:
+            return False
         if origin_planet == -2:
             headquarters_list = self.headquarters
             other_player = self.get_other_player()

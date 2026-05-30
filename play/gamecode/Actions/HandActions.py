@@ -923,10 +923,10 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                     elif ability == "Kauyon Strike":
                         self.action_object.action_chosen = ability
+                        primary_player.reset_all_aiming_reticles_play_hq()
                         primary_player.aiming_reticle_color = "blue"
                         primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
                         self.action_object.chosen_first_card = False
-                        self.khymera_to_move_positions = []
                     elif ability == "Ethereal Wisdom":
                         self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"

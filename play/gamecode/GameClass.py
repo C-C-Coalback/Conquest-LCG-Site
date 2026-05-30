@@ -246,7 +246,6 @@ class Game:
         self.delayed_reactions_needing_resolving = []
         self.misc_counter = 0
         self.wounded_scream_blanked = False
-        self.khymera_to_move_positions = []
         self.position_of_actioned_card = (-1, -1)
         self.position_of_selected_attachment = (-1, -1, -1)
         self.active_effects = []  # Each item should be a tuple containing all relevant info
