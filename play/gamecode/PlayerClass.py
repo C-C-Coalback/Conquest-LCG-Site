@@ -7584,6 +7584,13 @@ class Player:
                 if not self.check_if_already_have_reaction("Fall Back!"):
                     if self.search_hand_for_card("Fall Back!"):
                         self.game.create_reaction("Fall Back!", self.name_player, (int(self.number), -1, -1))
+                if not self.does_own_reaction_exist("Invasion Site"):
+                    if self.search_card_in_hq("Invasion Site"):
+                        self.game.create_reaction("Invasion Site", self.name_player,
+                                                  (int(self.number), -1, -1))
+                        cost = self.get_cost_given_pos(-2, card_pos)
+                        if cost > self.highest_cost_invasion_site:
+                            self.highest_cost_invasion_site = cost
             self.cards_recently_destroyed.append(self.headquarters[card_pos].get_name())
             self.add_card_in_hq_to_discard(card_pos)
             self.game.queued_sound = "destroy"
