@@ -270,6 +270,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             player.remove_card_name_from_hand(card.get_name())
                             player.aiming_reticle_coords_hand = None
                             self.deepstrike_deployment_active = False
+                            self.card_to_deploy = None
                             self.action_cleanup()
                             if player.extra_deploy_turn_active:
                                 player.extra_deploy_turn_active = False
