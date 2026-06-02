@@ -155,6 +155,7 @@ async def update_game_event_deploy_section(self, name, game_update_string):
                             self.resolving_search_box = True
                             primary_player.aiming_reticle_color = "blue"
                             primary_player.aiming_reticle_coords_hand = hand_pos
+                            self.card_to_deploy = card
                         elif card.get_card_type() == "Army":
                             if (primary_player.warlord_faction == "Necrons" and (
                                     card.get_faction() == primary_player.enslaved_faction or
