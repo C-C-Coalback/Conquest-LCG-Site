@@ -7335,8 +7335,6 @@ class Game:
         ValidMovesFinder.update_automated_attributes(self)
 
     async def update_game_event(self, name, game_update_string, same_thread=False):
-        self.automated_1_has_passed_action = False
-        self.automated_2_has_passed_action = False
         if not same_thread:
             self.condition_main_game.acquire()
         resolved_subroutine = False
@@ -7927,6 +7925,8 @@ class Game:
         return count_1, count_2
 
     def reset_combat_positions(self):
+        self.automated_1_has_passed_action = False
+        self.automated_2_has_passed_action = False
         self.defender_position = -1
         self.defender_planet = -1
         self.attacker_position = -1
