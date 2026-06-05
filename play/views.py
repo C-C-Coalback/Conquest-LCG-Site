@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .consumers import get_lobbies, get_active_games
 import os
+import update_settings
 
 
 def lobby(request):
@@ -23,19 +24,9 @@ def game(request, game_id):
     cardback_1 = "Cardback"
     cardback_2 = "Cardback"
     username = request.user.username
-    cwd = os.getcwd()
-    settings_file = os.path.join(cwd, "user_preferences_storage/" + username + ".txt")
     background = "images/ImperialAquila.jpg"
-    if os.path.exists(settings_file):
-        try:
-            with open(settings_file, "r") as f:
-                extracted_text = f.read()
-                split_text = extracted_text.split(sep="\n")
-                background = "/static/images/" + split_text[2].replace(" ", "_") + ".jpg"
-                if background == "/static/images/Imperial_Aquila.jpg":
-                    background = "/static/images/ImperialAquila.jpg"
-        except Exception as e:
-            print(e)
+    data = update_settings.get_user_settings(username)
+    background = "images/" + data["background"]
     if background not in valid_backgrounds:
         background = valid_backgrounds[0]
     for i in range(len(active_games)):

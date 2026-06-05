@@ -10,55 +10,18 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 import os
-
-
-valid_cardbacks = ["Cardback", "Space_Marines_Cardback", "Necrons_Cardback", "Chaos_Cardback", "Tyranids_Cardback",
-                   "Orks_Cardback", "Astra_Militarum_Cardback", "Dark_Eldar_Cardback",
-                   "Eldar_Cardback", "Tau_Cardback"]
-valid_backgrounds = ["Imperial Aquila", "Heldrakes", "Box Art", "Death Guard", "Necrons Awakening",
-                     "Chaos v Orks", "Tyranids v Tau"]
-if not os.path.exists(os.path.join(os.getcwd(), "user_preferences_storage/")):
-    os.mkdir(os.path.join(os.getcwd(), "user_preferences_storage/"))
+import update_settings
 
 
 def change_settings(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
             username = request.user.username
-            cwd = os.getcwd()
-            settings_file = os.path.join(cwd, "user_preferences_storage/" + username + ".txt")
             zoom = str(1.0)
+            volume = str(1.0)
             cardback = request.POST["Cardback"]
-            if cardback == "Default":
-                cardback = "Cardback"
-            else:
-                cardback = cardback.replace(" ", "_") + "_Cardback"
-            if cardback not in valid_cardbacks:
-                cardback = "Cardback"
-            else:
-                cardback = cardback
             background = request.POST["Background"]
-            if background not in valid_backgrounds:
-                background = "Imperial Aquila"
-            print(cardback)
-            print(background)
-            if os.path.exists(settings_file):
-                with open(settings_file, "r") as f:
-                    contents = f.read()
-                    content_split = contents.split(sep="\n")
-                    while len(content_split) < 7:
-                        content_split.append("-1")
-                    content_split[0] = zoom
-                    content_split[1] = cardback
-                    content_split[2] = background
-                    full_string = "\n".join(content_split)
-            else:
-                content_split = [zoom, cardback, background]
-                while len(content_split) < 7:
-                    content_split.append("-1")
-                full_string = "\n".join(content_split)
-            with open(settings_file, "w") as f:
-                f.write(full_string)
+            update_settings.update_settings(username, volume=volume, cardback=cardback, background=background)
     return redirect("/settings/")
 
 

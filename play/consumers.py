@@ -10,6 +10,7 @@ import traceback
 import datetime
 import copy
 from django.contrib.auth.models import User
+import update_settings
 
 
 ban_list_apoka = [
@@ -496,20 +497,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             await active_games[game_id_if_exists].joined_requests_graphics(self.name)
             await self.receive_game_update(self.name + " joined the lobby")
             if self.name != "Anonymous":
-                pref_path = "user_preferences_storage/" + self.name + ".txt"
-                if os.path.exists(pref_path):
-                    with open(pref_path, "r") as f:
-                        contents = f.read()
-                        content_split = contents.split(sep="\n")
-                        if len(content_split) > 6:
-                            choices_box_h = content_split[3]
-                            choices_box_v = content_split[4]
-                            info_box_h = content_split[5]
-                            info_box_v = content_split[6]
-                            await self.receive_game_update(
-                                "GAME_INFO/SET_BOX_LOCATIONS/" + self.name + "/" + choices_box_h + "/" + choices_box_v + "/" +
-                                info_box_h + "/" + info_box_v
-                            )
+                data = update_settings.get_user_settings(self.name)
+                choices_box_h = data["choices_box_h"]
+                choices_box_v = data["choices_box_v"]
+                info_box_h = data["info_box_h"]
+                info_box_v = data["info_box_v"]
+                await self.receive_game_update(
+                    "GAME_INFO/SET_BOX_LOCATIONS/" + self.name + "/" + choices_box_h + "/" + choices_box_v + "/" +
+                    info_box_h + "/" + info_box_v
+                )
         condition_games.notify_all()
         condition_games.release()
 
@@ -840,31 +836,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         elif message[0] == "UPDATE_CHOICE_BOX_LOCATION" and len(message) == 3:
             if self.name != "Anonymous":
-                pref_path = "user_preferences_storage/" + self.name + ".txt"
-                if os.path.exists(pref_path):
-                    with open(pref_path, "r") as f:
-                        contents = f.read()
-                        content_split = contents.split(sep="\n")
-                        while len(content_split) < 7:
-                            content_split.append("-1")
-                        content_split[3] = message[1]
-                        content_split[4] = message[2]
-                        contents = "\n".join(content_split)
-                    with open(pref_path, "w") as f:
-                        f.write(contents)
+                update_settings.update_settings(self.name, choices_box_h=message[1], choices_box_v=message[2])
         elif message[0] == "UPDATE_INFO_BOX_LOCATION" and len(message) == 3:
             if self.name != "Anonymous":
-                pref_path = "user_preferences_storage/" + self.name + ".txt"
-                if os.path.exists(pref_path):
-                    with open(pref_path, "r") as f:
-                        contents = f.read()
-                        content_split = contents.split(sep="\n")
-                        while len(content_split) < 7:
-                            content_split.append("-1")
-                        content_split[5] = message[1]
-                        content_split[6] = message[2]
-                        contents = "\n".join(content_split)
-                    with open(pref_path, "w") as f:
-                        f.write(contents)
+                update_settings.update_settings(self.name, info_box_h=message[1], info_box_v=message[2])
         condition_games.notify_all()
         condition_games.release()
