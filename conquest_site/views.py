@@ -23,6 +23,7 @@ def settings_page(request):
         background_name = data["background"]
     print(cardback_name)
     print(background_name)
+    volume = volume * 100
     return render(request, "settings.html", {"zoom": zoom, "cardback": cardback_name, "background": background_name, "volume": volume})
 
 

@@ -421,6 +421,7 @@
         function playSound(url) {
             console.log(url);
             var ourAudio = document.createElement('audio'); // Create a audio element using the DOM
+            ourAudio.volume = {{ volume }};
             ourAudio.style.display = "none"; // Hide the audio element
             ourAudio.src = url; // Set resource to our URL
             ourAudio.autoplay = true; // Automatically play sound

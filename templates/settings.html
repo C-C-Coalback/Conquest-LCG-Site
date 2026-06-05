@@ -81,10 +81,15 @@
                 <option>Chaos v Orks</option>
                 <option>Tyranids v Tau</option>
             </select>
+            <div class="volume">
+                <h2>Volume</h2>
+                <div>Adjust the volume using the slider below.</div>
+                <input type="range" min="0" max="100" value="{{ volume }}" class="slider" id="Volume" name="Volume">
+            </div>
             <br>
           <button type="submit">Save Settings</button>
         </form>
-        <div>You current settings are:</div>
+        <div>Your current settings are:</div>
         <div>Cardback: {{ cardback }}</div>
         <div>Background: {{ background }}</div>
     </div>

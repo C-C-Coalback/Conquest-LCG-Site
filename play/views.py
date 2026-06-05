@@ -26,6 +26,7 @@ def game(request, game_id):
     username = request.user.username
     background = "images/ImperialAquila.jpg"
     data = update_settings.get_user_settings(username)
+    volume = float(data["volume"])
     background = "images/" + data["background"]
     if background not in valid_backgrounds:
         background = valid_backgrounds[0]
@@ -35,7 +36,7 @@ def game(request, game_id):
             cardback_2 = active_games[i].p2.cardback_name
     return render(request, "play/play.html", {"game_id": game_id, "is_p2": is_second_player,
                                               "cardback_1": cardback_1, "cardback_2": cardback_2,
-                                              "background": background})
+                                              "background": background, "volume": volume})
 
 
 def discord_bot(request):
