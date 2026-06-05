@@ -18,10 +18,16 @@ def create_bot_room(request):
             bot_name_1 = data["name1"]
             bot_name_2 = data["name2"]
             game_id = data["id"]
+            private = data["private"]
             errata = "No Errata"
             sector = "Traxis Sector"
-
-            game_id = create_bot_game(bot_name_1, bot_name_2, game_id, errata, sector)
+            print(private)
+            if private == "False":
+                private = False
+            else:
+                private = True
+            print(type(private))
+            game_id = create_bot_game(bot_name_1, bot_name_2, game_id, errata, sector, private=private)
             response = {
                 'status': 'success',
                 "id": game_id
