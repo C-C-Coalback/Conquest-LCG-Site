@@ -15,9 +15,6 @@ def update_automated_attributes(self):
     elif self.xv805_enforcer_active:
         self.what_is_required_automated = "XV805 Enforcer"
         self.automated_player_waited_on = self.player_using_xv805
-    elif self.resolving_consumption:
-        self.what_is_required_automated = "Consumption"
-        self.automated_player_waited_on = self.player_with_initiative
     elif self.manual_bodyguard_resolution:
         self.what_is_required_automated = "Bodyguard"
         self.automated_player_waited_on = self.name_player_manual_bodyguard

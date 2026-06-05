@@ -1833,6 +1833,22 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Tzeentch's Firestorm cannot target warlords.")
+    elif self.action_object.action_chosen == "Consumption":
+        if planet_pos in self.action_object.misc_list:
+            if game_update_string[1] == primary_player.get_number():
+                if primary_player.sacrifice_card_in_play(planet_pos, unit_pos):
+                    self.action_object.misc_list.remove(planet_pos)
+                    if not self.action_object.misc_list:
+                        self.action_object.player_with_action = secondary_player.name_player
+                        if self.action_object.chosen_first_card:
+                            self.action_cleanup()
+                        else:
+                            self.action_object.misc_list = []
+                            for i in range(len(self.planets_in_play)):
+                                if self.planets_in_play_array[i]:
+                                    self.action_object.misc_list.append(i)
+                            self.action_object.chosen_first_card = True
+                            await self.send_update_message(secondary_player.name_player + " performs Consumption sacrifices.")
     elif self.action_object.action_chosen == "Pattern IX Immolator":
         if planet_pos == self.action_object.position_of_actioned_card[0]:
             if not self.action_object.chosen_first_card:

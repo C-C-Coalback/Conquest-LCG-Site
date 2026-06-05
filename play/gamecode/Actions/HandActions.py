@@ -893,10 +893,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Consumption":
                         self.action_object.action_chosen = ability
+                        self.action_object.misc_list = []
+                        for i in range(len(self.planets_in_play_array)):
+                            if self.planets_in_play_array[i]:
+                                self.action_object.misc_list.append(i)
+                        self.action_object.chosen_first_card = False
+                        await self.send_update_message(
+                            primary_player.name_player + " performs Consumption sacrifices.")
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        self.resolving_consumption = True
-                        primary_player.consumption_sacs_list = self.planets_in_play_array
-                        secondary_player.consumption_sacs_list = self.planets_in_play_array
                     elif ability == "Spore Burst":
                         any_infested = False
                         for i in range(len(self.infested_planets)):

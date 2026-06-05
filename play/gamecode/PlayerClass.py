@@ -130,7 +130,6 @@ class Player:
                                                 "Frontline Launch Bay", "Timeworn Stasis-Crypt"]
         self.synapse_name = ""
         self.warlord_faction = ""
-        self.consumption_sacs_list = [True, True, True, True, True, True, True]
         self.dark_possession_active = False
         self.force_due_to_dark_possession = False
         self.pos_card_dark_possession = -1

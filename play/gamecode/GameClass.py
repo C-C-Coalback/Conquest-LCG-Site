@@ -346,7 +346,6 @@ class Game:
         self.misc_target_player = ""
         self.ravenous_haruspex_gain = 0
         self.reset_resolving_attack_on_units = False
-        self.resolving_consumption = False
         self.stored_area_effect_value = 0
         self.area_effect_active = False
         self.max_aoe_targets = 3
@@ -919,8 +918,6 @@ class Game:
             info_string += "Unspecified/"
         elif self.choosing_unit_for_nullify:
             info_string += self.name_player_using_nullify + "/"
-        elif self.resolving_consumption:
-            info_string += "Unspecified/"
         elif self.manual_bodyguard_resolution:
             info_string += self.name_player_manual_bodyguard + "/"
         elif self.rearranging_deck:
@@ -984,20 +981,6 @@ class Game:
             info_string += "Setup/"
         elif self.choosing_unit_for_nullify:
             info_string += "Nullify: " + self.name_player_using_nullify + "/"
-        elif self.resolving_consumption:
-            info_string += "P1:"
-            for i in range(len(self.p1.consumption_sacs_list)):
-                if self.p1.consumption_sacs_list[i]:
-                    info_string += "True,"
-                else:
-                    info_string += "False,"
-            info_string += "/P2:"
-            for i in range(len(self.p2.consumption_sacs_list)):
-                if self.p2.consumption_sacs_list[i]:
-                    info_string += "True,"
-                else:
-                    info_string += "False,"
-            info_string += "/"
         elif self.manual_bodyguard_resolution:
             info_string += "Manual bodyguard resolution: " + self.name_player_manual_bodyguard + "/"
         elif self.rearranging_deck:
@@ -1473,6 +1456,17 @@ class Game:
                     elif self.action_object.action_chosen == "The Wolf Within":
                         await self.send_update_message("Stopping The Wolf Within early")
                         self.action_cleanup()
+                    elif self.action_object.action_chosen == "Consumption":
+                        self.action_object.player_with_action = secondary_player.name_player
+                        if self.action_object.chosen_first_card:
+                            self.action_cleanup()
+                        else:
+                            self.action_object.misc_list = []
+                            for i in range(len(self.planets_in_play_array)):
+                                if self.planets_in_play_array[i]:
+                                    self.action_object.misc_list.append(i)
+                            self.action_object.chosen_first_card = True
+                            await self.send_update_message(secondary_player.name_player + " performs Consumption sacrifices.")
                     elif self.action_object.action_chosen == "Memories of Fallen Comrades":
                         await self.send_update_message("Stopping Memories of Fallen Comrades early")
                         self.action_cleanup()
@@ -6704,42 +6698,6 @@ class Game:
                             else:
                                 await self.complete_nullify()
 
-    async def consumption_resolution(self, name, game_update_string):
-        if len(game_update_string) == 1:
-            if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                if name == self.name_1:
-                    self.p1.consumption_sacs_list = [True, True, True, True, True, True, True]
-                    await self.send_update_message(
-                        self.name_2 + " stops sacrificing units for consumption."
-                    )
-                elif name == self.name_2:
-                    self.p2.consumption_sacs_list = [True, True, True, True, True, True, True]
-                    await self.send_update_message(
-                        self.name_1 + " stops sacrificing units for consumption."
-                    )
-        if len(game_update_string) == 4:
-            if name == self.name_1 and game_update_string[1] == "1":
-                if not self.p1.consumption_sacs_list[int(game_update_string[2])]:
-                    if self.p1.sacrifice_card_in_play(int(game_update_string[2]), int(game_update_string[3])):
-                        self.p1.consumption_sacs_list[int(game_update_string[2])] = True
-            elif name == self.name_2 and game_update_string[1] == "2":
-                if not self.p2.consumption_sacs_list[int(game_update_string[2])]:
-                    if self.p2.sacrifice_card_in_play(int(game_update_string[2]), int(game_update_string[3])):
-                        self.p2.consumption_sacs_list[int(game_update_string[2])] = True
-        if self.p1.consumption_sacs_list == [True, True, True, True, True, True, True] and \
-                self.p2.consumption_sacs_list == [True, True, True, True, True, True, True]:
-            self.resolving_consumption = False
-            await self.send_update_message("Consumption Finished")
-            self.action_object.action_chosen = ""
-            self.action_object.player_with_action = ""
-            self.mode = "Normal"
-            if self.player_with_deploy_turn == self.name_1:
-                self.player_with_deploy_turn = self.name_2
-                self.number_with_deploy_turn = "2"
-            elif self.player_with_deploy_turn == self.name_2:
-                self.player_with_deploy_turn = self.name_1
-                self.number_with_deploy_turn = "1"
-
     def check_end_kugath_nurglings(self):
         for i in range(7):
             for j in range(len(self.p1.cards_in_play[i + 1])):
@@ -7352,8 +7310,6 @@ class Game:
                 await self.resolve_intercept(name, game_update_string)
             elif self.xv805_enforcer_active:
                 await self.resolve_xv805_enforcer(name, game_update_string)
-            elif self.resolving_consumption:
-                await self.consumption_resolution(name, game_update_string)
             elif self.manual_bodyguard_resolution:
                 await self.resolve_manual_bodyguard(name, game_update_string)
             elif self.rearranging_deck:
