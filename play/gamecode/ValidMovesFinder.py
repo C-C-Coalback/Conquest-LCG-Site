@@ -378,7 +378,7 @@ def determine_valid_moves(self):
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Combat Turn":
             battle_planet = self.last_planet_checked_for_battle
-            if self.attacker_planet == -1 and self.attacker_position == -1:
+            if self.attacker_planet == -1 or self.attacker_position == -1:
                 for i in range(len(primary_player.cards_in_play[battle_planet + 1])):
                     if self.check_if_unit_can_be_declared_as_attacker(primary_player, secondary_player, battle_planet, i):
                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", battle_planet, i)
