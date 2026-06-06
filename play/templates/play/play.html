@@ -406,7 +406,7 @@
 
         cardHeight = 100;
         cardWidth = 63;
-        var inPlayPlanets = ["true", "true", "true", "true", "true", "true", "true"];
+        var inPlayPlanets = ["true", "true", "true", "true", "true", "false", "false"];
         var tokenNames = ["Cultist", "Guardsman", "Khymera", "Snotlings", "Termagant"]
         var mouse_x = 0;
         var mouse_y = 0;
@@ -417,6 +417,7 @@
         var dist_between_two_hand_cards = 0;
         var num_cards_in_hand = 0;
         var active_string_id = "";
+        var stored_focused_planet = -1;
 
         function playSound(url) {
             console.log(url);
@@ -431,6 +432,162 @@
             document.body.appendChild(ourAudio);
         }
 
+        function updateGridTemplateColumns(first_pos_in_play, focused_planet) {
+            var new_grid_template_columns = ``;
+            var had_in_play_planet = "false";
+            for (var i = 0; i < inPlayPlanets.length; i++) {
+                if (focused_planet !== -1) {
+                    if (focused_planet === i) {
+                        new_grid_template_columns += (1 + getNumberPlanetsRemoved()).toString() + `fr`;
+                    } else if (inPlayPlanets[i] === "false") {
+                        if (had_in_play_planet === "true") {
+                            console.log("already had in play");
+                            new_grid_template_columns += `1fr`;
+                        } else {
+
+                        }
+                    } else {
+                        had_in_play_planet = "true";
+                        new_grid_template_columns += `1fr`;
+                    }
+                } else {
+                    if (inPlayPlanets[i] === "true") {
+                        new_grid_template_columns += `1fr`;
+                        had_in_play_planet = "true";
+                    } else if (had_in_play_planet === "true") {
+                        new_grid_template_columns += `1fr`;
+                    }
+                }
+                new_grid_template_columns += ` `;
+                console.log(new_grid_template_columns)
+            }
+            document.getElementById("in-play-box").style.gridTemplateColumns = new_grid_template_columns;
+        }
+
+        function updateDisplays(hideUnrevealedPlanets) {
+
+        }
+
+        function setPlanetAppearances(first_pos_in_play, forced_width, focused_planet) {
+            if (first_pos_in_play === -1) {
+                first_pos_in_play = 6;
+            }
+            stored_focused_planet = focused_planet;
+            console.log(inPlayPlanets);
+            console.log(first_pos_in_play);
+            console.log(focused_planet);
+            var planet_width_value = "10vw";
+            if (first_pos_in_play === 0) {
+                planet_width_value = "10vw";
+                {% if is_p2 %}
+                new_grid_template_areas = `
+                "play10 play11 play12 play13 play14 play15 play16"
+                "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
+                "play20 play21 play22 play23 play24 play25 play26"`;
+                {% else %}
+                new_grid_template_areas = `
+                "play20 play21 play22 play23 play24 play25 play26"
+                "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
+                "play10 play11 play12 play13 play14 play15 play16"`;
+                {% endif %}
+            }
+            if (first_pos_in_play === 1) {
+                planet_width_value = "11vw";
+                {% if is_p2 %}
+                new_grid_template_areas = `
+                "play11 play12 play13 play14 play15 play16"
+                "planet1 planet2 planet3 planet4 planet5 planet6"
+                "play21 play22 play23 play24 play25 play26"`;
+                {% else %}
+                new_grid_template_areas = `
+                "play21 play22 play23 play24 play25 play26"
+                "planet1 planet2 planet3 planet4 planet5 planet6"
+                "play11 play12 play13 play14 play15 play16"`;
+                {% endif %}
+            } else if (first_pos_in_play === 2) {
+                planet_width_value = "13vw";
+                {% if is_p2 %}
+                new_grid_template_areas = `
+                "play12 play13 play14 play15 play16"
+                "planet2 planet3 planet4 planet5 planet6"
+                "play22 play23 play24 play25 play26"`;
+                {% else %}
+                new_grid_template_areas = `
+                "play22 play23 play24 play25 play26"
+                "planet2 planet3 planet4 planet5 planet6"
+                "play12 play13 play14 play15 play16"`;
+                {% endif %}
+            } else if (first_pos_in_play === 3) {
+                planet_width_value = "17vw";
+                {% if is_p2 %}
+                new_grid_template_areas = `
+                "play13 play14 play15 play16"
+                "planet3 planet4 planet5 planet6"
+                "play23 play24 play25 play26"`;
+                {% else %}
+                new_grid_template_areas = `
+                "play23 play24 play25 play26"
+                "planet3 planet4 planet5 planet6"
+                "play13 play14 play15 play16"`;
+                {% endif %}
+            } else if (first_pos_in_play === 4) {
+                planet_width_value = "23vw";
+                {% if is_p2 %}
+                new_grid_template_areas = `
+                "play14 play15 play16"
+                "planet4 planet5 planet6"
+                "play24 play25 play26"`;
+                {% else %}
+                new_grid_template_areas = `
+                "play24 play25 play26"
+                "planet4 planet5 planet6"
+                "play14 play15 play16"`;
+                {% endif %}
+            } else if (first_pos_in_play === 5) {
+                planet_width_value = "35vw";
+                {% if is_p2 %}
+                new_grid_template_areas = `
+                "play15 play16"
+                "planet5 planet6"
+                "play25 play26"`;
+                {% else %}
+                new_grid_template_areas = `
+                "play25 play26"
+                "planet5 planet6"
+                "play15 play16"`;
+                {% endif %}
+            } else if (first_pos_in_play === 6) {
+                planet_width_value = "70vw";
+                {% if is_p2 %}
+                new_grid_template_areas = `
+                "play16"
+                "planet6"
+                "play26"`;
+                {% else %}
+                new_grid_template_areas = `
+                "play26"
+                "planet6"
+                "play16"`;
+                {% endif %}
+            }
+            if (focused_planet !== -1) {
+                planet_width_value = "10vw";
+            }
+            updateGridTemplateColumns(first_pos_in_play, focused_planet);
+            for (var i = 0; i < inPlayPlanets.length; i++) {
+                if (i === focused_planet) {
+                    document.getElementById("player-1-cards-planet-" + (i).toString()).style.maxWidth = forced_width;
+                    document.getElementById("player-2-cards-planet-" + (i).toString()).style.maxWidth = forced_width;
+                } else {
+                    document.getElementById("player-1-cards-planet-" + (i).toString()).style.maxWidth = planet_width_value;
+                    document.getElementById("player-2-cards-planet-" + (i).toString()).style.maxWidth = planet_width_value;
+                }
+            }
+            console.log("about to apply");
+            document.getElementById("in-play-box").style.gridTemplateAreas = new_grid_template_areas;
+            console.log("Hopefully changed planets");
+        }
+
         gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
@@ -438,19 +595,13 @@
                 if (split_data[1] === "PLANETS") {
                     var newPlanetsArray = [];
                     var had_in_play_planet = "false";
-                    var outOfPlayPlanets = [];
                     for (var i = 2; i < split_data.length; i++) {
                         var card_data_split = split_data[i].split("|");
                         var card_name = card_data_split[0];
                         let string_id = (i-2).toString();
                         var additional_helper_text = card_data_split[5];
                         if (card_name === "CardbackRotated") {
-                            if (had_in_play_planet === "false") {
-                                outOfPlayPlanets.push(string_id);
-                                newPlanetsArray.push("false");
-                            } else {
-                                newPlanetsArray.push("true");
-                            }
+                            newPlanetsArray.push("false");
                         } else {
                             had_in_play_planet = "true";
                             newPlanetsArray.push("true");
@@ -538,7 +689,6 @@
                         "play20 play21 play22 play23 play24 play25 play26"
                         "planet0 planet1 planet2 planet3 planet4 planet5 planet6"
                         "play10 play11 play12 play13 play14 play15 play16"`;
-                        var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr 1fr 1fr`;
                         var encountered_in_play_planet = "false";
                         var first_pos_in_play = -1;
                         for (var i = 0; i < newPlanetsArray.length; i++) {
@@ -553,143 +703,37 @@
                                         var element = document.getElementById("div-PLANETS-" + (i).toString());
                                         if (typeof(element) != 'undefined' && element != null)
                                         {
-                                            document.getElementById("player-1-cards-planet-" + (i).toString()).remove()
-                                            document.getElementById("player-2-cards-planet-" + (i).toString()).remove()
-                                            document.getElementById("div-PLANETS-" + (i).toString()).remove()
+                                            document.getElementById("player-1-cards-planet-" + (i).toString()).style.display = "none";
+                                            document.getElementById("player-2-cards-planet-" + (i).toString()).style.display = "none";
+                                            document.getElementById("div-PLANETS-" + (i).toString()).style.display = "none";
                                         }
                                     }
                                 }
                             }
                         }
-                        if (first_pos_in_play === -1) {
-                            first_pos_in_play = 6;
-                        }
-                        if (first_pos_in_play === 1) {
-                            var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr 1fr`;
-                            {% if is_p2 %}
-                            new_grid_template_areas = `
-                            "play11 play12 play13 play14 play15 play16"
-                            "planet1 planet2 planet3 planet4 planet5 planet6"
-                            "play21 play22 play23 play24 play25 play26"`;
-                            {% else %}
-                            new_grid_template_areas = `
-                            "play21 play22 play23 play24 play25 play26"
-                            "planet1 planet2 planet3 planet4 planet5 planet6"
-                            "play11 play12 play13 play14 play15 play16"`;
-                            {% endif %}
-                            document.getElementById("player-1-cards-planet-1").style.maxWidth = "11vw";
-                            document.getElementById("player-1-cards-planet-2").style.maxWidth = "11vw";
-                            document.getElementById("player-1-cards-planet-3").style.maxWidth = "11vw";
-                            document.getElementById("player-1-cards-planet-4").style.maxWidth = "11vw";
-                            document.getElementById("player-1-cards-planet-5").style.maxWidth = "11vw";
-                            document.getElementById("player-1-cards-planet-6").style.maxWidth = "11vw";
-                            document.getElementById("player-2-cards-planet-1").style.maxWidth = "11vw";
-                            document.getElementById("player-2-cards-planet-2").style.maxWidth = "11vw";
-                            document.getElementById("player-2-cards-planet-3").style.maxWidth = "11vw";
-                            document.getElementById("player-2-cards-planet-4").style.maxWidth = "11vw";
-                            document.getElementById("player-2-cards-planet-5").style.maxWidth = "11vw";
-                            document.getElementById("player-2-cards-planet-6").style.maxWidth = "11vw";
-                        } else if (first_pos_in_play === 2) {
-                            var new_grid_template_columns = `1fr 1fr 1fr 1fr 1fr`;
-                            {% if is_p2 %}
-                            new_grid_template_areas = `
-                            "play12 play13 play14 play15 play16"
-                            "planet2 planet3 planet4 planet5 planet6"
-                            "play22 play23 play24 play25 play26"`;
-                            {% else %}
-                            new_grid_template_areas = `
-                            "play22 play23 play24 play25 play26"
-                            "planet2 planet3 planet4 planet5 planet6"
-                            "play12 play13 play14 play15 play16"`;
-                            {% endif %}
-                            document.getElementById("player-1-cards-planet-2").style.maxWidth = "13vw";
-                            document.getElementById("player-1-cards-planet-3").style.maxWidth = "13vw";
-                            document.getElementById("player-1-cards-planet-4").style.maxWidth = "13vw";
-                            document.getElementById("player-1-cards-planet-5").style.maxWidth = "13vw";
-                            document.getElementById("player-1-cards-planet-6").style.maxWidth = "13vw";
-                            document.getElementById("player-2-cards-planet-2").style.maxWidth = "13vw";
-                            document.getElementById("player-2-cards-planet-3").style.maxWidth = "13vw";
-                            document.getElementById("player-2-cards-planet-4").style.maxWidth = "13vw";
-                            document.getElementById("player-2-cards-planet-5").style.maxWidth = "13vw";
-                            document.getElementById("player-2-cards-planet-6").style.maxWidth = "13vw";
-                        } else if (first_pos_in_play === 3) {
-                            var new_grid_template_columns = `1fr 1fr 1fr 1fr`;
-                            {% if is_p2 %}
-                            new_grid_template_areas = `
-                            "play13 play14 play15 play16"
-                            "planet3 planet4 planet5 planet6"
-                            "play23 play24 play25 play26"`;
-                            {% else %}
-                            new_grid_template_areas = `
-                            "play23 play24 play25 play26"
-                            "planet3 planet4 planet5 planet6"
-                            "play13 play14 play15 play16"`;
-                            {% endif %}
-                            document.getElementById("player-1-cards-planet-3").style.maxWidth = "17vw";
-                            document.getElementById("player-1-cards-planet-4").style.maxWidth = "17vw";
-                            document.getElementById("player-1-cards-planet-5").style.maxWidth = "17vw";
-                            document.getElementById("player-1-cards-planet-6").style.maxWidth = "17vw";
-                            document.getElementById("player-2-cards-planet-3").style.maxWidth = "17vw";
-                            document.getElementById("player-2-cards-planet-4").style.maxWidth = "17vw";
-                            document.getElementById("player-2-cards-planet-5").style.maxWidth = "17vw";
-                            document.getElementById("player-2-cards-planet-6").style.maxWidth = "17vw";
-                        } else if (first_pos_in_play === 4) {
-                            var new_grid_template_columns = `1fr 1fr 1fr`;
-                            {% if is_p2 %}
-                            new_grid_template_areas = `
-                            "play14 play15 play16"
-                            "planet4 planet5 planet6"
-                            "play24 play25 play26"`;
-                            {% else %}
-                            new_grid_template_areas = `
-                            "play24 play25 play26"
-                            "planet4 planet5 planet6"
-                            "play14 play15 play16"`;
-                            {% endif %}
-                            document.getElementById("player-1-cards-planet-4").style.maxWidth = "23vw";
-                            document.getElementById("player-1-cards-planet-5").style.maxWidth = "23vw";
-                            document.getElementById("player-1-cards-planet-6").style.maxWidth = "23vw";
-                            document.getElementById("player-2-cards-planet-4").style.maxWidth = "23vw";
-                            document.getElementById("player-2-cards-planet-5").style.maxWidth = "23vw";
-                            document.getElementById("player-2-cards-planet-6").style.maxWidth = "23vw";
-                        } else if (first_pos_in_play === 5) {
-                            var new_grid_template_columns = `1fr 1fr`;
-                            {% if is_p2 %}
-                            new_grid_template_areas = `
-                            "play15 play16"
-                            "planet5 planet6"
-                            "play25 play26"`;
-                            {% else %}
-                            new_grid_template_areas = `
-                            "play25 play26"
-                            "planet5 planet6"
-                            "play15 play16"`;
-                            {% endif %}
-                            document.getElementById("player-1-cards-planet-5").style.maxWidth = "35vw";
-                            document.getElementById("player-1-cards-planet-6").style.maxWidth = "35vw";
-                            document.getElementById("player-2-cards-planet-5").style.maxWidth = "35vw";
-                            document.getElementById("player-2-cards-planet-6").style.maxWidth = "35vw";
-                        } else if (first_pos_in_play === 6) {
-                            var new_grid_template_columns = `1fr`;
-                            {% if is_p2 %}
-                            new_grid_template_areas = `
-                            "play16"
-                            "planet6"
-                            "play26"`;
-                            {% else %}
-                            new_grid_template_areas = `
-                            "play26"
-                            "planet6"
-                            "play16"`;
-                            {% endif %}
-                            document.getElementById("player-1-cards-planet-6").style.maxWidth = "70vw";
-                            document.getElementById("player-2-cards-planet-6").style.maxWidth = "70vw";
-                        }
                         inPlayPlanets = newPlanetsArray;
-                        console.log("about to apply");
-                        document.getElementById("in-play-box").style.gridTemplateColumns = new_grid_template_columns;
-                        document.getElementById("in-play-box").style.gridTemplateAreas = new_grid_template_areas;
-                        console.log("Hopefully changed planets");
+                        if (stored_focused_planet !== -1) {
+                            if (inPlayPlanets[stored_focused_planet] === "false") {
+                                stored_focused_planet = -1;
+                            }
+                        }
+                        var forced_width = "0vw";
+                        if (stored_focused_planet !== -1) {
+                            var num_excess_planets = 0;
+                            var first_pos_in_play = -1;
+                            for (var i = 0; i < inPlayPlanets.length; i++) {
+                                if (inPlayPlanets[i] === "true") {
+                                    if (first_pos_in_play === -1) {
+                                        first_pos_in_play = i;
+                                    }
+                                }
+                            }
+                            num_excess_planets = first_pos_in_play;
+                            var width_excess_planets = 10;
+                            var available_width = width_excess_planets * num_excess_planets;
+                            var forced_width = available_width.toString() + "vw";
+                        }
+                        setPlanetAppearances(first_pos_in_play, forced_width, stored_focused_planet);
                     }
                 } else if (split_data[1] === "INFO_BOX") {
                     document.getElementById('info-box').innerHTML = ``;
@@ -1306,6 +1350,47 @@
             document.getElementById("contextMenu").style.display = "none"
         }
 
+        function getNumberPlanetsRemoved() {
+            var planetCount = 0;
+            for (var i = 0; i < inPlayPlanets.length; i++) {
+                if (inPlayPlanets[i] === "false") {
+                    planetCount += 1
+                } else {
+                    return planetCount
+                }
+            }
+            return planetCount
+        }
+
+        function unfocusPlanets() {
+            var first_pos_in_play = -1;
+            for (var i = 0; i < inPlayPlanets.length; i++) {
+                if (inPlayPlanets[i] === "true") {
+                    if (first_pos_in_play === -1) {
+                        first_pos_in_play = i;
+                    }
+                }
+            }
+            setPlanetAppearances(first_pos_in_play, "0vw", -1);
+        }
+
+        function focusPlanet(planet_pos) {
+            var num_excess_planets = 0;
+            var first_pos_in_play = -1;
+            for (var i = 0; i < inPlayPlanets.length; i++) {
+                if (inPlayPlanets[i] === "true") {
+                    if (first_pos_in_play === -1) {
+                        first_pos_in_play = i;
+                    }
+                }
+            }
+            num_excess_planets = first_pos_in_play;
+            var width_excess_planets = 10;
+            var available_width = width_excess_planets * num_excess_planets;
+            var forced_width_string = available_width.toString() + "vw";
+            setPlanetAppearances(first_pos_in_play, forced_width_string, planet_pos);
+        }
+
         function showContextMenu(e, string_id) {
             e.preventDefault();
             var contextMenu = document.getElementById("contextMenu");
@@ -1330,10 +1415,20 @@
                     <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Return"></li>
                 </ul>`
             } else if (active_string_id.includes("PLANETS")) {
-                contextMenu.innerHTML = `<ul id="contextOptions">
-                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Infest"></li>
-                    <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Clear Infestation"></li>
-                </ul>`
+                var planet_pos = parseInt(active_string_id.charAt(active_string_id.length - 1));
+                if (planet_pos === stored_focused_planet) {
+                    contextMenu.innerHTML = `<ul id="contextOptions">
+                        <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Infest"></li>
+                        <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Clear Infestation"></li>
+                        <li class="contextMenuOption"><input onclick="unfocusPlanets()" class=contextMenuButton type="button" value="Unfocus Planet"></li>
+                    </ul>`
+                } else {
+                    contextMenu.innerHTML = `<ul id="contextOptions">
+                        <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Infest"></li>
+                        <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Clear Infestation"></li>
+                        <li class="contextMenuOption"><input onclick="focusPlanet(` + planet_pos + `)" class=contextMenuButton type="button" value="Focus Planet"></li>
+                    </ul>`
+                }
             } else {
                 contextMenu.innerHTML = `<ul id="contextOptions">
                     <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Ready"></li>
