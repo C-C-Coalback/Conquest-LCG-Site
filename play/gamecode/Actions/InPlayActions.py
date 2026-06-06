@@ -2189,7 +2189,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_object.action_chosen == "Preemptive Barrage":
         if game_update_string[1] == primary_player.get_number():
             if self.action_object.misc_target_planet == -1 or self.action_object.misc_target_planet == planet_pos:
-                if card_chosen.get_faction() == "Astra Militarum":
+                if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum", own_event=True):
                     card_chosen.ranged_eop = True
                     self.action_object.misc_target_planet = planet_pos
                     self.action_object.misc_counter -= 1
