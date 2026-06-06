@@ -2647,6 +2647,9 @@ class Player:
         return False
 
     def check_if_can_attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False, relic_check_allowed=True, actual_check=False):
+        if card.get_card_type() == "Attachment":
+            if card.planet_attachment:
+                return False
         if planet == -2:
             target_card = self.headquarters[position]
         else:
