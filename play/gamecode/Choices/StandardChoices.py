@@ -1875,11 +1875,15 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.player_using_battle_ability = winner.name_player
             if winner.foretell_check():
                 self.choices_available = ["Yes", "No"]
+                if not winner.search_hand_for_card("Foretell"):
+                    self.choices_available = ["No"]
                 self.choice_context = "Use Foretell?"
                 self.name_player_making_choices = winner.name_player
                 await self.send_update_message("Foretell window offered")
             elif loser.foretell_check():
                 self.choices_available = ["Yes", "No"]
+                if not loser.search_hand_for_card("Foretell"):
+                    self.choices_available = ["No"]
                 self.choice_context = "Use Foretell?"
                 self.name_player_making_choices = loser.name_player
                 await self.send_update_message("Foretell window offered")

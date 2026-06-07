@@ -5321,6 +5321,8 @@ class Player:
                     return False
             war_plan, war_pos = self.get_location_of_warlord()
             if self.get_ready_given_pos(war_plan, war_pos):
+                if self.warlord_faction in ["Eldar", "Dark Eldar", "Tau"]:
+                    return True
                 if self.search_hand_for_card("Foretell"):
                     return True
         return False
