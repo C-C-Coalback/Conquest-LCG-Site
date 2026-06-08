@@ -38,6 +38,7 @@ ability_targets_dictionary = {
             "Required Traits": [],
             "Forbidden Traits": [],
             "Special": False,
+            "Target": False,
             "Ability Type": "Interrupt"
         }
     },
@@ -46,7 +47,7 @@ ability_targets_dictionary = {
         "Type 1": "Unit",
         "Restrictions 1": {
             "Unit Only": True,
-            "Own Unit": True,
+            "Own Unit": False,
             "Enemy Unit": False,
             "Unique": False,
             "Ready": False,
@@ -57,6 +58,7 @@ ability_targets_dictionary = {
             "Required Traits": [],
             "Forbidden Traits": [],
             "Special": True,
+            "Target": True,
             "Ability Type": "Reaction"
         }
     },
@@ -76,6 +78,7 @@ ability_targets_dictionary = {
             "Required Traits": [],
             "Forbidden Traits": [],
             "Special": True,
+            "Target": True,
             "Ability Type": "Reaction"
         }
     },
@@ -95,6 +98,7 @@ ability_targets_dictionary = {
             "Required Traits": [],
             "Forbidden Traits": [],
             "Special": False,
+            "Target": True,
             "Ability Type": "Planet"
         }
     },
@@ -114,6 +118,7 @@ ability_targets_dictionary = {
             "Required Traits": [],
             "Forbidden Traits": [],
             "Special": True,
+            "Target": False,
             "Ability Type": "Planet"
         },
         "Type 2": "Planet",
@@ -161,6 +166,7 @@ ability_targets_dictionary = {
             "Required Traits": [],
             "Forbidden Traits": [],
             "Special": False,
+            "Target": True,
             "Ability Type": "Planet"
         }
     },

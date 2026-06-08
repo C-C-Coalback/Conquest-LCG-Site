@@ -207,7 +207,7 @@ def add_active_non_first_planets_as_valid_moves(self, valid_moves):
     return valid_moves
 
 
-def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_pos, unit_pos, target_restrictions):
+def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_pos, unit_pos, target_restrictions, enemy_ability=False):
     unit_only = target_restrictions["Unit Only"]
     unique_required = target_restrictions["Unique"]
     ready_required = target_restrictions["Ready"]
@@ -217,6 +217,7 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
     forbidden_card_type = target_restrictions["Forbidden Card Type"]
     required_traits = target_restrictions["Required Traits"]
     forbidden_traits = target_restrictions["Forbidden Traits"]
+    targets = target_restrictions["Target"]
     special_restrictions = target_restrictions["Special"]
     ability_type = target_restrictions["Ability Type"]
     if unit_only:
@@ -258,6 +259,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     return False
         elif ability == "Planet":
             pass
+    if targets and enemy_ability:
+        if player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos, actual_check=False):
+            return False
     return True
 
 
@@ -314,11 +318,11 @@ def find_all_valid_unit_locations_given_restrictions(self, ability, primary_play
                     valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     if enemy_unit:
         for i in range(len(secondary_player.headquarters)):
-            if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, -2, i, target_restrictions):
+            if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, -2, i, target_restrictions, enemy_ability=True):
                 valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
         for i in range(7):
             for j in range(len(secondary_player.cards_in_play[i + 1])):
-                if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, i, j, target_restrictions):
+                if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, i, j, target_restrictions, enemy_ability=True):
                     valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     return valid_moves
 
