@@ -4579,6 +4579,12 @@ class Player:
     def count_units_at_planet(self, planet_id):
         return len(self.cards_in_play[planet_id + 1])
 
+    def count_damage_at_planet(self, planet_id):
+        damage_total = 0
+        for i in range(len(self.cards_in_play[planet_id + 1])):
+            damage_total += self.get_damage_given_pos(planet_id, i)
+        return damage_total
+
     def count_units_in_play_all(self):
         unit_count = 0
         for i in range(7):

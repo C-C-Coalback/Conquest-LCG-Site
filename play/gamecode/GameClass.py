@@ -401,6 +401,7 @@ class Game:
         self.resolve_kill_effects = True
         self.vamii_complex_discount = 0
         self.reactions_on_end_deploy_phase = False
+        self.tracked_elements_combat_rounds = []
         self.asked_if_resolve_effect = False
         self.card_to_deploy = None
         self.saved_planet_string = ""
@@ -8172,26 +8173,49 @@ class Game:
                         await winner.send_victory_display()
 
     async def check_stalemate(self, name):
+        no_meaningful_game_state_change_in_some_rounds = False
+        required_rounds_for_stalemate = 5
+        num_rounds_of_no_change = 0
+        unit_count = self.p1.count_units_at_planet(self.last_planet_checked_for_battle) + self.p2.count_units_at_planet(self.last_planet_checked_for_battle)
+        resources_count = self.p1.get_resources() + self.p2.get_resources()
+        damage_count = self.p1.count_damage_at_planet(self.last_planet_checked_for_battle) + self.p2.count_damage_at_planet(self.last_planet_checked_for_battle)
+        self.tracked_elements_combat_rounds.append((unit_count, resources_count, damage_count))
+        while len(self.tracked_elements_combat_rounds) > required_rounds_for_stalemate:
+            del self.tracked_elements_combat_rounds[0]
+        for i in range(len(self.tracked_elements_combat_rounds)):
+            if self.tracked_elements_combat_rounds[0] != (unit_count, resources_count, damage_count):
+                num_rounds_of_no_change = 0
+            else:
+                num_rounds_of_no_change += 1
+        if len(self.tracked_elements_combat_rounds) == required_rounds_for_stalemate:
+            no_meaningful_game_state_change_in_some_rounds = True
+            for i in range(len(self.tracked_elements_combat_rounds)):
+                if self.tracked_elements_combat_rounds[0] != (unit_count, resources_count, damage_count):
+                    no_meaningful_game_state_change_in_some_rounds = False
+        if num_rounds_of_no_change == required_rounds_for_stalemate - 1:
+            await self.send_update_message("WARNING: Stalemate will be called if nothing changes this combat round.")
         p1_has_units = self.p1.check_if_units_present(self.last_planet_checked_for_battle)
         p2_has_units = self.p2.check_if_units_present(self.last_planet_checked_for_battle)
-        if p1_has_units or p2_has_units:
+        if (p1_has_units or p2_has_units) and not no_meaningful_game_state_change_in_some_rounds:
             pass
         else:
-            if not p1_has_units and not p2_has_units:
-                if self.round_number == self.last_planet_checked_for_battle:
-                    self.p1.discard_planet_attachments(self.last_planet_checked_for_battle)
-                    self.p2.discard_planet_attachments(self.last_planet_checked_for_battle)
-                    self.planets_in_play_array[self.last_planet_checked_for_battle] = False
-                    self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
-                    self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
-                    if self.round_number == 6:
-                        if self.last_player_to_capture_planet == self.name_1:
-                            await self.send_victory_proper(self.name_1, "being the last player to capture a planet")
-                        elif self.last_player_to_capture_planet == self.name_2:
-                            await self.send_victory_proper(self.name_2, "being the last player to capture a planet")
-                        else:
-                            await self.send_victory_proper("???", "not capturing any planets...")
-                await self.resolve_battle_conclusion(name, ["", ""])
+            await self.send_update_message("Stalemate Called.")
+            self.p1.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
+            self.p2.move_all_at_planet_to_hq(self.last_planet_checked_for_battle)
+            if self.round_number == self.last_planet_checked_for_battle:
+                self.p1.discard_planet_attachments(self.last_planet_checked_for_battle)
+                self.p2.discard_planet_attachments(self.last_planet_checked_for_battle)
+                self.planets_in_play_array[self.last_planet_checked_for_battle] = False
+                self.p1.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                self.p2.discard_all_cards_in_reserve(self.last_planet_checked_for_battle)
+                if self.round_number == 6:
+                    if self.last_player_to_capture_planet == self.name_1:
+                        await self.send_victory_proper(self.name_1, "being the last player to capture a planet")
+                    elif self.last_player_to_capture_planet == self.name_2:
+                        await self.send_victory_proper(self.name_2, "being the last player to capture a planet")
+                    else:
+                        await self.send_victory_proper("???", "not capturing any planets...")
+            await self.resolve_battle_conclusion(name, ["", ""])
 
     async def check_combat_end(self, name):
         self.combat_reset_eocr_values()
@@ -8447,6 +8471,7 @@ class Game:
             self.number_with_initiative = "1"
 
     def begin_battle(self, planet_pos):
+        self.tracked_elements_combat_rounds = []
         self.battle_in_progress = True
         self.combat_round_number = 1
         self.last_planet_checked_for_battle = planet_pos
