@@ -4090,7 +4090,7 @@ class Game:
                     player_acting = self.name_1
                     num_acting = 1
         while current_planet < 7:
-            if self.planets_in_play_array[current_planet]:
+            if self.planets_in_play_array[current_planet] and not self.replaced_planets[current_planet]:
                 break
             current_planet += 1
         if current_planet > 6:
