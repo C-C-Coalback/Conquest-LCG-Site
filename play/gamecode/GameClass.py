@@ -8179,18 +8179,19 @@ class Game:
         unit_count = self.p1.count_units_at_planet(self.last_planet_checked_for_battle) + self.p2.count_units_at_planet(self.last_planet_checked_for_battle)
         resources_count = self.p1.get_resources() + self.p2.get_resources()
         damage_count = self.p1.count_damage_at_planet(self.last_planet_checked_for_battle) + self.p2.count_damage_at_planet(self.last_planet_checked_for_battle)
-        self.tracked_elements_combat_rounds.append((unit_count, resources_count, damage_count))
+        card_count = len(self.p1.cards) + len(self.p2.cards)
+        self.tracked_elements_combat_rounds.append((unit_count, resources_count, damage_count, card_count))
         while len(self.tracked_elements_combat_rounds) > required_rounds_for_stalemate:
             del self.tracked_elements_combat_rounds[0]
         for i in range(len(self.tracked_elements_combat_rounds)):
-            if self.tracked_elements_combat_rounds[0] != (unit_count, resources_count, damage_count):
+            if self.tracked_elements_combat_rounds[0] != (unit_count, resources_count, damage_count, card_count):
                 num_rounds_of_no_change = 0
             else:
                 num_rounds_of_no_change += 1
         if len(self.tracked_elements_combat_rounds) == required_rounds_for_stalemate:
             no_meaningful_game_state_change_in_some_rounds = True
             for i in range(len(self.tracked_elements_combat_rounds)):
-                if self.tracked_elements_combat_rounds[0] != (unit_count, resources_count, damage_count):
+                if self.tracked_elements_combat_rounds[0] != (unit_count, resources_count, damage_count, card_count):
                     no_meaningful_game_state_change_in_some_rounds = False
         if num_rounds_of_no_change == required_rounds_for_stalemate - 1:
             await self.send_update_message("WARNING: Stalemate will be called if nothing changes this combat round.")
