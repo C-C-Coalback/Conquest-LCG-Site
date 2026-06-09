@@ -4898,22 +4898,23 @@ class Player:
                 if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                     return True
             return self.headquarters[unit_id].get_mobile()
-        if self.get_ability_given_pos(planet_id, unit_id) == "Ravenwing Escort":
+        ability = self.get_ability_given_pos(planet_id, unit_id)
+        if ability == "Ravenwing Escort":
             if self.warlord_faction != "Space Marines":
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Venomous Fiend":
+        if ability == "Venomous Fiend":
             if self.warlord_faction != "Chaos":
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Firstborn Battalion":
+        if ability == "Firstborn Battalion":
             if self.count_supports() > 2:
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Interceptor Squad":
+        if ability == "Interceptor Squad":
             if self.get_has_faith_given_pos(planet_id, unit_id) > 0:
                 return True
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
             if self.search_card_at_planet(planet_id, unit_id, "Herald of the Tau'va"):
                 return True
-        if self.get_ability_given_pos(planet_id, unit_id) == "Conjuring Warmaster":
+        if ability == "Conjuring Warmaster":
             if self.check_for_warlord(planet_id, card_effect=True, searching_name=self.name_player):
                 return True
         return self.cards_in_play[planet_id + 1][unit_id].get_mobile()

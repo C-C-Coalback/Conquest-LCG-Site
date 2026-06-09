@@ -265,13 +265,7 @@ class Card:
         return self.name
 
     def get_ability(self, bloodied_relevant=False):
-        if self.blanked_eop:
-            return "BLANKED"
-        if self.blanked_eor:
-            return "BLANKED"
-        if self.blanked_eor_2:
-            return "BLANKED"
-        if self.blanked_eog:
+        if self.get_blanked():
             return "BLANKED"
         if self.new_ability:
             return self.new_ability
@@ -304,6 +298,8 @@ class Card:
 
     def get_blanked(self):
         if self.blanked_eor:
+            return self.blanked_eor
+        if self.blanked_eor_2:
             return self.blanked_eor
         if self.blanked_eog:
             return self.blanked_eog
