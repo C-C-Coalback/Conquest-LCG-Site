@@ -1386,7 +1386,7 @@
             }
             num_excess_planets = first_pos_in_play;
             var width_excess_planets = 10;
-            var available_width = width_excess_planets * num_excess_planets;
+            var available_width = width_excess_planets * (num_excess_planets + 1);
             var forced_width_string = available_width.toString() + "vw";
             setPlanetAppearances(first_pos_in_play, forced_width_string, planet_pos);
         }
