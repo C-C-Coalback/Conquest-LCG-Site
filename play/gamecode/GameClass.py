@@ -3095,6 +3095,7 @@ class Game:
             self.misc_target_player = ""
         elif self.battle_ability_to_resolve == "Chiros The Great Bazaar":
             self.choices_available = self.planets_removed_from_game
+            self.create_choices(self.choices_available, general_imaging_format="All Planets")
             self.choice_context = "Chiros The Great Bazaar Choice"
             self.name_player_making_choices = winner.name_player
             self.resolving_search_box = True
