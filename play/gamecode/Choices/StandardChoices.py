@@ -997,7 +997,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             secondary_player.shuffle_deck()
             self.reset_choices_available()
             self.resolving_search_box = False
-            primary_player.resolve_played_any_event()
+            secondary_player.resolve_played_any_event()
             self.action_cleanup()
     elif self.choice_context == "BTD: Last Planet or HQ?":
         if primary_player.aiming_reticle_coords_hand is not None:
