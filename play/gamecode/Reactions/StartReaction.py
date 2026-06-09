@@ -3265,6 +3265,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
                 self.delete_reaction()
         elif current_reaction == "Zadruk Prime":
+            self.planet_pos_to_deploy = planet_pos
             reaction.misc_target_planet = planet_pos
             primary_player.number_cards_to_search = 6
             for i in range(len(primary_player.headquarters)):

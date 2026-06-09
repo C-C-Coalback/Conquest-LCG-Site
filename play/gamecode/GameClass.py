@@ -1181,6 +1181,21 @@ class Game:
             else:
                 player = self.p2
                 secondary_player = self.p1
+        if self.battle_ability_to_resolve:
+            if self.player_resolving_battle_ability == self.name_1:
+                player = self.p1
+                secondary_player = self.p2
+            else:
+                player = self.p2
+                secondary_player = self.p1
+        if self.reactions_needing_resolving:
+            if self.reactions_needing_resolving[0].get_reaction_name() in ["Vamii Industrial Complex", "The Dance Without End", "Dark Allegiance Rally", "Zadruk Prime"]:
+                if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_1:
+                    player = self.p1
+                    secondary_player = self.p2
+                else:
+                    player = self.p2
+                    secondary_player = self.p1
         if self.interrupts_waiting_on_resolution:
             if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Catachan Devils Patrol":
                 if self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() == self.name_1:
@@ -1192,9 +1207,11 @@ class Game:
         return player, secondary_player
 
     async def update_game_event_applying_discounts(self, name, game_update_string):
+        print("discounts update")
         if self.card_to_deploy is not None:
             player, secondary_player = self.determine_player_with_discounts()
             if name == player.name_player:
+                print("attempt discount")
                 if len(game_update_string) == 1:
                     if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
                         print("Play card with not all discounts")
@@ -1204,7 +1221,9 @@ class Game:
                             self.mode = "Normal"
                 if len(game_update_string) == 3:
                     if game_update_string[0] == "HQ":
+                        print("hq")
                         if game_update_string[1] == player.get_number():
+                            print("right player")
                             discount_received = player.perform_discount_at_pos_hq(
                                 int(game_update_string[2]), self.card_to_deploy.get_faction(),
                                 self.card_to_deploy.get_traits(), self.planet_aiming_reticle_position,
@@ -1295,6 +1314,9 @@ class Game:
                                                                               discounts=self.discounts_applied)
                                         if self.mode == "DISCOUNT":
                                             self.mode = "Normal"
+        else:
+            await self.send_update_message("Applying discounts with no card to deploy; forcefully quitting.")
+            self.mode = "Normal"
 
     async def send_mistarget_message(self, name_player, mistarget_main, mistarget_extra):
         message = "GAME_INFO/MISTARGET/"
@@ -2090,11 +2112,11 @@ class Game:
                             else:
                                 primary_player.number_cards_to_search += 1
                         elif self.what_to_do_with_searched_card == "Zadruk Prime":
-                            pla = self.misc_target_planet
                             card_name = primary_player.deck[int(game_update_string[1])]
                             card = self.preloaded_find_card(card_name)
                             self.card_to_deploy = card
-                            self.planet_pos_to_deploy = pla
+                            self.planet_pos_to_deploy = self.reactions_needing_resolving[0].get_planet_pos()
+                            pla = self.planet_pos_to_deploy
                             self.misc_player_storage = "ZADRUK PRIME"
                             await self.discount_begin_routine(pla, card, primary_player, 1)
                             if self.available_discounts > self.discounts_applied:
@@ -2104,8 +2126,7 @@ class Game:
                                 self.planet_aiming_reticle_active = True
                             else:
                                 units_at_planet = primary_player.count_units_at_planet(pla)
-                                await DeployPhase.deploy_card_routine(self, name, self.planet_pos_to_deploy,
-                                                                      discounts=self.discounts_applied)
+                                await DeployPhase.deploy_card_routine(self, name, pla, discounts=self.discounts_applied)
                                 if units_at_planet < primary_player.count_units_at_planet(pla):
                                     del primary_player.deck[int(game_update_string[1])]
                         elif self.what_to_do_with_searched_card == "DISCARD":

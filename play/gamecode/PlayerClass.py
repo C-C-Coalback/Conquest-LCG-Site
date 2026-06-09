@@ -5191,7 +5191,7 @@ class Player:
         discounts_available = 0
         automatic_discounts = 0
         for i in range(len(self.cards_in_play[planet_pos + 1])):
-            if self.cards_in_play[planet_pos + 1][i].get_ability() == "Crushface":
+            if self.get_ability_given_pos(planet_pos, i) == "Crushface":
                 if faction_of_card == "Orks":
                     if actual_discounts:
                         self.set_aiming_reticle_in_play(planet_pos, i, "green")
