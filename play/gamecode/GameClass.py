@@ -3114,7 +3114,7 @@ class Game:
                 self.choices_available.append("Stop")
                 self.choice_context = "Heletine Move"
                 self.name_player_making_choices = winner.name_player
-                self.create_choices(self.choices_available)
+                self.create_choices(self.choices_available, general_imaging_format="All But Last")
                 self.resolving_search_box = True
                 await self.send_update_message("Please choose which cards to put on the bottom of your deck.")
         elif self.battle_ability_to_resolve == "Ice World Hydras IV":
