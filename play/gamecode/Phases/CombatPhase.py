@@ -290,11 +290,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
     elif len(game_update_string) == 3:
         if game_update_string[0] == "HAND":
             print("Card in hand clicked on")
-            if self.mode == "SHIELD":
-                if name == self.player_who_is_shielding:
-                    if game_update_string[1] == self.number_who_is_shielding:
-                        hand_pos = int(game_update_string[2])
-            elif self.mode == "Normal":
+            if self.mode == "Normal":
                 if name == self.player_with_combat_turn:
                     if game_update_string[1] == self.number_with_combat_turn:
                         if self.attacker_position != -1:
