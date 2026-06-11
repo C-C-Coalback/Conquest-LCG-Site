@@ -3085,6 +3085,7 @@ class Game:
             self.location_of_indirect = "ALL"
             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
         elif self.battle_ability_to_resolve == "Gareth Prime":
+            self.chosen_first_card = False
             self.misc_target_unit = (-1, -1)
             self.player_resolving_battle_ability = loser.name_player
         elif self.battle_ability_to_resolve == "Selphini VII":
