@@ -95,6 +95,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
         self.assertEqual(test_game.p1.resources, 7)
         self.assertEqual(test_game.p1.get_ready_given_pos(-2, 1), False)
+        self.assertEqual(len(test_game.p1.cards), 0)
 
     async def test_deploy_attachment(self):
         random.seed(42)
