@@ -1144,14 +1144,14 @@
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefRotate(this.dataset.cardsrc)"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefRotate(this.dataset.cardsrc)"><br>`
                                 } else {
                                     var card_name = choice_data[0];
                                     let string_id = (i-4).toString();
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDef(this.dataset.cardsrc)"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDef(this.dataset.cardsrc)"><br>`
                                 }
                             } else {
                                 full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
