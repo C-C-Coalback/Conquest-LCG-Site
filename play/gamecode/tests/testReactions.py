@@ -366,6 +366,28 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Guardsman")
 
+    async def test_omega_zero_command(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
+            new_warlord_deck_content = file.read()
+        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Omega Zero Command"))
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P2"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P2", ["PLANETS", "1"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.after_command_struggle, True)
+        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
