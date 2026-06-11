@@ -566,11 +566,16 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Warlord is not ready.")
                     elif ability == "Battle Cry":
-                        primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
-                                                                            expiration="EOB")
-                        primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        primary_player.resolve_played_any_event()
-                        self.action_cleanup()
+                        if self.check_if_battle_taking_place():
+                            primary_player.increase_attack_of_all_units_in_play(2, required_faction="Orks",
+                                                                                expiration="EOB")
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            primary_player.resolve_played_any_event()
+                            self.action_cleanup()
+                        else:
+                            primary_player.add_resources(cost, refund=True)
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
+                                                              "Battle not taking place.")
                     elif ability == "Power from Pain":
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.action_object.action_chosen = ability

@@ -5638,7 +5638,7 @@ class Player:
             if self.headquarters[i].get_is_unit():
                 if required_faction is None:
                     self.increase_attack_of_unit_at_pos(-2, i, amount, expiration)
-                elif required_faction == self.headquarters[i].get_faction():
+                elif self.check_if_faction_given_pos(-2, i, required_faction, own_event=True):
                     self.increase_attack_of_unit_at_pos(-2, i, amount, expiration)
 
     def increase_attack_of_all_units_at_planet(self, amount, planet_pos, required_faction=None, expiration="EOB"):
@@ -5646,7 +5646,7 @@ class Player:
             if self.cards_in_play[planet_pos + 1][i].get_is_unit():
                 if required_faction is None:
                     self.increase_attack_of_unit_at_pos(planet_pos, i, amount, expiration)
-                elif required_faction == self.cards_in_play[planet_pos + 1][i].get_faction():
+                elif self.check_if_faction_given_pos(planet_pos, i, required_faction, own_event=True):
                     self.increase_attack_of_unit_at_pos(planet_pos, i, amount, expiration)
 
     def increase_attack_of_all_units_at_all_planets(self, amount, required_faction=None, expiration="EOB"):
