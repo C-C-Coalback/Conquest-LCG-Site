@@ -132,6 +132,7 @@ class Player:
         self.chosen_enslaved_faction = False
         self.erekiels_queued = 0
         self.nahumekh_value = 0
+        self.yvarn_force_pass = False
         self.last_hand_string = ""
         self.last_hq_string = ""
         self.last_planet_strings = ["", "", "", "", "", "", ""]

@@ -3322,6 +3322,8 @@ class Game:
             self.yvarn_active = True
             self.p1_triggered_yvarn = False
             self.p2_triggered_yvarn = False
+            self.p1.yvarn_force_pass = False
+            self.p2.yvarn_force_pass = False
             self.reset_choices_available()
         elif self.battle_ability_to_resolve == "Excellor":
             self.misc_target_unit = (-1, -1)
@@ -3471,8 +3473,20 @@ class Game:
                 if not self.p1_triggered_yvarn:
                     if len(game_update_string) == 1:
                         if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                            await self.send_update_message(self.name_1 + " declines y'varn.")
-                            self.p1_triggered_yvarn = True
+                            valid_pass = True
+                            for i in range(len(self.p1.cards)):
+                                card = self.p1.get_card_in_hand(i)
+                                if card.get_card_type() == "Army" and self.p1.check_if_card_can_enter_play(card):
+                                    valid_pass = False
+                            if valid_pass or self.p1.yvarn_force_pass:
+                                if valid_pass:
+                                    await self.send_update_message(self.name_1 + " has no units and declines Y'varn.")
+                                else:
+                                    await self.send_update_message(self.name_1 + " declines Y'varn despite having valid units.")
+                                self.p1_triggered_yvarn = True
+                            else:
+                                self.p1.yvarn_force_pass = True
+                                await self.send_update_message(self.name_1 + " attempted to decline Y'varn, but has valid units. Passing again will forcefully decline.")
                     elif len(game_update_string) == 3:
                         if game_update_string[0] == "HAND":
                             if game_update_string[1] == "1":
@@ -3483,8 +3497,20 @@ class Game:
                 if not self.p2_triggered_yvarn:
                     if len(game_update_string) == 1:
                         if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                            await self.send_update_message(self.name_2 + " declines y'varn.")
-                            self.p2_triggered_yvarn = True
+                            valid_pass = True
+                            for i in range(len(self.p2.cards)):
+                                card = self.p2.get_card_in_hand(i)
+                                if card.get_card_type() == "Army" and self.p2.check_if_card_can_enter_play(card):
+                                    valid_pass = False
+                            if valid_pass or self.p2.yvarn_force_pass:
+                                if valid_pass:
+                                    await self.send_update_message(self.name_2 + " has no units and declines Y'varn.")
+                                else:
+                                    await self.send_update_message(self.name_2 + " declines Y'varn despite having valid units.")
+                                self.p2_triggered_yvarn = True
+                            else:
+                                self.p2.yvarn_force_pass = True
+                                await self.send_update_message(self.name_2 + " attempted to decline Y'varn, but has valid units. Passing again will forcefully decline.")
                     elif len(game_update_string) == 3:
                         if game_update_string[0] == "HAND":
                             if game_update_string[1] == "2":
