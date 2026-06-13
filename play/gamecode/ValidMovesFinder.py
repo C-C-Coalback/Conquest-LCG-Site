@@ -55,7 +55,7 @@ def update_automated_attributes(self):
         self.automated_player_waited_on = self.reactions_needing_resolving[0].get_player_resolving_reaction()
     elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
         self.what_is_required_automated = "Mobile"
-        self.automated_player_waited_on = ""  # TODO: Less stupid mobile player
+        self.automated_player_waited_on = self.player_mobiling
     elif self.battle_ability_to_resolve:
         self.what_is_required_automated = "Battle Ability"
         self.automated_player_waited_on = self.player_resolving_battle_ability

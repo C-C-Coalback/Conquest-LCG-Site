@@ -583,6 +583,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                 await self.send_update_message("Window granted for players to use "
                                                "reactions/actions before the battle begins.")
             else:
+                self.determine_mobile_player()
                 await self.send_update_message("Mobile window offered.")
         elif self.nectavus_active:
             ret_val = try_entire_command(self, self.nectavus_target)
