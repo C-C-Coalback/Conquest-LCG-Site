@@ -1,10 +1,17 @@
 <ul id="navi-bar">
   <li class="navi-bar-item"><a href="/">Home</a></li>
+  {% if user.is_authenticated %}
   <li class="navi-bar-item"><a href="/decks/">Decks</a></li>
+  {% endif %}
   <li class="navi-bar-item"><a href="/play/">Play</a></li>
   <li class="navi-bar-item"><a href="/help/">Help</a></li>
+  {% if user.is_authenticated %}
   <li class="navi-bar-item"><a href="/settings/">Settings</a></li>
+  {% endif %}
   <li class="navi-bar-item"><a href="/chat/Main/">Chat</a></li>
+  {% if user.is_authenticated %}
+  <li class="navi-bar-item"><a href="/decks/import/">Import</a></li>
+  {% endif %}
   <!-- "/static/images/ProfilePictures/{{ user.username }}" -->
   {% if user.is_authenticated %}
   <li id="avatar" class="pull-right navi-bar-item">

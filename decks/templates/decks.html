@@ -748,5 +748,15 @@
             console.log("Set to none")
         }
     }
+
+    {% if load_latest %}
+    window.onload = function() {
+        decksSocket.onopen = function() {
+            decksSocket.send(JSON.stringify({
+                'message': ("LOAD LATEST")
+            }));
+        }
+    }
+    {% endif %}
 </script>
 {% endblock %}

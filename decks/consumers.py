@@ -4,6 +4,8 @@ from .deckscode import Initfunctions, FindCard
 import os
 import copy
 import shutil
+import re
+import glob
 
 ban_list_apoka = [
     "Bonesinger Choir", "Squiggoth Brute", "Corrupted Teleportarium", "Gun Drones", "Archon's Palace",
@@ -304,6 +306,60 @@ def create_default_decks(username):
         shutil.copytree("decks/default_decks/", "decks/DeckStorage/" + username)
 
 
+def deck_check_and_save(username, deck_text):
+    message_to_send = ""
+    will_send = False
+    deck_text = deck_text.replace("\"Subject: Ω-X62113\"", "Subject Omega-X62113")
+    deck_text = deck_text.replace("\"Subject: W-808\"", "Subject W-808")
+    deck_text = deck_text.replace("Zen \"Xi\" Aonia", "Zen Xi Aonia")
+    deck_text = deck_text.replace("idden Base", "'idden Base")
+    deck_text = deck_text.replace("é", "e")
+    deck_text = deck_text.replace("\"", "")
+    true_split_message = deck_text.split(sep="\n")
+    while true_split_message:
+        if true_split_message[0].strip():
+            break
+        del true_split_message[0]
+    if true_split_message:
+        true_split_message[0] = re.sub(r'[^a-zA-Z0-9 ]', '', true_split_message[0])
+        if len(true_split_message[0]) < 4:
+            true_split_message[0] = "IMPORTED DECK"
+    deck_text = "\n".join(true_split_message)
+    deck = clean_sent_deck(deck_text)
+    deck_name = deck[0]
+    deck_exists = False
+    if len(deck) > 5:
+        if "{AUTOMAIN}" in deck[2]:
+            warlord = FindCard.find_card(deck[1], cards_array, cards_dict)
+            deck[2] = deck[2].replace("{AUTOMAIN}", warlord.get_faction())
+            deck_text = deck_text.replace("{AUTOMAIN}", warlord.get_faction())
+        message_to_send = second_part_deck_validation(deck)
+    if message_to_send == "SUCCESS":
+        print("Need to save deck")
+        print(os.path.dirname(os.path.realpath(__file__)))
+        print(os.getcwd())
+        if not username:
+            username = "Anonymous"
+        print("username:", username)
+        target_user_dir = os.getcwd() + "/decks/DeckStorage/" + username
+        target_deck_dir = os.getcwd() + "/decks/DeckStorage/" + username + "/" + deck_name
+        print(target_user_dir)
+        print(target_deck_dir)
+        if not os.path.isdir(target_user_dir):
+            print("Path does not exist")
+            os.mkdir(target_user_dir)
+        will_send = False
+        if not os.path.exists(target_deck_dir):
+            will_send = True
+        else:
+            deck_exists = True
+        with open(target_deck_dir, "w") as file:
+            file.write(deck_text)
+    message_to_send = "Feedback/" + message_to_send
+    message = message_to_send
+    return {"message": message, "will_send": will_send, "deck_name": deck_name, "deck_exists": deck_exists}
+
+
 class DecksConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = "decks"
@@ -345,6 +401,64 @@ class DecksConsumer(AsyncWebsocketConsumer):
             message = "saved_deck/" + content[0].replace('\n', '') + "/" + content[2].replace('\n', '')
             await self.send(text_data=json.dumps({"message": message}))
 
+    async def load_deck(self, deck_name):
+        if os.path.isdir("decks/DeckStorage/" + self.name):
+            path_to_deck = os.getcwd() + "/decks/DeckStorage/" + self.name + "/" + deck_name
+            if os.path.exists(path_to_deck):
+                with open(path_to_deck, 'r') as f:
+                    deck_content = f.read()
+                deck_list_content = deck_content.split(sep="\n")
+                message = "Load deck/" + deck_content
+                deck_name = "Name/" + deck_list_content[0]
+                await self.send(text_data=json.dumps({"message": deck_name}))
+                warlord = "Warlord/" + deck_list_content[2]
+                self.warlord = deck_list_content[2]
+                await self.send(text_data=json.dumps({"message": warlord}))
+                factions = deck_list_content[3]
+                factions = factions.split(sep=" (")
+                pledge = deck_list_content[4]
+                num_to_delete = 4
+                if pledge != "----------------------------------------------------------------------" \
+                        and pledge:
+                    print("pledge: ", pledge)
+                    pledge = "Pledge/" + pledge
+                    num_to_delete = 5
+                    await self.send(text_data=json.dumps({"message": pledge}))
+                for i in range(len(factions)):
+                    factions[i] = factions[i].replace(")", "")
+                    if i == 0:
+                        self.main_faction = factions[i]
+                        if len(factions) == 1:
+                            ally = "SetAlly/"
+                            await self.send(text_data=json.dumps({"message": ally}))
+                    elif i == 1:
+                        self.ally_faction = factions[i]
+                        ally = "SetAlly/" + factions[i]
+                        await self.send(text_data=json.dumps({"message": ally}))
+                await self.send(text_data=json.dumps({"message": "Ally"}))
+                for i in range(num_to_delete):
+                    del deck_list_content[0]
+                i = 0
+                while i < len(deck_list_content):
+                    if deck_list_content[i] in ["-----------------------------------"
+                                                "-----------------------------------", ""]:
+                        del deck_list_content[i]
+                        i = i - 1
+                    i = i + 1
+                current_header = "SS"
+                for i in range(len(deck_list_content)):
+                    if deck_list_content[i] in ["Signature Squad", "Army", "Support",
+                                                "Synapse", "Attachment", "Event", "Planet"]:
+                        current_header = deck_list_content[i]
+                        if current_header == "Signature Squad":
+                            current_header = "SS"
+                    else:
+                        number_of_cards = deck_list_content[i][0]
+                        card_name = deck_list_content[i][3:]
+                        for _ in range(int(number_of_cards)):
+                            item_sent = current_header + "/" + card_name
+                            await self.send(text_data=json.dumps({"message": item_sent}))
+
     async def receive(self, text_data): # noqa
         global cards_array
         global cards_dict
@@ -353,63 +467,72 @@ class DecksConsumer(AsyncWebsocketConsumer):
         print("receive:", message)
         split_message = message.split(sep="/")
         if len(split_message) == 1:
-            card_object = FindCard.find_card(message, cards_array, cards_dict)
-            if card_object.get_name() != "FINAL CARD":
-                card_type = card_object.get_card_type()
-                card_loyalty = card_object.get_loyalty()
-                message = card_type + "/" + message
-                if card_type == "Warlord":
-                    message = message + "/" + card_object.get_faction()
-                    self.main_faction = card_object.get_faction()
-                    self.warlord = card_object.get_name()
-                if card_loyalty != "Signature" or card_type == "Warlord":
-                    if card_object.check_for_a_trait("Pledge"):
-                        if self.warlord != "Kariaq Dreadking":
-                            message = "Pledge/" + card_object.get_name()
-                            print("New message", message)
-                            if self.main_faction == card_object.get_faction():
-                                print("sending")
-                                await self.send(text_data=json.dumps({"message": message}))
-                            elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
-                                print("sending")
-                                await self.send(text_data=json.dumps({"message": message}))
-                    elif self.main_faction == card_object.get_faction():
-                        await self.send(text_data=json.dumps({"message": message}))
-                    elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
-                        if self.warlord == "Yvraine":
-                            if card_object.get_faction() == "Chaos" and card_object.check_for_a_trait("Elite"):
-                                pass
+            if split_message[0] == "LOAD LATEST":
+                if self.name != "":
+                    list_of_files = glob.glob(os.getcwd() + "/decks/DeckStorage/" + self.name + "/*")
+                    latest_file = max(list_of_files, key=os.path.getctime)
+                    print("LATEST")
+                    print(latest_file)
+                    deck_name = os.path.basename(latest_file)
+                    await self.load_deck(deck_name)
+            else:
+                card_object = FindCard.find_card(message, cards_array, cards_dict)
+                if card_object.get_name() != "FINAL CARD":
+                    card_type = card_object.get_card_type()
+                    card_loyalty = card_object.get_loyalty()
+                    message = card_type + "/" + message
+                    if card_type == "Warlord":
+                        message = message + "/" + card_object.get_faction()
+                        self.main_faction = card_object.get_faction()
+                        self.warlord = card_object.get_name()
+                    if card_loyalty != "Signature" or card_type == "Warlord":
+                        if card_object.check_for_a_trait("Pledge"):
+                            if self.warlord != "Kariaq Dreadking":
+                                message = "Pledge/" + card_object.get_name()
+                                print("New message", message)
+                                if self.main_faction == card_object.get_faction():
+                                    print("sending")
+                                    await self.send(text_data=json.dumps({"message": message}))
+                                elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
+                                    print("sending")
+                                    await self.send(text_data=json.dumps({"message": message}))
+                        elif self.main_faction == card_object.get_faction():
+                            await self.send(text_data=json.dumps({"message": message}))
+                        elif self.ally_faction == card_object.get_faction() and card_loyalty == "Common":
+                            if self.warlord == "Yvraine":
+                                if card_object.get_faction() == "Chaos" and card_object.check_for_a_trait("Elite"):
+                                    pass
+                                else:
+                                    await self.send(text_data=json.dumps({"message": message}))
                             else:
                                 await self.send(text_data=json.dumps({"message": message}))
-                        else:
+                        elif self.main_faction == "Necrons" and card_object.get_faction() != "Tyranids" and\
+                                card_loyalty == "Common" and card_type == "Army":
                             await self.send(text_data=json.dumps({"message": message}))
-                    elif self.main_faction == "Necrons" and card_object.get_faction() != "Tyranids" and\
-                            card_loyalty == "Common" and card_type == "Army":
-                        await self.send(text_data=json.dumps({"message": message}))
-                    elif card_object.get_faction() == "Neutral":
-                        if self.main_faction != "Tyranids":
-                            await self.send(text_data=json.dumps({"message": message}))
-                        elif card_type != "Army":
-                            await self.send(text_data=json.dumps({"message": message}))
-                    elif self.warlord == "Gorzod":
-                        if card_object.get_card_type() == "Army":
-                            if card_object.get_faction() == "Space Marines" \
-                                    or card_object.get_faction() == "Astra Militarum":
-                                if card_object.check_for_a_trait("Vehicle"):
-                                    if card_loyalty == "Common":
+                        elif card_object.get_faction() == "Neutral":
+                            if self.main_faction != "Tyranids":
+                                await self.send(text_data=json.dumps({"message": message}))
+                            elif card_type != "Army":
+                                await self.send(text_data=json.dumps({"message": message}))
+                        elif self.warlord == "Gorzod":
+                            if card_object.get_card_type() == "Army":
+                                if card_object.get_faction() == "Space Marines" \
+                                        or card_object.get_faction() == "Astra Militarum":
+                                    if card_object.check_for_a_trait("Vehicle"):
+                                        if card_loyalty == "Common":
+                                            await self.send(text_data=json.dumps({"message": message}))
+                        elif self.warlord == "Kariaq Dreadking":
+                            if card_object.get_card_type() == "Event":
+                                if card_object.get_faction() not in ["Tyranids", "Necrons"]:
+                                    if card_object.get_loyalty() != "Signature":
                                         await self.send(text_data=json.dumps({"message": message}))
-                    elif self.warlord == "Kariaq Dreadking":
-                        if card_object.get_card_type() == "Event":
-                            if card_object.get_faction() not in ["Tyranids", "Necrons"]:
-                                if card_object.get_loyalty() != "Signature":
-                                    await self.send(text_data=json.dumps({"message": message}))
-                if card_type == "Warlord":
-                    sig_squad = card_object.signature_squad
-                    for i in range(len(sig_squad)):
-                        num_copies = int(sig_squad[i][0])
-                        card_name = sig_squad[i][3:]
-                        for _ in range(num_copies):
-                            await self.send(text_data=json.dumps({"message": "SS/" + card_name}))
+                    if card_type == "Warlord":
+                        sig_squad = card_object.signature_squad
+                        for i in range(len(sig_squad)):
+                            num_copies = int(sig_squad[i][0])
+                            card_name = sig_squad[i][3:]
+                            for _ in range(num_copies):
+                                await self.send(text_data=json.dumps({"message": "SS/" + card_name}))
         elif len(split_message) == 2:
             if split_message[0] == "Name":
                 s = split_message[1]
@@ -463,110 +586,12 @@ class DecksConsumer(AsyncWebsocketConsumer):
                         os.remove(path_to_deck)
             elif split_message[0] == "LOAD DECK":
                 deck_name = split_message[1]
-                if os.path.isdir("decks/DeckStorage/" + self.name):
-                    path_to_deck = os.getcwd() + "/decks/DeckStorage/" + self.name + "/" + deck_name
-                    if os.path.exists(path_to_deck):
-                        with open(path_to_deck, 'r') as f:
-                            deck_content = f.read()
-                        deck_list_content = deck_content.split(sep="\n")
-                        message = "Load deck/" + deck_content
-                        deck_name = "Name/" + deck_list_content[0]
-                        await self.send(text_data=json.dumps({"message": deck_name}))
-                        warlord = "Warlord/" + deck_list_content[2]
-                        self.warlord = deck_list_content[2]
-                        await self.send(text_data=json.dumps({"message": warlord}))
-                        factions = deck_list_content[3]
-                        factions = factions.split(sep=" (")
-                        pledge = deck_list_content[4]
-                        num_to_delete = 4
-                        if pledge != "----------------------------------------------------------------------"\
-                                and pledge:
-                            print("pledge: ", pledge)
-                            pledge = "Pledge/" + pledge
-                            num_to_delete = 5
-                            await self.send(text_data=json.dumps({"message": pledge}))
-                        for i in range(len(factions)):
-                            factions[i] = factions[i].replace(")", "")
-                            if i == 0:
-                                self.main_faction = factions[i]
-                                if len(factions) == 1:
-                                    ally = "SetAlly/"
-                                    await self.send(text_data=json.dumps({"message": ally}))
-                            elif i == 1:
-                                self.ally_faction = factions[i]
-                                ally = "SetAlly/" + factions[i]
-                                await self.send(text_data=json.dumps({"message": ally}))
-                        await self.send(text_data=json.dumps({"message": "Ally"}))
-                        for i in range(num_to_delete):
-                            del deck_list_content[0]
-                        i = 0
-                        while i < len(deck_list_content):
-                            if deck_list_content[i] in ["-----------------------------------"
-                                                        "-----------------------------------", ""]:
-                                del deck_list_content[i]
-                                i = i - 1
-                            i = i + 1
-                        current_header = "SS"
-                        for i in range(len(deck_list_content)):
-                            if deck_list_content[i] in ["Signature Squad", "Army", "Support",
-                                                        "Synapse", "Attachment", "Event", "Planet"]:
-                                current_header = deck_list_content[i]
-                                if current_header == "Signature Squad":
-                                    current_header = "SS"
-                            else:
-                                number_of_cards = deck_list_content[i][0]
-                                card_name = deck_list_content[i][3:]
-                                for _ in range(int(number_of_cards)):
-                                    item_sent = current_header + "/" + card_name
-                                    await self.send(text_data=json.dumps({"message": item_sent}))
-                        # print("Sending: ", deck_name, warlord, factions, sep="\n")
-                        # await self.send(text_data=json.dumps({"message": message}))
+                await self.load_deck(deck_name)
             elif split_message[0] == "SEND DECK":
-                message_to_send = ""
-                split_message[1] = split_message[1].replace("\"Subject: Ω-X62113\"", "Subject Omega-X62113")
-                split_message[1] = split_message[1].replace("\"Subject: W-808\"", "Subject W-808")
-                split_message[1] = split_message[1].replace("Zen \"Xi\" Aonia", "Zen Xi Aonia")
-                split_message[1] = split_message[1].replace("idden Base", "'idden Base")
-                split_message[1] = split_message[1].replace("\"", "")
-                true_split_message = split_message[1].split(sep="\n")
-                while true_split_message:
-                    if true_split_message[0].strip():
-                        break
-                    del true_split_message[0]
-                split_message[1] = "\n".join(true_split_message)
-                deck = clean_sent_deck(split_message[1])
-                deck_name = deck[0]
-                if len(deck) > 5:
-                    if "{AUTOMAIN}" in deck[2]:
-                        warlord = FindCard.find_card(deck[1], cards_array, cards_dict)
-                        deck[2] = deck[2].replace("{AUTOMAIN}", warlord.get_faction())
-                        split_message[1] = split_message[1].replace("{AUTOMAIN}", warlord.get_faction())
-                    message_to_send = second_part_deck_validation(deck)
-                if message_to_send == "SUCCESS":
-                    print("Need to save deck")
-                    print(os.path.dirname(os.path.realpath(__file__)))
-                    print(os.getcwd())
-                    username = self.name
-                    if not self.name:
-                        username = "Anonymous"
-                    print("username:", username)
-                    target_user_dir = os.getcwd() + "/decks/DeckStorage/" + username
-                    target_deck_dir = os.getcwd() + "/decks/DeckStorage/" + username + "/" + deck_name
-                    print(target_user_dir)
-                    print(target_deck_dir)
-                    if not os.path.isdir(target_user_dir):
-                        print("Path does not exist")
-                        os.mkdir(target_user_dir)
-                    will_send = False
-                    if not os.path.exists(target_deck_dir):
-                        will_send = True
-                    with open(target_deck_dir, "w") as file:
-                        file.write(split_message[1])
-                    if will_send:
-                        await self.send_deck(deck_name)
-                message_to_send = "Feedback/" + message_to_send
-                message = message_to_send
-                await self.send(text_data=json.dumps({"message": message}))
+                data_from_check = deck_check_and_save(self.name, split_message[1])
+                if data_from_check["will_send"]:
+                    await self.send_deck(data_from_check["deck_name"])
+                await self.send(text_data=json.dumps({"message": data_from_check["message"]}))
         elif len(split_message) == 4:
             if split_message[0] == "Load More":
                 value = int(split_message[1])

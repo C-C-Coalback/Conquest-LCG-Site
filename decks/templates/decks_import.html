@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Import{% endblock %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'decks_import_style.css' %}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<div class="import-container">
+    <h1>
+        Deck key in here
+    </h1>
+</div>
+<div class="import-container">
+    <input id="deck-key" type="text">
+</div>
+<div class="import-container">
+    <input type="button" value="Import" onclick="sendDeck()">
+</div>
+<div class="import-container">
+    <p id="responseMessage">Responses show up here.</p>
+</div>
+<script>
+    function sendDeck() {
+        var deck_key = document.querySelector('#deck-key').value;
+        if (deck_key === "") {
+            console.log("deck is blank");
+            $('#responseMessage').text("You have not entered anything into the key area.");
+        } else {
+            $.ajax({
+                url: '/decks/ajax_import/',  // The URL of the Django view that handles the request
+                type: 'POST',
+                data: {
+                    'deck_key': deck_key,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRF token for security
+                },
+                success: function(response) {
+                    $('#responseMessage').text(response.message);  // Update the page dynamically
+                    const message = response.message;
+                    console.log(message);
+                    if (message === "Found and saved deck") {
+                        location.href = "/decks/load_latest/";
+                    }
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}
