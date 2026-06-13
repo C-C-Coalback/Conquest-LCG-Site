@@ -1141,9 +1141,6 @@ class Player:
                     if self.check_if_faction_given_pos(hurt_pla, hurt_pos, "Orks"):
                         if self.game.stored_damage[0].get_position_attacker() is not None:
                             return True
-            elif ability == "Lurking Hormagaunt":
-                if self.game.damage_moved_to_old_one_eye == 0:
-                    return True
             elif planet_pos == hurt_pla and hurt_pos == unit_pos:
                 if self.our_last_stand_bonus_active and self.game.may_block_with_ols and \
                         self.get_card_type_given_pos(hurt_pla, hurt_pos) == "Warlord" and \
@@ -1153,12 +1150,12 @@ class Player:
                         self.get_ready_given_pos(hurt_pla, hurt_pos) and not \
                         self.headquarters[hurt_pos].misc_ability_used:
                     return True
+                elif ability == "Lurking Hormagaunt":
+                    if self.game.damage_moved_to_old_one_eye == 0:
+                        return True
                 elif self.get_faith_given_pos(hurt_pla, hurt_pos) > 0:
                     return True
             return False
-        elif ability == "Lurking Hormagaunt":
-            if self.game.damage_moved_to_old_one_eye == 0:
-                return True
         elif ability == "Expendable Pawn":
             if planet_pos != hurt_pla or unit_pos != hurt_pos:
                 if planet_pos == hurt_pla or abs(planet_pos - hurt_pla) == 1:
@@ -1192,6 +1189,9 @@ class Player:
                     self.get_ready_given_pos(planet_pos, unit_pos) and not \
                     self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                 return True
+            elif ability == "Lurking Hormagaunt":
+                if self.game.damage_moved_to_old_one_eye == 0:
+                    return True
             elif ability == "Deff Dread" and not \
                     self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                 if self.game.stored_damage[0].get_position_attacker():
