@@ -3474,6 +3474,14 @@ class Game:
                 await primary_player.dark_eldar_event_played()
         del self.stored_discard_and_target[0]
 
+    def determine_player_resolving_yvarn(self):
+        player_with_ability = self.player_resolving_battle_ability
+        if self.p1_triggered_yvarn:
+            player_with_ability = self.name_2
+        elif self.p2_triggered_yvarn:
+            player_with_ability = self.name_1
+        return player_with_ability
+
     async def resolve_battle_ability_routine(self, name, game_update_string):
         if self.yvarn_active:
             if name == self.name_1:

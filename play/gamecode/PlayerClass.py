@@ -535,6 +535,13 @@ class Player:
                         if card.get_shields():
                             return "playable"
                 return "unplayable"
+            if self.game.battle_ability_to_resolve == "Y'varn":
+                name_yvarn_trigger = self.game.determine_player_resolving_yvarn()
+                if name_yvarn_trigger == self.name_player:
+                    if card.get_card_type() == "Army" and card.get_name() != "Knight Paladain Voris":
+                        if self.check_if_card_can_enter_play(card):
+                            return "playable"
+                return "unplayable"
             if card.get_name() != "FINAL CARD":
                 if card.get_limited():
                     if not self.can_play_limited:
