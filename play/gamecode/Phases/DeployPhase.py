@@ -522,8 +522,8 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 self.create_reaction("Optimized Protocol", primary_player.name_player,
                                      (int(primary_player.get_number()), planet_pos, position_of_unit))
         elif self.action_object.action_chosen == "Accelerated Gestation":
-            og_pla, og_pos, og_att = self.misc_target_attachment
-            num = self.misc_target_player
+            og_pla, og_pos, og_att = self.action_object.misc_target_attachment
+            num = self.action_object.misc_target_player
             if num == int(primary_player.get_number()):
                 del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_att]
                 if not primary_player.get_immune_to_enemy_events(og_pla, og_pos):
