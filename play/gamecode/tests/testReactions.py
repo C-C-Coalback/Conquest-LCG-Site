@@ -388,6 +388,24 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.after_command_struggle, True)
         self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
 
+    async def test_cadian_mortar_squad(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
+            new_warlord_deck_content = file.read()
+        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Cadian Mortar Squad"), 0, already_exhausted=True)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Cadian Mortar Squad"), 0)
+        test_game.p1.destroy_card_in_play(0, 1)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.p1.get_ready_given_pos(0, 0), True)
+
 
 if __name__ == "__main__":
     unittest.main()
