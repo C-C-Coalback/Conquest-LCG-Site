@@ -5077,10 +5077,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             player_receiving_buff.increase_attack_of_unit_at_pos(int(game_update_string[2]),
                                                                  int(game_update_string[3]), 2,
                                                                  expiration="NEXT")
-            await self.send_update_message(
-                "Catachan Outpost used on " + player_receiving_buff.cards_in_play[int(game_update_string[2]) + 1]
-                [int(game_update_string[3])].get_name() + ", located at planet " + game_update_string[2] +
-                ", position " + game_update_string[3])
             primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
                                                         self.action_object.position_of_actioned_card[1])
             self.action_object.position_of_actioned_card = (-1, -1)
