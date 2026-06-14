@@ -103,8 +103,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
                 else:
                     primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
-                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True,
-                                                          rickety_warbuggy=True)
+                    secondary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                     self.delete_reaction()
         elif current_reaction == "Dark Lance Raider":
@@ -133,7 +132,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.delete_reaction()
                 else:
                     primary_player.remove_damage_from_pos(og_pla, og_pos, 1)
-                    secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, can_shield=False, is_reassign=True)
+                    secondary_player.resolve_moved_damage_to_pos(planet_pos, unit_pos, 1)
                     self.delete_reaction()
         elif current_reaction == "Charging Juggernaut":
             if game_update_string[1] == secondary_player.number:
