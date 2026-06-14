@@ -81,7 +81,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                          card.check_for_a_trait("Soldier", primary_player.etekh_trait)):
                     if card.get_cost() < self.ghost_ark_of_orikan:
                         num, planet, unit = self.reactions_needing_resolving[0].get_position_unit_triggering()
-                        if primary_player.add_card_to_planet(card, planet) != -1:
+                        if primary_player.add_card_to_planet(card, planet, already_exhausted=True) != -1:
                             position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
                             primary_player.cards_in_play[planet + 1][position_of_unit]. \
                                 valid_target_dynastic_weaponry = True
