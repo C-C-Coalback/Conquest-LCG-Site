@@ -91,7 +91,7 @@ def necrons_cards_init():
         CardClasses.ArmyCard("Immortal Legion", "Combat Action: Exhaust this unit to move it to a planet with an "
                                                 "enemy warlord with a faction symbol that matches"
                                                 " your enslaved faction.", "Soldier. Sautekh.",
-                             4, faction, "Common", 4, 4, 1, False, action_in_play=True,
+                             4, faction, "Common", 4, 4, 2, False, action_in_play=True,
                              allowed_phases_in_play="COMBAT"),
         CardClasses.ArmyCard("Praetorian Ancient", "While you have 6 or more units in your discard pile, "
                                                    "this unit gets +2 ATK and gains Armorbane.", "Soldier.",
