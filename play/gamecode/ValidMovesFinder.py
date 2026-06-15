@@ -374,6 +374,23 @@ def determine_valid_moves(self):
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
         elif self.what_is_required_automated == "Command not Commitment":
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Mobile":
+            if self.misc_target_unit[0] != -1 and self.misc_target_unit[1] != -1:
+                planet_pos = self.misc_target_unit[0]
+                if planet_pos != 0:
+                    if self.planets_in_play_array[planet_pos - 1]:
+                        valid_moves = add_valid_move(valid_moves, primary_player, "PLANETS", planet_pos=planet_pos-1)
+                if planet_pos != 6:
+                    if self.planets_in_play_array[planet_pos + 1]:
+                        valid_moves = add_valid_move(valid_moves, primary_player, "PLANETS", planet_pos=planet_pos+1)
+            else:
+                for planet_pos in range(7):
+                    for unit_pos in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                        if primary_player.get_mobile_given_pos(planet_pos, unit_pos) and primary_player.get_available_mobile_given_pos(planet_pos, unit_pos):
+                            valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=planet_pos, unit_pos=unit_pos)
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Outside Combat":
             valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
