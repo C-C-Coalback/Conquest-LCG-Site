@@ -137,6 +137,44 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
         self.assertEqual(test_game.p1.get_name_given_pos(0, 1), "Eager Recruit")
 
+    async def test_battle_cry(self):
+        random.seed(42)
+        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
+            cato_deck_content = file.read()
+        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
+            nazdreg_deck_content = file.read()
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        card = test_game.preloaded_find_card("Burna Boyz")
+        test_game.p1.add_card_to_planet(card, 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Land Raider"), 0)
+        test_game.p1.cards = ["Battle Cry"]
+        test_game.p1.resources = 7
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        self.assertEqual(test_game.p1.resources, 4)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 1), 7)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 2), 3)
+
+    async def test_squig_bombin(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Squig Bombin'"]
+        test_game.p2.cards = []
+        test_game.p1.resources = 7
+        test_game.p2.add_to_hq(test_game.preloaded_find_card("Promethium Mine"))
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["HQ", "2", "1"])
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertEqual(len(test_game.p2.headquarters), 1)
+
     async def test_know_no_fear(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
