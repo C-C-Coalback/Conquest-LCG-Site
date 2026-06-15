@@ -450,6 +450,31 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 2)
         self.assertEqual(test_game.p2.get_damage_given_pos(-2, 0), 1)
 
+    async def test_tankbusta_bommaz(self):
+        random.seed(42)
+        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
+            cato_deck_content = file.read()
+        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
+            nazdreg_deck_content = file.read()
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        card = test_game.preloaded_find_card("Tankbusta Bommaz")
+        test_game.p1.add_card_to_planet(card, 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Land Raider"), 0)
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
+        self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 3)
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        test_game.p1.ready_given_pos(0, 1)
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
+        self.assertEqual(6, test_game.p2.get_damage_given_pos(0, 1))
+
 
 if __name__ == "__main__":
     unittest.main()
