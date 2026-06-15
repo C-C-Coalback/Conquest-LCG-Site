@@ -139,6 +139,20 @@ class PassiveEffectsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Raven Guard Speeder"), 0)
         self.assertEqual(test_game.p2.get_flying_given_pos(0, 0), False)
 
+    async def test_goff_boyz(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        with open(os.path.join(current_dir, 'decksForTests/ZarathurCore.txt')) as file:
+            zarathur_deck_content = file.read()
+        await test_game.p1.setup_player(zarathur_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        card = test_game.preloaded_find_card("Goff Boyz")
+        test_game.p1.add_card_to_planet(card, 0)
+        test_game.p1.add_card_to_planet(card, 1)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 3)
+        self.assertEqual(test_game.p1.get_attack_given_pos(1, 0), 0)
+
+
 
 if __name__ == "__main__":
     unittest.main()
