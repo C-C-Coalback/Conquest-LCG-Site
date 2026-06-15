@@ -2099,7 +2099,6 @@ class Player:
                         if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]. \
                                 name_owner == self.name_player:
                             return True
-        print("not own in play")
         other_player = self.get_other_player()
         return other_player.search_enemy_relic_in_own_cards()
 
