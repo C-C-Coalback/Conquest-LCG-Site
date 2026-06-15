@@ -334,6 +334,23 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 7)
         self.assertEqual(len(test_game.p1.cards), 0)
 
+    async def test_infernal_gateway(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.cards = ["Infernal Gateway", "Zarathur's Flamers"]
+        test_game.p1.resources = 7
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 1), "Zarathur's Flamers")
+        self.assertEqual(test_game.p1.cards_in_play[1][1].get_sacrifice_end_of_phase(), True)
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(len(test_game.p1.cards), 0)
+
     async def test_muster_the_guard(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
