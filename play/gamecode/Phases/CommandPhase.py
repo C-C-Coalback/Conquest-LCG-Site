@@ -575,6 +575,7 @@ async def update_game_event_command_section(self, name, game_update_string):
             self.p2.set_available_mobile_all(True)
             self.p1.mobile_resolved = False
             self.p2.mobile_resolved = False
+            self.misc_target_unit = (-1, -1)
             if not self.p1.search_cards_for_available_mobile():
                 self.p1.mobile_resolved = True
             if not self.p2.search_cards_for_available_mobile():
