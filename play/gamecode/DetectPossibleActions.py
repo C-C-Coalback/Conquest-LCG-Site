@@ -21,6 +21,17 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                                     possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
                             else:
                                 possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
+    for i in range(len(primary_player.headquarters)):
+        card = primary_player.get_card_given_pos(-2, i)
+        if card.get_has_action_while_in_play():
+            if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
+                print("card has action and right phase")
+                ability = primary_player.get_ability_given_pos(-2, i)
+                if ability in action_ability_starts:
+                    prereqs = action_ability_starts[ability]
+                    print("checking if action can start")
+                    if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=i, card=card):
+                        possible_action_locations = add_action(possible_action_locations, "HQ/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
     for i in range(7):
         for j in range(len(primary_player.cards_in_play[i + 1])):
             card = primary_player.get_card_given_pos(i, j)
@@ -89,7 +100,13 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
     requires_hand_card = prereqs["Requires Hand Card"]
     requires_in_play_card = prereqs["Requires In Play Card"]
     once_per_phase = prereqs["Once Per Phase"]
+    ready_required = prereqs["Ready Required"]
     special = prereqs["Special"]
+    if ready_required:
+        if card is None:
+            return False
+        if not card.get_ready():
+            return False
     if once_per_phase:
         if card is None:
             return False

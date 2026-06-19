@@ -292,6 +292,7 @@ action_ability_starts = {
         "Requires Hand Card": True,
         "Requires In Play Card": False,
         "Once Per Phase": False,
+        "Ready Required": False,
         "Attributes Hand Card": {
             "Faction": "Space Marines",
             "Card Type": "Army",
@@ -308,12 +309,14 @@ action_ability_starts = {
         "Requires Hand Card": False,
         "Requires In Play Card": False,
         "Once Per Phase": True,
+        "Ready Required": False,
     },
     "Preemptive Barrage": {
         "Special": True,
         "Requires Hand Card": False,
         "Requires In Play Card": True,
         "Once Per Phase": False,
+        "Ready Required": False,
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": False,
@@ -328,6 +331,7 @@ action_ability_starts = {
         "Requires Hand Card": False,
         "Requires In Play Card": True,
         "Once Per Phase": False,
+        "Ready Required": True,
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": True,
@@ -342,5 +346,6 @@ action_ability_starts = {
         "Requires Hand Card": False,
         "Requires In Play Card": False,
         "Once Per Phase": False,
+        "Ready Required": False,
     }
 }
