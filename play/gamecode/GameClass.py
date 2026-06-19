@@ -4683,12 +4683,13 @@ class Game:
                                         self.last_shield_string = game_update_string
                                 elif primary_player.cards[hand_pos] == "Glorious Intervention":
                                     if primary_player.resources > 0:
-                                        if self.stored_damage[0].get_position_attacker() is not None:
-                                            alt_shield_check = True
-                                            self.choices_available = ["Shield", "Effect"]
-                                            self.name_player_making_choices = name
-                                            self.choice_context = "Use alternative shield effect?"
-                                            self.last_shield_string = game_update_string
+                                        if primary_player.check_if_can_play_glorious_intervention(planet_pos, unit_pos):
+                                            if self.stored_damage[0].get_position_attacker() is not None:
+                                                alt_shield_check = True
+                                                self.choices_available = ["Shield", "Effect"]
+                                                self.name_player_making_choices = name
+                                                self.choice_context = "Use alternative shield effect?"
+                                                self.last_shield_string = game_update_string
                                 elif primary_player.cards[hand_pos] == "Faith Denies Death":
                                     if primary_player.get_has_faith_given_pos(planet_pos, unit_pos) > 0:
                                         alt_shield_check = True

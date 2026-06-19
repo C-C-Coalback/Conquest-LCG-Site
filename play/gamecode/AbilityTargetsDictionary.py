@@ -22,6 +22,26 @@ ability_targets_dictionary = {
             "Card Enters Play": True,
         }
     },
+    "Catachan Outpost": {
+        "Num Stages": 1,
+        "Type 1": "Unit",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
     "No Mercy": {
         "Num Stages": 1,
         "Type 1": "Unit",
@@ -80,6 +100,98 @@ ability_targets_dictionary = {
             "Special": True,
             "Target": True,
             "Ability Type": "Reaction"
+        }
+    },
+    "Preemptive Barrage": {
+        "Num Stages": 1,
+        "Type 1": "Unit",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": "Astra Militarum",
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
+    "Captain Markis": {
+        "Num Stages": 2,
+        "Type 1": "Unit",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": True,
+            "Exhaust": False,
+            "Faction": "Astra Militarum",
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        },
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": True,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
+    "Suppressive Fire": {
+        "Num Stages": 2,
+        "Type 1": "Unit",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": True,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Target": False,
+            "Ability Type": "Action"
+        },
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": True,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Action"
         }
     },
     "Ferrin": {
@@ -176,6 +288,7 @@ action_ability_starts = {
     "Veteran Brother Maxos": {
         "Special": False,
         "Requires Hand Card": True,
+        "Requires In Play Card": False,
         "Attributes Hand Card": {
             "Faction": "Space Marines",
             "Card Type": "Army",
@@ -186,5 +299,41 @@ action_ability_starts = {
             },
             "Card Enters Play": True,
         }
+    },
+    "Captain Markis": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+    },
+    "Preemptive Barrage": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": False,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Faction": "Astra Militarum",
+            "Card Type": None
+        }
+    },
+    "Catachan Outpost": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": None
+        }
+    },
+    "Suppressive Fire": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
     }
 }

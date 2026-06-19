@@ -40,6 +40,13 @@ def update_automated_attributes(self):
     elif self.interrupts_waiting_on_resolution:
         self.what_is_required_automated = "Interrupt"
         self.automated_player_waited_on = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
+    elif self.alt_shield_mode_active:
+        self.what_is_required_automated = "Alt Shield"
+        player_num = self.stored_damage[0].get_player_num_of_unit()
+        if player_num == 1:
+            self.automated_player_waited_on = self.name_1
+        else:
+            self.automated_player_waited_on = self.name_2
     elif self.stored_damage:
         self.what_is_required_automated = "Damage"
         player_num = self.stored_damage[0].get_player_num_of_unit()
@@ -207,7 +214,7 @@ def add_active_non_first_planets_as_valid_moves(self, valid_moves):
     return valid_moves
 
 
-def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_pos, unit_pos, target_restrictions, enemy_ability=False):
+def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_pos, unit_pos, target_restrictions, enemy_ability=False, misc_pla=-1):
     unit_only = target_restrictions["Unit Only"]
     unique_required = target_restrictions["Unique"]
     ready_required = target_restrictions["Ready"]
@@ -257,6 +264,20 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             elif ability.get_reaction_name() == "Sicarius's Chosen":
                 if abs(ability.get_planet_pos() - planet_pos) != 1:
                     return False
+        elif ability_type == "Action":
+            if ability.action_chosen == "Preemptive Barrage":
+                if player.get_ranged_given_pos(planet_pos, unit_pos):
+                    return False
+                if ability.misc_target_planet != -1:
+                    if ability.misc_target_planet != planet_pos:
+                        return False
+            elif ability.action_chosen == "Captain Markis":
+                if ability.get_planet_pos() != planet_pos:
+                    return False
+            elif ability.action_chosen == "Suppressive Fire":
+                if self.chosen_first_card:
+                    if ability.misc_target_planet != planet_pos:
+                        return False
         elif ability == "Planet":
             pass
     if targets and enemy_ability:
@@ -304,25 +325,25 @@ def find_all_valid_hand_locations_given_restrictions(self, ability, primary_play
     return valid_moves
 
 
-def find_all_valid_unit_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions):
+def find_all_valid_unit_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1):
     valid_moves = []
     own_unit = target_restrictions["Own Unit"]
     enemy_unit = target_restrictions["Enemy Unit"]
     if own_unit:
         for i in range(len(primary_player.headquarters)):
-            if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, -2, i, target_restrictions):
+            if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, -2, i, target_restrictions, misc_pla=planet_pos):
                 valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
         for i in range(7):
             for j in range(len(primary_player.cards_in_play[i + 1])):
-                if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, i, j, target_restrictions):
+                if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, i, j, target_restrictions, misc_pla=planet_pos):
                     valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     if enemy_unit:
         for i in range(len(secondary_player.headquarters)):
-            if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, -2, i, target_restrictions, enemy_ability=True):
+            if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, -2, i, target_restrictions, enemy_ability=True, misc_pla=planet_pos):
                 valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
         for i in range(7):
             for j in range(len(secondary_player.cards_in_play[i + 1])):
-                if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, i, j, target_restrictions, enemy_ability=True):
+                if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, i, j, target_restrictions, enemy_ability=True, misc_pla=planet_pos):
                     valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     return valid_moves
 
@@ -453,6 +474,10 @@ def determine_valid_moves(self):
                             valid_moves = add_valid_move(valid_moves, secondary_player, "PLANETS", planet_pos=self.atrox_origin + 1)
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Alt Shield":
+            if self.alt_shield_name == "Glorious Intervention":
+                valid_moves = primary_player.get_playable_borders()
+            valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Damage":
             if self.stored_damage[0].get_position_unit()[0] == int(primary_player.get_number()):
                 valid_moves = primary_player.get_playable_borders()
@@ -487,6 +512,10 @@ def determine_valid_moves(self):
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
+                        self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
+                    )
+                if type_target == "In Play":
+                    valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
                     )
                 if type_target == "Planet":

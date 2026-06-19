@@ -36,6 +36,25 @@ async def resolve_command(self, name, message):
                     elif self.name_2 == name:
                         if not self.p2.deck_loaded:
                             await self.p2.setup_player(deck_content, self.planet_array)
+    elif message[1] == "loaddeckbot" and len(message) > 3:
+        name_player = message[2]
+        deck_name = message[3]
+        print(deck_name)
+        path_to_player_decks = os.getcwd() + "/decks/DeckStorage/" + name_player + "/" + deck_name
+        print(path_to_player_decks)
+        if os.path.exists(path_to_player_decks):
+            with open(path_to_player_decks, 'r') as f:
+                deck_content = f.read()
+                if self.name_1 == name_player:
+                    if not self.p1.deck_loaded:
+                        await self.p1.setup_player(deck_content, self.planet_array)
+                        await self.update_automated_info()
+                        await self.send_automated_info(force=True)
+                elif self.name_2 == name_player:
+                    if not self.p2.deck_loaded:
+                        await self.p2.setup_player(deck_content, self.planet_array)
+                        await self.update_automated_info()
+                        await self.send_automated_info(force=True)
     elif message[1] == "loadrandombot":
         if self.phase == "SETUP":
             name_player = message[2]

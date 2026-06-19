@@ -12,11 +12,15 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                     if primary_player.determine_playability(card.get_name()):
                         possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
                 elif card.get_cost(urien_relevant=primary_player.urien_relevant) <= primary_player.resources:
-                    if card.get_ability() in primary_player.events_requiring_battle:
-                        if game.check_if_battle_taking_place():
-                            possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
-                    else:
-                        possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
+                    ability = card.get_ability()
+                    if ability in action_ability_starts:
+                        prereqs = action_ability_starts[ability]
+                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player):
+                            if ability in primary_player.events_requiring_battle:
+                                if game.check_if_battle_taking_place():
+                                    possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
+                            else:
+                                possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
     for i in range(7):
         for j in range(len(primary_player.cards_in_play[i + 1])):
             card = primary_player.get_card_given_pos(i, j)
@@ -64,13 +68,84 @@ def check_single_card_in_hand(game, action_ability, prereqs, primary_player, sec
     return True
 
 
+def check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, unit_pos):
+    faction_card = prereqs["Attributes In Play Card"]["Faction"]
+    card_type_card = prereqs["Attributes In Play Card"]["Card Type"]
+    special = prereqs["Special"]
+    if faction_card:
+        if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, faction_card):
+            return False
+    if card_type_card:
+        if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == card_type_card:
+            return False
+    if special:
+        if action_ability == "Preemptive Barrage":
+            if primary_player.get_ranged_given_pos(planet_pos, unit_pos):
+                return False
+    return True
+
+
 def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos):
     requires_hand_card = prereqs["Requires Hand Card"]
+    requires_in_play_card = prereqs["Requires In Play Card"]
+    special = prereqs["Special"]
     if requires_hand_card:
-        print("requires hand")
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):
                 return True
+    if requires_in_play_card:
+        in_play_card_reqs = prereqs["Attributes In Play Card"]
+        own_card = in_play_card_reqs["Own Unit"]
+        enemy_card = in_play_card_reqs["Enemy Unit"]
+        if own_card:
+            if in_play_card_reqs["At Planet"]:
+                for i in range(7):
+                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                        if check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, i, j):
+                            return True
+            if in_play_card_reqs["At HQ"]:
+                for i in range(len(primary_player.headquarters)):
+                    if check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, -2, i):
+                        return True
+        if enemy_card:
+            if in_play_card_reqs["At Planet"]:
+                for i in range(7):
+                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                        if check_single_card_in_play(game, action_ability, prereqs, secondary_player, primary_player, i, j):
+                            return True
+            if in_play_card_reqs["At HQ"]:
+                for i in range(len(secondary_player.headquarters)):
+                    if check_single_card_in_play(game, action_ability, prereqs, secondary_player, secondary_player, -2, i):
+                        return True
+    if special:
+        if action_ability == "Captain Markis":
+            if planet_pos == -2:
+                return False
+            sac_unit_check = False
+            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                if primary_player.check_if_faction_given_pos(planet_pos, i, "Astra Militarum"):
+                    if primary_player.get_card_type_given_pos(planet_pos, i) != "Warlord":
+                        sac_unit_check = True
+            if sac_unit_check:
+                exhaustible_unit_check = False
+                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    if secondary_player.get_ready_given_pos(planet_pos, i):
+                        if secondary_player.get_card_type_given_pos(planet_pos, i) != "Warlord":
+                            exhaustible_unit_check = True
+                if exhaustible_unit_check:
+                    return True
+        if action_ability == "Suppressive Fire":
+            for i in range(7):
+                has_own_ready_unit = False
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if primary_player.get_ready_given_pos(i, j):
+                        has_own_ready_unit = True
+                if has_own_ready_unit:
+                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                        if secondary_player.get_ready_given_pos(i, j):
+                            if secondary_player.get_card_type_given_pos(i, j) != "Warlord":
+                                if not secondary_player.get_immune_to_enemy_events(i, j):
+                                    return True
     return False
 
 

@@ -1249,7 +1249,11 @@ class Player:
             return "unplayable"
         if self.game.stored_damage:
             if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
-                if self.check_if_card_ability_usable_during_shield(planet_pos, unit_pos):
+                if self.game.alt_shield_mode_active:
+                    if self.game.alt_shield_name == "Glorious Intervention":
+                        if self.check_if_valid_glorious_intervention_sacrifice(planet_pos, unit_pos):
+                            return "playable"
+                elif self.check_if_card_ability_usable_during_shield(planet_pos, unit_pos):
                     return "playable"
             return "unplayable"
         elif self.game.card_to_deploy is not None:
@@ -1491,6 +1495,26 @@ class Player:
             if warlord_pla == planet_id:
                 retaliate += 1
         return retaliate
+
+    def check_if_valid_glorious_intervention_sacrifice(self, planet_pos, unit_pos):
+        if not self.game.stored_damage[0]:
+            return False
+        if self.game.stored_damage[0].get_position_unit()[0] == int(self.number):
+            if self.game.stored_damage[0].get_position_unit()[1] == planet_pos:
+                if self.game.stored_damage[0].get_position_unit()[2] != unit_pos:
+                    if self.check_for_trait_given_pos(planet_pos, unit_pos, "Soldier") or self.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
+                        if self.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                            return True
+        return False
+
+    def check_if_can_play_glorious_intervention(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return False
+        for i in range(len(self.cards_in_play[planet_pos + 1])):
+            if i != unit_pos:
+                if self.check_if_valid_glorious_intervention_sacrifice(planet_pos, i):
+                    return True
+        return False
 
     async def send_victory_display(self):
         if self.victory_display:

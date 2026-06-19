@@ -2742,10 +2742,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 await self.better_shield_card_resolution(
                     secondary_player.name_player, self.last_shield_string, alt_shields=False)
     elif self.choice_context == "Use alternative shield effect?":
-        if game_update_string[1] == "0":
+        if chosen_choice == "Shield":
             self.reset_choices_available()
             await self.better_shield_card_resolution(name, self.last_shield_string, alt_shields=False)
-        elif game_update_string[1] == "1":
+        else:
             self.reset_choices_available()
             if primary_player.cards[self.pos_shield_card] == "Indomitable":
                 if secondary_player.nullify_check():
