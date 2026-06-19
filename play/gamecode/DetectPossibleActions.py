@@ -15,7 +15,7 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                     ability = card.get_ability()
                     if ability in action_ability_starts:
                         prereqs = action_ability_starts[ability]
-                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player):
+                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card):
                             if ability in primary_player.events_requiring_battle:
                                 if game.check_if_battle_taking_place():
                                     possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
@@ -31,7 +31,7 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                     if ability in action_ability_starts:
                         prereqs = action_ability_starts[ability]
                         print("checking if action can start")
-                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=i):
+                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=i, card=card):
                             possible_action_locations = add_action(possible_action_locations, "IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j), combat_turn_action=combat_turn_action)
     if combat_turn_action:
         possible_action_locations.append("pass-P1")
@@ -85,10 +85,16 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
     return True
 
 
-def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos):
+def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos=-1, card=None):
     requires_hand_card = prereqs["Requires Hand Card"]
     requires_in_play_card = prereqs["Requires In Play Card"]
+    once_per_phase = prereqs["Once Per Phase"]
     special = prereqs["Special"]
+    if once_per_phase:
+        if card is None:
+            return False
+        if card.get_once_per_phase_used():
+            return False
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):

@@ -272,10 +272,17 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     if ability.misc_target_planet != planet_pos:
                         return False
             elif ability.action_chosen == "Captain Markis":
-                if ability.get_planet_pos() != planet_pos:
+                if ability.misc_target_planet != planet_pos:
                     return False
             elif ability.action_chosen == "Suppressive Fire":
-                if self.chosen_first_card:
+                if not ability.chosen_first_card:
+                    other_player = player.get_other_player()
+                    for i in range(len(other_player.cards_in_play[planet_pos + 1])):
+                        if other_player.get_ready_given_pos(planet_pos, i):
+                            if other_player.get_card_type_given_pos(planet_pos, i) != "Warlord":
+                                return True
+                    return False
+                if ability.chosen_first_card:
                     if ability.misc_target_planet != planet_pos:
                         return False
         elif ability == "Planet":
@@ -448,7 +455,7 @@ def determine_valid_moves(self):
                 type_target = target_restriction_data["Type " + stage_number]
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
                 misc_pla = self.last_planet_checked_for_battle
-                if type_target == "Unit":
+                if type_target == "In Play":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, planet_ability, primary_player, secondary_player, target_restrictions
                     )
@@ -510,6 +517,8 @@ def determine_valid_moves(self):
                     stage_number = "3"
                 type_target = target_restriction_data["Type " + stage_number]
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
+                print("Target:", type_target)
+                print("Restrctions:", target_restrictions)
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
@@ -537,7 +546,7 @@ def determine_valid_moves(self):
                     stage_number = "3"
                 type_target = target_restriction_data["Type " + stage_number]
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
-                if type_target == "Unit":
+                if type_target == "In Play":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, self.reactions_needing_resolving[0], primary_player, secondary_player, target_restrictions
                     )
@@ -558,7 +567,7 @@ def determine_valid_moves(self):
                     stage_number = "3"
                 type_target = target_restriction_data["Type " + stage_number]
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
-                if type_target == "Unit":
+                if type_target == "In Play":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, self.interrupts_waiting_on_resolution[0], primary_player, secondary_player, target_restrictions
                     )

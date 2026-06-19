@@ -24,7 +24,7 @@ ability_targets_dictionary = {
     },
     "Catachan Outpost": {
         "Num Stages": 1,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
@@ -44,7 +44,7 @@ ability_targets_dictionary = {
     },
     "No Mercy": {
         "Num Stages": 1,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
@@ -64,7 +64,7 @@ ability_targets_dictionary = {
     },
     "Cato's Stronghold": {
         "Num Stages": 1,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": False,
@@ -84,7 +84,7 @@ ability_targets_dictionary = {
     },
     "Sicarius's Chosen": {
         "Num Stages": 1,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": False,
@@ -104,7 +104,7 @@ ability_targets_dictionary = {
     },
     "Preemptive Barrage": {
         "Num Stages": 1,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
@@ -124,13 +124,13 @@ ability_targets_dictionary = {
     },
     "Captain Markis": {
         "Num Stages": 2,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
             "Enemy Unit": False,
             "Unique": False,
-            "Ready": True,
+            "Ready": False,
             "Exhaust": False,
             "Faction": "Astra Militarum",
             "Card Type": None,
@@ -141,6 +141,7 @@ ability_targets_dictionary = {
             "Target": False,
             "Ability Type": "Action"
         },
+        "Type 2": "In Play",
         "Restrictions 2": {
             "Unit Only": True,
             "Own Unit": True,
@@ -160,7 +161,7 @@ ability_targets_dictionary = {
     },
     "Suppressive Fire": {
         "Num Stages": 2,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
@@ -173,10 +174,11 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
-            "Special": False,
+            "Special": True,
             "Target": False,
             "Ability Type": "Action"
         },
+        "Type 2": "In Play",
         "Restrictions 2": {
             "Unit Only": True,
             "Own Unit": True,
@@ -196,7 +198,7 @@ ability_targets_dictionary = {
     },
     "Ferrin": {
         "Num Stages": 1,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
@@ -216,7 +218,7 @@ ability_targets_dictionary = {
     },
     "Plannum": {
         "Num Stages": 2,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
@@ -264,7 +266,7 @@ ability_targets_dictionary = {
     },
     "Iridial": {
         "Num Stages": 1,
-        "Type 1": "Unit",
+        "Type 1": "In Play",
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
@@ -289,6 +291,7 @@ action_ability_starts = {
         "Special": False,
         "Requires Hand Card": True,
         "Requires In Play Card": False,
+        "Once Per Phase": False,
         "Attributes Hand Card": {
             "Faction": "Space Marines",
             "Card Type": "Army",
@@ -304,11 +307,13 @@ action_ability_starts = {
         "Special": True,
         "Requires Hand Card": False,
         "Requires In Play Card": False,
+        "Once Per Phase": True,
     },
     "Preemptive Barrage": {
         "Special": True,
         "Requires Hand Card": False,
         "Requires In Play Card": True,
+        "Once Per Phase": False,
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": False,
@@ -322,6 +327,7 @@ action_ability_starts = {
         "Special": False,
         "Requires Hand Card": False,
         "Requires In Play Card": True,
+        "Once Per Phase": False,
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": True,
@@ -335,5 +341,6 @@ action_ability_starts = {
         "Special": True,
         "Requires Hand Card": False,
         "Requires In Play Card": False,
+        "Once Per Phase": False,
     }
 }

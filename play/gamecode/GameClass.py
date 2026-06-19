@@ -584,22 +584,16 @@ class Game:
         not rearranging a deck, and not in some other mode such as discounts.
         """
         if self.choices_available:
-            print("Choices are available")
             return False
         if self.stored_damage:
-            print("damage is being done")
             return False
         if self.reactions_needing_resolving:
-            print("reactions are being done")
             return False
         if self.interrupts_waiting_on_resolution:
-            print("interrupts are being done")
             return False
         if self.action_object.action_chosen:
-            print("action being done")
             return False
         if self.rearranging_deck:
-            print("rearranging deck")
             return False
         if self.mode != "Normal":
             return False
