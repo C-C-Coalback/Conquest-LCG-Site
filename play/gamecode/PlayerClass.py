@@ -3334,7 +3334,7 @@ class Player:
 
     def torture_event_played(self, name=""):
         warlord_planet, warlord_pos = self.get_location_of_warlord()
-        if self.search_attachments_at_pos(warlord_planet, warlord_pos, "Ichor Gauntlet"):
+        if self.search_attachments_at_pos(warlord_planet, warlord_pos, "Ichor Gauntlet") and name:
             if self.get_ready_given_pos(warlord_planet, warlord_pos):
                 self.game.create_reaction("Ichor Gauntlet", self.name_player, (int(self.number), -1, -1))
                 self.ichor_gauntlet_target = name
