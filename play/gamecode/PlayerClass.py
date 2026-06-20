@@ -3103,58 +3103,62 @@ class Player:
                                 self.game.create_reaction("Repurposed Pariah", other_player.name_player,
                                                           (int(other_player.number), position, i),
                                                           additional_info=(position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Augmented Warriors":
+            ability = self.get_ability_given_pos(position, last_element_index)
+            if ability == "Augmented Warriors":
                 self.assign_damage_to_pos(position, last_element_index, 2, preventable=False, by_enemy_unit=False)
-            if self.get_ability_given_pos(position, last_element_index) == "Flayed Ones Revenants":
+            if ability == "Flayed Ones Revenants":
                 self.game.create_interrupt("Flayed Ones Revenants", self.name_player,
                                            (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Hybrid Metamorph":
+            if ability == "Hybrid Metamorph":
                 self.game.create_reaction("Hybrid Metamorph", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Triarch Stalkers Procession" and self.game.blackstone:
+            if ability == "Triarch Stalkers Procession" and self.game.blackstone:
                 self.game.create_reaction("Triarch Stalkers Procession", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Frenzied Wulfen":
+            if ability == "Frenzied Wulfen":
                 self.game.create_reaction("Frenzied Wulfen", self.name_player, (int(self.number), position,
                                                                                 last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "The Blinded Princess":
+            if ability == "Kith's Khymeramasters":
+                self.game.create_reaction("Kith's Khymeramasters", self.name_player,
+                                          (int(self.number), position, last_element_index))
+            if ability == "The Blinded Princess":
                 self.game.create_reaction("The Blinded Princess", self.name_player, (int(self.number), position,
                                                                                      last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Water Caste Bureaucrat":
+            if ability == "Water Caste Bureaucrat":
                 if other_player.cards_in_play[position + 1]:
                     self.game.create_reaction("Water Caste Bureaucrat", self.name_player, (int(self.number), position,
                                                                                            last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Angel Shark Bomber":
+            if ability == "Angel Shark Bomber":
                 self.game.create_reaction("Angel Shark Bomber", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Carnifex":
+            if ability == "Carnifex":
                 self.game.create_reaction("Carnifex", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Death Jesters":
+            if ability == "Death Jesters":
                 self.game.create_reaction("Death Jesters", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Scavenging Kroot Rider":
+            if ability == "Scavenging Kroot Rider":
                 self.game.create_reaction("Scavenging Kroot Rider", self.name_player, (int(self.number), position,
                                                                                        last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Gue'vesa Overseer":
+            if ability == "Gue'vesa Overseer":
                 self.game.create_reaction("Gue'vesa Overseer", self.name_player, (int(self.number), position,
                                                                                   last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Voidscarred Corsair":
+            if ability == "Voidscarred Corsair":
                 self.game.create_reaction("Voidscarred Corsair", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Awakened Geomancer":
+            if ability == "Awakened Geomancer":
                 self.game.create_reaction("Awakened Geomancer", self.name_player, (int(self.number), position,
                                                                                    last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Goff Shokboyz":
+            if ability == "Goff Shokboyz":
                 self.game.create_reaction("Goff Shokboyz", self.name_player, (int(self.number), position,
                                                                               last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Elusive Escort":
+            if ability == "Elusive Escort":
                 self.game.create_reaction("Elusive Escort", self.name_player, (int(self.number), position,
                                                                                last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Raven Guard Legion":
+            if ability == "Raven Guard Legion":
                 self.game.create_reaction("Raven Guard Legion", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Herald of the WAAGH!":
+            if ability == "Herald of the WAAGH!":
                 if self.game.phase == "DEPLOY":
                     self.game.create_reaction("Herald of the WAAGH!", self.name_player, (int(self.number), position,
                                                                                          last_element_index))
@@ -3174,58 +3178,58 @@ class Player:
                             other_player.wrathful_retribution_value = cost_card_wrath
             if sacrifice_end_of_phase:
                 self.cards_in_play[position + 1][last_element_index].set_sacrifice_end_of_phase(True)
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Heretek Inventor":
+            if ability == "Heretek Inventor":
                 enemy_name = self.game.name_1
                 if self.name_player == self.game.name_1:
                     enemy_name = self.game.name_2
                 self.game.create_reaction("Heretek Inventor", enemy_name,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Griffon Escort":
+            if ability == "Griffon Escort":
                 self.game.create_reaction("Griffon Escort", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Devoted Hospitaller":
+            if ability == "Devoted Hospitaller":
                 self.game.create_reaction("Devoted Hospitaller", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Advocator of Blood":
+            if ability == "Advocator of Blood":
                 self.game.create_reaction("Advocator of Blood", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Court of the Stormlord":
+            if ability == "Court of the Stormlord":
                 self.game.create_reaction("Court of the Stormlord", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Convoking Praetorians":
+            if ability == "Convoking Praetorians":
                 self.game.create_reaction("Convoking Praetorians", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.get_ability_given_pos(position, last_element_index) == "Spreading Genestealer Brood":
+            if ability == "Spreading Genestealer Brood":
                 self.game.create_reaction("Spreading Genestealer Brood", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Swordwind Farseer":
+            if ability == "Swordwind Farseer":
                 self.game.create_reaction("Swordwind Farseer", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Mighty Wraithknight":
+            if ability == "Mighty Wraithknight":
                 self.game.create_reaction("Mighty Wraithknight", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Veteran Barbrus":
+            if ability == "Veteran Barbrus":
                 self.game.create_reaction("Veteran Barbrus", self.name_player, (int(self.number), position,
                                                                                 last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Vale Tenndrac":
+            if ability == "Vale Tenndrac":
                 self.game.create_reaction("Vale Tenndrac", self.name_player, (int(self.number), position,
                                                                               last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Standard Bearer":
+            if ability == "Standard Bearer":
                 self.game.create_reaction("Standard Bearer", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Coliseum Fighters":
+            if ability == "Coliseum Fighters":
                 self.game.create_reaction("Coliseum Fighters", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Sicarius's Chosen":
+            if ability == "Sicarius's Chosen":
                 self.game.create_reaction("Sicarius's Chosen", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Weirdboy Maniak":
+            if ability == "Weirdboy Maniak":
                 self.game.create_reaction("Weirdboy Maniak", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Inquisitor Caius Wroth":
+            if ability == "Inquisitor Caius Wroth":
                 self.game.create_reaction("Inquisitor Caius Wroth", self.name_player,
                                           (int(self.number), position, last_element_index))
-            if self.cards_in_play[position + 1][last_element_index].get_ability() == "Earth Caste Technician":
+            if ability == "Earth Caste Technician":
                 self.game.create_reaction("Earth Caste Technician", self.name_player,
                                           (int(self.number), position, last_element_index))
             if card.check_for_a_trait("Kabalite", self.etekh_trait) or card.check_for_a_trait("Raider", self.etekh_trait):
@@ -3683,9 +3687,6 @@ class Player:
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Genestealer Brood":
                                 self.game.create_reaction("Genestealer Brood", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
-                            if card.get_ability() == "Kith's Khymeramasters":
-                                self.game.create_reaction("Kith's Khymeramasters", self.name_player,
                                                           (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Space Wolves Predator":
                                 self.game.create_reaction("Space Wolves Predator", self.name_player,
