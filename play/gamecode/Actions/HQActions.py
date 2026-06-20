@@ -2104,13 +2104,17 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if player_getting_attachment.attach_card(card, -2, unit_pos, not_own_attachment=not_own_attachment):
                 primary_player.aiming_reticle_coords_hand = None
                 self.action_cleanup()
+    elif self.action_object.action_chosen == "Warpstorm":
+        for i in range(len(player_owning_card.headquarters)):
+            if player_owning_card.headquarters[i].get_is_unit():
+                if not player_owning_card.headquarters[i].get_attachments():
+                    if not player_owning_card.get_immune_to_enemy_events(planet_pos, i, power=True):
+                        player_owning_card.assign_damage_to_pos(planet_pos, i, 2, by_enemy_unit=False)
+        primary_player.resolve_played_any_event()
+        self.action_cleanup()
     elif self.action_object.action_chosen == "Calculated Strike":
-        if game_update_string[1] == "1":
-            player_being_hit = self.p1
-        else:
-            player_being_hit = self.p2
         can_continue = True
-        if player_being_hit.name_player == secondary_player.name_player:
+        if player_owning_card.name_player == secondary_player.name_player:
             is_support = False
             if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Support":
                 is_support = True
@@ -2132,8 +2136,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Event Action"
         if can_continue:
-            if player_being_hit.headquarters[unit_pos].get_limited():
-                player_being_hit.destroy_card_in_hq(unit_pos)
+            if player_owning_card.headquarters[unit_pos].get_limited():
+                player_owning_card.destroy_card_in_hq(unit_pos)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.resolve_played_any_event()
