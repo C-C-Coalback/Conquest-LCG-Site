@@ -1,5 +1,4 @@
 import copy
-import random
 import os
 import sys
 from .. import FindCard

@@ -135,6 +135,7 @@ async def resolve_command(self, name, message):
         num_times = 1
         if len(message) == 3:
             num_times = int(message[2])
+        num_times = min(num_times, 500)
         start_time = datetime.datetime.now()
         for i in range(num_times):
             move_id = self.saved_move_id
@@ -156,6 +157,8 @@ async def resolve_command(self, name, message):
                         if move_details_split[1] == "pass-P1":
                             pass
                         else:
+                            print("Special action details")
+                            print(move_details_split[1:])
                             await self.update_game_event(name_user, ["action-button"], same_thread=True)
                             await self.update_game_event(name_user, move_details_split[1:])
                     elif move_details_split[0] == "REARRANGE_HAND":

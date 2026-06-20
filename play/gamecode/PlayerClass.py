@@ -49,6 +49,7 @@ class Player:
         self.cards_dict = cards_dict
         self.apoka_errata_cards = apoka_errata_cards
         self.cards_that_have_errata = []
+        self.rng = random.Random(game.random_seed)
         for i in range(len(self.apoka_errata_cards)):
             self.cards_that_have_errata.append(self.apoka_errata_cards[i].get_name())
         self.number = str(number)
@@ -324,7 +325,11 @@ class Player:
                     del self.deck[i]
                     i = i - 1
                 i = i + 1
+        print("PRESHUFFLE")
+        print(self.deck)
         self.shuffle_deck()
+        print("POSTSHUFFLE")
+        print(self.deck)
         self.deck_loaded = True
         self.cards_in_play[0] = planet_array
         self.deck_string = raw_deck
@@ -403,7 +408,11 @@ class Player:
                     del self.deck[i]
                     i = i - 1
                 i = i + 1
+        print("PRESHUFFLE")
+        print(self.deck)
         self.shuffle_deck()
+        print("POSTSHUFFLE")
+        print(self.deck)
         self.deck_loaded = True
         self.cards_in_play[0] = planet_array
         self.deck_string = raw_deck
@@ -2081,7 +2090,6 @@ class Player:
             self.vael_relevent = True
         if name_card == "Castellan Crowe":
             self.castellan_crowe_2_relevant = True
-
 
     def bloody_warlord_given_pos(self, planet_id, unit_id):
         if planet_id != -2:

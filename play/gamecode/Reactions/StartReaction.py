@@ -1,7 +1,6 @@
 from .. import FindCard
 from ..Phases import CombatPhase
 import copy
-import random
 
 
 async def start_resolving_reaction(self, name, game_update_string):
@@ -3210,7 +3209,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
             self.delete_reaction()
         elif current_reaction == "Helvetis":
-            if random.choice(["heads", "tails"]) == "tails":
+            if self.rng.choice(["heads", "tails"]) == "tails":
                 primary_player.indirect_damage_applied = 0
                 self.location_of_indirect = "PLANET"
                 self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
@@ -3225,7 +3224,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.start_next_activity(primary_player.name_player, self.reactions_needing_resolving[0].get_planet_pos())
                 self.delete_reaction()
         elif current_reaction == "Hostaryn XXI":
-            if random.choice(["heads", "tails"]) == "tails":
+            if self.rng.choice(["heads", "tails"]) == "tails":
                 primary_player.add_resources(1)
                 secondary_player.add_resources(1)
                 await self.send_update_message("Hostaryn XXI flipped tails, each player gained a resource.")

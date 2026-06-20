@@ -60,6 +60,7 @@ class Game:
             self.random_seed = random_seed
         random.seed(str(self.random_seed))
         self.random_seed = str(self.random_seed)
+        print("seed:", self.random_seed)
         self.rng = random.Random(str(self.random_seed))
         self.game_events_as_mono_string = ""
         self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder", "Sanctified Aggressor",

@@ -768,10 +768,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                                     if "MOVE DETAILS:" in replay_details_split[i]:
                                         move_details_started = True
                                         if not first_to_load_deck:
-                                            if p1_name == replay_details_split[i + 1].split(sep="|||")[0]:
+                                            if "loaddeckbot" in replay_details_split[i + 1]:
+                                                first_to_load_deck = p1_name
+                                            elif p1_name == replay_details_split[i + 1].split(sep="|||")[0]:
                                                 first_to_load_deck = p1_name
                                             else:
                                                 first_to_load_deck = p2_name
+                                print("First to load", first_to_load_deck)
                                 print(random_seed)
                                 print(moves_list)
                                 card_errata = []
