@@ -385,6 +385,7 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Deploy Turn":
             if self.card_to_deploy is None:
+                valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
                 for i in range(len(primary_player.cards)):
                     playability = primary_player.determine_playability(primary_player.cards[i])
                     if playability == "playable":
