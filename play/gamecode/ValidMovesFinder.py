@@ -401,6 +401,8 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Commitment":
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
         elif self.what_is_required_automated == "Command not Commitment":
+            if self.after_command_struggle:
+                valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Mobile":
             if self.misc_target_unit[0] != -1 and self.misc_target_unit[1] != -1:

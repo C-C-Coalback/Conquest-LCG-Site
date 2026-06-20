@@ -262,6 +262,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                     self.p2.has_passed = False
                     self.committing_warlords = False
                     self.before_command_struggle = True
+                    self.after_command_struggle = False
                     await self.send_update_message("Both players are given a chance to resolve "
                                                    "cards/reactions before the command struggle.")
     elif self.before_command_struggle:
