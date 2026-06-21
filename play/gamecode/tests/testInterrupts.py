@@ -50,6 +50,23 @@ class InterruptsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.headquarters), 2)
         self.assertEqual(test_game.p1.get_ability_given_pos(-2, 1), "Catachan Outpost")
 
+    async def test_shrouded_harlequin(self):
+        # FIXME: MAKE SHROUDED HARLEQUIN AN ACTUAL INTERRUPT INSTEAD OF A REACTION
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        card = test_game.preloaded_find_card("Shrouded Harlequin")
+        test_game.p1.add_card_to_planet(card, 0)
+        test_game.p2.add_card_to_planet(card, 1)
+        test_game.p1.destroy_card_in_play(0, 0)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "2", "1", "0"])
+        self.assertEqual(test_game.p2.get_ready_given_pos(1, 0), False)
+
 
 if __name__ == "__main__":
     unittest.main()
