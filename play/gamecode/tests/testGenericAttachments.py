@@ -477,6 +477,46 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertEqual(test_game.p1.get_ready_given_pos(0, 0), True)
 
+    async def test_shadowsuns_stealth_cadre(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0, 0)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 4)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 4)
+
+    async def test_gun_drones(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Gun Drones"), 0, 0)
+        self.assertEqual(test_game.p1.get_area_effect_given_pos(0, 0), 2)
+
+    async def test_escort_drone(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Escort Drone"), 0, 0)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 4)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 3)
+        test_game.p1.destroy_card_in_play(0, 0)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Escort Drone")
+        test_game.p1.cards_in_play[1][0].print_info()
+
 
 if __name__ == "__main__":
     unittest.main()

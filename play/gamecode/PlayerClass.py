@@ -567,38 +567,30 @@ class Player:
                                     return "playable"
                                 non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre",
                                                                             "Escort Drone"]
-                                army_unit_as_attach = False
-                                if card.get_name() in non_attachs_that_can_be_played_as_attach:
-                                    army_unit_as_attach = True
                                 not_own_attach = False
                                 for i in range(len(self.headquarters)):
                                     if self.check_if_can_attach_card(
-                                            card, -2, i,
-                                            not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
+                                            card, -2, i, not_own_attachment=not_own_attach
                                     ):
                                         return "playable"
                                 for i in range(7):
                                     for j in range(len(self.cards_in_play[i + 1])):
                                         if self.check_if_can_attach_card(
-                                                card, i, j,
-                                                not_own_attachment=not_own_attach,
-                                                army_unit_as_attachment=army_unit_as_attach
+                                                card, i, j, not_own_attachment=not_own_attach
                                         ):
                                             return "playable"
                                 not_own_attach = True
                                 other_player = self.get_other_player()
                                 for i in range(len(other_player.headquarters)):
                                     if other_player.check_if_can_attach_card(
-                                            card, -2, i,
-                                            not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach
+                                            card, -2, i, not_own_attachment=not_own_attach
                                     ):
                                         return "playable"
                                 for i in range(7):
                                     for j in range(len(other_player.cards_in_play[i + 1])):
                                         if other_player.check_if_can_attach_card(
                                                 card, i, j,
-                                                not_own_attachment=not_own_attach,
-                                                army_unit_as_attachment=army_unit_as_attach
+                                                not_own_attachment=not_own_attach
                                         ):
                                             return "playable"
                                 return "unplayable"
@@ -1268,16 +1260,11 @@ class Player:
         elif self.game.card_to_deploy is not None:
             if self.game.card_to_deploy.get_card_type() == "Attachment" and self.game.phase == "DEPLOY":
                 non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
-                army_unit_as_attach = False
-                if self.game.card_to_deploy.get_name() in non_attachs_that_can_be_played_as_attach:
-                    army_unit_as_attach = True
                 not_own_attach = False
                 if self.game.player_with_deploy_turn != self.name_player:
                     not_own_attach = True
                 if self.check_if_can_attach_card(
-                        self.game.card_to_deploy, planet_pos, unit_pos,
-                        not_own_attachment=not_own_attach, army_unit_as_attachment=army_unit_as_attach):
-
+                        self.game.card_to_deploy, planet_pos, unit_pos, not_own_attachment=not_own_attach):
                     return "playable"
                 return "unplayable"
         elif planet_pos != -2:
@@ -2629,14 +2616,8 @@ class Player:
             target_attachment = self.cards_in_play[origin_planet + 1][origin_position]. \
                 get_attachments()[origin_attachment_position]
         print("Moving attachment code")
-        army_unit_as_attachment = False
-        if target_attachment.get_ability() == "Gun Drones" or \
-                target_attachment.get_ability() == "Shadowsun's Stealth Cadre" or \
-                target_attachment.get_ability() == "Escort Drone":
-            army_unit_as_attachment = True
         if self.attach_card(card=target_attachment, planet=destination_planet, position=destination_position,
-                            not_own_attachment=False,
-                            army_unit_as_attachment=army_unit_as_attachment, relic_check_allowed=False):
+                            not_own_attachment=False, relic_check_allowed=False):
             self.remove_attachment_from_pos(origin_planet, origin_position, origin_attachment_position)
             return True
         return False
@@ -2669,8 +2650,7 @@ class Player:
             return self.headquarters[position].get_attachments()[attachment_position]
         return self.cards_in_play[planet + 1][position].get_attachments()[attachment_position]
 
-    def deploy_attachment(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False,
-                          extra_discounts=0):
+    def deploy_attachment(self, card, planet, position, not_own_attachment=False, extra_discounts=0):
         if card.get_limited() and not self.can_play_limited:
             return False
         discounts = extra_discounts
@@ -2678,14 +2658,13 @@ class Player:
             if self.get_ability_given_pos(-2, i) == "Ambush Platform":
                 discounts += 1
         if self.spend_resources(card.get_cost() - extra_discounts):
-            if self.attach_card(card, planet, position, not_own_attachment=not_own_attachment,
-                                army_unit_as_attachment=army_unit_as_attachment):
+            if self.attach_card(card, planet, position, not_own_attachment=not_own_attachment):
                 return True
             else:
                 self.add_resources(card.get_cost() - extra_discounts, refund=True)
         return False
 
-    def check_if_can_attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False, relic_check_allowed=True, actual_check=False):
+    def check_if_can_attach_card(self, card, planet, position, not_own_attachment=False, relic_check_allowed=True, actual_check=False):
         if card.get_card_type() == "Attachment":
             if card.planet_attachment:
                 return False
@@ -2693,6 +2672,31 @@ class Player:
             target_card = self.headquarters[position]
         else:
             target_card = self.cards_in_play[planet + 1][position]
+        if card.get_ability() in ["Shadowsun's Stealth Cadre", "Gun Drones", "Escort Drone"]:
+            if card.get_ability() == "Shadowsun's Stealth Cadre":
+                card = CardClasses.AttachmentCard(
+                    "Shadowsun's Stealth Cadre",
+                    "Attach to a non-Vehicle army unit.\n Attached unit gets +2 ATK and +2 HP.",
+                    "", 2, "Tau", "Signature", 0, False, extra_attack=2, extra_health=2,
+                    type_of_units_allowed_for_attachment="Army", forbidden_traits="Vehicle"
+                )
+            elif card.get_ability() == "Gun Drones":
+                card = CardClasses.AttachmentCard(
+                    "Gun Drones",
+                    "Attach to a non-Vehicle army unit.\n Attached unit gains Area Effect (2).",
+                    "Drone.", 2, "Tau", "Loyal", 0, False,
+                    type_of_units_allowed_for_attachment="Army", forbidden_traits="Vehicle"
+                )
+            elif card.get_ability() == "Escort Drone":
+                card = CardClasses.AttachmentCard(
+                    "Escort Drone",
+                    "Attach to an army unit.\n Attached unit gets +2 ATK and +1 HP.\n "
+                    "Interrupt: When attached unit leaves play detach this card to have it become an army unit.",
+                    "Wargear.", 1, "Tau", "Loyal", 0, False, extra_attack=2, extra_health=1,
+                    type_of_units_allowed_for_attachment="Army"
+                )
+            else:
+                return False
         name_owner = self.name_player
         if not_own_attachment:
             if self.number == "1":
@@ -2718,23 +2722,6 @@ class Player:
                     self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
                                                            "Already controlling a unique card of the same name.")
                 return False
-        if army_unit_as_attachment:
-            if type_of_card != "Army":
-                if actual_check:
-                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                           "Army units as attachments can only be attached to other army units.")
-                return False
-            if target_card.get_no_attachments():
-                if actual_check:
-                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                           "Unit cannot have attachments.")
-                return False
-            if target_card.check_for_a_trait("Vehicle"):
-                if actual_check:
-                    self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                           "Vehicles cannot have 'as army unit' attachments.")
-                return False
-            return True
         allowed_types = card.type_of_units_allowed_for_attachment
         if type_of_card not in allowed_types:
             if actual_check:
@@ -2796,6 +2783,18 @@ class Player:
                         self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
                                                                "Limit one copy of that attachment per unit.")
                     return False
+        if card.must_be_own_unit and not_own_attachment:
+            if actual_check:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment must go to own unit.")
+                print("Must be own unit, but is not")
+            return False
+        if card.must_be_enemy_unit and not not_own_attachment:
+            if actual_check:
+                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
+                                                       "Attachment must go to enemy unit.")
+                print("Must be enemy unit, but is not")
+            return False
         if target_card.get_no_attachments():
             if actual_check:
                 self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
@@ -2821,8 +2820,7 @@ class Player:
                 return False
         return True
 
-    def attach_card(self, card, planet, position, not_own_attachment=False, army_unit_as_attachment=False,
-                    relic_check_allowed=True):
+    def attach_card(self, card, planet, position, not_own_attachment=False, relic_check_allowed=True):
         if planet == -2:
             target_card = self.headquarters[position]
         else:
@@ -2836,9 +2834,34 @@ class Player:
                 name_owner = self.game.p2.name_player
             elif self.number == "2":
                 name_owner = self.game.p1.name_player
-        if not self.check_if_can_attach_card(card, planet, position, not_own_attachment, army_unit_as_attachment,
+        if not self.check_if_can_attach_card(card, planet, position, not_own_attachment,
                                              relic_check_allowed, actual_check=True):
             return False
+        if card.get_ability() in ["Shadowsun's Stealth Cadre", "Gun Drones", "Escort Drone"]:
+            if card.get_ability() == "Shadowsun's Stealth Cadre":
+                card = CardClasses.AttachmentCard(
+                    "Shadowsun's Stealth Cadre",
+                    "Attach to a non-Vehicle army unit.\n Attached unit gets +2 ATK and +2 HP.",
+                    "", 2, "Tau", "Signature", 0, False, extra_attack=2, extra_health=2,
+                    type_of_units_allowed_for_attachment="Army", forbidden_traits="Vehicle"
+                )
+            elif card.get_ability() == "Gun Drones":
+                card = CardClasses.AttachmentCard(
+                    "Gun Drones",
+                    "Attach to a non-Vehicle army unit.\n Attached unit gains Area Effect (2).",
+                    "Drone.", 2, "Tau", "Loyal", 0, False,
+                    type_of_units_allowed_for_attachment="Army", forbidden_traits="Vehicle"
+                )
+            elif card.get_ability() == "Escort Drone":
+                card = CardClasses.AttachmentCard(
+                    "Escort Drone",
+                    "Attach to an army unit.\n Attached unit gets +2 ATK and +1 HP.\n "
+                    "Interrupt: When attached unit leaves play detach this card to have it become an army unit.",
+                    "Wargear.", 1, "Tau", "Loyal", 0, False, extra_attack=2, extra_health=1,
+                    type_of_units_allowed_for_attachment="Army"
+                )
+            else:
+                return False
         target_card.add_attachment(card, name_owner=name_owner)
         if card.get_ability() == "Fusion Cascade Defiance":
             if planet != -2:
@@ -2867,8 +2890,7 @@ class Player:
                         return True
         return False
 
-    def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False,
-                                        army_unit_as_attachment=False):
+    def play_attachment_card_to_in_play(self, card, planet, position, discounts=0, not_own_attachment=False):
         name_owner = self.name_player
         if not_own_attachment:
             if self.number == "1":
@@ -2885,33 +2907,7 @@ class Player:
                 self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
                                                        "Already controlling a Relic.")
                 return False
-        if army_unit_as_attachment:
-            if not_own_attachment:
-                if self.attach_card(card, planet, position, not_own_attachment,
-                                    army_unit_as_attachment=army_unit_as_attachment):
-                    return True
-                return False
-            if self.get_ability_given_pos(planet, position) == "Junk Chucka Kommando":
-                discounts += 1
-            cost = card.get_cost() - discounts
-            if cost < 0:
-                cost = 0
-            if self.spend_resources(cost):
-                if self.attach_card(card, planet, position, not_own_attachment,
-                                    army_unit_as_attachment=army_unit_as_attachment):
-                    return True
-                self.add_resources(cost, refund=True)
-        else:
-            if card.must_be_own_unit and not_own_attachment:
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Attachment must go to own unit.")
-                print("Must be own unit, but is not")
-                return False
-            if card.must_be_enemy_unit and not not_own_attachment:
-                self.game.set_queued_mistarget_message(name_owner, "Cannot Attach Card",
-                                                       "Attachment must go to enemy unit.")
-                print("Must be enemy unit, but is not")
-                return False
+        if self.check_if_can_attach_card(card, planet, position, not_own_attachment=not_own_attachment, actual_check=True):
             if not_own_attachment:
                 if self.attach_card(card, planet, position, not_own_attachment):
                     return True

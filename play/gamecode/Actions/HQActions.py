@@ -1753,7 +1753,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             card = FindCard.find_card("Lethal Toxin Sacs", self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             played_card = primary_player. \
-                play_attachment_card_to_in_play(card, planet_pos, unit_pos, army_unit_as_attachment=False, discounts=0)
+                play_attachment_card_to_in_play(card, planet_pos, unit_pos, discounts=0)
             if played_card:
                 primary_player.discard.remove("Lethal Toxin Sacs")
                 primary_player.aiming_reticle_coords_discard = None
@@ -2921,25 +2921,16 @@ async def update_game_event_action_hq(self, name, game_update_string):
             unit_pos = int(game_update_string[2])
             card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array, self.cards_dict,
                                       self.apoka_errata_cards, self.cards_that_have_errata)
-            army_unit_as_attachment = False
             discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
-            if card.get_ability() == "Gun Drones" or \
-                    card.get_ability() == "Shadowsun's Stealth Cadre" or \
-                    card.get_ability() == "Escort Drone":
-                army_unit_as_attachment = True
             if primary_player.get_number() == player_receiving_attachment.get_number():
                 print("Playing own card")
                 played_card = primary_player. \
-                    play_attachment_card_to_in_play(card, planet_pos, unit_pos,
-                                                    army_unit_as_attachment=
-                                                    army_unit_as_attachment,
-                                                    discounts=discounts)
+                    play_attachment_card_to_in_play(card, planet_pos, unit_pos, discounts=discounts)
             else:
                 played_card = False
                 if primary_player.spend_resources(int(card.get_cost()) - discounts):
                     played_card = player_receiving_attachment.play_attachment_card_to_in_play(
-                        card, planet_pos, unit_pos, not_own_attachment=True,
-                        army_unit_as_attachment=army_unit_as_attachment)
+                        card, planet_pos, unit_pos, not_own_attachment=True)
                     if not played_card:
                         primary_player.add_resources(int(card.get_cost()) - discounts, refund=True)
             if played_card:

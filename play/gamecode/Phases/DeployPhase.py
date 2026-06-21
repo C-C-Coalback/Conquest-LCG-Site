@@ -658,13 +658,11 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         discounts += 1
     discounts += extra_discounts
     can_continue = False
-    army_unit_as_attachment = False
     non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
     if card.get_card_type() == "Attachment":
         can_continue = True
     elif card.get_ability() in non_attachs_that_can_be_played_as_attach:
         can_continue = True
-        army_unit_as_attachment = True
     if can_continue:
         limited = card.get_limited()
         print("Limited state of card:", limited)
@@ -674,18 +672,14 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                                               "Already played a Limited card this round.")
         else:
             if primary_player.get_number() == player_gaining_attachment.get_number():
-                played_card = primary_player.play_attachment_card_to_in_play(card, int(game_update_string[2]),
-                                                                             int(game_update_string[3]),
-                                                                             army_unit_as_attachment=
-                                                                             army_unit_as_attachment,
-                                                                             discounts=discounts)
+                played_card = primary_player.play_attachment_card_to_in_play(
+                    card, int(game_update_string[2]), int(game_update_string[3]), discounts=discounts)
                 enemy_card = False
             else:
                 played_card = False
                 if primary_player.spend_resources(int(card.get_cost()) - discounts):
                     played_card = secondary_player.play_attachment_card_to_in_play(
-                        card, int(game_update_string[2]), int(game_update_string[3]), not_own_attachment=True,
-                        army_unit_as_attachment=army_unit_as_attachment)
+                        card, int(game_update_string[2]), int(game_update_string[3]), not_own_attachment=True)
                     if not played_card:
                         primary_player.add_resources(int(card.get_cost()) - discounts, refund=True)
                 enemy_card = True

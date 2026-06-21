@@ -1148,10 +1148,6 @@ class UnitCard(Card):
             if self.attachments[i].get_card_type() == "Attachment":
                 if not self.attachments[i].from_magus_harid:
                     attack += self.attachments[i].get_extra_attack()
-            elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
-                attack += 2
-            elif self.attachments[i].get_ability() == "Escort Drone":
-                attack += 2
             elif self.attachments[i].get_ability() == "Necklace of Teef":
                 attack += self.attachments[i].misc_counter
         if self.get_ability() == "Fire Warrior Strike Team":
@@ -1170,10 +1166,6 @@ class UnitCard(Card):
             if self.attachments[i].get_card_type() == "Attachment":
                 if not self.attachments[i].from_magus_harid:
                     health += self.attachments[i].get_extra_health()
-            elif self.attachments[i].get_ability() == "Shadowsun's Stealth Cadre":
-                health += 2
-            elif self.attachments[i].get_ability() == "Escort Drone":
-                health += 1
         for i in range(len(self.attachments)):
             if self.attachments[i].get_ability() == "Cybork Body":
                 health = 2 * health

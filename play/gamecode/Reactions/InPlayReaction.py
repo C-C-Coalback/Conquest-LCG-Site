@@ -52,13 +52,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     card = FindCard.find_card(primary_player.cards[self.location_hand_attachment_shadowsun],
                                               self.card_array, self.cards_dict,
                                               self.apoka_errata_cards, self.cards_that_have_errata)
-                    army_unit_as_attachment = False
-                    if card.get_name() == "Shadowsun's Stealth Cadre":
-                        army_unit_as_attachment = True
                     if player_receiving_attachment.play_attachment_card_to_in_play(
                             card, planet_pos, unit_pos, discounts=card.get_cost(),
-                            not_own_attachment=not_own_attachment,
-                            army_unit_as_attachment=army_unit_as_attachment):
+                            not_own_attachment=not_own_attachment):
                         primary_player.remove_card_from_hand(self.location_hand_attachment_shadowsun)
                         primary_player.aiming_reticle_coords_hand = None
                         self.shadowsun_chose_hand = False
@@ -77,13 +73,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         player_receiving_attachment = secondary_player
                         own_attachment = False
                     card = primary_player.get_card_in_discard(self.location_attachment_discard_shadowsun)
-                    army_unit_as_attachment = False
-                    if card.get_name() == "Shadowsun's Stealth Cadre":
-                        army_unit_as_attachment = True
                     not_own_attachment = not own_attachment
                     if player_receiving_attachment.attach_card(card, planet_pos, unit_pos,
-                                                               not_own_attachment=not_own_attachment,
-                                                               army_unit_as_attachment=army_unit_as_attachment):
+                                                               not_own_attachment=not_own_attachment):
                         del primary_player.discard[self.location_attachment_discard_shadowsun]
                         primary_player.aiming_reticle_coords_discard = None
                         self.location_attachment_discard_shadowsun = -1
