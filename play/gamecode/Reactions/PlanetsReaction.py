@@ -293,8 +293,6 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
         if warlord_planet != new_planet:
             primary_player.commit_warlord_to_planet_from_planet(warlord_planet, new_planet)
             self.delete_reaction()
-            primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
-            primary_player.aiming_reticle_coords_hand = None
     elif current_reaction == "Wyrdboy Stikk":
         primary_player.summon_token_at_planet("Snotlings", chosen_planet)
         self.delete_reaction()

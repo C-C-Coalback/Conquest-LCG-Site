@@ -4304,6 +4304,9 @@ class Player:
                 other_player = self.get_other_player()
                 self.resolve_additional_warlord_after_commit_effects(dest_planet)
                 other_player.resolve_enemy_warlord_committed_to_planet(dest_planet)
+                if self.search_hand_for_card("Foresight"):
+                    if self.get_resources() > 0:
+                        self.game.create_reaction("Foresight", self.name_player, (int(self.number), dest_planet - 1, -1))
             i += 1
 
     def move_synapse_to_hq(self):
@@ -4323,6 +4326,7 @@ class Player:
             if self.cards_in_play[planet + 1][i].yvraine_active:
                 return True
         return False
+
     def check_savage_warrior_prime_present(self, planet):
         for i in range(len(self.cards_in_play[planet + 1])):
             if self.cards_in_play[planet + 1][i].get_ability() == "Savage Warrior Prime":
@@ -4454,6 +4458,9 @@ class Player:
                                 if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
                                     self.game.create_reaction("Blackmane Sentinel", self.name_player,
                                                               (int(self.number), j, k))
+                    if self.search_hand_for_card("Foresight"):
+                        if self.get_resources() > 0:
+                            self.game.create_reaction("Foresight", self.name_player, (int(self.number), planet_pos - 1, -1))
                     return True
             return False
         else:
@@ -4518,6 +4525,10 @@ class Player:
                                     if self.get_ability_given_pos(j, k) == "Blackmane Sentinel":
                                         self.game.create_reaction("Blackmane Sentinel", self.name_player,
                                                                   (int(self.number), j, k))
+                        if self.search_hand_for_card("Foresight"):
+                            if self.get_resources() > 0:
+                                self.game.create_reaction("Foresight", self.name_player,
+                                                          (int(self.number), planet_pos - 1, -1))
                     i -= 1
                 i += 1
         return None

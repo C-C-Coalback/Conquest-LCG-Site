@@ -285,28 +285,7 @@ async def update_game_event_command_section(self, name, game_update_string):
                     secondary_player = self.p1
                 if game_update_string[1] == primary_player.get_number():
                     hand_pos = int(game_update_string[2])
-                    if primary_player.cards[hand_pos] == "Foresight":
-                        if secondary_player.nullify_check() and self.nullify_enabled:
-                            await self.send_update_message(
-                                primary_player.name_player + " wants to play Foresight; "
-                                                             "Nullify window offered.")
-                            self.choices_available = ["Yes", "No"]
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Use Nullify?"
-                            self.nullified_card_pos = int(game_update_string[2])
-                            self.nullified_card_name = "Foresight"
-                            self.cost_card_nullified = 1
-                            self.nullify_string = "/".join(game_update_string)
-                            self.first_player_nullified = primary_player.name_player
-                            self.nullify_context = "Foresight"
-                        elif primary_player.spend_resources(1):
-                            warlord_planet = primary_player.warlord_commit_location
-                            self.create_reaction("Foresight", primary_player.name_player,
-                                                 (int(primary_player.get_number()),
-                                                  warlord_planet, -1))
-                            primary_player.aiming_reticle_color = "blue"
-                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                    elif primary_player.cards[hand_pos] == "Sweep Attack":
+                    if primary_player.cards[hand_pos] == "Sweep Attack":
                         if secondary_player.nullify_check() and self.nullify_enabled:
                             await self.send_update_message(
                                 primary_player.name_player + " wants to play Sweep Attack; "

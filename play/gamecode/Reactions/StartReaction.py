@@ -2324,6 +2324,29 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
+        elif current_reaction == "Foresight":
+            cost = 1
+            can_continue = True
+            if primary_player.resources >= cost:
+                if self.nullify_enabled:
+                    if secondary_player.nullify_check():
+                        await self.send_update_message(primary_player.name_player + " wants to play " + current_reaction +
+                                                       "; Nullify window offered.")
+                        self.choices_available = ["Yes", "No"]
+                        self.name_player_making_choices = secondary_player.name_player
+                        self.choice_context = "Use Nullify?"
+                        self.nullified_card_pos = -1
+                        self.nullified_card_name = current_reaction
+                        self.cost_card_nullified = cost
+                        self.first_player_nullified = primary_player.name_player
+                        self.nullify_context = "Reaction Event"
+                        can_continue = False
+                if can_continue:
+                    primary_player.spend_resources(1)
+                    primary_player.discard_card_name_from_hand(current_reaction)
+                    primary_player.aiming_reticle_coords_hand = None
+            else:
+                self.delete_reaction()
         elif current_reaction == "Coliseum Fighters":
             i = len(primary_player.discard) - 1
             found_card = False
