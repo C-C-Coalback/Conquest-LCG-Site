@@ -22,7 +22,7 @@ https://docs.google.com/spreadsheets/d/19WVZDINaXXJkV-hodJnYNgk2xx7UQQGF9aBtdWPV
 
 I assume you already have some knowledge of git, python and docker.
 
-You will need Python 3.13.1 and docker installed. Please keep in mind that, depending on how you installed python, you may need to replace "py" in any given commands with "python", "python3" or similar.
+You will need Python 3.14.6 and docker installed. Please keep in mind that, depending on how you installed python, you may need to replace "py" in any given commands with "python", "python3" or similar.
 
 Open up a command terminal. In it:
 
