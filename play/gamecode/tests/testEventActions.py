@@ -251,6 +251,25 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.discard), 1)
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 1), 9)
 
+    async def test_power_from_pain(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.cards = ["Power from Pain"]
+        test_game.p2.cards = []
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Land Raider"), 0)
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
+        self.assertEqual(len(test_game.p2.cards_in_play[1]), 2)
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "1"])
+        self.assertEqual(len(test_game.p2.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertEqual(len(test_game.p1.cards), 0)
+        self.assertEqual(len(test_game.p1.discard), 1)
+
     async def test_repent(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
