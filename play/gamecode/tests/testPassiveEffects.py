@@ -205,6 +205,19 @@ class PassiveEffectsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 8)
         self.assertEqual(len(test_game.p1.cards), 2)
 
+    async def test_fire_warrior_strike_team(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], forced_planet_array=["Barlus", "Osus IV", "Elouith", "Ferrin", "Y'varn", "Iridial", "Carnath"])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Fire Warrior Strike Team"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Ion Rifle"), 0, 0)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 5)
+
 
 if __name__ == "__main__":
     unittest.main()
