@@ -5122,8 +5122,71 @@ class Game:
                                     amount_to_remove = self.stored_damage[0].get_amount_that_can_be_blocked()
                                 self.stored_damage[0].decrease_amount_that_can_be_blocked(amount_to_remove)
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
-                                self.queued_sound = "shield"
                                 primary_player.remove_faith_given_pos(hurt_planet, hurt_pos)
+                                self.queued_sound = "shield"
+                                if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
+                                    if self.flamers_damage_active:
+                                        primary_player.cards_in_play[planet_pos + 1][
+                                            unit_pos].hit_by_which_salamanders.append(
+                                            self.id_of_the_active_flamer)
+                                    self.queued_sound = "damage"
+                                    if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                        if primary_player.get_ability_given_pos(
+                                                planet_pos, unit_pos) == "Reanimating Warriors" \
+                                                and not primary_player.cards_in_play[planet_pos + 1][
+                                            unit_pos].once_per_phase_used:
+                                            self.create_interrupt("Reanimating Warriors",
+                                                                  primary_player.name_player,
+                                                                  (int(primary_player.number), planet_pos,
+                                                                   unit_pos))
+                                        if primary_player.get_ability_given_pos(
+                                                planet_pos, unit_pos) == "Treacherous Lhamaean":
+                                            self.create_reaction(
+                                                "Treacherous Lhamaean", primary_player.name_player,
+                                                (int(primary_player.number), planet_pos, unit_pos)
+                                            )
+                                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                                == "Swarmling Termagants":
+                                            self.create_reaction("Swarmling Termagants",
+                                                                 primary_player.name_player,
+                                                                 (int(primary_player.number), planet_pos,
+                                                                  unit_pos))
+                                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) \
+                                                == "Prudent Fire Warriors":
+                                            self.create_interrupt("Prudent Fire Warriors",
+                                                                  primary_player.name_player,
+                                                                  (int(primary_player.number), planet_pos,
+                                                                   unit_pos))
+                                    self.checks_on_damage(primary_player, secondary_player, planet_pos,
+                                                          unit_pos)
+                                    if self.stored_damage[0].get_position_attacker() is not None:
+                                        damage_object = self.stored_damage[0]
+                                        att_num, att_pla, att_pos = damage_object.get_position_attacker()
+                                        damage_object.damage_taken_was_from_attack = True
+                                        damage_object.faction_of_attacker = \
+                                            secondary_player.get_faction_given_pos(att_pla, att_pos)
+                                        self.stored_taken_damage.append(damage_object)
+                                        self.checks_on_damage_from_attack(primary_player, secondary_player,
+                                                                          planet_pos, unit_pos)
+                                    else:
+                                        self.stored_taken_damage.append(self.stored_damage[0])
+                                    if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
+                                        if primary_player.check_if_faction_given_pos(planet_pos, unit_pos,
+                                                                                     "Space Marines", own_event=True):
+                                            primary_player.set_vow_of_honor(planet_pos, unit_pos, True)
+                                            if primary_player.resources > 0:
+                                                if primary_player.search_hand_for_card("Vow of Honor"):
+                                                    if not primary_player.check_if_already_have_reaction(
+                                                            "Vow of Honor"):
+                                                        self.create_reaction("Vow of Honor",
+                                                                             primary_player.name_player,
+                                                                             (int(primary_player.number),
+                                                                              -1, -1))
+                                    if primary_player.get_ability_given_pos(
+                                            planet_pos, unit_pos) == "Zogwort's Runtherders":
+                                        self.create_reaction("Zogwort's Runtherders",
+                                                             primary_player.name_player,
+                                                             (int(primary_player.number), planet_pos, unit_pos))
                                 await self.send_update_message("Faith is being used as a shield.\n" +
                                                                str(amount_to_remove) + " damage is being removed.")
                                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
