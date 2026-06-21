@@ -287,6 +287,26 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards), 0)
         self.assertEqual(len(test_game.p1.discard), 1)
 
+    async def test_raid(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Raid"]
+        test_game.p2.cards = []
+        test_game.p1.resources = 7
+        test_game.p2.resources = 7
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        self.assertEqual(test_game.p1.cards, ["Raid"])
+        test_game.p1.resources = 6
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 7)
+        self.assertEqual(test_game.p2.resources, 6)
+
     async def test_repent(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
