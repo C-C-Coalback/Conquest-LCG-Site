@@ -1,6 +1,6 @@
 import unittest
 from play.gamecode.GameClass import Game
-from play.gamecode import Initfunctions, FindCard
+from play.gamecode import Initfunctions
 import os
 import random
 
