@@ -707,20 +707,21 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.backlash_enabled = True
             self.intercept_enabled = True
         elif chosen_choice == "Communications Relay":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Communications Relay?"
+            await self.resolve_communications_relay(name, primary_player, secondary_player)
         elif chosen_choice == "Intercept":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Intercept?"
+            self.reset_choices_available()
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_ability_given_pos(-2, i) == "Intercept":
+                    if primary_player.get_ready_given_pos(-2, i):
+                        primary_player.exhaust_given_pos(-2, i)
+            self.intercept_active = True
+            self.name_player_intercept = primary_player.name_player
         elif chosen_choice == "Jain Zar":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Jain Zar?"
+            await self.resolve_jain_zar(name, primary_player, secondary_player)
         elif chosen_choice == "Colony Shield Generator":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Colony Shield Generator?"
+            await self.resolve_colony_shield_generator(name, primary_player, secondary_player)
         elif chosen_choice == "Slumbering Gardens":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Slumbering Gardens?"
+            await self.resolve_slumbering_gardens(name, primary_player, secondary_player)
         elif chosen_choice == "Searing Brand":
             self.choice_context = "Choose card to discard for Searing Brand"
             self.choices_available = []
@@ -732,14 +733,11 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             )
             self.action_object.misc_counter = 0
         elif chosen_choice == "Backlash":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Backlash?"
+            await self.resolve_backlash(name, primary_player, secondary_player)
         elif chosen_choice == "Storm of Silence":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Storm of Silence?"
+            await self.resolve_storm_of_silence(name, primary_player, secondary_player)
         elif chosen_choice == "Immortal Loyalist":
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Immortal Loyalist?"
+            await self.resolve_immortal_loyalist(name, primary_player, secondary_player)
     elif self.asking_if_interrupt and self.interrupts_waiting_on_resolution \
             and not self.resolving_search_box:
         print("Asking if interrupt")
@@ -781,30 +779,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.resolving_search_box = False
             self.delete_interrupt()
         self.reset_choices_available()
-    elif self.choice_context == "Use Jain Zar?":
-        await self.resolve_jain_zar(name, game_update_string, primary_player, secondary_player)
-    elif self.choice_context == "Use Colony Shield Generator?":
-        await self.resolve_colony_shield_generator(name, game_update_string, primary_player,
-                                                   secondary_player)
-    elif self.choice_context == "Use Immortal Loyalist?":
-        await self.resolve_immortal_loyalist(name, game_update_string, primary_player, secondary_player)
-    elif self.choice_context == "Use Intercept?":
-        if game_update_string[1] == "0":
-            self.reset_choices_available()
-            for i in range(len(primary_player.headquarters)):
-                if primary_player.get_ability_given_pos(-2, i) == "Intercept":
-                    if primary_player.get_ready_given_pos(-2, i):
-                        primary_player.exhaust_given_pos(-2, i)
-            self.intercept_active = True
-            self.name_player_intercept = primary_player.name_player
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.intercept_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list,
-                                         same_thread=True)
-            self.intercept_enabled = True
     elif self.choice_context == "Dark Lance Raider Damage":
         self.misc_target_choice = chosen_choice
         self.reactions_needing_resolving[0].misc_misc = []
@@ -1772,16 +1746,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         primary_player.resolve_played_any_event()
         self.action_cleanup()
         self.reset_choices_available()
-    elif self.choice_context == "Use Backlash?":
-        await self.resolve_backlash(name, game_update_string, primary_player, secondary_player)
-    elif self.choice_context == "Use Storm of Silence?":
-        await self.resolve_storm_of_silence(name, game_update_string, primary_player, secondary_player)
-    elif self.choice_context == "Use Communications Relay?":
-        await self.resolve_communications_relay(name, game_update_string,
-                                                primary_player, secondary_player)
-    elif self.choice_context == "Use Slumbering Gardens?":
-        await self.resolve_slumbering_gardens(name, game_update_string, primary_player,
-                                              secondary_player)
     elif self.asking_if_reaction and self.reactions_needing_resolving \
             and not self.resolving_search_box:
         print("Asking if reaction")

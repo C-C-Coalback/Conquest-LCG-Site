@@ -2703,228 +2703,171 @@ class Game:
                 self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                      (int(primary_player.number), planet_pos, unit_pos))
 
-    async def resolve_storm_of_silence(self, name, game_update_string, primary_player,
-                                       secondary_player, may_nullify=True):
-        if game_update_string[1] == "0":
-            if secondary_player.nullify_check() and may_nullify:
-                self.nullifying_storm_of_silence = True
-                self.name_player_using_backlash = primary_player.name_player
-                await self.send_update_message(
-                    primary_player.name_player + " wants to play Storm of Silence; "
-                                                 "Nullify window offered.")
-                self.choices_available = ["Yes", "No"]
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Use Nullify?"
-            else:
-                await self.complete_storm_of_silence(primary_player, secondary_player)
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.storm_of_silence_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.storm_of_silence_enabled = True
+    async def resolve_storm_of_silence(self, name, primary_player, secondary_player, may_nullify=True):
+        if secondary_player.nullify_check() and may_nullify:
+            self.nullifying_storm_of_silence = True
+            self.name_player_using_backlash = primary_player.name_player
+            await self.send_update_message(
+                primary_player.name_player + " wants to play Storm of Silence; "
+                                             "Nullify window offered.")
+            self.choices_available = ["Yes", "No"]
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Use Nullify?"
+        else:
+            await self.complete_storm_of_silence(primary_player, secondary_player)
 
-    async def resolve_backlash(self, name, game_update_string, primary_player, secondary_player, may_nullify=True):
-        if game_update_string[1] == "0":
-            if secondary_player.nullify_check() and may_nullify:
-                self.nullifying_backlash = True
-                self.name_player_using_backlash = primary_player.name_player
-                await self.send_update_message(
-                    primary_player.name_player + " wants to play Backlash; "
-                                                 "Nullify window offered.")
-                self.choices_available = ["Yes", "No"]
-                self.name_player_making_choices = secondary_player.name_player
-                self.choice_context = "Use Nullify?"
-            else:
-                await self.complete_backlash(primary_player, secondary_player)
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.backlash_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.backlash_enabled = True
+    async def resolve_backlash(self, name, primary_player, secondary_player, may_nullify=True):
+        if secondary_player.nullify_check() and may_nullify:
+            self.nullifying_backlash = True
+            self.name_player_using_backlash = primary_player.name_player
+            await self.send_update_message(
+                primary_player.name_player + " wants to play Backlash; "
+                                             "Nullify window offered.")
+            self.choices_available = ["Yes", "No"]
+            self.name_player_making_choices = secondary_player.name_player
+            self.choice_context = "Use Nullify?"
+        else:
+            await self.complete_backlash(primary_player, secondary_player)
 
-    async def resolve_colony_shield_generator(self, name, game_update_string, primary_player, secondary_player):
-        if game_update_string[1] == "0":
-            self.reset_choices_available()
-            new_pos = -1
-            for i in range(len(primary_player.headquarters)):
-                if primary_player.get_ability_given_pos(-2, i) == "Colony Shield Generator":
-                    if primary_player.get_ready_given_pos(-2, i):
-                        primary_player.exhaust_given_pos(-2, i)
-                        new_pos = i
-            self.colony_shield_generator_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            if len(new_string_list) == 3:
-                if new_pos != -1:
-                    new_string_list[2] = str(new_pos)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.colony_shield_generator_enabled = True
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.colony_shield_generator_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.colony_shield_generator_enabled = True
+    async def resolve_colony_shield_generator(self, name, primary_player, secondary_player):
+        self.reset_choices_available()
+        new_pos = -1
+        for i in range(len(primary_player.headquarters)):
+            if primary_player.get_ability_given_pos(-2, i) == "Colony Shield Generator":
+                if primary_player.get_ready_given_pos(-2, i):
+                    primary_player.exhaust_given_pos(-2, i)
+                    new_pos = i
+        self.colony_shield_generator_enabled = False
+        new_string_list = self.nullify_string.split(sep="/")
+        print("String used:", new_string_list)
+        if len(new_string_list) == 3:
+            if new_pos != -1:
+                new_string_list[2] = str(new_pos)
+        await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
+        self.colony_shield_generator_enabled = True
 
-    async def resolve_slumbering_gardens(self, name, game_update_string, primary_player, secondary_player):
-        if game_update_string[1] == "0":
-            self.reset_choices_available()
-            primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
-            if self.nullify_context == "Event Action":
-                secondary_player.aiming_reticle_coords_hand = None
-                secondary_player.aiming_reticle_coords_hand_2 = None
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.amount_spend_for_tzeentch_firestorm = 0
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
-                                                              self.action_object.position_of_actioned_card[1])
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.action_object.position_of_actioned_card = (-1, -1)
-            elif self.nullify_context == "Reaction":
-                self.delete_reaction()
-            elif self.nullify_context == "Reaction Event":
-                self.delete_reaction()
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
-                await self.resolve_battle_conclusion(secondary_player, game_string="")
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.slumbering_gardens_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.slumbering_gardens_enabled = True
+    async def resolve_slumbering_gardens(self, name, primary_player, secondary_player):
+        self.reset_choices_available()
+        primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
+        if self.nullify_context == "Event Action":
+            secondary_player.aiming_reticle_coords_hand = None
+            secondary_player.aiming_reticle_coords_hand_2 = None
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.amount_spend_for_tzeentch_firestorm = 0
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "In Play Action":
+            secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                          self.action_object.position_of_actioned_card[1])
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.action_object.position_of_actioned_card = (-1, -1)
+        elif self.nullify_context == "Reaction":
+            self.delete_reaction()
+        elif self.nullify_context == "Reaction Event":
+            self.delete_reaction()
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+            await self.resolve_battle_conclusion(secondary_player, game_string="")
 
-    async def resolve_immortal_loyalist(self, name, game_update_string, primary_player, secondary_player):
-        if game_update_string[1] == "0":
-            self.reset_choices_available()
-            if self.nullify_context == "Event Action":
-                secondary_player.aiming_reticle_coords_hand = None
-                secondary_player.aiming_reticle_coords_hand_2 = None
-                if self.nullified_card_name == "Overrun":
-                    secondary_player.draw_card()
-                    secondary_player.draw_card()
-                if self.nullified_card_name == "Breach and Clear":
-                    secondary_player.add_resources(2)
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.amount_spend_for_tzeentch_firestorm = 0
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
-                                                              self.action_object.position_of_actioned_card[1])
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.action_object.position_of_actioned_card = (-1, -1)
-            elif self.nullify_context == "Reaction":
-                self.delete_reaction()
-            elif self.nullify_context == "Reaction Event":
-                self.delete_reaction()
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
-                await self.resolve_battle_conclusion(secondary_player, game_string="")
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.communications_relay_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.communications_relay_enabled = True
+    async def resolve_immortal_loyalist(self, name, primary_player, secondary_player):
+        self.reset_choices_available()
+        if self.nullify_context == "Event Action":
+            secondary_player.aiming_reticle_coords_hand = None
+            secondary_player.aiming_reticle_coords_hand_2 = None
+            if self.nullified_card_name == "Overrun":
+                secondary_player.draw_card()
+                secondary_player.draw_card()
+            if self.nullified_card_name == "Breach and Clear":
+                secondary_player.add_resources(2)
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.amount_spend_for_tzeentch_firestorm = 0
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "In Play Action":
+            secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                          self.action_object.position_of_actioned_card[1])
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.action_object.position_of_actioned_card = (-1, -1)
+        elif self.nullify_context == "Reaction":
+            self.delete_reaction()
+        elif self.nullify_context == "Reaction Event":
+            self.delete_reaction()
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+            await self.resolve_battle_conclusion(secondary_player, game_string="")
 
-    async def resolve_jain_zar(self, name, game_update_string, primary_player, secondary_player):
-        if game_update_string[1] == "0":
-            self.reset_choices_available()
-            warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
-            primary_player.resolve_reactions_on_cancelling_enemy_effect()
-            if warlord_pla != -2:
-                primary_player.cards_in_play[warlord_pla + 1][warlord_pos].once_per_round_used = True
-            if self.nullify_context == "Event Action":
-                secondary_player.aiming_reticle_coords_hand = None
-                secondary_player.aiming_reticle_coords_hand_2 = None
-                if self.nullified_card_name == "Overrun":
-                    secondary_player.draw_card()
-                    secondary_player.draw_card()
-                if self.nullified_card_name == "Breach and Clear":
-                    secondary_player.add_resources(2)
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.amount_spend_for_tzeentch_firestorm = 0
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
-                                                              self.action_object.position_of_actioned_card[1])
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.action_object.position_of_actioned_card = (-1, -1)
-            elif self.nullify_context == "Reaction":
-                self.delete_reaction()
-            elif self.nullify_context == "Reaction Event":
-                self.delete_reaction()
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "Interrupt":
-                self.delete_interrupt()
-            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
-                await self.resolve_battle_conclusion(secondary_player, game_string="")
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.communications_relay_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.communications_relay_enabled = True
+    async def resolve_jain_zar(self, name, primary_player, secondary_player):
+        self.reset_choices_available()
+        warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
+        primary_player.resolve_reactions_on_cancelling_enemy_effect()
+        if warlord_pla != -2:
+            primary_player.cards_in_play[warlord_pla + 1][warlord_pos].once_per_round_used = True
+        if self.nullify_context == "Event Action":
+            secondary_player.aiming_reticle_coords_hand = None
+            secondary_player.aiming_reticle_coords_hand_2 = None
+            if self.nullified_card_name == "Overrun":
+                secondary_player.draw_card()
+                secondary_player.draw_card()
+            if self.nullified_card_name == "Breach and Clear":
+                secondary_player.add_resources(2)
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.amount_spend_for_tzeentch_firestorm = 0
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "In Play Action":
+            secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                          self.action_object.position_of_actioned_card[1])
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.action_object.position_of_actioned_card = (-1, -1)
+        elif self.nullify_context == "Reaction":
+            self.delete_reaction()
+        elif self.nullify_context == "Reaction Event":
+            self.delete_reaction()
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "Interrupt":
+            self.delete_interrupt()
+        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+            await self.resolve_battle_conclusion(secondary_player, game_string="")
 
-    async def resolve_communications_relay(self, name, game_update_string, primary_player, secondary_player):
-        if game_update_string[1] == "0":
-            self.reset_choices_available()
-            primary_player.exhaust_card_in_hq_given_name("Communications Relay")
-            if self.nullify_context == "Event Action":
-                secondary_player.aiming_reticle_coords_hand = None
-                secondary_player.aiming_reticle_coords_hand_2 = None
-                if self.nullified_card_name == "Overrun":
-                    secondary_player.draw_card()
-                    secondary_player.draw_card()
-                if self.nullified_card_name == "Breach and Clear":
-                    secondary_player.add_resources(2)
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.amount_spend_for_tzeentch_firestorm = 0
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "In Play Action":
-                secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
-                                                              self.action_object.position_of_actioned_card[1])
-                self.action_object.action_chosen = ""
-                self.action_object.player_with_action = ""
-                self.mode = "Normal"
-                self.action_object.position_of_actioned_card = (-1, -1)
-            elif self.nullify_context == "Reaction":
-                self.delete_reaction()
-            elif self.nullify_context == "Reaction Event":
-                self.delete_reaction()
-                secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-            elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
-                await self.resolve_battle_conclusion(secondary_player, game_string="")
-        elif game_update_string[1] == "1":
-            self.reset_choices_available()
-            self.communications_relay_enabled = False
-            new_string_list = self.nullify_string.split(sep="/")
-            print("String used:", new_string_list)
-            await self.update_game_event(secondary_player.name_player, new_string_list, same_thread=True)
-            self.communications_relay_enabled = True
+    async def resolve_communications_relay(self, name, primary_player, secondary_player):
+        self.reset_choices_available()
+        primary_player.exhaust_card_in_hq_given_name("Communications Relay")
+        if self.nullify_context == "Event Action":
+            secondary_player.aiming_reticle_coords_hand = None
+            secondary_player.aiming_reticle_coords_hand_2 = None
+            if self.nullified_card_name == "Overrun":
+                secondary_player.draw_card()
+                secondary_player.draw_card()
+            if self.nullified_card_name == "Breach and Clear":
+                secondary_player.add_resources(2)
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.amount_spend_for_tzeentch_firestorm = 0
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "In Play Action":
+            secondary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
+                                                          self.action_object.position_of_actioned_card[1])
+            self.action_object.action_chosen = ""
+            self.action_object.player_with_action = ""
+            self.mode = "Normal"
+            self.action_object.position_of_actioned_card = (-1, -1)
+        elif self.nullify_context == "Reaction":
+            self.delete_reaction()
+        elif self.nullify_context == "Reaction Event":
+            self.delete_reaction()
+            secondary_player.discard_card_name_from_hand(self.nullified_card_name)
+        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+            await self.resolve_battle_conclusion(secondary_player, game_string="")
 
     def action_cleanup(self):
         self.action_object.reset_action_data()
