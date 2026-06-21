@@ -704,6 +704,15 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                               "Once per round ability used.")
+                    elif ability == "Haemonculus Tormentor":
+                        if player_owning_card.spend_resources(1):
+                            player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos,
+                                                                              2, expiration="EOP")
+                            self.action_cleanup()
+                            await self.send_update_message("Haemonculus buffed")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
+                                                              "Insufficient resources.")
                     elif ability == "Lone Wolf":
                         planet_pos = -2
                         unit_pos = int(game_update_string[2])
