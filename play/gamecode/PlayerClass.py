@@ -2965,6 +2965,11 @@ class Player:
                 return False
         return True
 
+    def get_id_given_pos(self, planet_pos, unit_pos):
+        if planet_pos == -2:
+            return self.headquarters[unit].card_id
+        return self.cards_in_play[planet_pos + 1][unit_pos].card_id
+
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
                            is_owner_of_card=True, triggered_card_effect=True, deepstrike=False):
         if position == -2:

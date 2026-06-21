@@ -4531,14 +4531,14 @@ class Game:
                             if secondary_player.search_hand_for_card("Hostile Acquisition"):
                                 self.create_reaction("Hostile Acquisition", secondary_player.name_player,
                                                      (int(primary_player.number), planet_pos, unit_pos))
-            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                 if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Black Heart Ravager":
                     self.create_reaction("Black Heart Ravager", secondary_player.name_player,
-                                         (int(primary_player.number), planet_pos, unit_pos))
+                                         (int(primary_player.number), att_pla, att_pos),
+                                         additional_info=primary_player.get_id_given_pos(planet_pos, unit_pos))
                 if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Pincer Tail"):
                     self.create_reaction("Pincer Tail", secondary_player.name_player, pos_holder)
-            if primary_player.get_card_type_given_pos(
-                    planet_pos, unit_pos) == "Army":
+            if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if secondary_player.search_attachments_at_pos(
                         att_pla, att_pos, "Last Breath"):
                     self.create_reaction(

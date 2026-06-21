@@ -816,10 +816,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.discard_top_card_deck()
             self.delete_reaction()
         elif current_reaction == "Black Heart Ravager":
-            if num == 1:
-                self.p1.rout_unit(planet_pos, unit_pos)
-            elif num == 2:
-                self.p2.rout_unit(planet_pos, unit_pos)
+            card_id = extra_info
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                if secondary_player.get_id_given_pos(planet_pos, i) == card_id:
+                    secondary_player.rout_unit(planet_pos, i)
+                    break
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Noxious Fleshborer":
             self.infest_planet(planet_pos, primary_player)
