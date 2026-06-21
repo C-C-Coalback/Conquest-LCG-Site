@@ -384,7 +384,6 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.headquarters), 1)
         self.assertEqual(len(test_game.p1.cards_in_play[3]), 1)
 
-
     async def test_repent(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
