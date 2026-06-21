@@ -5700,7 +5700,7 @@ class Player:
     def reset_reaction_beasthunter_wyches(self):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Beasthunter Wyches":
-                self.headquarters[i].set_reaction_availabe(True)
+                self.headquarters[i].set_reaction_available(True)
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Beasthunter Wyches":

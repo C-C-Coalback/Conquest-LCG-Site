@@ -48,6 +48,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.create_choices(self.choices_available, "All")
             self.choice_context = "First Line Rhinos Rally"
             self.name_player_making_choices = primary_player.name_player
+        elif current_reaction == "Beasthunter Wyches":
+            if primary_player.spend_resources(1):
+                primary_player.summon_token_at_hq("Khymera")
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_reaction == "Gladius Strike Force":
             primary_player.headquarters[unit_pos].counter += 1
             self.delete_reaction()
