@@ -175,6 +175,35 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 5)
         self.assertEqual(len(test_game.p2.headquarters), 1)
 
+    async def test_pact_of_the_haemonculi(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Pact of the Haemonculi", "Pact of the Haemonculi"]
+        test_game.p2.cards = ["Rogue Trader", "Void Pirate"]
+        test_game.p1.resources = 7
+        card = test_game.preloaded_find_card("Khymera")
+        test_game.p1.add_to_hq(card)
+        test_game.p1.add_card_to_planet(card, 0)
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertEqual(len(test_game.p1.headquarters), 1)
+        self.assertEqual(len(test_game.p1.cards), 3)
+        self.assertEqual(len(test_game.p2.cards), 1)
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        self.assertEqual(test_game.p1.resources, 3)
+        self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
+        self.assertEqual(len(test_game.p1.cards), 4)
+        self.assertEqual(len(test_game.p2.cards), 0)
+
     async def test_know_no_fear(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
