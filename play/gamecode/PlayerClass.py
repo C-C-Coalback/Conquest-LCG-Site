@@ -4054,7 +4054,7 @@ class Player:
                 if self.get_damage_given_pos(destination, new_pos) > 0:
                     self.game.create_reaction("Quartermasters", self.name_player,
                                               (int(self.number), destination, new_pos))
-            if self.cards_in_play[destination + 1][new_pos].get_faction() == "Eldar":
+            if self.check_if_faction_given_pos(destination, new_pos, "Eldar") and not self.get_ready_given_pos(destination, new_pos):
                 if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
                     if not self.check_if_already_have_reaction("Alaitoc Shrine"):
                         self.game.create_reaction("Alaitoc Shrine", self.name_player,
@@ -4147,6 +4147,12 @@ class Player:
                 if self.get_damage_given_pos(destination, new_pos) > 0:
                     self.game.create_reaction("Quartermasters", self.name_player,
                                               (int(self.number), destination, new_pos))
+            if self.check_if_faction_given_pos(destination, new_pos, "Eldar") and not self.get_ready_given_pos(destination, new_pos):
+                if self.search_card_in_hq("Alaitoc Shrine", ready_relevant=True):
+                    if not self.check_if_already_have_reaction("Alaitoc Shrine"):
+                        self.game.create_reaction("Alaitoc Shrine", self.name_player,
+                                                  (int(self.number), -1, -1))
+                    self.allowed_units_alaitoc_shrine.append((int(self.number), destination, new_pos))
             for i in range(len(self.headquarters)):
                 if i != last_element_index:
                     if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
