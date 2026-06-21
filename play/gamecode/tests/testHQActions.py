@@ -158,6 +158,25 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(test_game.action_chosen, "")
 
+    async def test_ambush_platform_action(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.cards = ["Ion Rifle"]
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Fire Warrior Strike Team"), 0)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Ambush Platform"))
+        test_game.p1.resources = 7
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        self.assertEqual(len(test_game.p1.cards), 0)
+        self.assertEqual(test_game.p1.resources, 7)
+        self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 1)), 1)
+
     async def test_craftworld_gate(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
