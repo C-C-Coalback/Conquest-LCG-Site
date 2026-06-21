@@ -58,6 +58,7 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.stored_damage), 0)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 2)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 1)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(test_game.action_chosen, "")
 
     async def test_ork_kannon(self):
@@ -73,6 +74,7 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
         await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
         self.assertEqual(len(test_game.stored_damage), 2)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 1)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 1)
 
@@ -93,6 +95,7 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HQ", "1", "0"])
         await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(len(test_game.p1.cards_in_play[1]), 3)
 
     async def test_khymera_den(self):
@@ -119,6 +122,7 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards_in_play[3]), 0)
         self.assertEqual(len(test_game.p1.cards_in_play[4]), 0)
         self.assertEqual(len(test_game.p1.cards_in_play[5]), 0)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(len(test_game.p1.headquarters), 1)
 
     async def test_catachan_outpost(self):
@@ -133,6 +137,7 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["HQ", "1", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 1), 4)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(test_game.action_chosen, "")
 
     async def test_twisted_laboratory(self):
@@ -150,6 +155,32 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p2.get_attack_given_pos(0, 1), 0)
         self.assertEqual(test_game.p2.get_blanked_given_pos(0, 1), True)
         self.assertEqual(test_game.p2.get_brutal_given_pos(0, 1), False)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
+        self.assertEqual(test_game.action_chosen, "")
+
+    async def test_craftworld_gate(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Enraged Ork"), 0)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Craftworld Gate"))
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        self.assertEqual(test_game.p1.cards, ["Enraged Ork"])
+        self.assertEqual(len(test_game.p1.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
+        self.assertEqual(test_game.action_chosen, "")
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Enraged Ork"))
+        test_game.p1.ready_given_pos(-2, 0)
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        self.assertEqual(test_game.p1.cards, ["Enraged Ork", "Enraged Ork"])
+        self.assertEqual(len(test_game.p1.headquarters), 1)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(test_game.action_chosen, "")
 
 
