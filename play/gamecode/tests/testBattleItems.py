@@ -704,5 +704,47 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
         self.assertEqual(test_game.p2.get_ready_given_pos(0, 1), False)
 
+    async def test_biel_tan_warp_spiders(self):
+        random.seed(42)
+        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
+            cato_deck_content = file.read()
+        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
+            nazdreg_deck_content = file.read()
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        test_game.p1.cards = ["Rogue Trader"]
+        test_game.p2.cards = ["Rogue Trader"]
+        test_game.p1.deck = ["Rogue Trader", "Void Pirate", "Gift of Isha", "Promethium Mine"]
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Biel-Tan Warp Spiders"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Biel-Tan Warp Spiders"), 0)
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        print(test_game.choices_available)
+        self.assertEqual(len(test_game.choices_available), 2)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        print(test_game.cards_in_search_box)
+        self.assertEqual(len(test_game.cards_in_search_box), 2)
+        await test_game.update_game_event("P1", ["SEARCH", "0"])
+        print(test_game.p1.deck)
+        self.assertEqual(test_game.p1.deck, ["Void Pirate", "Gift of Isha", "Promethium Mine"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "1"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        print(test_game.choices_available)
+        self.assertEqual(len(test_game.choices_available), 2)
+        await test_game.update_game_event("P2", ["CHOICE", "1"])
+        print(test_game.cards_in_search_box)
+        self.assertEqual(len(test_game.cards_in_search_box), 2)
+        await test_game.update_game_event("P2", ["SEARCH", "1"])
+        self.assertEqual(len(test_game.p1.deck), 2)
+        self.assertEqual(test_game.p1.deck, ["Void Pirate", "Promethium Mine"])
+        self.assertEqual(test_game.p1.discard, ["Rogue Trader", "Gift of Isha"])
+
+
 if __name__ == "__main__":
     unittest.main()
