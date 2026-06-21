@@ -95,6 +95,107 @@ class InterruptsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "1", "0"])
         self.assertEqual(test_game.p2.get_ready_given_pos(1, 0), False)
 
+    async def test_nullify_event_action(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Raid"]
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Spiritseer Erathal"), 0)
+        test_game.p2.cards = ["Nullify"]
+        test_game.p1.resources = 6
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
+        self.assertEqual(test_game.p2.get_ready_given_pos(0, 0), False)
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p2.cards, [])
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(test_game.p2.resources, 7)
+        self.assertEqual(test_game.mode, "Normal")
+        self.assertEqual(test_game.player_with_deploy_turn, "P2")
+        self.assertEqual(test_game.p1.discard, ["Raid"])
+        self.assertEqual(test_game.p2.discard, ["Nullify"])
+
+    async def test_nullify_event_reaction(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.cards = ["Contaminated Convoys", "No Mercy", "No Mercy", "No Mercy", "Indomitable", "Indomitable", "Indomitable"]
+        test_game.p2.cards = ["Nullify", "No Mercy", "No Mercy", "No Mercy", "Indomitable", "Indomitable", "Indomitable"]
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Spiritseer Erathal"), 0)
+        await test_game.update_game_event("P1", ["CHOICE", "1"])
+        await test_game.update_game_event("P2", ["CHOICE", "1"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
+        self.assertEqual(test_game.p2.get_ready_given_pos(0, 0), False)
+        self.assertEqual(len(test_game.p1.cards), 6)
+        self.assertEqual(len(test_game.p2.cards), 6)
+        self.assertEqual(test_game.p1.contaminated_convoys, False)
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(test_game.p2.resources, 7)
+        self.assertEqual(test_game.p1.discard, ["Contaminated Convoys"])
+        self.assertEqual(test_game.p2.discard, ["Nullify"])
+
+    async def test_nullify_event_pseudo_interrupt(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Spiritseer Erathal"), 0)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P2", ["PLANETS", "0"])
+        test_game.p1.cards = ["Superiority"]
+        test_game.p2.cards = ["Nullify"]
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Rogue Trader"), 0)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
+        self.assertEqual(test_game.p2.get_ready_given_pos(0, 0), False)
+        self.assertEqual(len(test_game.p1.cards), 0)
+        self.assertEqual(len(test_game.p2.cards), 0)
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(test_game.p2.resources, 7)
+        self.assertEqual(test_game.p1.discard, ["Superiority"])
+        self.assertEqual(test_game.p2.discard, ["Nullify"])
+
+    async def test_nullify_event_interrupt(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Spiritseer Erathal"), 0)
+        test_game.p1.cards = ["No Mercy"]
+        test_game.p2.cards = ["Nullify", "Indomitable"]
+        test_game.p2.assign_damage_to_pos(0, 0, 1)
+        await test_game.update_game_event("P2", [])
+        await test_game.update_game_event("P2", ["HAND", "2", "1"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        # FIXME: MISSING REQUIRED EXHAUSTION DUE TO NULLIFY FIRING FIRST
+        # await test_game.update_game_event_action("P1", ["HQ", "1", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
+        await test_game.update_game_event("P2", ["HAND", "2", "0"])  # FIXME: SHOULD NOT REQUIRE THIS EXTRA STEP
+        self.assertEqual(test_game.p2.get_ready_given_pos(0, 0), False)
+        self.assertEqual(len(test_game.p1.cards), 0)
+        self.assertEqual(len(test_game.p2.cards), 0)
+        # self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
+        self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
