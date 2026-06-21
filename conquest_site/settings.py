@@ -142,8 +142,13 @@ MEDIA_URL = 'media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
+try:
+    local_hostname_ip = socket.gethostbyname(socket.gethostname())
+except socket.gaierror:
+    local_hostname_ip = "127.0.0.1"
+
 CSRF_TRUSTED_ORIGINS = [
-    'https://' + socket.gethostbyname(socket.gethostname()), "https://www.iridial.net"
+    f"https://{local_hostname_ip}", "https://www.iridial.net"
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
