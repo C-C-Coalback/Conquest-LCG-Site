@@ -10,6 +10,7 @@ import traceback
 import datetime
 import copy
 from django.contrib.auth.models import User
+from django.db.utils import OperationalError, ProgrammingError
 import update_settings
 
 
@@ -38,10 +39,10 @@ condition_games = threading.Condition()
 
 
 def get_users():
-    all_users = User.objects.values()
-    usernames = []
-    for i in range(len(all_users)):
-        usernames.append((all_users[i]['username']))
+    try:
+        usernames = list(User.objects.values_list("username", flat=True))
+    except (OperationalError, ProgrammingError):
+        return
     with open(os.getcwd() + "/users_list.txt", "w") as user_file:
         user_file.write("\n".join(usernames))
 
