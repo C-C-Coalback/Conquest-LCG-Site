@@ -458,6 +458,25 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.add_card_to_planet(card, 1)
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 5)
 
+    async def test_hypex_injector(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Raid"]
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Baleful Mandrake"), 0)
+        test_game.p1.exhaust_given_pos(0, 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Hypex Injector"), 0, 0)
+        test_game.p1.resources = 6
+        test_game.p2.resources = 7
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.p1.get_ready_given_pos(0, 0), True)
+
 
 if __name__ == "__main__":
     unittest.main()
