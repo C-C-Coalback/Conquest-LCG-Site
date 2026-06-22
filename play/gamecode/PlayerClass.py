@@ -1263,8 +1263,11 @@ class Player:
                     return "playable"
             return "unplayable"
         elif self.game.card_to_deploy is not None:
-            if self.game.card_to_deploy.get_card_type() == "Attachment" and self.game.phase == "DEPLOY":
-                non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
+            non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
+            army_attach = False
+            if self.game.card_to_deploy.get_ability() in non_attachs_that_can_be_played_as_attach:
+                army_attach = True
+            if (self.game.card_to_deploy.get_card_type() == "Attachment" or army_attach) and self.game.phase == "DEPLOY":
                 not_own_attach = False
                 if self.game.player_with_deploy_turn != self.name_player:
                     not_own_attach = True
