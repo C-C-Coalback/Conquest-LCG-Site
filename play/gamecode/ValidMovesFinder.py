@@ -1,5 +1,97 @@
+import copy
+import os
+import re
 from .AbilityTargetsDictionary import ability_targets_dictionary
 from .DetectPossibleActions import detect_possible_actions
+
+
+def load_action_resolution_abilities():
+    abilities = set()
+    actions_dir = os.path.join(os.path.dirname(__file__), "Actions")
+    equality_pattern = re.compile(r"self\.action_object\.action_chosen\s*==\s*[\"']([^\"']+)[\"']")
+    list_pattern = re.compile(r"self\.action_object\.action_chosen\s+in\s+\[([^\]]+)\]")
+    list_item_pattern = re.compile(r"[\"']([^\"']+)[\"']")
+    try:
+        file_names = os.listdir(actions_dir)
+    except OSError:
+        return abilities
+    for file_name in file_names:
+        if not file_name.endswith(".py"):
+            continue
+        if file_name in ["ActionClass.py", "__init__.py"]:
+            continue
+        file_path = os.path.join(actions_dir, file_name)
+        try:
+            with open(file_path, "r") as action_file:
+                content = action_file.read()
+        except OSError:
+            continue
+        for ability in equality_pattern.findall(content):
+            abilities.add(ability)
+        for list_match in list_pattern.findall(content):
+            for ability in list_item_pattern.findall(list_match):
+                abilities.add(ability)
+    return abilities
+
+
+ACTION_RESOLUTION_ABILITIES = load_action_resolution_abilities()
+
+
+def check_if_deploy_action_has_non_pass_followup(self, primary_player, ability):
+    original_what_is_required = self.what_is_required_automated
+    original_player_waited_on = self.automated_player_waited_on
+    original_mode = self.mode
+    original_stored_mode = self.stored_mode
+    original_clickable_items = copy.deepcopy(self.clickable_items_automated)
+    original_action_object = copy.deepcopy(self.action_object)
+    try:
+        self.what_is_required_automated = "Action"
+        self.automated_player_waited_on = primary_player.name_player
+        self.mode = "ACTION"
+        self.stored_mode = "Normal"
+        self.action_object.reset_action_data()
+        self.action_object.action_chosen = ability
+        self.action_object.player_with_action = primary_player.name_player
+        followup_moves = determine_valid_moves(self)
+        for move in followup_moves:
+            if move != "pass-P1":
+                return True
+        return False
+    finally:
+        self.what_is_required_automated = original_what_is_required
+        self.automated_player_waited_on = original_player_waited_on
+        self.mode = original_mode
+        self.stored_mode = original_stored_mode
+        self.clickable_items_automated = original_clickable_items
+        self.action_object = original_action_object
+
+
+def check_if_deploy_event_action_card_is_currently_legal(self, primary_player, hand_pos, possible_deploy_actions=None):
+    card = primary_player.get_card_in_hand(hand_pos)
+    if card is None:
+        return False
+    if card.get_card_type() != "Event":
+        return True
+    if not card.get_has_action_while_in_hand():
+        return True
+    if card.get_allowed_phases_while_in_hand() not in [self.phase, "ALL"]:
+        return True
+    if possible_deploy_actions is None:
+        if str(primary_player.number) == "1":
+            secondary_player = self.p2
+        else:
+            secondary_player = self.p1
+        possible_deploy_actions = detect_possible_actions(
+            self, primary_player, secondary_player, combat_turn_action=False
+        )
+    special_action_token = "SPECIAL_ACTION_HAND/" + str(primary_player.number) + "/" + str(hand_pos)
+    if special_action_token not in possible_deploy_actions:
+        return False
+    ability = card.get_ability()
+    ability_needs_followup = ability in ACTION_RESOLUTION_ABILITIES or ability in ability_targets_dictionary
+    if not ability_needs_followup:
+        return True
+    return check_if_deploy_action_has_non_pass_followup(self, primary_player, ability)
 
 
 def update_automated_attributes(self):
@@ -140,6 +232,9 @@ def update_automated_attributes(self):
             self.automated_player_waited_on = self.name_1
         else:
             self.automated_player_waited_on = self.name_2
+    elif self.phase.startswith("FIN"):
+        self.what_is_required_automated = "Game Over"
+        self.automated_player_waited_on = ""
     elif self.phase == "SETUP":
         self.what_is_required_automated = "SETUP"
         if not self.p1.deck_loaded:
@@ -384,21 +479,103 @@ def determine_valid_moves(self):
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Deploy Turn":
-            if self.card_to_deploy is None:
-                valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
+            if self.mode == "ACTION" and self.card_to_deploy is None:
+                valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=True)
+                if not valid_moves:
+                    valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            elif self.card_to_deploy is None:
+                deploy_action_locations = detect_possible_actions(
+                    self, primary_player, secondary_player, combat_turn_action=False
+                )
+                valid_moves = copy.copy(deploy_action_locations)
                 for i in range(len(primary_player.cards)):
                     playability = primary_player.determine_playability(primary_player.cards[i])
                     if playability == "playable":
+                        if not check_if_deploy_event_action_card_is_currently_legal(
+                                self, primary_player, i, possible_deploy_actions=deploy_action_locations):
+                            continue
                         valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
             else:
-                if self.card_to_deploy.get_card_type() == "Army":
-                    valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
-                if self.card_to_deploy.get_card_type() == "Attachment":
-                    if self.card_to_deploy.planet_attachment:
+                selected_card = self.card_to_deploy
+                selected_card_still_playable = True
+                if selected_card.get_limited() and not primary_player.get_can_play_limited():
+                    selected_card_still_playable = False
+                if primary_player.determine_lowest_possible_cost_of_card(selected_card) > primary_player.get_resources():
+                    selected_card_still_playable = False
+                if selected_card_still_playable:
+                    if selected_card.get_card_type() == "Army":
                         valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
-                    else:
-                        valid_moves = primary_player.get_playable_borders()
+                    if selected_card.get_card_type() == "Attachment":
+                        if selected_card.planet_attachment:
+                            for i in range(len(self.planets_in_play_array)):
+                                if not self.planets_in_play_array[i]:
+                                    continue
+                                can_continue = True
+                                if selected_card.get_ability() == "Trapped Objective" and i == self.round_number:
+                                    can_continue = False
+                                if selected_card.get_unique():
+                                    if primary_player.search_for_unique_card(selected_card.get_name()):
+                                        can_continue = False
+                                if selected_card.get_limited():
+                                    if not primary_player.get_can_play_limited():
+                                        can_continue = False
+                                if selected_card.limit_one_per_unit:
+                                    for j in range(len(primary_player.attachments_at_planet[i])):
+                                        if primary_player.attachments_at_planet[i][j].get_name() == selected_card.get_name():
+                                            can_continue = False
+                                if selected_card.red_required and not self.get_red_icon(i):
+                                    can_continue = False
+                                if selected_card.blue_required and not self.get_blue_icon(i):
+                                    can_continue = False
+                                if selected_card.green_required and not self.get_green_icon(i):
+                                    can_continue = False
+                                discounts = primary_player.search_hq_for_discounts("", "", is_attachment=True)
+                                required_resources = selected_card.get_cost() - discounts
+                                if required_resources < 0:
+                                    required_resources = 0
+                                if required_resources > primary_player.get_resources():
+                                    can_continue = False
+                                if can_continue:
+                                    valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
+                        else:
+                            non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
+                            army_unit_as_attachment = selected_card.get_name() in non_attachs_that_can_be_played_as_attach
+                            for i in range(len(primary_player.headquarters)):
+                                if primary_player.check_if_can_attach_card(
+                                        selected_card, -2, i, not_own_attachment=False,
+                                        army_unit_as_attachment=army_unit_as_attachment):
+                                    valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
+                            for i in range(7):
+                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    if primary_player.check_if_can_attach_card(
+                                            selected_card, i, j, not_own_attachment=False,
+                                            army_unit_as_attachment=army_unit_as_attachment):
+                                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                            for i in range(len(secondary_player.headquarters)):
+                                if secondary_player.check_if_can_attach_card(
+                                        selected_card, -2, i, not_own_attachment=True,
+                                        army_unit_as_attachment=army_unit_as_attachment):
+                                    valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
+                            for i in range(7):
+                                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                                    if secondary_player.check_if_can_attach_card(
+                                            selected_card, i, j, not_own_attachment=True,
+                                            army_unit_as_attachment=army_unit_as_attachment):
+                                        valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                if not valid_moves:
+                    deploy_action_locations = detect_possible_actions(
+                        self, primary_player, secondary_player, combat_turn_action=False
+                    )
+                    valid_moves = copy.copy(deploy_action_locations)
+                    for i in range(len(primary_player.cards)):
+                        playability = primary_player.determine_playability(primary_player.cards[i])
+                        if playability == "playable":
+                            if not check_if_deploy_event_action_card_is_currently_legal(
+                                    self, primary_player, i, possible_deploy_actions=deploy_action_locations):
+                                continue
+                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+                    valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Commitment":
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
         elif self.what_is_required_automated == "Command not Commitment":
@@ -439,6 +616,8 @@ def determine_valid_moves(self):
                         valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
                 if primary_player.get_area_effect_given_pos(self.attacker_planet, self.attacker_position) > 0:
                     valid_moves = add_valid_move(valid_moves, primary_player, "PLANETS", planet_pos=battle_planet)
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Retreat Turn":
             battle_planet = self.last_planet_checked_for_battle
             for i in range(len(primary_player.cards_in_play[battle_planet + 1])):

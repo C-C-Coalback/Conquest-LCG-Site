@@ -12,6 +12,7 @@ import copy
 from django.contrib.auth.models import User
 from django.db.utils import OperationalError, ProgrammingError
 import update_settings
+from . import turn_notifier
 
 
 ban_list_apoka = [
@@ -49,8 +50,47 @@ def get_users():
 
 get_users()
 
+def _find_active_game_by_id(game_id):
+    for i in range(len(active_games)):
+        if active_games[i].game_id == game_id:
+            return active_games[i]
+    return None
+
+
+def _game_is_finished(game):
+    if game is None:
+        return True
+    phase = getattr(game, "phase", "")
+    if isinstance(phase, str) and phase.startswith("FIN"):
+        return True
+    try:
+        if game.p1.is_the_winner or game.p2.is_the_winner:
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def prune_spectator_games():
+    global spectator_games
+    current_time = datetime.datetime.now()
+    i = 0
+    while i < len(spectator_games):
+        remove_game = False
+        if spectator_games[i][3] < current_time:
+            remove_game = True
+        else:
+            game = _find_active_game_by_id(spectator_games[i][2])
+            if _game_is_finished(game):
+                remove_game = True
+        if remove_game:
+            del spectator_games[i]
+            i = i - 1
+        i = i + 1
+
 
 def get_lobbies():
+    prune_spectator_games()
     return active_lobbies, spectator_games
 
 
@@ -180,14 +220,9 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                       + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] +\
                       "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
             await self.chat_message({"type": "chat.message", "message": message})
-        i = 0
         print("CURRENT SPEC")
         print(spectator_games)
-        while i < len(spectator_games):
-            if spectator_games[i][3] < datetime.datetime.now():
-                del spectator_games[i]
-                i = i - 1
-            i = i + 1
+        prune_spectator_games()
         message = "Delete spec"
         print("CURRENT SPEC")
         print(spectator_games)
@@ -383,6 +418,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     spectator_games.append((first_name, second_name, game_id, end_time))
                     print("End game time:")
                     print(end_time)
+                prune_spectator_games()
                 message = "Move to game/" + game_id + "/" + first_name + "/" + second_name
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
@@ -558,6 +594,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                     game_relevant_string = self.name + "|||" + "/".join(message[1:])
                     active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, message[1:])
+                    try:
+                        turn_notifier.maybe_notify_turn_changed(active_games[current_game_id])
+                    except Exception:
+                        pass
                 except:
                     try:
                         with open("errorslog.txt", "a") as f:
@@ -586,6 +626,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                         game_relevant_string = message[1] + "|||" + "/".join(message[2:])
                         active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                         await active_games[current_game_id].update_game_event(message[1], message[2:])
+                    try:
+                        turn_notifier.maybe_notify_turn_changed(active_games[current_game_id])
+                    except Exception:
+                        pass
                 except:
                     try:
                         with open("errorslog.txt", "a") as f:

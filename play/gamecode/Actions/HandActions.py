@@ -997,15 +997,39 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.action_object.action_chosen = "Warpstorm"
                             primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Tzeentch's Firestorm":
-                        self.action_object.action_chosen = ability
-                        primary_player.aiming_reticle_color = "blue"
-                        primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
-                        self.choices_available = []
-                        for i in range(primary_player.resources + 1):
-                            self.choices_available.append(str(i))
-                        self.name_player_making_choices = primary_player.name_player
-                        self.choice_context = "Amount to spend for Tzeentch's Firestorm:"
-                        self.amount_spend_for_tzeentch_firestorm = -1
+                        has_valid_target = False
+                        for player in [primary_player, secondary_player]:
+                            for unit_pos in range(len(player.headquarters)):
+                                if player.check_is_unit_at_pos(-2, unit_pos):
+                                    if player.get_card_type_given_pos(-2, unit_pos) != "Warlord":
+                                        has_valid_target = True
+                                        break
+                            if has_valid_target:
+                                break
+                            for planet_pos in range(7):
+                                for unit_pos in range(len(player.cards_in_play[planet_pos + 1])):
+                                    if player.check_is_unit_at_pos(planet_pos, unit_pos):
+                                        if player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                                            has_valid_target = True
+                                            break
+                                if has_valid_target:
+                                    break
+                            if has_valid_target:
+                                break
+                        if not has_valid_target:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
+                                                              "No non-warlord units are in play.")
+                            primary_player.add_resources(cost, refund=True)
+                        else:
+                            self.action_object.action_chosen = ability
+                            primary_player.aiming_reticle_color = "blue"
+                            primary_player.aiming_reticle_coords_hand = int(game_update_string[2])
+                            self.choices_available = []
+                            for i in range(primary_player.resources + 1):
+                                self.choices_available.append(str(i))
+                            self.name_player_making_choices = primary_player.name_player
+                            self.choice_context = "Amount to spend for Tzeentch's Firestorm:"
+                            self.amount_spend_for_tzeentch_firestorm = -1
                     elif ability == "Infernal Gateway":
                         self.action_object.action_chosen = "Infernal Gateway"
                         primary_player.discard_card_from_hand(hand_pos)

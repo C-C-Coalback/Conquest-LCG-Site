@@ -174,6 +174,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 can_continue = False
                     if not can_continue:
                         await self.send_update_message("You are forced to win the battle if you don't have a way to exhaust your units.")
+                        await self.check_combat_end(name)
                     else:
                         self.number_with_combat_turn = "2"
                         self.player_with_combat_turn = self.name_2
@@ -194,6 +195,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                 can_continue = False
                     if not can_continue:
                         await self.send_update_message("You are forced to win the battle if you don't have a way to exhaust your units.")
+                        await self.check_combat_end(name)
                     else:
                         self.number_with_combat_turn = "1"
                         self.player_with_combat_turn = self.name_1

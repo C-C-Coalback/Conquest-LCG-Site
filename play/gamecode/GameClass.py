@@ -17,6 +17,7 @@ import os
 import sys
 from . import ValidMovesFinder
 from . import Commands
+from .. import profile_records
 
 
 class Game:
@@ -46,6 +47,7 @@ class Game:
         self.bot_is_present = bot_is_present
         self.saved_moves = []
         self.saved_move_id = 0
+        self.profile_result_recorded = False
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
@@ -780,9 +782,8 @@ class Game:
         await self.p2.send_victory_display()
         await self.send_planet_array(force=True)
         await self.send_initiative(force=True)
-        if self.bot_is_present:
-            await self.update_automated_info()
-            await self.send_automated_info(force=True)
+        await self.update_automated_info()
+        await self.send_automated_info(force=True)
         self.condition_main_game.notify_all()
         self.condition_main_game.release()
 
@@ -1471,7 +1472,9 @@ class Game:
                         await self.send_update_message("Stopping Memories of Fallen Comrades early")
                         self.action_cleanup()
                     else:
-                        await self.send_update_message("Too far in; action must be concluded now. Use /force-quit-action to quit.")
+                        action_was_cancelled = await self.try_cancel_reversible_dead_end_action(primary_player)
+                        if not action_was_cancelled:
+                            await self.send_update_message("Too far in; action must be concluded now. Use /force-quit-action to quit.")
             elif len(game_update_string) == 2:
                 if game_update_string[0] == "PLANETS":
                     await PlanetActions.update_game_event_action_planet(self, name, game_update_string)
@@ -1805,7 +1808,63 @@ class Game:
             self.p1.is_the_winner = True
         elif winner_name == self.name_2:
             self.p2.is_the_winner = True
+        if not self.phase.startswith("FIN"):
+            self.phase = "FIN/" + reason.replace("/", "-")
+        if not self.profile_result_recorded:
+            try:
+                profile_records.record_finished_game_result(self, winner_name, reason)
+            except Exception as e:
+                print(e)
+            self.profile_result_recorded = True
         await self.send_update_message(victory_string)
+    def check_if_any_planets_in_play(self):
+        for i in range(len(self.planets_in_play_array)):
+            if self.planets_in_play_array[i]:
+                return True
+        return False
+
+    async def resolve_no_planets_remaining_endgame(self):
+        if self.check_if_any_planets_in_play():
+            return False
+        self.committing_warlords = False
+        self.before_command_struggle = False
+        self.after_command_struggle = False
+        self.battle_in_progress = False
+        self.phase = "FIN/NO_PLANETS_REMAINING"
+        if self.p1.is_the_winner or self.p2.is_the_winner:
+            return True
+        p1_icons = self.p1.get_icons_on_captured()
+        p2_icons = self.p2.get_icons_on_captured()
+        p1_icon_win = p1_icons[0] > 2 or p1_icons[1] > 2 or p1_icons[2] > 2
+        p2_icon_win = p2_icons[0] > 2 or p2_icons[1] > 2 or p2_icons[2] > 2
+        if p1_icon_win and not p2_icon_win:
+            winner_name = self.name_1
+            reason = "icons on captured planets"
+        elif p2_icon_win and not p1_icon_win:
+            winner_name = self.name_2
+            reason = "icons on captured planets"
+        elif self.last_player_to_capture_planet == self.name_1:
+            winner_name = self.name_1
+            reason = "capturing the last available planet"
+        elif self.last_player_to_capture_planet == self.name_2:
+            winner_name = self.name_2
+            reason = "capturing the last available planet"
+        elif len(self.p1.victory_display) > len(self.p2.victory_display):
+            winner_name = self.name_1
+            reason = "capturing more planets when none remained"
+        elif len(self.p2.victory_display) > len(self.p1.victory_display):
+            winner_name = self.name_2
+            reason = "capturing more planets when none remained"
+        else:
+            winner_name = "???"
+            reason = "no planets remained and no clear winner"
+        await self.send_update_message(
+            "----GAME END----"
+            "Victory for " + winner_name + "; " + reason + "."
+            "----GAME END----"
+        )
+        await self.send_victory_proper(winner_name, reason)
+        return True
 
     def determine_last_planet(self):
         last = -1
@@ -2635,7 +2694,7 @@ class Game:
         elif self.nullify_context == "Reaction Event":
             self.delete_reaction()
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+        elif self.nullify_context in ("Ferrin", "Iridial"):
             await self.resolve_battle_conclusion(secondary_player, game_string="")
 
     async def complete_backlash(self, primary_player, secondary_player):
@@ -2678,7 +2737,7 @@ class Game:
             self.delete_reaction()
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
             secondary_player.resolve_played_any_event()
-        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+        elif self.nullify_context in ("Ferrin", "Iridial"):
             await self.resolve_battle_conclusion(secondary_player, game_string="")
 
     def mask_jain_zar_check_actions(self, primary_player, secondary_player):
@@ -2768,7 +2827,7 @@ class Game:
         elif self.nullify_context == "Reaction Event":
             self.delete_reaction()
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+        elif self.nullify_context in ("Ferrin", "Iridial"):
             await self.resolve_battle_conclusion(secondary_player, game_string="")
 
     async def resolve_immortal_loyalist(self, name, primary_player, secondary_player):
@@ -2865,8 +2924,50 @@ class Game:
         elif self.nullify_context == "Reaction Event":
             self.delete_reaction()
             secondary_player.discard_card_name_from_hand(self.nullified_card_name)
-        elif self.nullify_context == "Ferrin" or self.nullify_context == "Iridial":
+        elif self.nullify_context in ("Ferrin", "Iridial"):
             await self.resolve_battle_conclusion(secondary_player, game_string="")
+
+    async def try_cancel_reversible_dead_end_action(self, primary_player):
+        hand_pos = primary_player.aiming_reticle_coords_hand
+        if hand_pos is None or hand_pos == -1:
+            return False
+        if hand_pos < 0:
+            return False
+        if hand_pos >= len(primary_player.cards):
+            return False
+        current_action_name = self.action_object.action_chosen
+        if not current_action_name:
+            return False
+        card_name = primary_player.cards[hand_pos]
+        card = self.preloaded_find_card(card_name)
+        if card is None:
+            return False
+        if card.get_ability() != current_action_name:
+            return False
+        ValidMovesFinder.update_automated_attributes(self)
+        non_pass_moves = []
+        for move in self.clickable_items_automated:
+            if move != "pass-P1":
+                non_pass_moves.append(move)
+        if non_pass_moves:
+            return False
+        refund_amount = card.get_cost(primary_player.urien_relevant)
+        if refund_amount > 0:
+            primary_player.add_resources(refund_amount, refund=True)
+        primary_player.aiming_reticle_coords_hand = None
+        primary_player.aiming_reticle_color = None
+        self.mode = self.stored_mode
+        if not self.mode:
+            self.mode = "Normal"
+        self.stored_mode = ""
+        self.action_object.reset_action_data()
+        self.action_object.action_chosen = ""
+        self.action_object.player_with_action = ""
+        self.action_object.position_of_actioned_card = (-1, -1)
+        await self.send_update_message(
+            "No legal continuation was found for " + card_name + "; action cancelled and resources refunded."
+        )
+        return True
 
     def action_cleanup(self):
         self.action_object.reset_action_data()
@@ -4152,6 +4253,9 @@ class Game:
                 j = j + 1
         if self.phase == "COMMAND":
             self.committing_warlords = True
+            if not self.check_if_any_planets_in_play():
+                await self.resolve_no_planets_remaining_endgame()
+                return None
         if self.phase == "COMBAT":
             if self.p1.search_card_in_hq("'idden Base"):
                 self.p1.idden_base_transform()
@@ -7851,9 +7955,8 @@ class Game:
         await self.send_queued_sound()
         await self.send_queued_message()
         await self.send_queued_mistarget_message()
-        if self.bot_is_present:
-            await self.update_automated_info()
-            await self.send_automated_info()
+        await self.update_automated_info()
+        await self.send_automated_info()
 
     def get_name_interrupts_of_players_interrupts(self, name):
         interrupts_positions_list = []
