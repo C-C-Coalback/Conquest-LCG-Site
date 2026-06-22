@@ -422,6 +422,8 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Bodyguard":
+            valid_moves = primary_player.get_playable_borders()
         elif self.what_is_required_automated == "Outside Combat":
             valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")

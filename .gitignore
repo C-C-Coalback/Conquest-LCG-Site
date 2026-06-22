@@ -8,3 +8,7 @@ db.sqlite3
 db2.sqlite3
 /errorslog.txt
 /staticfiles/images/CroppedImages/
+/_trial_temp/_trial_marker
+/_trial_temp/user_preferences_storage/P1.json
+/_trial_temp/user_preferences_storage/P2.json
+/_trial_temp/test.log

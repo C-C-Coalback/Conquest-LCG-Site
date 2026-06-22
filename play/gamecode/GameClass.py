@@ -13,7 +13,6 @@ from .Interrupts import StartInterrupt, InPlayInterrupts, PlanetInterrupts, HQIn
     AttachmentHQInterrupts, AttachmentInPlayInterrupts, InterruptsClass
 from .Intercept import InPlayIntercept, HQIntercept
 from . import CardClasses
-from .Damage import DamageClass
 import os
 import sys
 from . import ValidMovesFinder

@@ -87,7 +87,6 @@ class Player:
         self.warlord_just_got_bloodied = False
         self.automated_command_rewards = True
         self.cardback_name = "Cardback"
-        cwd = os.getcwd()
         data = update_settings.get_user_settings(self.name_player)
         self.cardback_name = data["cardback"]
         self.condition_player_main = threading.Condition()
@@ -1243,6 +1242,12 @@ class Player:
         return False
 
     def determine_border(self, planet_pos, unit_pos):
+        if self.game.manual_bodyguard_resolution:
+            if self.game.name_player_manual_bodyguard == self.name_player:
+                if planet_pos == self.game.planet_bodyguard:
+                    if unit_pos in self.game.body_guard_positions:
+                        return "playable"
+            return "unplayable"
         if self.game.mode == "DISCOUNT":
             if self.game.determine_player_with_discounts()[0].name_player == self.name_player:
                 if self.get_aiming_reticle_in_play(planet_pos, unit_pos) == "green":

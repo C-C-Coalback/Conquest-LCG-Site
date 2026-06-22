@@ -481,7 +481,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
             cato_deck_content = file.read()
         with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
             nazdreg_deck_content = file.read()
-        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], bot_is_present=True)
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
         await skip_to_battle_first_planet(test_game)
@@ -495,6 +495,8 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.attach_card(test_game.preloaded_find_card("Bodyguard"), 0, 2)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
+        self.assertEqual(test_game.last_automated_data_string, "GAME_INFO/AUTOMATED_DATA/Bodyguard/P2/|||IN_PLAY/2/0/1|||IN_PLAY/2/0/2|||")
+        self.assertEqual(test_game.manual_bodyguard_resolution, True)
         self.assertEqual(len(test_game.stored_damage), 0)
         await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "1"])
         self.assertEqual(len(test_game.stored_damage), 1)
