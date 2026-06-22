@@ -1769,6 +1769,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 self.may_move_defender = True
                 self.shadow_thorns_body_allowed = True
             elif self.reactions_needing_resolving[0].get_reaction_name() == "Firedrake Terminators" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "The Black Sword" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Rampaging Knarloc" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Neurotic Obliterator":
                 self.allow_damage_abilities_defender = False

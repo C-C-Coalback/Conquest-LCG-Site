@@ -2030,6 +2030,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.damage_abilities_defender_active = True
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
+        elif current_reaction == "The Black Sword":
+            self.damage_abilities_defender_active = True
+            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
+            self.delete_reaction()
         elif current_reaction == "Calibration Error":
             cost = 2
             if primary_player.urien_relevant:
@@ -2115,9 +2119,6 @@ async def start_resolving_reaction(self, name, game_update_string):
                     if secondary_player.cards_in_play[i + 1][j].resolving_attack:
                         secondary_player.assign_damage_to_pos(i, j, 4, rickety_warbuggy=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
-        elif current_reaction == "The Black Sword":
-            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
             self.delete_reaction()
         elif current_reaction == "Commissar Somiel":
             primary_player.summon_token_at_hq("Guardsman")

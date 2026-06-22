@@ -1137,6 +1137,22 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     self.last_defender_position = (secondary_player.number,
                                                                    self.defender_planet,
                                                                    self.defender_position)
+                                if secondary_player.search_attachments_at_pos(
+                                        self.defender_planet, self.defender_position, "The Black Sword"
+                                ):
+                                    can_continue = False
+                                    await self.send_update_message(
+                                        "The Black Sword must fire before the rest of the attack."
+                                    )
+                                    secondary_player.set_aiming_reticle_in_play(
+                                        self.defender_planet, self.defender_position, "blue"
+                                    )
+                                    self.create_reaction("The Black Sword", secondary_player.name_player,
+                                                         (int(primary_player.number), self.attacker_planet,
+                                                          self.attacker_position))
+                                    self.last_defender_position = (secondary_player.number,
+                                                                   self.defender_planet,
+                                                                   self.defender_position)
                             if can_continue and self.allow_damage_abilities_defender:
                                 if secondary_player.get_ability_given_pos(
                                         self.defender_planet, self.defender_position) == "Rampaging Knarloc":
@@ -1321,12 +1337,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                         self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
                                                              (int(secondary_player.number), self.defender_planet,
                                                               -1))
-                                if secondary_player.search_attachments_at_pos(
-                                        self.defender_planet, self.defender_position, "The Black Sword"
-                                ):
-                                    self.create_reaction("The Black Sword", secondary_player.name_player,
-                                                         (int(primary_player.number), self.attacker_planet,
-                                                          self.attacker_position))
                                 # Flying check
                                 if def_flying and not att_flying and not att_ignores_flying:
                                     attack_value = int(attack_value / 2 + (attack_value % 2))
