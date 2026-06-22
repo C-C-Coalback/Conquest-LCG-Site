@@ -468,6 +468,26 @@
 
         }
 
+        function determineForcedWidth() {
+            var forced_width = "0vw";
+            if (stored_focused_planet !== -1) {
+                var num_excess_planets = 0;
+                var first_pos_in_play = -1;
+                for (var i = 0; i < inPlayPlanets.length; i++) {
+                    if (inPlayPlanets[i] === "true") {
+                        if (first_pos_in_play === -1) {
+                            first_pos_in_play = i;
+                        }
+                    }
+                }
+                num_excess_planets = first_pos_in_play;
+                var width_excess_planets = 10;
+                var available_width = width_excess_planets * num_excess_planets;
+                forced_width = available_width.toString() + "vw";
+            }
+            return forced_width
+        }
+
         function setPlanetAppearances(first_pos_in_play, forced_width, focused_planet) {
             if (first_pos_in_play === -1) {
                 first_pos_in_play = 6;
@@ -573,7 +593,12 @@
             if (focused_planet !== -1) {
                 planet_width_value = "10vw";
             }
+            var value_width_integer = parseInt(forced_width.replace("vw", ""))
+            var value_planet_width_integer = parseInt(planet_width_value.replace("vw", ""))
             updateGridTemplateColumns(first_pos_in_play, focused_planet);
+            var zoom_value = current_zoom;
+            forced_width = (value_width_integer * zoom_value).toString() + "vw";
+            planet_width_value = (value_planet_width_integer * zoom_value).toString() + "vw";
             for (var i = 0; i < inPlayPlanets.length; i++) {
                 if (i === focused_planet) {
                     document.getElementById("player-1-cards-planet-" + (i).toString()).style.maxWidth = forced_width;
@@ -717,22 +742,7 @@
                                 stored_focused_planet = -1;
                             }
                         }
-                        var forced_width = "0vw";
-                        if (stored_focused_planet !== -1) {
-                            var num_excess_planets = 0;
-                            var first_pos_in_play = -1;
-                            for (var i = 0; i < inPlayPlanets.length; i++) {
-                                if (inPlayPlanets[i] === "true") {
-                                    if (first_pos_in_play === -1) {
-                                        first_pos_in_play = i;
-                                    }
-                                }
-                            }
-                            num_excess_planets = first_pos_in_play;
-                            var width_excess_planets = 10;
-                            var available_width = width_excess_planets * num_excess_planets;
-                            var forced_width = available_width.toString() + "vw";
-                        }
+                        var forced_width = determineForcedWidth();
                         setPlanetAppearances(first_pos_in_play, forced_width, stored_focused_planet);
                     }
                 } else if (split_data[1] === "INFO_BOX") {
