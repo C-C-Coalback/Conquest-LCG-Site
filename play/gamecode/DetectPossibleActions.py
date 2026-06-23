@@ -101,11 +101,17 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
     requires_in_play_card = prereqs["Requires In Play Card"]
     once_per_phase = prereqs["Once Per Phase"]
     ready_required = prereqs["Ready Required"]
+    exhaust_required = prereqs["Exhaust Required"]
     special = prereqs["Special"]
     if ready_required:
         if card is None:
             return False
         if not card.get_ready():
+            return False
+    if exhaust_required:
+        if card is None:
+            return False
+        if card.get_ready():
             return False
     if once_per_phase:
         if card is None:

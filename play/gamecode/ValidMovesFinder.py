@@ -1,6 +1,7 @@
 import copy
 import os
 import re
+
 from .AbilityTargetsDictionary import ability_targets_dictionary
 from .DetectPossibleActions import detect_possible_actions
 
@@ -85,6 +86,9 @@ def check_if_deploy_event_action_card_is_currently_legal(self, primary_player, h
         if not primary_player.get_can_play_limited():
             return False
         if primary_player.get_resources() >= secondary_player.get_resources():
+            return False
+    elif ability == "Tzeentch's Firestorm":
+        if primary_player.get_resources() == 0:
             return False
     ability_needs_followup = ability in ability_targets_dictionary
     if possible_deploy_actions is None:
@@ -220,7 +224,7 @@ def update_automated_attributes(self):
                 self.what_is_required_automated = "Retreat Turn"
                 self.automated_player_waited_on = self.player_with_combat_turn
             else:
-                if (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.bot_is_present:
+                if (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.bot_is_present:  # Remove bot_is_present requirement if you want to manually test action windows between combat turns
                     self.automated_player_waited_on = self.get_action_window_between_combat_turns_player()
                     self.what_is_required_automated = "Action Window Between Combat Turns"
                 else:
@@ -382,6 +386,16 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                 if ability.chosen_first_card:
                     if ability.misc_target_planet != planet_pos:
                         return False
+            elif ability.action_chosen == "Kraktoof Hall":
+                if not ability.chosen_first_card:
+                    other_player = player.get_other_player()
+                    if len(other_player.cards_in_play[planet_pos + 1]) + len(player.cards_in_play[planet_pos + 1]) < 2:
+                        return False
+                    if player.get_damage_given_pos(planet_pos, unit_pos) == 0:
+                        return False
+                if ability.chosen_first_card:
+                    if ability.misc_target_planet != planet_pos:
+                        return False
         elif ability == "Planet":
             pass
     if targets and enemy_ability:
@@ -476,6 +490,12 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
         elif self.what_is_required_automated == "Discount":
             valid_moves = primary_player.get_playable_borders()
+            hand_disc = primary_player.search_hand_for_discounts(self.card_to_deploy.get_faction(), self.card_to_deploy.get_traits())
+            if hand_disc > 0:
+                if self.card_to_deploy.get_faction() == "Orks":
+                    for i in range(len(primary_player.cards)):
+                        if primary_player.cards[i] == "Bigga Is Betta":
+                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
             if self.card_to_deploy.get_cost() <= primary_player.get_resources() - self.discounts_applied:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
             if not valid_moves:

@@ -171,6 +171,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.player_with_combat_turn = secondary_player.get_name_player()
             elif self.mode == "Normal" and self.check_if_battle_taking_place() and (
                     not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and \
+                    self.bot_is_present and \
                     name == self.get_action_window_between_combat_turns_player() and \
                     name != self.player_with_combat_turn:
                 if name == self.name_1:

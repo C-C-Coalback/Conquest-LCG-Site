@@ -196,6 +196,43 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Kraktoof Hall": {
+        "Num Stages": 2,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Action"
+        },
+        "Type 2": "In Play",
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -313,6 +350,7 @@ action_ability_starts = {
         "Requires In Play Card": False,
         "Once Per Phase": False,
         "Ready Required": False,
+        "Exhaust Required": False,
         "Attributes Hand Card": {
             "Faction": "Space Marines",
             "Card Type": "Army",
@@ -330,6 +368,7 @@ action_ability_starts = {
         "Requires In Play Card": False,
         "Once Per Phase": True,
         "Ready Required": False,
+        "Exhaust Required": False,
     },
     "Preemptive Barrage": {
         "Special": True,
@@ -337,6 +376,7 @@ action_ability_starts = {
         "Requires In Play Card": True,
         "Once Per Phase": False,
         "Ready Required": False,
+        "Exhaust Required": False,
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": False,
@@ -352,6 +392,7 @@ action_ability_starts = {
         "Requires In Play Card": True,
         "Once Per Phase": False,
         "Ready Required": True,
+        "Exhaust Required": False,
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": True,
@@ -367,5 +408,30 @@ action_ability_starts = {
         "Requires In Play Card": False,
         "Once Per Phase": False,
         "Ready Required": False,
-    }
+        "Exhaust Required": False
+    },
+    "Nazdreg's Flash Gitz": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": True,
+        "Ready Required": False,
+        "Exhaust Required": True
+    },
+    "Kraktoof Hall": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": False,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": None
+        }
+    },
 }
