@@ -175,6 +175,8 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                             if secondary_player.get_card_type_given_pos(i, j) != "Warlord":
                                 if not secondary_player.get_immune_to_enemy_events(i, j):
                                     return True
+    if not special and not requires_hand_card and not requires_in_play_card:
+        return True
     return False
 
 
