@@ -213,7 +213,7 @@ def update_automated_attributes(self):
                 self.what_is_required_automated = "Retreat Turn"
                 self.automated_player_waited_on = self.player_with_combat_turn
             else:
-                if not self.automated_1_has_passed_action or not self.automated_2_has_passed_action:
+                if (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.bot_is_present:
                     self.automated_player_waited_on = self.get_action_window_between_combat_turns_player()
                     self.what_is_required_automated = "Action Window Between Combat Turns"
                 else:

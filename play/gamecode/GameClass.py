@@ -1013,7 +1013,7 @@ class Game:
             elif not self.check_if_battle_taking_place():
                 info_string += "Outside Battle/"
             elif self.mode == "Normal" and (
-                    not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
+                    not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.bot_is_present:
                 info_string += "Action Window: " + self.get_action_window_between_combat_turns_player() + "/"
             elif self.ranged_skirmish_active:
                 info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
