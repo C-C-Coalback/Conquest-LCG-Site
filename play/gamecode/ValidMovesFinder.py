@@ -454,8 +454,8 @@ def determine_valid_moves(self):
                 if primary_player.valid_nullify_unit(-2, i):
                     valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
             for planet_pos in range(7):
-                for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
-                    if self.valid_nullify_unit(planet_pos, unit_pos):
+                for unit_pos in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    if primary_player.valid_nullify_unit(planet_pos, unit_pos):
                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=planet_pos, unit_pos=unit_pos)
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
@@ -501,6 +501,28 @@ def determine_valid_moves(self):
                 if selected_card_still_playable:
                     if selected_card.get_card_type() == "Army":
                         valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                        non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre",
+                                                                    "Escort Drone"]
+                        army_unit_as_attachment = selected_card.get_name() in non_attachs_that_can_be_played_as_attach
+                        if army_unit_as_attachment:
+                            for i in range(len(primary_player.headquarters)):
+                                if primary_player.check_if_can_attach_card(
+                                        selected_card, -2, i, not_own_attachment=False):
+                                    valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
+                            for i in range(7):
+                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    if primary_player.check_if_can_attach_card(
+                                            selected_card, i, j, not_own_attachment=False):
+                                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                            for i in range(len(secondary_player.headquarters)):
+                                if secondary_player.check_if_can_attach_card(
+                                        selected_card, -2, i, not_own_attachment=True):
+                                    valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
+                            for i in range(7):
+                                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                                    if secondary_player.check_if_can_attach_card(
+                                            selected_card, i, j, not_own_attachment=True):
+                                        valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
                     if selected_card.get_card_type() == "Attachment":
                         if selected_card.planet_attachment:
                             for i in range(len(self.planets_in_play_array)):
@@ -534,30 +556,26 @@ def determine_valid_moves(self):
                                 if can_continue:
                                     valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
                         else:
-                            non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]
-                            army_unit_as_attachment = selected_card.get_name() in non_attachs_that_can_be_played_as_attach
                             for i in range(len(primary_player.headquarters)):
                                 if primary_player.check_if_can_attach_card(
-                                        selected_card, -2, i, not_own_attachment=False,
-                                        army_unit_as_attachment=army_unit_as_attachment):
+                                        selected_card, -2, i, not_own_attachment=False):
                                     valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
                             for i in range(7):
                                 for j in range(len(primary_player.cards_in_play[i + 1])):
                                     if primary_player.check_if_can_attach_card(
-                                            selected_card, i, j, not_own_attachment=False,
-                                            army_unit_as_attachment=army_unit_as_attachment):
-                                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                                            selected_card, i, j, not_own_attachment=False):
+                                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i,
+                                                                     unit_pos=j)
                             for i in range(len(secondary_player.headquarters)):
                                 if secondary_player.check_if_can_attach_card(
-                                        selected_card, -2, i, not_own_attachment=True,
-                                        army_unit_as_attachment=army_unit_as_attachment):
+                                        selected_card, -2, i, not_own_attachment=True):
                                     valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
                             for i in range(7):
                                 for j in range(len(secondary_player.cards_in_play[i + 1])):
                                     if secondary_player.check_if_can_attach_card(
-                                            selected_card, i, j, not_own_attachment=True,
-                                            army_unit_as_attachment=army_unit_as_attachment):
-                                        valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                                            selected_card, i, j, not_own_attachment=True):
+                                        valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i,
+                                                                     unit_pos=j)
                 if not valid_moves:
                     deploy_action_locations = detect_possible_actions(
                         self, primary_player, secondary_player, combat_turn_action=False
