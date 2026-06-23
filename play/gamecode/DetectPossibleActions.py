@@ -93,6 +93,9 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Preemptive Barrage":
             if primary_player.get_ranged_given_pos(planet_pos, unit_pos):
                 return False
+        if action_ability == "Tellyporta Pad":
+            if planet_pos == game.round_number or primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+                return False
     return True
 
 

@@ -271,6 +271,26 @@ ability_targets_dictionary = {
             "Not Same Planet": False
         }
     },
+    "Tellyporta Pad": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": "Orks",
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -519,5 +539,21 @@ action_ability_starts = {
         "Once Per Phase": False,
         "Ready Required": True,
         "Exhaust Required": False,
+    },
+    "Tellyporta Pad": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Faction": "Orks",
+            "Card Type": None
+        }
     },
 }
