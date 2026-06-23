@@ -76,22 +76,29 @@ def check_if_deploy_event_action_card_is_currently_legal(self, primary_player, h
         return True
     if card.get_allowed_phases_while_in_hand() not in [self.phase, "ALL"]:
         return True
+    if str(primary_player.number) == "1":
+        secondary_player = self.p2
+    else:
+        secondary_player = self.p1
+    ability = card.get_ability()
+    if ability == "Raid":
+        if not primary_player.get_can_play_limited():
+            return False
+        if primary_player.get_resources() >= secondary_player.get_resources():
+            return False
+    ability_needs_followup = ability in ability_targets_dictionary
     if possible_deploy_actions is None:
-        if str(primary_player.number) == "1":
-            secondary_player = self.p2
-        else:
-            secondary_player = self.p1
         possible_deploy_actions = detect_possible_actions(
             self, primary_player, secondary_player, combat_turn_action=False
         )
     special_action_token = "SPECIAL_ACTION_HAND/" + str(primary_player.number) + "/" + str(hand_pos)
-    if special_action_token not in possible_deploy_actions:
-        return False
-    ability = card.get_ability()
-    ability_needs_followup = ability in ACTION_RESOLUTION_ABILITIES or ability in ability_targets_dictionary
-    if not ability_needs_followup:
-        return True
-    return check_if_deploy_action_has_non_pass_followup(self, primary_player, ability)
+    if special_action_token in possible_deploy_actions:
+        if not ability_needs_followup:
+            return True
+        return check_if_deploy_action_has_non_pass_followup(self, primary_player, ability)
+    if ability_needs_followup:
+        return check_if_deploy_action_has_non_pass_followup(self, primary_player, ability)
+    return True
 
 
 def update_automated_attributes(self):
