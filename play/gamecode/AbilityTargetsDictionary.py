@@ -362,6 +362,14 @@ action_ability_starts = {
             "Card Enters Play": True,
         }
     },
+    "Drop Pod Assault": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
+    },
     "Captain Markis": {
         "Special": True,
         "Requires Hand Card": False,
@@ -433,5 +441,13 @@ action_ability_starts = {
             "Faction": None,
             "Card Type": None
         }
+    },
+    "Battle Cry": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
     },
 }
