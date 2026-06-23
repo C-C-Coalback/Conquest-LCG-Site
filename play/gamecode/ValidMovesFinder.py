@@ -214,12 +214,7 @@ def update_automated_attributes(self):
                 self.automated_player_waited_on = self.player_with_combat_turn
             else:
                 if not self.automated_1_has_passed_action or not self.automated_2_has_passed_action:
-                    if self.p1.has_initiative_for_battle and not self.automated_1_has_passed_action:
-                        self.automated_player_waited_on = self.name_1
-                    elif not self.automated_2_has_passed_action:
-                        self.automated_player_waited_on = self.name_2
-                    else:
-                        self.automated_player_waited_on = self.name_1
+                    self.automated_player_waited_on = self.get_action_window_between_combat_turns_player()
                     self.what_is_required_automated = "Action Window Between Combat Turns"
                 else:
                     self.what_is_required_automated = "Combat Turn"

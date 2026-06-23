@@ -2,7 +2,7 @@ import json
 from asgiref.sync import async_to_sync
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from play.consumers import create_bot_game, get_active_games, get_lobbies
+from play.consumers import create_bot_game, get_active_games, get_lobbies, persist_runtime_state
 from play import turn_notifier
 
 
@@ -452,6 +452,7 @@ def agent_action(request, game_id):
         _apply_agent_action(game, player, normalized_action)
     except Exception as e:
         return _json_error("Failed to apply action", status=500, details=str(e))
+    persist_runtime_state()
     return JsonResponse({
         "status": "success",
         "applied_action": normalized_action,
@@ -484,6 +485,7 @@ def agent_command(request, game_id):
         async_to_sync(game.resolve_chat_message)(player, [""] + split_command)
     except Exception as e:
         return _json_error("Failed to apply command", status=500, details=str(e))
+    persist_runtime_state()
     return JsonResponse({
         "status": "success",
         "applied_command": split_command,

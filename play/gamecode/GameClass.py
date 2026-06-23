@@ -958,7 +958,11 @@ class Game:
                     active_player = self.name_1
                 info_string += active_player + "/"
             else:
-                info_string += self.player_with_combat_turn + "/"
+                if self.mode == "Normal" and (
+                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
+                    info_string += self.get_action_window_between_combat_turns_player() + "/"
+                else:
+                    info_string += self.player_with_combat_turn + "/"
         elif self.phase == "DEPLOY":
             info_string += self.player_with_deploy_turn + "/"
         else:
@@ -1008,6 +1012,9 @@ class Game:
                 info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
             elif not self.check_if_battle_taking_place():
                 info_string += "Outside Battle/"
+            elif self.mode == "Normal" and (
+                    not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
+                info_string += "Action Window: " + self.get_action_window_between_combat_turns_player() + "/"
             elif self.ranged_skirmish_active:
                 info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
             else:
@@ -8013,6 +8020,19 @@ class Game:
         self.defender_planet = -1
         self.attacker_position = -1
         self.attacker_planet = -1
+
+    def get_action_window_between_combat_turns_player(self):
+        if self.p1.has_initiative_for_battle:
+            if not self.automated_1_has_passed_action:
+                return self.name_1
+            if not self.automated_2_has_passed_action:
+                return self.name_2
+            return self.name_1
+        if not self.automated_2_has_passed_action:
+            return self.name_2
+        if not self.automated_1_has_passed_action:
+            return self.name_1
+        return self.name_2
 
     def reset_shielding_values(self):
         self.number_who_is_shielding = None
