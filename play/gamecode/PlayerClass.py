@@ -3,7 +3,6 @@ import random
 import copy
 import threading
 from . import CardClasses
-import os
 from .Damage import DamageClass
 import update_settings
 
@@ -1247,6 +1246,12 @@ class Player:
                 if planet_pos == self.game.planet_bodyguard:
                     if unit_pos in self.game.body_guard_positions:
                         return "playable"
+            return "unplayable"
+        if self.game.p1.total_indirect_damage > 0 or self.game.p2.total_indirect_damage > 0:
+            if self.indirect_damage_applied >= self.total_indirect_damage:
+                return "unplayable"
+            if self.game.check_valid_indirect_damage_target(self, planet_pos, unit_pos):
+                return "playable"
             return "unplayable"
         if self.game.mode == "DISCOUNT":
             if self.game.determine_player_with_discounts()[0].name_player == self.name_player:

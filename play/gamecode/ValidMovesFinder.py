@@ -130,6 +130,9 @@ def update_automated_attributes(self):
     elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
         self.what_is_required_automated = "Indirect"
         self.automated_player_waited_on = self.player_with_initiative
+        player, other_player = self.get_players_given_name(self.automated_player_waited_on)
+        if player.indirect_damage_applied >= player.total_indirect_damage:
+            self.automated_player_waited_on = other_player.name_player
     elif self.choices_available:
         self.what_is_required_automated = "Choice"
         self.automated_player_waited_on = self.name_player_making_choices
@@ -641,6 +644,10 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Bodyguard":
             valid_moves = primary_player.get_playable_borders()
+        elif self.what_is_required_automated == "Indirect":
+            valid_moves = primary_player.get_playable_borders()
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Outside Combat":
             valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")

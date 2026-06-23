@@ -6063,53 +6063,51 @@ class Game:
             self.p1.has_passed = False
             self.p2.has_passed = False
 
+    def check_valid_indirect_damage_target(self, player, planet_pos, unit_pos):
+        if (self.location_of_indirect == "HQ" and planet_pos == -2) or \
+                (self.location_of_indirect == "PLANET" and planet_pos != -2 and self.planet_of_indirect == planet_pos) or \
+                self.location_of_indirect == "ALL":
+            if player.get_card_type_given_pos(planet_pos, unit_pos) in self.valid_targets_for_indirect:
+                if player.get_faction_given_pos(planet_pos, unit_pos) == \
+                        self.faction_of_cards_for_indirect or not \
+                        self.faction_of_cards_for_indirect:
+                    if (not self.indirect_exhaust_only or not player.get_ready_given_pos(planet_pos, unit_pos)) and \
+                            (self.forbidden_traits_indirect == "" or not player.check_for_trait_given_pos(
+                                planet_pos, unit_pos, self.forbidden_traits_indirect)):
+                        return True
+        return False
+
     async def apply_indirect_damage(self, name, game_update_string):
         if name == self.name_1 or name == self.name_2:
             if name == self.name_1:
                 player = self.p1
             else:
                 player = self.p2
-            if player.indirect_damage_applied < player.total_indirect_damage:
-                if len(game_update_string) == 1:
-                    if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                        player.indirect_damage_applied = 999
-                        await self.send_update_message(
-                            player.name_player + " stops placing indirect damage"
-                        )
-                if self.location_of_indirect == "HQ" or self.location_of_indirect == "ALL":
-                    if len(game_update_string) == 3:
-                        if game_update_string[0] == "HQ":
-                            if game_update_string[1] == player.get_number():
-                                if player.get_card_type_given_pos(-2, int(game_update_string[2])) in \
-                                        self.valid_targets_for_indirect:
-                                    if player.get_faction_given_pos(
-                                            -2, int(game_update_string[2])) == \
-                                            self.faction_of_cards_for_indirect or not \
-                                            self.faction_of_cards_for_indirect:
-                                        player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
-                if self.location_of_indirect == "PLANET" or self.location_of_indirect == "ALL":
-                    if len(game_update_string) == 4:
-                        if game_update_string[0] == "IN_PLAY":
-                            if self.planet_of_indirect == int(game_update_string[2]) \
-                                    or self.location_of_indirect == "ALL":
-                                if game_update_string[1] == player.get_number():
-                                    if player.get_card_type_given_pos(
-                                            int(game_update_string[2]), int(game_update_string[3])) \
-                                            in self.valid_targets_for_indirect and \
-                                            (not self.indirect_exhaust_only or not player.get_ready_given_pos(
-                                                int(game_update_string[2]), int(game_update_string[3]))) and \
-                                            (self.forbidden_traits_indirect == ""
-                                             or not player.check_for_trait_given_pos(
-                                                        int(game_update_string[2]), int(game_update_string[3]),
-                                                        self.forbidden_traits_indirect)):
-                                        if player.get_faction_given_pos(
-                                                int(game_update_string[2]), int(game_update_string[3])) == \
-                                                self.faction_of_cards_for_indirect or not \
-                                                self.faction_of_cards_for_indirect:
-                                            player.increase_indirect_damage_at_pos(int(game_update_string[2]),
-                                                                                   int(game_update_string[3]), 1)
-        if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
-                self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    player.indirect_damage_applied = 999
+                    await self.send_update_message(
+                        player.name_player + " stops placing indirect damage"
+                    )
+            else:
+                planet_pos = -1
+                unit_pos = -1
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == player.get_number():
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == player.get_number():
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                if planet_pos == -1 or unit_pos == -1:
+                    return None
+                if player.indirect_damage_applied < player.total_indirect_damage:
+                    if self.check_valid_indirect_damage_target(player, planet_pos, unit_pos):
+                        player.increase_indirect_damage_at_pos(planet_pos, unit_pos, 1)
+        if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()
             if self.battle_ability_to_resolve == "Diamat":
                 self.damage_from_atrox = True
@@ -6122,6 +6120,7 @@ class Game:
             self.forbidden_traits_indirect = ""
             self.p1.total_indirect_damage = 0
             self.p2.total_indirect_damage = 0
+        return None
 
     async def resolve_indirect_damage_applied(self):
         self.first_card_damaged = True

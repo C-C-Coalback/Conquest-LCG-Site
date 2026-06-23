@@ -262,6 +262,15 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Ork Kannon": {
+        "Num Stages": 1,
+        "Type 1": "Planet",
+        "Restrictions 1": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": False
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -502,5 +511,13 @@ action_ability_starts = {
         "Once Per Phase": False,
         "Ready Required": False,
         "Exhaust Required": False
-    }
+    },
+    "Ork Kannon": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False,
+    },
 }
