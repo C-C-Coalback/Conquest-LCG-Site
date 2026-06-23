@@ -670,6 +670,10 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
         if not primary_player.can_play_limited and limited:
             self.set_queued_mistarget_message(primary_player.name_player, "Cannot Attach Card",
                                               "Already played a Limited card this round.")
+            primary_player.aiming_reticle_coords_hand = None
+            primary_player.aiming_reticle_color = None
+            self.card_type_of_selected_card_in_hand = ""
+            self.card_to_deploy = None
         else:
             if primary_player.get_number() == player_gaining_attachment.get_number():
                 played_card = primary_player.play_attachment_card_to_in_play(

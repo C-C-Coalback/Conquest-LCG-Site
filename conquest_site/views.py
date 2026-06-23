@@ -7,6 +7,7 @@ from django.core.files.base import ContentFile
 from PIL import Image
 import os
 import update_settings
+from play import profile_records
 
 
 def settings_page(request):
@@ -14,6 +15,9 @@ def settings_page(request):
     volume = 1.0
     cardback_name = "Default"
     background_name = "Imperial Aquila"
+    match_record = []
+    wins = 0
+    losses = 0
     if request.user.is_authenticated:
         username = request.user.username
         data = update_settings.get_user_settings(username)
@@ -21,10 +25,14 @@ def settings_page(request):
         volume = float(data["volume"])
         cardback_name = data["cardback"]
         background_name = data["background"]
+        match_record = profile_records.get_user_match_record(username, limit=50)
+        wins, losses = profile_records.get_user_win_loss(username)
     print(cardback_name)
     print(background_name)
     volume = volume * 100
-    return render(request, "settings.html", {"zoom": zoom, "cardback": cardback_name, "background": background_name, "volume": volume})
+    return render(request, "settings.html", {"zoom": zoom, "cardback": cardback_name, "background": background_name,
+                                             "volume": volume, "match_record": match_record,
+                                             "wins": wins, "losses": losses})
 
 
 def simple_upload(request):

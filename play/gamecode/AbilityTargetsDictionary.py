@@ -284,6 +284,26 @@ ability_targets_dictionary = {
             "Ability Type": "Planet"
         }
     },
+    "Tzeentch's Firestorm": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
 }
 
 action_ability_starts = {

@@ -418,6 +418,181 @@
         var num_cards_in_hand = 0;
         var active_string_id = "";
         var stored_focused_planet = -1;
+        var latest_info_box_rows = [];
+        var latest_info_box_color = "red";
+        var automated_required_action = "";
+        var automated_waited_on = "";
+        var automated_legal_actions = [];
+        var automated_misc_type = "";
+        var automated_misc_details = "";
+
+        function escapeHtml(text) {
+            if (text === undefined || text === null) {
+                return ``;
+            }
+            return String(text)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
+        }
+
+        function parseAutomatedDataMessage(message) {
+            const prefix = "GAME_INFO/AUTOMATED_DATA/";
+            if (!message.startsWith(prefix)) {
+                return null;
+            }
+            const rest = message.slice(prefix.length);
+            const firstSlash = rest.indexOf("/");
+            if (firstSlash === -1) {
+                return null;
+            }
+            const secondSlash = rest.indexOf("/", firstSlash + 1);
+            if (secondSlash === -1) {
+                return null;
+            }
+            const required = rest.slice(0, firstSlash);
+            const waitedOn = rest.slice(firstSlash + 1, secondSlash);
+            const actionsText = rest.slice(secondSlash + 1);
+            const actions = actionsText.split("|||").map((entry) => entry.trim()).filter(Boolean);
+            return {
+                required: required,
+                waitedOn: waitedOn,
+                actions: actions,
+            };
+        }
+
+        function parseMiscAutomatedDataMessage(message) {
+            const prefix = "GAME_INFO/MISC_AUTOMATED_DATA/";
+            if (!message.startsWith(prefix)) {
+                return null;
+            }
+            const rest = message.slice(prefix.length);
+            const firstSlash = rest.indexOf("/");
+            if (firstSlash === -1) {
+                return null;
+            }
+            const secondSlash = rest.indexOf("/", firstSlash + 1);
+            if (secondSlash === -1) {
+                return null;
+            }
+            const thirdSlash = rest.indexOf("/", secondSlash + 1);
+            if (thirdSlash === -1) {
+                return null;
+            }
+            const details = rest.slice(thirdSlash + 1);
+            const detailsSplit = details.split("|||");
+            return {
+                detailType: detailsSplit[0] || "",
+                detailText: detailsSplit.slice(1).join("|||") || "",
+            };
+        }
+
+        function isPassToken(token) {
+            return token === "pass" || token === "pass-P1" || token === "pass-P2";
+        }
+
+        function describeActionToken(token) {
+            if (token.startsWith("HAND/")) {
+                return "play/select a card from hand";
+            }
+            if (token.startsWith("IN_PLAY/")) {
+                return "select a unit in play";
+            }
+            if (token.startsWith("HQ/")) {
+                return "select a card in HQ";
+            }
+            if (token.startsWith("PLANETS/")) {
+                return "select a planet";
+            }
+            if (token.startsWith("CHOICE/")) {
+                return "pick an option in the choice panel";
+            }
+            if (token.startsWith("SEARCH/")) {
+                return "pick a card in the search panel";
+            }
+            if (token.startsWith("ATTACHMENT/")) {
+                return "select an attachment target";
+            }
+            if (isPassToken(token)) {
+                return "pass";
+            }
+            return token;
+        }
+
+        function buildTurnHint() {
+            if (!automated_required_action) {
+                return "";
+            }
+            const myName = "{{ user.username }}";
+            const legalActions = automated_legal_actions || [];
+            const nonPassActions = legalActions.filter((token) => !isPassToken(token));
+            if (automated_waited_on && automated_waited_on !== myName) {
+                return "Waiting on " + automated_waited_on + " to act.";
+            }
+            if (automated_required_action === "Action Window Between Combat Turns") {
+                if (nonPassActions.length === 0) {
+                    return "Only optional actions are available right now, so PASS is the correct way to continue combat.";
+                }
+                return "You can trigger an action with a highlighted card, or click PASS to continue to the next combat turn.";
+            }
+            if (automated_required_action === "Combat Turn") {
+                if (nonPassActions.length === 0) {
+                    return "No legal attacks are available, so PASS is the only valid combat-turn action.";
+                }
+                const ownPrefix = "IN_PLAY/" + own_player_number + "/";
+                if (own_player_number !== "0" && nonPassActions.every((token) => token.startsWith(ownPrefix))) {
+                    return "Select one of your ready units to declare as attacker.";
+                }
+                if (nonPassActions.every((token) => token.startsWith("IN_PLAY/"))) {
+                    return "Select an enemy unit as defender for the current attack.";
+                }
+                return "Resolve combat by selecting one of the highlighted legal targets.";
+            }
+            if (automated_required_action === "Commitment") {
+                return "Select a planet to commit your warlord.";
+            }
+            if (automated_required_action === "Choice") {
+                if (automated_misc_type === "CHOICE" && automated_misc_details) {
+                    return "Make a choice: " + automated_misc_details;
+                }
+                return "Pick one of the available choices in the choice panel.";
+            }
+            if (automated_required_action === "Search") {
+                return "Pick a card from the search panel.";
+            }
+            if (
+                automated_required_action === "Deploy Turn" ||
+                automated_required_action === "Command not Commitment" ||
+                automated_required_action === "Headquarters Action" ||
+                automated_required_action === "Outside Combat"
+            ) {
+                if (nonPassActions.length === 0) {
+                    return "No legal actions are currently available, so PASS is the right move.";
+                }
+                const preview = nonPassActions.slice(0, 2).map((token) => describeActionToken(token)).join(" or ");
+                return "You can " + preview + ".";
+            }
+            if (nonPassActions.length === 0 && legalActions.length > 0) {
+                return "PASS is the only legal action right now.";
+            }
+            return "Required step: " + automated_required_action + ".";
+        }
+
+        function renderInfoBox() {
+            const infoBox = document.getElementById("info-box");
+            if (!infoBox) {
+                return;
+            }
+            infoBox.innerHTML = ``;
+            for (var i = 0; i < latest_info_box_rows.length; i++) {
+                const row = escapeHtml(latest_info_box_rows[i]);
+                infoBox.innerHTML += `<p class="info-box-sub" style="color:` + latest_info_box_color + `;">` + row + `</p>`;
+            }
+            const hintText = buildTurnHint();
+            if (hintText) {
+                infoBox.innerHTML += `<p class="info-box-sub" style="color:#7a4d00;font-weight:700;margin-top:4px;">Hint: ` + escapeHtml(hintText) + `</p>`;
+            }
+        }
 
         function playSound(url) {
             console.log(url);
@@ -746,15 +921,31 @@
                         setPlanetAppearances(first_pos_in_play, forced_width, stored_focused_planet);
                     }
                 } else if (split_data[1] === "INFO_BOX") {
-                    document.getElementById('info-box').innerHTML = ``;
                     var color = "red";
                     if (split_data[2] === "{{ user.username }}") {
                         color = "green";
                     }
+                    latest_info_box_rows = [];
+                    latest_info_box_color = color;
                     for (var i = 3; i < split_data.length; i++) {
-                        var full_string = `<p class="info-box-sub" style="color:` + color + `;">` + split_data[i] + `</p>`
-                        document.getElementById("info-box").innerHTML += full_string;
+                        latest_info_box_rows.push(split_data[i]);
                     }
+                    renderInfoBox();
+                } else if (split_data[1] === "AUTOMATED_DATA") {
+                    const automatedData = parseAutomatedDataMessage(data.message);
+                    if (automatedData !== null) {
+                        automated_required_action = automatedData.required;
+                        automated_waited_on = automatedData.waitedOn;
+                        automated_legal_actions = automatedData.actions;
+                    }
+                    renderInfoBox();
+                } else if (split_data[1] === "MISC_AUTOMATED_DATA") {
+                    const miscData = parseMiscAutomatedDataMessage(data.message);
+                    if (miscData !== null) {
+                        automated_misc_type = miscData.detailType;
+                        automated_misc_details = miscData.detailText;
+                    }
+                    renderInfoBox();
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
                     var target_victory_display_id = "victory-display-player-" + split_data[2];
                     document.getElementById(target_victory_display_id).innerHTML = ``;
@@ -1302,7 +1493,6 @@
                     }
                 }
                 applyZoom();
-            } else if (split_data[1] === "AUTOMATED_DATA" || split_data[1] === "MISC_AUTOMATED_DATA") {
 
             } else {
                 var text = data.message;
