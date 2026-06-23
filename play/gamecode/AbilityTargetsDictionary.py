@@ -242,6 +242,26 @@ ability_targets_dictionary = {
             "Not Same Planet": False
         }
     },
+    "Squig Bombin'": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": False,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": "Support",
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -463,6 +483,22 @@ action_ability_starts = {
         "Special": False,
         "Requires Hand Card": False,
         "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
+    },
+    "Squig Bombin'": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Attributes In Play Card": {
+            "At Planet": False,
+            "At HQ": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": "Support"
+        },
         "Once Per Phase": False,
         "Ready Required": False,
         "Exhaust Required": False

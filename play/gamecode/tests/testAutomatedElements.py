@@ -29,6 +29,7 @@ with open(second_deck_location, 'r') as file:
 # There are not dedicated action windows during combat turns, as passing through these
 # repeatedly is frustrating for both players. Bots can communicate their combat turn action window status by sending
 # "AUTOMATED_SPECIAL_ACTION_CHOICE/{name_player}/{choice_content}" instead of the usual "SPECIAL_ACTION" indicator.
+# Bots can tell if they are in a combat turn action window if they receive "Action Window Between Combat Turns" in AUTOMATED_DATA.
 # e.g. to pass a combat turn action window: "AUTOMATED_SPECIAL_ACTION_CHOICE/P1/pass-P1"
 # to take an action: "AUTOMATED_SPECIAL_ACTION_CHOICE/P1/HAND/1/0"
 #
@@ -123,3 +124,20 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         self.assertIn("HAND/1/0", test_game.last_automated_data_string)
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
         self.assertEqual("GAME_INFO/AUTOMATED_DATA/Action/P1/|||PLANETS/0|||PLANETS/1|||PLANETS/2|||PLANETS/3|||PLANETS/4|||", test_game.last_automated_data_string)
+
+    async def test_squig_bombin_offered(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], bot_is_present=True)
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Squig Bombin'"]
+        test_game.p2.cards = []
+        await test_game.update_game_event("P1", [])
+        self.assertNotIn("HAND/1/0", test_game.last_automated_data_string)
+        test_game.p2.add_to_hq(test_game.preloaded_find_card("Promethium Mine"))
+        await test_game.update_game_event("P1", [])
+        self.assertIn("HAND/1/0", test_game.last_automated_data_string)
+        # await test_game.update_game_event("P1", ["HAND", "1", "0"])
+

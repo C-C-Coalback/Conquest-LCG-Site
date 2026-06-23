@@ -84,10 +84,10 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
     card_type_card = prereqs["Attributes In Play Card"]["Card Type"]
     special = prereqs["Special"]
     if faction_card:
-        if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, faction_card):
+        if not primary_player.check_if_faction_given_pos(planet_pos, unit_pos, faction_card):
             return False
     if card_type_card:
-        if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == card_type_card:
+        if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != card_type_card:
             return False
     if special:
         if action_ability == "Preemptive Barrage":
