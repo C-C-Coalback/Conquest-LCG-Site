@@ -533,7 +533,8 @@
                 if (nonPassActions.length === 0) {
                     return "Only optional actions are available right now, so PASS is the correct way to continue combat.";
                 }
-                return "You can trigger an action with a highlighted card, or click PASS to continue to the next combat turn.";
+                return "You can trigger an action with a highlighted card, or declare a unit as an attacker."
+                // return "You can trigger an action with a highlighted card, or click PASS to continue to the next combat turn.";
             }
             if (automated_required_action === "Combat Turn") {
                 if (nonPassActions.length === 0) {
