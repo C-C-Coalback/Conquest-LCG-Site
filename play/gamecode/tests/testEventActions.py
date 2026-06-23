@@ -47,6 +47,57 @@ async def skip_to_battle_first_planet(test_game):
 
 
 class ActionsTest(unittest.IsolatedAsyncioTestCase):
+    async def test_automated_valid_moves_include_promise_of_glory(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["Promise of Glory"]
+        test_game.p2.cards = []
+        await test_game.update_automated_info()
+        self.assertEqual(test_game.what_is_required_automated, "Deploy Turn")
+        self.assertEqual(test_game.automated_player_waited_on, "P1")
+        self.assertIn("HAND/1/0", test_game.clickable_items_automated)
+
+    async def test_automated_valid_moves_include_snotling_attack(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["Snotling Attack"]
+        test_game.p2.cards = []
+        await test_game.update_automated_info()
+        self.assertEqual(test_game.what_is_required_automated, "Deploy Turn")
+        self.assertEqual(test_game.automated_player_waited_on, "P1")
+        self.assertIn("HAND/1/0", test_game.clickable_items_automated)
+
+    async def test_automated_valid_moves_include_legal_raid(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["Raid"]
+        test_game.p2.cards = []
+        test_game.p1.resources = 6
+        test_game.p2.resources = 7
+        await test_game.update_automated_info()
+        self.assertIn("HAND/1/0", test_game.clickable_items_automated)
+
+    async def test_automated_valid_moves_exclude_illegal_raid(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["Raid"]
+        test_game.p2.cards = []
+        test_game.p1.resources = 7
+        test_game.p2.resources = 7
+        await test_game.update_automated_info()
+        self.assertNotIn("HAND/1/0", test_game.clickable_items_automated)
     async def test_snotling_attack(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
