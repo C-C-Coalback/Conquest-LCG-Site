@@ -397,6 +397,11 @@ ability_targets_dictionary = {
             "Not Same Planet": False
         }
     },
+    "Khymera Den": {
+        "Num Stages": 1,
+        "Type 1": "Special",
+        "Restrictions 1": {}
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -730,4 +735,12 @@ action_ability_starts = {
         "Ready Required": False,
         "Exhaust Required": False
     },
+    "Khymera Den": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False
+    }
 }

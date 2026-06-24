@@ -203,6 +203,14 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                 for j in range(len(primary_player.cards_in_play[i + 1])):
                     if primary_player.check_for_trait_given_pos(i, j, "Cultist"):
                         return True
+        if action_ability == "Khymera Den":
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if primary_player.get_name_given_pos(i, j) == "Khymera":
+                        return True
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.get_name_given_pos(-2, i) == "Khymera":
+                    return True
     if not special and not requires_hand_card and not requires_in_play_card:
         return True
     return False

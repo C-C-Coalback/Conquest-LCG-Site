@@ -757,7 +757,20 @@ def determine_valid_moves(self):
                 type_target = target_restriction_data["Type " + stage_number]
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
                 print("Target:", type_target)
-                print("Restrctions:", target_restrictions)
+                print("Restrictions:", target_restrictions)
+                if type_target == "Special":
+                    if self.action_object.action_chosen == "Khymera Den":
+                        for i in range(7):
+                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                                if primary_player.get_name_given_pos(i, j) == "Khymera":
+                                    if primary_player.get_aiming_reticle_in_play(i, j) != "blue":
+                                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                        for i in range(len(primary_player.headquarters)):
+                            if primary_player.get_name_given_pos(-2, i) == "Khymera":
+                                if primary_player.get_aiming_reticle_in_play(-2, i) != "blue":
+                                    valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
+                    if self.action_object.misc_counter > 0:
+                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
