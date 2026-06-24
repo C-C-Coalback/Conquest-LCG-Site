@@ -133,6 +133,10 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
             return False
         if card.get_once_per_phase_used():
             return False
+    if special:
+        if action_ability == "Tzeentch's Firestorm":
+            if primary_player.get_resources() == 0:
+                return False
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):
@@ -193,9 +197,6 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                             if secondary_player.get_card_type_given_pos(i, j) != "Warlord":
                                 if not secondary_player.get_immune_to_enemy_events(i, j):
                                     return True
-        if action_ability == "Tzeentch's Firestorm":
-            if primary_player.get_resources() == 0:
-                return False
         if action_ability == "Ravenous Flesh Hounds":
             if card.get_damage() == 0:
                 return False
@@ -211,6 +212,9 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
             for i in range(len(primary_player.headquarters)):
                 if primary_player.get_name_given_pos(-2, i) == "Khymera":
                     return True
+        if action_ability == "Haemonculus Tormentor":
+            if primary_player.get_resources() > 0:
+                return True
     if not special and not requires_hand_card and not requires_in_play_card:
         return True
     return False
