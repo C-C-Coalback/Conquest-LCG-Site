@@ -291,6 +291,46 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Zarathur's Flamers": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
+    "Tzeentch's Firestorm": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -379,26 +419,6 @@ ability_targets_dictionary = {
             "Ability Type": "Planet"
         }
     },
-    "Tzeentch's Firestorm": {
-        "Num Stages": 1,
-        "Type 1": "In Play",
-        "Restrictions 1": {
-            "Unit Only": True,
-            "Own Unit": True,
-            "Enemy Unit": True,
-            "Unique": False,
-            "Ready": False,
-            "Exhaust": False,
-            "Faction": None,
-            "Card Type": None,
-            "Forbidden Card Type": "Warlord",
-            "Required Traits": [],
-            "Forbidden Traits": [],
-            "Special": False,
-            "Target": True,
-            "Ability Type": "Action"
-        }
-    },
 }
 
 action_ability_starts = {
@@ -449,7 +469,9 @@ action_ability_starts = {
             "Own Unit": True,
             "Enemy Unit": False,
             "Faction": "Astra Militarum",
-            "Card Type": None
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Same Planet": False
         }
     },
     "Catachan Outpost": {
@@ -465,7 +487,9 @@ action_ability_starts = {
             "Own Unit": True,
             "Enemy Unit": True,
             "Faction": None,
-            "Card Type": None
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Same Planet": False
         }
     },
     "Suppressive Fire": {
@@ -497,7 +521,9 @@ action_ability_starts = {
             "Own Unit": True,
             "Enemy Unit": True,
             "Faction": None,
-            "Card Type": None
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Same Planet": False
         }
     },
     "Battle Cry": {
@@ -526,7 +552,9 @@ action_ability_starts = {
             "Own Unit": True,
             "Enemy Unit": True,
             "Faction": None,
-            "Card Type": "Support"
+            "Card Type": "Support",
+            "Forbidden Card Type": None,
+            "Same Planet": False
         },
         "Once Per Phase": False,
         "Ready Required": False,
@@ -553,7 +581,27 @@ action_ability_starts = {
             "Own Unit": True,
             "Enemy Unit": False,
             "Faction": "Orks",
-            "Card Type": None
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Same Planet": False
+        }
+    },
+    "Zarathur's Flamers": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": False,
+            "Own Unit": False,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Same Planet": True
         }
     },
 }

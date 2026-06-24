@@ -402,6 +402,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             elif ability.action_chosen == "Tellyporta Pad":
                 if planet_pos == self.round_number:
                     return False
+            elif ability.action_chosen == "Zarathur's Flamers":
+                if ability.get_planet_pos() != planet_pos:
+                    return False
         elif ability == "Planet":
             pass
     if targets and enemy_ability:
