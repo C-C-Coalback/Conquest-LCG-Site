@@ -26,39 +26,6 @@ h4 {
     overflow-x: scroll;
 }
 
-#contextMenu {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    border-width: 2px;
-    border-style: double;
-    border-color: black;
-    background: rgba(19, 18, 24, 0.6);
-}
-
-#contextOptions {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-.contextMenuButton {
-    display: none;
-    width: 100%;
-    background-color: black;
-    border: lightgray 2px solid;
-    color: white;
-    padding: 5px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.contextMenuButton:hover {
-    background-color: green;
-}
-
 #helper-text-box {
     position: fixed;
     display: none;
@@ -864,7 +831,6 @@ legend {
 
 #info-box {
     position: absolute;
-    width: 14vw;
     max-width: 14vw;
     min-height: 4vh;
     max-height: 20vh;
