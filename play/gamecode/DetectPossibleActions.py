@@ -162,6 +162,9 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                     if check_single_card_in_play(game, action_ability, prereqs, secondary_player, secondary_player, -2, i, src_planet=planet_pos):
                         return True
     if special:
+        if action_ability == "Exterminatus":
+            if game.round_number != 6:
+                return True
         if action_ability == "Captain Markis":
             if planet_pos == -2:
                 return False

@@ -388,6 +388,15 @@ ability_targets_dictionary = {
             "Ability Type": "Reaction"
         }
     },
+    "Warpstorm": {
+        "Num Stages": 1,
+        "Type 1": "Planet",
+        "Restrictions 1": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": False
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -479,6 +488,14 @@ ability_targets_dictionary = {
 }
 
 action_ability_starts = {
+    "Exterminatus": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
+    },
     "Veteran Brother Maxos": {
         "Special": False,
         "Requires Hand Card": True,
@@ -688,6 +705,14 @@ action_ability_starts = {
     },
     "Ravenous Flesh Hounds": {
         "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
+    },
+    "Warpstorm": {
+        "Special": False,
         "Requires Hand Card": False,
         "Requires In Play Card": False,
         "Once Per Phase": False,
