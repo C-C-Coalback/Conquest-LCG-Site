@@ -466,6 +466,7 @@ action_ability_starts = {
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": False,
+            "Must Be Unit": True,
             "Own Unit": True,
             "Enemy Unit": False,
             "Faction": "Astra Militarum",
@@ -484,6 +485,7 @@ action_ability_starts = {
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": True,
+            "Must Be Unit": True,
             "Own Unit": True,
             "Enemy Unit": True,
             "Faction": None,
@@ -518,6 +520,7 @@ action_ability_starts = {
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": False,
+            "Must Be Unit": True,
             "Own Unit": True,
             "Enemy Unit": True,
             "Faction": None,
@@ -549,6 +552,7 @@ action_ability_starts = {
         "Attributes In Play Card": {
             "At Planet": False,
             "At HQ": True,
+            "Must Be Unit": False,
             "Own Unit": True,
             "Enemy Unit": True,
             "Faction": None,
@@ -578,6 +582,7 @@ action_ability_starts = {
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": True,
+            "Must Be Unit": True,
             "Own Unit": True,
             "Enemy Unit": False,
             "Faction": "Orks",
@@ -596,12 +601,32 @@ action_ability_starts = {
         "Attributes In Play Card": {
             "At Planet": True,
             "At HQ": False,
+            "Must Be Unit": True,
             "Own Unit": False,
             "Enemy Unit": True,
             "Faction": None,
             "Card Type": None,
             "Forbidden Card Type": "Warlord",
             "Same Planet": True
+        }
+    },
+    "Tzeentch's Firestorm": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Must Be Unit": True,
+            "Own Unit": False,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Same Planet": False
         }
     },
 }

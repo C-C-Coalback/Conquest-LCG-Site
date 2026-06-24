@@ -84,9 +84,13 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
     card_type_card = prereqs["Attributes In Play Card"]["Card Type"]
     forbidden_card_type_card = prereqs["Attributes In Play Card"]["Forbidden Card Type"]
     must_be_same_planet = prereqs["Attributes In Play Card"]["Same Planet"]
+    must_be_a_unit = prereqs["Attributes In Play Card"]["Must Be Unit"]
     special = prereqs["Special"]
     if must_be_same_planet:
         if src_planet != planet_pos:
+            return False
+    if must_be_a_unit:
+        if not primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
             return False
     if faction_card:
         if not primary_player.check_if_faction_given_pos(planet_pos, unit_pos, faction_card):
@@ -102,7 +106,7 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
             if primary_player.get_ranged_given_pos(planet_pos, unit_pos):
                 return False
         if action_ability == "Tellyporta Pad":
-            if planet_pos == game.round_number or primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Support":
+            if planet_pos == game.round_number:
                 return False
     return True
 
@@ -186,8 +190,9 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                             if secondary_player.get_card_type_given_pos(i, j) != "Warlord":
                                 if not secondary_player.get_immune_to_enemy_events(i, j):
                                     return True
-        if action_ability == "Zarathur's Flamers":
-            return False
+        if action_ability == "Tzeentch's Firestorm":
+            if primary_player.get_resources() == 0:
+                return False
     if not special and not requires_hand_card and not requires_in_play_card:
         return True
     return False
