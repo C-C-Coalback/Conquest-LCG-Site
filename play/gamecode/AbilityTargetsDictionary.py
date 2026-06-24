@@ -37,6 +37,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": False,
             "Target": True,
             "Ability Type": "Action"
@@ -57,6 +58,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": False,
             "Target": False,
             "Ability Type": "Interrupt"
@@ -77,6 +79,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Reaction"
@@ -97,6 +100,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Reaction"
@@ -117,6 +121,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Action"
@@ -137,6 +142,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": "Warlord",
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": False,
             "Ability Type": "Action"
@@ -154,6 +160,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": "Warlord",
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Action"
@@ -174,6 +181,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": False,
             "Ability Type": "Action"
@@ -191,6 +199,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": "Warlord",
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Action"
@@ -211,6 +220,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Action"
@@ -228,6 +238,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Action"
@@ -257,6 +268,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": False,
             "Target": True,
             "Ability Type": "Action"
@@ -286,6 +298,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": True,
             "Ability Type": "Action"
@@ -306,6 +319,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": "Warlord",
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": True,
             "Special": True,
             "Target": True,
             "Ability Type": "Action"
@@ -326,6 +340,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": "Warlord",
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": False,
             "Target": True,
             "Ability Type": "Action"
@@ -346,9 +361,31 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": ["Cultist"],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": False,
             "Target": False,
             "Ability Type": "Action"
+        }
+    },
+    "Soul Grinder": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": True,
+            "Special": False,
+            "Target": False,
+            "Ability Type": "Reaction"
         }
     },
     "Ferrin": {

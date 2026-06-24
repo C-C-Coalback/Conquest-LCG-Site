@@ -328,6 +328,7 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
     forbidden_card_type = target_restrictions["Forbidden Card Type"]
     required_traits = target_restrictions["Required Traits"]
     forbidden_traits = target_restrictions["Forbidden Traits"]
+    same_planet = target_restrictions["Same Planet"]
     targets = target_restrictions["Target"]
     special_restrictions = target_restrictions["Special"]
     ability_type = target_restrictions["Ability Type"]
@@ -360,6 +361,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
         for trait in forbidden_traits:
             if player.check_for_trait_given_pos(planet_pos, unit_pos, trait):
                 return False
+    if same_planet:
+        if planet_pos != ability.get_planet_pos():
+            return False
     if special_restrictions:
         if ability_type == "Reaction":
             if ability.get_reaction_name() == "Cato's Stronghold":
@@ -401,9 +405,6 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                         return False
             elif ability.action_chosen == "Tellyporta Pad":
                 if planet_pos == self.round_number:
-                    return False
-            elif ability.action_chosen == "Zarathur's Flamers":
-                if ability.get_planet_pos() != planet_pos:
                     return False
         elif ability == "Planet":
             pass
