@@ -1012,8 +1012,7 @@ class Game:
                 info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
             elif not self.check_if_battle_taking_place():
                 info_string += "Outside Battle/"
-            elif self.mode == "Normal" and (
-                    not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.bot_is_present:
+            elif self.mode == "Normal" and (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.check_style_of_bot() != "ARG" and self.bot_is_present:
                 info_string += "Action Window: " + self.get_action_window_between_combat_turns_player() + "/"
             elif self.ranged_skirmish_active:
                 info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
@@ -1315,6 +1314,40 @@ class Game:
                                             rickety_warbuggy=rickety_warbuggy, actual_area_effect=True)
         self.number_of_units_left_to_suffer_damage = \
             secondary_player.get_number_of_units_at_planet(chosen_planet)
+
+    def check_style_of_bot(self):
+        """
+        Checks what "style" the bot is. (ARG - Neural Network with WebSocket interface)
+        "Other" refers to the REST API framework (I think, correct if wrong).
+        This is only used for distinguishing the different ways the AIs handle combat turn action windows
+        (Other - dedicated action window for all, ARG - dedicated action window only for AIs)
+
+        :return: string of the type of bot.
+        """
+        if "conqueror" in self.name_1 or "conqueror" in self.name_2:
+            return "ARG"
+        return "Other"
+
+    async def update_game_event_combat_turn_special_action(self, name, game_update_string):
+        """
+        Used by the ARG style of bot to process combat turn actions windows.
+
+        :param name: player_name, string
+        :param game_update_string: list of strings containing data on what was clicked on.
+        :return: None
+        """
+        if game_update_string[0] == "pass-P1":
+            if name == self.name_1:
+                self.automated_1_has_passed_action = True
+            elif name == self.name_2:
+                self.automated_2_has_passed_action = True
+            await self.update_automated_info()
+            await self.send_automated_info()
+        else:
+            await self.update_game_event(name, ["action-button"], same_thread=True)
+            self.automated_1_has_passed_action = False
+            self.automated_2_has_passed_action = False
+            await self.update_game_event(name, game_update_string)
 
     async def update_game_event_action(self, name, game_update_string):
         if name == self.action_object.player_with_action:

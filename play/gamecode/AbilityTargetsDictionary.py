@@ -412,6 +412,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": "Warlord",
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": False,
             "Target": True,
             "Ability Type": "Planet"
@@ -432,6 +433,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": "Warlord",
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": True,
             "Target": False,
             "Ability Type": "Planet"
@@ -480,6 +482,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
+            "Same Planet": False,
             "Special": False,
             "Target": True,
             "Ability Type": "Planet"
