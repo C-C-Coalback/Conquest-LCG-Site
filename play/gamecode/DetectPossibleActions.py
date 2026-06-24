@@ -30,7 +30,7 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                 if ability in action_ability_starts:
                     prereqs = action_ability_starts[ability]
                     print("checking if action can start")
-                    if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=i, card=card):
+                    if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=-2, card=card):
                         possible_action_locations = add_action(possible_action_locations, "HQ/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
     for i in range(7):
         for j in range(len(primary_player.cards_in_play[i + 1])):
@@ -79,15 +79,23 @@ def check_single_card_in_hand(game, action_ability, prereqs, primary_player, sec
     return True
 
 
-def check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, unit_pos):
+def check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, unit_pos, src_planet=-1):
     faction_card = prereqs["Attributes In Play Card"]["Faction"]
     card_type_card = prereqs["Attributes In Play Card"]["Card Type"]
+    forbidden_card_type_card = prereqs["Attributes In Play Card"]["Forbidden Card Type"]
+    must_be_same_planet = prereqs["Attributes In Play Card"]["Same Planet"]
     special = prereqs["Special"]
+    if must_be_same_planet:
+        if src_planet != planet_pos:
+            return False
     if faction_card:
         if not primary_player.check_if_faction_given_pos(planet_pos, unit_pos, faction_card):
             return False
     if card_type_card:
         if primary_player.get_card_type_given_pos(planet_pos, unit_pos) != card_type_card:
+            return False
+    elif forbidden_card_type_card:
+        if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == forbidden_card_type_card:
             return False
     if special:
         if action_ability == "Preemptive Barrage":
@@ -133,21 +141,21 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
             if in_play_card_reqs["At Planet"]:
                 for i in range(7):
                     for j in range(len(primary_player.cards_in_play[i + 1])):
-                        if check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, i, j):
+                        if check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, i, j, src_planet=planet_pos):
                             return True
             if in_play_card_reqs["At HQ"]:
                 for i in range(len(primary_player.headquarters)):
-                    if check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, -2, i):
+                    if check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, -2, i, src_planet=planet_pos):
                         return True
         if enemy_card:
             if in_play_card_reqs["At Planet"]:
                 for i in range(7):
                     for j in range(len(secondary_player.cards_in_play[i + 1])):
-                        if check_single_card_in_play(game, action_ability, prereqs, secondary_player, primary_player, i, j):
+                        if check_single_card_in_play(game, action_ability, prereqs, secondary_player, primary_player, i, j, src_planet=planet_pos):
                             return True
             if in_play_card_reqs["At HQ"]:
                 for i in range(len(secondary_player.headquarters)):
-                    if check_single_card_in_play(game, action_ability, prereqs, secondary_player, secondary_player, -2, i):
+                    if check_single_card_in_play(game, action_ability, prereqs, secondary_player, secondary_player, -2, i, src_planet=planet_pos):
                         return True
     if special:
         if action_ability == "Captain Markis":
@@ -178,6 +186,8 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                             if secondary_player.get_card_type_given_pos(i, j) != "Warlord":
                                 if not secondary_player.get_immune_to_enemy_events(i, j):
                                     return True
+        if action_ability == "Zarathur's Flamers":
+            return False
     if not special and not requires_hand_card and not requires_in_play_card:
         return True
     return False
