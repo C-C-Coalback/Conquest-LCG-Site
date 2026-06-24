@@ -193,6 +193,13 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Tzeentch's Firestorm":
             if primary_player.get_resources() == 0:
                 return False
+        if action_ability == "Ravenous Flesh Hounds":
+            if card.get_damage() == 0:
+                return False
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if primary_player.check_for_trait_given_pos(i, j, "Cultist"):
+                        return True
     if not special and not requires_hand_card and not requires_in_play_card:
         return True
     return False

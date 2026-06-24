@@ -331,6 +331,26 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Ravenous Flesh Hounds": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": ["Cultist"],
+            "Forbidden Traits": [],
+            "Special": False,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -628,5 +648,13 @@ action_ability_starts = {
             "Forbidden Card Type": "Warlord",
             "Same Planet": False
         }
+    },
+    "Ravenous Flesh Hounds": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
     },
 }
