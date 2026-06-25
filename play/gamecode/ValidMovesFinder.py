@@ -872,8 +872,9 @@ def determine_valid_moves(self):
                         target_restrictions, planet_pos=self.reactions_needing_resolving[0].get_planet_pos(), ability_type="Reaction"
                     )
                 if type_target == "Planet":
-                    valid_moves = add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player,
-                                                                   current_reaction, target_restrictions, misc_pla=-1)
+                    valid_moves = add_valid_planets_as_valid_moves(
+                        self, valid_moves, primary_player, secondary_player, current_reaction, target_restrictions,
+                        misc_pla=-1, unit_pla=self.reactions_needing_resolving[0].get_planet_pos())
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Interrupt":

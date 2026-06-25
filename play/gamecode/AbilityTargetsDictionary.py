@@ -5,7 +5,8 @@ ability_targets_dictionary = {
         "Restrictions 1": {
             "Non-first": True,
             "Icons": None,
-            "Not Same Planet": False
+            "Not Same Planet": False,
+            "Not Same Planet Unit": False
         }
     },
     "Veteran Brother Maxos": {
@@ -250,7 +251,8 @@ ability_targets_dictionary = {
         "Restrictions 1": {
             "Non-first": False,
             "Icons": None,
-            "Not Same Planet": False
+            "Not Same Planet": False,
+            "Not Same Planet Unit": False
         }
     },
     "Squig Bombin'": {
@@ -280,7 +282,8 @@ ability_targets_dictionary = {
         "Restrictions 1": {
             "Non-first": False,
             "Icons": None,
-            "Not Same Planet": False
+            "Not Same Planet": False,
+            "Not Same Planet Unit": False
         }
     },
     "Tellyporta Pad": {
@@ -339,7 +342,8 @@ ability_targets_dictionary = {
         "Restrictions 2": {
             "Non-first": False,
             "Icons": None,
-            "Not Same Planet": False
+            "Not Same Planet": False,
+            "Not Same Planet Unit": False
         }
     },
     "Tzeentch's Firestorm": {
@@ -411,7 +415,8 @@ ability_targets_dictionary = {
         "Restrictions 1": {
             "Non-first": False,
             "Icons": None,
-            "Not Same Planet": False
+            "Not Same Planet": False,
+            "Not Same Planet Unit": False
         }
     },
     "Khymera Den": {
@@ -543,6 +548,16 @@ ability_targets_dictionary = {
             "Special": True,
             "Target": False,
             "Ability Type": "Reaction"
+        }
+    },
+    "Foresight": {
+        "Num Stages": 1,
+        "Type 1": "Planet",
+        "Restrictions 1": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": False,
+            "Not Same Planet Unit": True
         }
     },
     "Commander Shadowsun hand": {
