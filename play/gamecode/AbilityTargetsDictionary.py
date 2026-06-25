@@ -440,6 +440,27 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Power from Pain": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": False,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -822,5 +843,24 @@ action_ability_starts = {
         "Once Per Phase": False,
         "Ready Required": False,
         "Exhaust Required": False,
+    },
+    "Power from Pain": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Must Be Unit": True,
+            "Own Unit": False,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Same Planet": False
+        }
     }
 }
