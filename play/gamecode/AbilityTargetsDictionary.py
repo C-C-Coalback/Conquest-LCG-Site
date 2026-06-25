@@ -503,6 +503,27 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Eldorath Starbane": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": True,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": "Warlord",
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": True,
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Reaction"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",

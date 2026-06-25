@@ -18,11 +18,14 @@ apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 
 first_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_1.txt')
 second_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_2.txt')
+eldorath_deck_location = os.path.join(current_dir, "decksForTests/StarbaneCore.txt")
 
 with open(first_deck_location, 'r') as file:
     deck_content_1 = file.read()
 with open(second_deck_location, 'r') as file:
     deck_content_2 = file.read()
+with open(eldorath_deck_location, 'r') as file:
+    eldorath_deck_content = file.read()
 
 
 # IMPORTANT: How automated combat turn actions work
@@ -438,3 +441,20 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HQ", "1", "0"])
         self.assertIn("IN_PLAY/2/0/1", test_game.last_automated_data_string)
+
+    async def test_eldorath_starbane(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], bot_is_present=True)
+        await test_game.p1.setup_player(eldorath_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Incubus Warrior"), 0)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P2", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertIn("IN_PLAY/2/0/0", test_game.last_automated_data_string)
