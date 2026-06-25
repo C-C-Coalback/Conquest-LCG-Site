@@ -108,6 +108,9 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Tellyporta Pad":
             if planet_pos == game.round_number:
                 return False
+        if action_ability == "Archon's Terror":
+            if primary_player.get_unique_given_pos(planet_pos, unit_pos):
+                return False
     return True
 
 
