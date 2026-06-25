@@ -560,6 +560,16 @@ ability_targets_dictionary = {
             "Not Same Planet Unit": True
         }
     },
+    "Wildrider Squadron": {
+        "Num Stages": 1,
+        "Type 1": "Planet",
+        "Restrictions 1": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": False,
+            "Not Same Planet Unit": True
+        }
+    },
     "Commander Shadowsun hand": {
         "Num Stages": 2,
         "Type 1": "Hand",
@@ -1057,4 +1067,12 @@ action_ability_starts = {
             "Same Planet": False
         }
     },
+    "Wildrider Squadron": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": True,
+        "Ready Required": False,
+        "Exhaust Required": False,
+    }
 }

@@ -839,7 +839,13 @@ def determine_valid_moves(self):
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
                     )
                 if type_target == "Planet":
-                    if target_restrictions["Non-first"]:
+                    if self.action_object.action_chosen == "Wildrider Squadron":
+                        for i in range(7):
+                            if not self.planets_in_play_array[i]:
+                                continue
+                            if abs(i - self.action_object.get_planet_pos()) == 1:
+                                valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
+                    elif target_restrictions["Non-first"]:
                         valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
                     else:
                         valid_moves = add_active_planets_as_valid_moves(self, valid_moves)

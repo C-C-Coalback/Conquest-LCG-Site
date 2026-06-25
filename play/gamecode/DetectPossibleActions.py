@@ -140,6 +140,12 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Tzeentch's Firestorm":
             if primary_player.get_resources() == 0:
                 return False
+        if action_ability == "Wildrider Squadron":
+            if planet_pos == -2:
+                return False
+            if game.count_planets_in_play() <= 1:
+                return False
+            return True
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):

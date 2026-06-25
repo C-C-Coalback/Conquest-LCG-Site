@@ -895,6 +895,13 @@ class Game:
                 self.anything_changed_since_last_send = True
             await self.send_update_message(initiative_string)
 
+    def count_planets_in_play(self):
+        count = 0
+        for i in range(len(self.planets_in_play_array)):
+            if self.planets_in_play_array[i]:
+                count += 1
+        return count
+
     async def begin_asking_nullify(self, primary_player, secondary_player, effect_name, cost_card, game_update_string,
                                    nullify_context, nullified_card_pos=-1):
         await self.send_update_message(
