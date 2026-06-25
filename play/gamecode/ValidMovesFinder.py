@@ -378,6 +378,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             elif ability.get_reaction_name() == "Sicarius's Chosen":
                 if abs(ability.get_planet_pos() - planet_pos) != 1:
                     return False
+            elif ability.get_reaction_name() == "Shrouded Harlequin":
+                if planet_pos == -2:
+                    return False
             elif ability.get_reaction_name() == "Commander Shadowsun hand":
                 shadowsun_player = ability.get_player_resolving_reaction()
                 shadowsun_player = self.get_player_given_name(shadowsun_player)

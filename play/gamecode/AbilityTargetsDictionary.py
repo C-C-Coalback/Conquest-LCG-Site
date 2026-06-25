@@ -581,6 +581,27 @@ ability_targets_dictionary = {
             "Card Enters Play": False,
         },
     },
+    "Shrouded Harlequin": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": False,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": True,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Reaction"
+        }
+    },
     "Commander Shadowsun hand": {
         "Num Stages": 2,
         "Type 1": "Hand",

@@ -552,7 +552,7 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         self.assertIn("PLANETS/1", test_game.last_automated_data_string)
         self.assertNotIn("PLANETS/2", test_game.last_automated_data_string)
 
-    async def test_wailing_wraithfighter(self):
+    async def test_wailing_wraithfighter_execution(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], bot_is_present=True)
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
@@ -565,3 +565,21 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertIn("HAND/2/0", test_game.last_automated_data_string)
+
+    async def test_shrouded_harlequin_execution(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], bot_is_present=True)
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = []
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shrouded Harlequin"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Shrouded Harlequin"), 0)
+        await test_game.update_game_event("P1", [])
+        test_game.p1.destroy_card_in_play(0, 0)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertIn("IN_PLAY/2/0/0", test_game.last_automated_data_string)
+        self.assertNotIn("HQ/2/0", test_game.last_automated_data_string)
