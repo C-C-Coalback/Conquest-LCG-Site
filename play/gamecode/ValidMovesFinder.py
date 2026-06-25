@@ -371,6 +371,10 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             if ability.get_reaction_name() == "Cato's Stronghold":
                 if planet_pos not in ability.misc_list:
                     return False
+            elif ability.get_reaction_name() == "Alaitoc Shrine":
+                full_position = (int(player.get_number()), planet_pos, unit_pos)
+                if full_position not in player.allowed_units_alaitoc_shrine:
+                    return False
             elif ability.get_reaction_name() == "Sicarius's Chosen":
                 if abs(ability.get_planet_pos() - planet_pos) != 1:
                     return False

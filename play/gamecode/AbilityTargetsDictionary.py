@@ -524,6 +524,27 @@ ability_targets_dictionary = {
             "Ability Type": "Reaction"
         }
     },
+    "Alaitoc Shrine": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": True,
+            "Faction": "Eldar",
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Reaction"
+        }
+    },
     "Commander Shadowsun hand": {
         "Num Stages": 2,
         "Type 1": "Hand",
