@@ -940,7 +940,7 @@ class Game:
             else:
                 info_string += self.name_2 + "/"
         elif self.reactions_needing_resolving:
-            info_string += self.reactions_needing_resolving[0].get_player_resolving_reaction()[0] + "/"
+            info_string += self.reactions_needing_resolving[0].get_player_resolving_reaction() + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
             info_string += self.player_mobiling + "/"
         elif self.battle_ability_to_resolve:

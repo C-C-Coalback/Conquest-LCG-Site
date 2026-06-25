@@ -265,6 +265,8 @@ def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, h
         valid_moves.append("IN_PLAY/" + player.number + "/" + str(planet_pos) + "/" + str(unit_pos))
     elif card_zone == "HAND":
         valid_moves.append("HAND/" + player.number + "/" + str(hand_pos))
+    elif card_zone == "IN_DISCARD":
+        valid_moves.append("IN_DISCARD/" + player.number + "/" + str(discard_pos))
     elif card_zone == "CHOICE":
         valid_moves.append("CHOICE/" + str(choice_pos))
     elif card_zone == "SEARCH":
@@ -372,6 +374,18 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             elif ability.get_reaction_name() == "Sicarius's Chosen":
                 if abs(ability.get_planet_pos() - planet_pos) != 1:
                     return False
+            elif ability.get_reaction_name() == "Commander Shadowsun hand":
+                shadowsun_player = ability.get_player_resolving_reaction()
+                shadowsun_player = self.get_player_given_name(shadowsun_player)
+                card = shadowsun_player.get_card_in_hand(shadowsun_player.aiming_reticle_coords_hand)
+                if not player.check_if_can_attach_card(card, planet_pos, unit_pos):
+                    return False
+            elif ability.get_reaction_name() == "Commander Shadowsun discard":
+                shadowsun_player = ability.get_player_resolving_reaction()
+                shadowsun_player = self.get_player_given_name(shadowsun_player)
+                card = shadowsun_player.get_card_in_discard(shadowsun_player.aiming_reticle_coords_discard)
+                if not player.check_if_can_attach_card(card, planet_pos, unit_pos):
+                    return False
         elif ability_type == "Action":
             if ability.action_chosen == "Preemptive Barrage":
                 if player.get_ranged_given_pos(planet_pos, unit_pos):
@@ -419,17 +433,20 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
     return True
 
 
-def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos, target_restrictions, planet_pos=-1):
+def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos, target_restrictions, planet_pos=-1, ability_type=""):
     faction_hand_card = target_restrictions["Faction"]
     card_type_hand_card = target_restrictions["Card Type"]
     max_cost_hand_card = target_restrictions["Max Cost"]
     payment_hand_card = target_restrictions["Payment"]
     card_enters_play = target_restrictions["Card Enters Play"]
     card = player.get_card_in_hand(hand_pos)
+    if ability_type == "Reaction":
+        if ability.get_reaction_name() == "Commander Shadowsun hand":
+            if card.get_ability() == "Shadowsun's Stealth Cadre":
+                return True
     if faction_hand_card:
-        if faction_hand_card:
-            if faction_hand_card != card.get_faction():
-                return False
+        if faction_hand_card != card.get_faction():
+            return False
     if card_type_hand_card:
         if card_type_hand_card != card.get_card_type():
             return False
@@ -450,11 +467,44 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
     return True
 
 
-def find_all_valid_hand_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1):
+def find_all_valid_hand_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1, ability_type=""):
     valid_moves = []
     for i in range(len(primary_player.cards)):
-        if check_if_single_card_in_hand_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=planet_pos):
+        if check_if_single_card_in_hand_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=planet_pos, ability_type=ability_type):
             valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+    return valid_moves
+
+
+def check_if_single_card_in_discard_is_valid_target(self, ability, player, discard_pos, target_restrictions, planet_pos=-1, ability_type=""):
+    faction_card = target_restrictions["Faction"]
+    card_type_card = target_restrictions["Card Type"]
+    max_cost_card = target_restrictions["Max Cost"]
+    card_enters_play = target_restrictions["Card Enters Play"]
+    card = player.get_card_in_discard(discard_pos)
+    if ability_type == "Reaction":
+        if ability.get_reaction_name() == "Commander Shadowsun discard":
+            if card.get_ability() == "Shadowsun's Stealth Cadre":
+                return True
+    if faction_card:
+        if faction_hand_card != card.get_faction():
+            return False
+    if card_type_card:
+        if card_type_card != card.get_card_type():
+            return False
+    if max_cost_card:
+        if card.get_cost() > max_cost_card:
+            return False
+    if card_enters_play:
+        if not player.check_if_card_can_enter_play(card, planet_pos=planet_pos, triggered_card_effect=True):
+            return False
+    return True
+
+
+def find_all_valid_discard_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1, ability_type=""):
+    valid_moves = []
+    for i in range(len(primary_player.discard)):
+        if check_if_single_card_in_discard_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=planet_pos, ability_type=ability_type):
+            valid_moves = add_valid_move(valid_moves, primary_player, "IN_DISCARD", discard_pos=i)
     return valid_moves
 
 
@@ -806,6 +856,16 @@ def determine_valid_moves(self):
                 if type_target == "In Play":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, self.reactions_needing_resolving[0], primary_player, secondary_player, target_restrictions
+                    )
+                if type_target == "Hand":
+                    valid_moves = find_all_valid_hand_locations_given_restrictions(
+                        self, self.reactions_needing_resolving[0], primary_player, secondary_player,
+                        target_restrictions, planet_pos=self.reactions_needing_resolving[0].get_planet_pos(), ability_type="Reaction"
+                    )
+                if type_target == "Discard":
+                    valid_moves = find_all_valid_discard_locations_given_restrictions(
+                        self, self.reactions_needing_resolving[0], primary_player, secondary_player,
+                        target_restrictions, planet_pos=self.reactions_needing_resolving[0].get_planet_pos(), ability_type="Reaction"
                     )
                 if type_target == "Planet":
                     valid_moves = add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player,

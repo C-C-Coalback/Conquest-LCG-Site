@@ -21,7 +21,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             primary_player.discard_card_from_hand(hand_pos)
             self.banshee_power_sword_extra_attack += 1
         elif current_reaction == "Commander Shadowsun hand":
-            if self.location_hand_attachment_shadowsun == -1:
+            if not self.reactions_needing_resolving[0].chosen_first_card:
                 hand_pos = int(game_update_string[2])
                 card = FindCard.find_card(primary_player.cards[hand_pos], self.card_array,
                                           self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
@@ -30,6 +30,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
                     self.location_hand_attachment_shadowsun = hand_pos
                     primary_player.aiming_reticle_coords_hand = hand_pos
                     primary_player.aiming_reticle_color = "blue"
+                    self.reactions_needing_resolving[0].chosen_first_card = True
         elif current_reaction == "Awakened Geomancer":
             primary_player.discard_card_from_hand(hand_pos)
             primary_player.add_resources(1)

@@ -157,6 +157,7 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                         card.get_name() == "Shadowsun's Stealth Cadre":
                     self.location_attachment_discard_shadowsun = pos_discard
                     primary_player.aiming_reticle_coords_discard = pos_discard
+                    self.reactions_needing_resolving[0].chosen_first_card = True
         elif current_reaction == "The Dance Without End":
             if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):

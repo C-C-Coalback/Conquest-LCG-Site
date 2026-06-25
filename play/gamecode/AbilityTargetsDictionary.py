@@ -524,6 +524,63 @@ ability_targets_dictionary = {
             "Ability Type": "Reaction"
         }
     },
+    "Commander Shadowsun hand": {
+        "Num Stages": 2,
+        "Type 1": "Hand",
+        "Restrictions 1": {
+            "Faction": "Tau",
+            "Card Type": "Attachment",
+            "Max Cost": 2,
+            "Payment": False,
+            "Card Enters Play": False,
+        },
+        "Type 2": "In Play",
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Reaction"
+        }
+    },
+    "Commander Shadowsun discard": {
+        "Num Stages": 2,
+        "Type 1": "Discard",
+        "Restrictions 1": {
+            "Faction": "Tau",
+            "Card Type": "Attachment",
+            "Max Cost": 2,
+            "Card Enters Play": False,
+        },
+        "Type 2": "In Play",
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Reaction"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
