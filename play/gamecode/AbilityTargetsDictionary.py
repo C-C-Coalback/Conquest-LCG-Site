@@ -482,6 +482,27 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Twisted Laboratory": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -899,6 +920,25 @@ action_ability_starts = {
             "Enemy Unit": True,
             "Faction": None,
             "Card Type": None,
+            "Forbidden Card Type": None,
+            "Same Planet": False
+        }
+    },
+    "Twisted Laboratory": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Must Be Unit": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": "Army",
             "Forbidden Card Type": None,
             "Same Planet": False
         }
