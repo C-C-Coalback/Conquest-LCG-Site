@@ -325,6 +325,23 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Infernal Gateway": {
+        "Num Stages": 2,
+        "Type 1": "Hand",
+        "Restrictions 1": {
+            "Faction": "Chaos",
+            "Card Type": "Army",
+            "Max Cost": 3,
+            "Payment": False,
+            "Card Enters Play": True,
+        },
+        "Type 2": "Planet",
+        "Restrictions 2": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": False
+        }
+    },
     "Tzeentch's Firestorm": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -711,6 +728,21 @@ action_ability_starts = {
             "Card Type": None,
             "Forbidden Card Type": "Warlord",
             "Same Planet": True
+        }
+    },
+    "Infernal Gateway": {
+        "Special": False,
+        "Requires Hand Card": True,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+        "Attributes Hand Card": {
+            "Faction": "Chaos",
+            "Card Type": "Army",
+            "Max Cost": 3,
+            "Payment": False,
+            "Card Enters Play": True,
         }
     },
     "Tzeentch's Firestorm": {
