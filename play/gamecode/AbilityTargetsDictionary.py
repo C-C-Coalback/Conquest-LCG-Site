@@ -1148,5 +1148,13 @@ action_ability_starts = {
         "Once Per Phase": True,
         "Ready Required": False,
         "Exhaust Required": False,
-    }
+    },
+    "Doom": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
+    },
 }
