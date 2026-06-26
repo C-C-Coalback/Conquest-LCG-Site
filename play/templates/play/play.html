@@ -10,7 +10,11 @@
 <link rel="stylesheet" href="{% static 'play_style.css' %}">
 {% endif %}
 <div class="box" onmousemove="getCursor(event)">
-    <div id="helper-text-box">
+    <div id="hover-preview-box">
+        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard" onclick="changeHelperSize()">
+        <div id="helper-text-box">
+
+        </div>
 
     </div>
     <div id="contextMenu" class="context-menu">
@@ -173,12 +177,35 @@
             </div>
         </div>
     </div>
-    <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard" onclick="changeHelperSize()">
     <div id="increase-zoom-div">
         <input id="inc-zoom" type="button" value="Zoom In" onclick="increaseZoom();">
     </div>
     <div id="decrease-zoom-div">
         <input id="dec-zoom" type="button" value="Zoom Out" onclick="decreaseZoom();">
+    </div>
+    <div id="in-game-settings-div">
+        <input id="open-in-game-settings" type="button" value="In-Game Settings" onclick="toggleInGameSettingsDialog();">
+    </div>
+    <div id="in-game-settings-dialog">
+        <h3 id="in-game-settings-header">In-Game Settings</h3>
+        <label class="in-game-settings-option">
+            <input id="setting-toggle-hints" type="checkbox" checked onchange="setHintsEnabled(this.checked)">
+            Toggle Hints in the info-box
+        </label>
+        <label style="display:none" class="in-game-settings-option">
+            <input id="setting-toggle-tutorial" type="checkbox" onchange="setTutorialModeEnabled(this.checked)">
+            Toggle tutorial mode (we'll add later)
+        </label>
+        <div class="in-game-settings-option in-game-settings-slider-option">
+            <label for="setting-preview-size">Preview size</label>
+            <input id="setting-preview-size" type="range" min="70" max="170" step="5" value="100" oninput="setHoverPreviewScalePercent(this.value)">
+            <span id="setting-preview-size-value">100%</span>
+        </div>
+        <label class="in-game-settings-option">
+            <input id="setting-toggle-preview" type="checkbox" checked onchange="setHoverPreviewEnabled(this.checked)">
+            Toggle preview-on-hover on/off
+        </label>
+        <input id="close-in-game-settings" type="button" value="Close" onclick="hideInGameSettingsDialog();">
     </div>
     <div id="pass-player-1">
         <input id="pass-P1" type="button" value="PASS" onclick="testImageButton(this.id);">
@@ -242,6 +269,17 @@
     function replaceCardbacksText_1(original_string) {
         var result = original_string.replaceAll("Cardback", cardback_1);
         return result;
+    }
+
+    function escapeHtmlAttribute(value) {
+        if (value === undefined || value === null) {
+            return "";
+        }
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("\"", "&quot;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
     }
 
     function replaceCardbacksText_2(original_string) {
@@ -425,6 +463,12 @@
         var automated_legal_actions = [];
         var automated_misc_type = "";
         var automated_misc_details = "";
+        var hints_enabled = true;
+        var tutorial_mode_enabled = false;
+        var hover_preview_enabled = true;
+        var hover_preview_scale_percent = 100;
+        var choice_context_hover_request_id = 0;
+        var current_planet_names = ["", "", "", "", "", "", ""];
 
         function escapeHtml(text) {
             if (text === undefined || text === null) {
@@ -492,6 +536,19 @@
         }
 
         function describeActionToken(token) {
+            if (token.startsWith("SPECIAL_ACTION_")) {
+                var special_action_token = token.slice("SPECIAL_ACTION_".length);
+                if (special_action_token.startsWith("HAND/")) {
+                    return "trigger a special action from a card in hand";
+                }
+                if (special_action_token.startsWith("IN_PLAY/")) {
+                    return "trigger a special action from a unit in play";
+                }
+                if (special_action_token.startsWith("HQ/")) {
+                    return "trigger a special action from a card in HQ";
+                }
+                return "trigger a special action";
+            }
             if (token.startsWith("HAND/")) {
                 return "play/select a card from hand";
             }
@@ -519,6 +576,103 @@
             return token;
         }
 
+        function extractPlanetNameFromInfoRows() {
+            if (!latest_info_box_rows || latest_info_box_rows.length === 0) {
+                return "";
+            }
+            for (var i = 0; i < latest_info_box_rows.length; i++) {
+                var row_text = String(latest_info_box_rows[i] || "").trim();
+                if (!row_text) {
+                    continue;
+                }
+                var lowered_row_text = row_text.toLowerCase();
+                if (lowered_row_text.startsWith("resolve battle ability:")) {
+                    return row_text.slice("resolve battle ability:".length).trim();
+                }
+                if (lowered_row_text.startsWith("planet:")) {
+                    return row_text.slice("planet:".length).trim();
+                }
+            }
+            return "";
+        }
+
+        function isRangedSkirmishActiveFromInfoRows() {
+            if (!latest_info_box_rows || latest_info_box_rows.length === 0) {
+                return false;
+            }
+            for (var i = 0; i < latest_info_box_rows.length; i++) {
+                var row_text = String(latest_info_box_rows[i] || "").toLowerCase();
+                if (row_text.startsWith("active (ranged):")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function extractPlanetIndexFromActionToken(token) {
+            if (!token || isPassToken(token)) {
+                return -1;
+            }
+            var split_token = token.split("/");
+            if (split_token.length < 2) {
+                return -1;
+            }
+            var parsed_index = -1;
+            if (split_token[0] === "PLANETS" && split_token.length >= 2) {
+                parsed_index = parseInt(split_token[1], 10);
+            } else if (split_token[0] === "IN_PLAY" && split_token.length >= 3) {
+                parsed_index = parseInt(split_token[2], 10);
+            } else if (split_token[0] === "RESERVE" && split_token.length >= 3) {
+                parsed_index = parseInt(split_token[2], 10);
+            } else if (split_token[0] === "ATTACHMENT" && split_token.length >= 4) {
+                if (split_token[1] === "IN_PLAY") {
+                    parsed_index = parseInt(split_token[3], 10);
+                } else if (split_token[1] === "PLANETS") {
+                    parsed_index = parseInt(split_token[3], 10);
+                }
+            }
+            if (isNaN(parsed_index) || parsed_index < 0 || parsed_index >= current_planet_names.length) {
+                return -1;
+            }
+            return parsed_index;
+        }
+
+        function inferPlanetNameFromAutomatedActions() {
+            var legal_actions = automated_legal_actions || [];
+            var found_planet_index = -1;
+            for (var i = 0; i < legal_actions.length; i++) {
+                var maybe_planet_index = extractPlanetIndexFromActionToken(legal_actions[i]);
+                if (maybe_planet_index === -1) {
+                    continue;
+                }
+                if (found_planet_index === -1) {
+                    found_planet_index = maybe_planet_index;
+                } else if (found_planet_index !== maybe_planet_index) {
+                    return "";
+                }
+            }
+            if (found_planet_index === -1) {
+                return "";
+            }
+            return sanitizeChoiceContextText(current_planet_names[found_planet_index]);
+        }
+
+        function inferActivePlanetName(choice_context_text="") {
+            var info_planet_name = sanitizeChoiceContextText(extractPlanetNameFromInfoRows());
+            if (info_planet_name) {
+                return info_planet_name;
+            }
+            var automated_planet_name = inferPlanetNameFromAutomatedActions();
+            if (automated_planet_name) {
+                return automated_planet_name;
+            }
+            var normalized_context = sanitizeChoiceContextText(choice_context_text).toLowerCase();
+            if (normalized_context === "resolve battle ability?") {
+                return "";
+            }
+            return "";
+        }
+
         function buildTurnHint() {
             if (!automated_required_action) {
                 return "";
@@ -536,14 +690,30 @@
                 return "You can trigger an action with a highlighted card, or click PASS to continue to the next combat turn.";
             }
             if (automated_required_action === "Combat Turn") {
+                const rangedSkirmishActive = isRangedSkirmishActiveFromInfoRows();
                 if (nonPassActions.length === 0) {
+                    if (rangedSkirmishActive) {
+                        return "Ranged skirmish is active. You have no legal ranged attacks, so click PASS to continue to normal combat attacks.";
+                    }
                     return "No legal attacks are available, so PASS is the only valid combat-turn action.";
+                }
+                if (rangedSkirmishActive) {
+                    const hasAttackDeclaration = nonPassActions.some((token) => token.startsWith("IN_PLAY/"));
+                    if (!hasAttackDeclaration) {
+                        return "Ranged skirmish is active. You can use a special action now, or click PASS to continue to normal combat attacks.";
+                    }
                 }
                 const ownPrefix = "IN_PLAY/" + own_player_number + "/";
                 if (own_player_number !== "0" && nonPassActions.every((token) => token.startsWith(ownPrefix))) {
+                    if (rangedSkirmishActive) {
+                        return "Ranged skirmish is active. Select one of your ready ranged units to declare as attacker.";
+                    }
                     return "Select one of your ready units to declare as attacker.";
                 }
                 if (nonPassActions.every((token) => token.startsWith("IN_PLAY/"))) {
+                    if (rangedSkirmishActive) {
+                        return "Ranged skirmish is active. Select an enemy unit as defender for the current ranged attack.";
+                    }
                     return "Select an enemy unit as defender for the current attack.";
                 }
                 return "Resolve combat by selecting one of the highlighted legal targets.";
@@ -588,9 +758,117 @@
                 const row = escapeHtml(latest_info_box_rows[i]);
                 infoBox.innerHTML += `<p class="info-box-sub" style="color:` + latest_info_box_color + `;">` + row + `</p>`;
             }
+            const activePlanetName = inferActivePlanetName();
+            if (activePlanetName) {
+                infoBox.innerHTML += `<p class="info-box-sub" style="color:#1f4a7a;font-weight:700;margin-top:4px;">Planet: ` + escapeHtml(activePlanetName) + `</p>`;
+            }
             const hintText = buildTurnHint();
-            if (hintText) {
-                infoBox.innerHTML += `<p class="info-box-sub" style="padding-bottom: 10px; color:#7a4d00;font-weight:700;margin-top:4px;">Hint: ` + escapeHtml(hintText) + `</p>`;
+            if (hints_enabled && hintText) {
+                infoBox.innerHTML += `<p class="info-box-sub" style="color:#7a4d00;font-weight:700;margin-top:4px;">Hint: ` + escapeHtml(hintText) + `</p>`;
+            }
+        }
+
+        function syncInGameSettingsControls() {
+            var hintsToggle = document.getElementById("setting-toggle-hints");
+            if (hintsToggle) {
+                hintsToggle.checked = hints_enabled;
+            }
+            var tutorialToggle = document.getElementById("setting-toggle-tutorial");
+            if (tutorialToggle) {
+                tutorialToggle.checked = tutorial_mode_enabled;
+            }
+            var previewToggle = document.getElementById("setting-toggle-preview");
+            if (previewToggle) {
+                previewToggle.checked = hover_preview_enabled;
+            }
+            var previewScale = document.getElementById("setting-preview-size");
+            if (previewScale) {
+                previewScale.value = hover_preview_scale_percent.toString();
+            }
+            var previewScaleValue = document.getElementById("setting-preview-size-value");
+            if (previewScaleValue) {
+                previewScaleValue.innerHTML = hover_preview_scale_percent.toString() + "%";
+            }
+        }
+
+        function showInGameSettingsDialog() {
+            var settingsDialog = document.getElementById("in-game-settings-dialog");
+            if (!settingsDialog) {
+                return;
+            }
+            syncInGameSettingsControls();
+            settingsDialog.style.display = "block";
+        }
+
+        function hideInGameSettingsDialog() {
+            var settingsDialog = document.getElementById("in-game-settings-dialog");
+            if (!settingsDialog) {
+                return;
+            }
+            settingsDialog.style.display = "none";
+        }
+
+        function toggleInGameSettingsDialog() {
+            var settingsDialog = document.getElementById("in-game-settings-dialog");
+            if (!settingsDialog) {
+                return;
+            }
+            if (settingsDialog.style.display === "block") {
+                hideInGameSettingsDialog();
+            } else {
+                showInGameSettingsDialog();
+            }
+        }
+
+        function setHintsEnabled(enabled) {
+            hints_enabled = !!enabled;
+            renderInfoBox();
+        }
+
+        function setTutorialModeEnabled(enabled) {
+            tutorial_mode_enabled = !!enabled;
+        }
+
+        function setHoverPreviewEnabled(enabled) {
+            hover_preview_enabled = !!enabled;
+            if (!hover_preview_enabled) {
+                changeDefOut();
+            }
+        }
+
+        function setHoverPreviewScalePercent(percentValue) {
+            var parsedPercent = parseInt(percentValue, 10);
+            if (isNaN(parsedPercent)) {
+                parsedPercent = 100;
+            }
+            if (parsedPercent < 70) {
+                parsedPercent = 70;
+            }
+            if (parsedPercent > 170) {
+                parsedPercent = 170;
+            }
+            hover_preview_scale_percent = parsedPercent;
+            var previewScaleValue = document.getElementById("setting-preview-size-value");
+            if (previewScaleValue) {
+                previewScaleValue.innerHTML = hover_preview_scale_percent.toString() + "%";
+            }
+            applyHoverPreviewSizeSettings();
+        }
+
+        function applyHoverPreviewSizeSettings() {
+            var scaleMultiplier = hover_preview_scale_percent / 100;
+            if (helper_is_large === "T") {
+                current_helper_width = (50 * scaleMultiplier).toFixed(1) + "vh";
+                current_helper_height = (68 * scaleMultiplier).toFixed(1) + "vh";
+            } else {
+                current_helper_width = "min(" + (20 * scaleMultiplier).toFixed(1) + "vw, "
+                    + (29.5 * scaleMultiplier).toFixed(1) + "vh)";
+                current_helper_height = (40 * scaleMultiplier).toFixed(1) + "vh";
+            }
+            var helperCard = document.getElementById("LargeHelperCard");
+            if (helperCard) {
+                helperCard.style.width = current_helper_width;
+                helperCard.style.height = current_helper_height;
             }
         }
 
@@ -788,6 +1066,229 @@
             console.log("Hopefully changed planets");
         }
 
+        function sanitizeChoiceContextText(choice_context) {
+            if (choice_context === undefined || choice_context === null) {
+                return "";
+            }
+            return String(choice_context).trim();
+        }
+
+        function inferChoiceContextCardName(choice_context) {
+            var candidate = sanitizeChoiceContextText(choice_context);
+            if (!candidate) {
+                return "";
+            }
+            if (candidate.includes(":")) {
+                candidate = candidate.split(":")[0].trim();
+            }
+            while (candidate.endsWith("?")) {
+                candidate = candidate.slice(0, -1).trim();
+            }
+            if (!candidate) {
+                return "";
+            }
+            var lowered_candidate = candidate.toLowerCase();
+            if (lowered_candidate.startsWith("use ")) {
+                candidate = candidate.slice(4).trim();
+                lowered_candidate = candidate.toLowerCase();
+            }
+            if (lowered_candidate.endsWith(" scrying")) {
+                candidate = candidate.slice(0, -8).trim();
+                lowered_candidate = candidate.toLowerCase();
+            }
+            if (!candidate) {
+                return "";
+            }
+            var generic_prefixes = [
+                "choose ",
+                "target ",
+                "amount ",
+                "gains ",
+                "interrupt ",
+                "remove ",
+                "rearranging ",
+            ];
+            for (var i = 0; i < generic_prefixes.length; i++) {
+                if (lowered_candidate.startsWith(generic_prefixes[i])) {
+                    return "";
+                }
+            }
+            var generic_contexts = [
+                "choice hidden",
+                "yes",
+                "no",
+                "nothing here",
+                "resolve battle ability",
+            ];
+            if (generic_contexts.includes(lowered_candidate)) {
+                return "";
+            }
+            return candidate;
+        }
+
+        function buildChoiceContextHelperText(choice_context, choice_context_card="") {
+            var prompt_text = sanitizeChoiceContextText(choice_context);
+            if (!prompt_text) {
+                return "Choose one of the available options.";
+            }
+            var lowered_prompt = prompt_text.toLowerCase();
+            var helper_text = "Prompt: " + prompt_text;
+            var inferred_planet_name = sanitizeChoiceContextText(choice_context_card);
+            if (!inferred_planet_name) {
+                inferred_planet_name = inferActivePlanetName(prompt_text);
+            }
+            if (lowered_prompt.includes("hangyz")) {
+                helper_text += "\nYes resolves the Hangyz effect.\nNo skips the effect.";
+            } else if (lowered_prompt.startsWith("choose ") || lowered_prompt.startsWith("target ")) {
+                helper_text += "\nSelect the option that matches this prompt.";
+            } else {
+                helper_text += "\nFor Yes/No prompts, Yes resolves the effect and No skips it.";
+            }
+            if (inferred_planet_name) {
+                helper_text += "\nPlanet: " + inferred_planet_name;
+            }
+            return helper_text;
+        }
+
+        function showChoiceContextPreview(route_text, is_planet_context, helper_text) {
+            if (is_planet_context) {
+                changeDefRotate(route_text);
+            } else {
+                changeDef(route_text);
+            }
+            setHoverHelperText(helper_text);
+        }
+        function showChoiceContextHelp(choice_context, choice_context_card) {
+            if (!hover_preview_enabled) {
+                return;
+            }
+            choice_context_hover_request_id += 1;
+            var request_id = choice_context_hover_request_id;
+            var inferred_card_name = sanitizeChoiceContextText(choice_context_card);
+            if (!inferred_card_name) {
+                inferred_card_name = inferChoiceContextCardName(choice_context);
+            }
+            if (!inferred_card_name) {
+                inferred_card_name = inferActivePlanetName(choice_context);
+            }
+            var helper_text = buildChoiceContextHelperText(choice_context, inferred_card_name);
+            if (!inferred_card_name) {
+                changeDef("/static/images/CardImages/Cardback.jpg");
+                setHoverHelperText(helper_text);
+                return;
+            }
+            var normalized_name = inferred_card_name.split(" ").join("_");
+            var card_route_text = "/static/images/CardImages/" + normalized_name + ".jpg";
+            var planet_route_text = "/static/images/PlanetImages/" + normalized_name + ".jpg";
+            var card_image_test = new Image();
+            card_image_test.onload = function() {
+                if (request_id !== choice_context_hover_request_id) {
+                    return;
+                }
+                var current_choice_header = document.getElementById("header-choices-container");
+                if (!current_choice_header) {
+                    return;
+                }
+                showChoiceContextPreview(card_route_text, false, helper_text);
+            };
+            card_image_test.onerror = function() {
+                if (request_id !== choice_context_hover_request_id) {
+                    return;
+                }
+                var planet_image_test = new Image();
+                planet_image_test.onload = function() {
+                    if (request_id !== choice_context_hover_request_id) {
+                        return;
+                    }
+                    var current_choice_header = document.getElementById("header-choices-container");
+                    if (!current_choice_header) {
+                        return;
+                    }
+                    showChoiceContextPreview(planet_route_text, true, helper_text);
+                };
+                planet_image_test.onerror = function() {
+                    if (request_id !== choice_context_hover_request_id) {
+                        return;
+                    }
+                    changeDef("/static/images/CardImages/Cardback.jpg");
+                    setHoverHelperText(helper_text);
+                };
+                planet_image_test.src = planet_route_text;
+            };
+            card_image_test.src = card_route_text;
+        }
+
+        function calculateChoiceBoxMaxWidthVw(choice_context_text, split_data) {
+            var longest_length = sanitizeChoiceContextText(choice_context_text).length;
+            for (var i = 4; i < split_data.length; i++) {
+                var option_text = split_data[i];
+                var pipe_index = option_text.lastIndexOf("|");
+                if (pipe_index !== -1) {
+                    option_text = option_text.slice(0, pipe_index);
+                }
+                if (option_text.length > longest_length) {
+                    longest_length = option_text.length;
+                }
+            }
+            if (longest_length > 40) {
+                return 26;
+            }
+            if (longest_length > 30) {
+                return 22;
+            }
+            if (longest_length > 22) {
+                return 18;
+            }
+            if (longest_length > 16) {
+                return 14;
+            }
+            return 10;
+        }
+
+        function applyStoredDraggablePosition(target_element, stored_left_value, stored_top_value, reset_if_bottom_right=false) {
+            if (!target_element) {
+                return false;
+            }
+            var parsed_left = parseFloat(stored_left_value);
+            var parsed_top = parseFloat(stored_top_value);
+            if (isNaN(parsed_left) || isNaN(parsed_top)) {
+                return false;
+            }
+            var box_rect = target_element.getBoundingClientRect();
+            var box_width = box_rect.width;
+            var box_height = box_rect.height;
+            if (!(box_width > 0)) {
+                box_width = target_element.offsetWidth;
+            }
+            if (!(box_height > 0)) {
+                box_height = target_element.offsetHeight;
+            }
+            var min_margin = 8;
+            var max_left = Math.max(min_margin, window.innerWidth - box_width - min_margin);
+            var max_top = Math.max(min_margin, window.innerHeight - box_height - min_margin);
+            var overflow_tolerance = 60;
+            if (
+                parsed_left < (min_margin - overflow_tolerance) ||
+                parsed_left > (max_left + overflow_tolerance) ||
+                parsed_top < (min_margin - overflow_tolerance) ||
+                parsed_top > (max_top + overflow_tolerance)
+            ) {
+                return false;
+            }
+            if (reset_if_bottom_right) {
+                if (parsed_left >= (max_left - 4) && parsed_top >= (max_top - 4)) {
+                    return false;
+                }
+            }
+            var clamped_left = Math.max(min_margin, Math.min(parsed_left, max_left));
+            var clamped_top = Math.max(min_margin, Math.min(parsed_top, max_top));
+            target_element.style.right = `auto`;
+            target_element.style.bottom = `auto`;
+            target_element.style.left = clamped_left + `px`;
+            target_element.style.top = clamped_top + `px`;
+            return true;
+        }
+
         gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
@@ -797,9 +1298,15 @@
                     var had_in_play_planet = "false";
                     for (var i = 2; i < split_data.length; i++) {
                         var card_data_split = split_data[i].split("|");
-                        var card_name = card_data_split[0];
+                        var raw_planet_name = card_data_split[0];
+                        current_planet_names[i - 2] = "";
+                        if (raw_planet_name !== "CardbackRotated") {
+                            current_planet_names[i - 2] = raw_planet_name;
+                        }
+                        var card_name = raw_planet_name;
                         let string_id = (i-2).toString();
                         var additional_helper_text = card_data_split[5];
+                        var safe_helper_text = escapeHtmlAttribute(additional_helper_text);
                         if (card_name === "CardbackRotated") {
                             newPlanetsArray.push("false");
                         } else {
@@ -814,7 +1321,7 @@
                         if (typeof(element) != 'undefined' && element != null)
                         {
                             document.getElementById(container_id).innerHTML = ``;
-                            var full_string = `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` data-helpertext="` + additional_helper_text + `" onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDefRotateAndHelp(this.src, this.dataset.helpertext)" onmouseout="changeDefOut()">`
+                            var full_string = `<div><input type=\"image\" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` data-helpertext=\"` + safe_helper_text + `\" onclick=\"testImageButton(this.id);\" class=\"planet\"  onmouseover=\"changeDefRotateAndHelp(this.src, this.dataset.helpertext)\" onmouseout=\"changeDefOut()\">`
                             if (card_data_split.length >= 2) {
                                 if (card_data_split[1] === "I") {
                                     full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
@@ -1076,11 +1583,12 @@
                             var hale = card_data_split[4];
                             var border_type = card_data_split[5];
                             var additional_helper_text = card_data_split[6];
+                            var safe_helper_text = escapeHtmlAttribute(additional_helper_text);
                             var aiming_reticle = card_data_split[7];
                             var attachment_data_position = 8;
                             var deepstrike = "False";
                             var original_text = "";
-                            var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
+                            var enlarge_card_formula = ` data-helpertext=\"` + safe_helper_text + `\" onmouseover=\"changeDefAndHelp(this.src, this.dataset.helpertext)\" onmouseleave=\"changeDefOut()\"`;
                             if (hale === "D") {
                                 if (target_user === "{{ user.username }}") {
                                     original_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -1206,6 +1714,7 @@
                         var hale = card_data_split[4];
                         var border_type = card_data_split[5];
                         var additional_helper_text = card_data_split[6];
+                        var safe_helper_text = escapeHtmlAttribute(additional_helper_text);
                         var attachment_start_id = 8;
                         var target = card_data_split[7];
                         let string_id = (i-4).toString();
@@ -1213,7 +1722,7 @@
                         if (tokenNames.includes(card_name)) {
                             card_class = "Token-Card";
                         }
-                        var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
+                        var enlarge_card_formula = ` data-helpertext="` + safe_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
                         if (hale === "D") {
                             if (target_user === "{{ user.username }}") {
                                 original_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -1325,43 +1834,58 @@
                         el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
                     }
                 } else if (split_data[1] === "CHOICE") {
-                    var full_string = `<div id="choices-container"><div id="header-choices-container">`;
+                    changeDefOut();
+                    var choice_context_text = split_data[3];
+                    var full_string = `<div id="choices-container">`;
                     if (split_data[2] === "{{ user.username }}") {
-                        full_string = full_string + split_data[3];
+                        var inferred_context_card = inferChoiceContextCardName(choice_context_text);
+                        if (!inferred_context_card) {
+                            inferred_context_card = inferActivePlanetName(choice_context_text);
+                        }
+                        var safe_choice_context_attr = escapeHtmlAttribute(choice_context_text);
+                        var safe_choice_context_card_attr = escapeHtmlAttribute(inferred_context_card);
+                        full_string += `<div id="header-choices-container" data-choicecontext="` + safe_choice_context_attr + `" data-choicecontextcard="` + safe_choice_context_card_attr + `" onmouseover="showChoiceContextHelp(this.dataset.choicecontext, this.dataset.choicecontextcard)" onmouseout="changeDefOut()">` + escapeHtml(choice_context_text) + `</div>`;
                     } else {
-                        full_string = full_string + `Choice Hidden`;
+                        full_string += `<div id="header-choices-container">Choice Hidden</div>`;
                     }
-                    full_string = full_string + `</div>`;
                     console.log(split_data)
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
                             var choice_data = split_data[i].split("|");
                             if (choice_data.length === 2) {
                                 if (choice_data[1] === "N") {
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefOut()" onmouseout="changeDefOut()"><br>`
                                 } else if (choice_data[1] === "P") {
                                     var card_name = choice_data[0];
                                     let string_id = (i-4).toString();
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefRotate(this.dataset.cardsrc)"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefRotate(this.dataset.cardsrc)" onmouseout="changeDefOut()"><br>`
                                 } else {
                                     var card_name = choice_data[0];
                                     let string_id = (i-4).toString();
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDef(this.dataset.cardsrc)"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDef(this.dataset.cardsrc)" onmouseout="changeDefOut()"><br>`
                                 }
                             } else {
-                                full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
+                                full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefOut()" onmouseout="changeDefOut()"><br>`
                             }
                         }
                     }
                     full_string += `</div>`;
-                    document.getElementById("search-collapse").innerHTML = full_string;
-                    document.getElementById("search-collapse").style.maxWidth = `10vw`;
+                    var choice_collapse = document.getElementById("search-collapse");
+                    choice_collapse.innerHTML = full_string;
+                    if (split_data[2] === "{{ user.username }}") {
+                        var choice_box_max_width = calculateChoiceBoxMaxWidthVw(choice_context_text, split_data);
+                        choice_collapse.style.maxWidth = choice_box_max_width.toString() + `vw`;
+                        choice_collapse.style.minWidth = `10vw`;
+                    } else {
+                        choice_collapse.style.maxWidth = `10vw`;
+                        choice_collapse.style.minWidth = `10vw`;
+                    }
                 } else if (split_data[1] === "SOUND") {
                     console.log("trying to play sound")
                     var soundUrl = "/static/sounds/" + split_data[2] + ".wav";
@@ -1390,6 +1914,7 @@
                 } else if (split_data[1] === "VICTORY_MESSAGE") {
                     displayVictoryMessage(split_data[2], split_data[3]);
                 } else if (split_data[1] === "SEARCH") {
+                    changeDefOut();
                     var full_string = `<div id="choices-container"><div id="header-choices-container">` + split_data[3] + `</div>`;
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
@@ -1479,16 +2004,22 @@
 
                         if (box_choice_h !== "-1" && box_choice_v !== "-1") {
                             var box_choice = document.getElementById("search-collapse");
-
-                            box_choice.style.left = box_choice_h + `px`;
-                            box_choice.style.top = box_choice_v + `px`;
+                            if (!applyStoredDraggablePosition(box_choice, box_choice_h, box_choice_v)) {
+                                box_choice.style.left = ``;
+                                box_choice.style.top = ``;
+                                box_choice.style.right = `0`;
+                                box_choice.style.bottom = `auto`;
+                            }
                         }
 
                         if (box_info_h !== "-1" && box_info_v !== "-1") {
                             var box_info = document.getElementById("info-box");
-
-                            box_info.style.left = box_info_h + `px`;
-                            box_info.style.top = box_info_v + `px`;
+                            if (!applyStoredDraggablePosition(box_info, box_info_h, box_info_v, true)) {
+                                box_info.style.left = ``;
+                                box_info.style.top = ``;
+                                box_info.style.right = `0`;
+                                box_info.style.bottom = `auto`;
+                            }
                         }
                     }
                 }
@@ -1534,8 +2065,10 @@
             messageInputDom.value = '';
         };
 
-        var current_helper_width = "min(15vw, 22.1vh)";
-        var current_helper_height = "30vh";
+        var current_helper_width = "min(20vw, 29.5vh)";
+        var current_helper_height = "40vh";
+        applyHoverPreviewSizeSettings();
+        syncInGameSettingsControls();
 
         document.onclick = hideMenu;
 
@@ -1649,20 +2182,12 @@
         }
 
         function changeHelperSize() {
-            helperCard = document.getElementById("LargeHelperCard");
             if (helper_is_large === "F") {
-                helperCard.style.width = "44.2vh";
-                helperCard.style.height = "60vh";
                 helper_is_large = "T";
-                current_helper_width = "44.2vh";
-                current_helper_height = "60vh";
             } else {
-                helperCard.style.width = "min(15vw, 22.1vh)";
-                helperCard.style.height = "30vh";
                 helper_is_large = "F";
-                current_helper_width = "min(15vw, 22.1vh)";
-                current_helper_height = "30vh";
             }
+            applyHoverPreviewSizeSettings();
         }
 
         function testImageButton(button_id) {
@@ -1677,12 +2202,22 @@
         const dragElements = document.querySelectorAll(".draggable");
 
         function onMouseDrag(event, element) {
-            let leftValue = parseInt(window.getComputedStyle(element).left);
-            let topValue = parseInt(window.getComputedStyle(element).top);
+            var computedStyle = window.getComputedStyle(element);
+            var leftValue = parseFloat(computedStyle.left);
+            var topValue = parseFloat(computedStyle.top);
+            var rect = element.getBoundingClientRect();
+            if (isNaN(leftValue)) {
+                leftValue = rect.left;
+            }
+            if (isNaN(topValue)) {
+                topValue = rect.top;
+            }
 
             var newLeftValue = `${leftValue + event.movementX}`;
             var newTopValue = `${topValue + event.movementY}`;
 
+            element.style.right = `auto`;
+            element.style.bottom = `auto`;
             element.style.left = newLeftValue + `px`;
             element.style.top = newTopValue + `px`;
 
@@ -1811,6 +2346,136 @@
             }
         }
 
+        function enforceHoverPreviewInlineStyles() {
+            var preview = document.getElementById("hover-preview-box");
+            var helper = document.getElementById("helper-text-box");
+            var helperCard = document.getElementById("LargeHelperCard");
+            preview.style.position = "fixed";
+            preview.style.zIndex = "1100";
+            preview.style.pointerEvents = "none";
+            preview.style.flexDirection = "column";
+            preview.style.alignItems = "flex-start";
+            preview.style.gap = "2px";
+            preview.style.overflow = "visible";
+            helper.style.position = "relative";
+            helper.style.left = "0";
+            helper.style.right = "auto";
+            helper.style.top = "0";
+            helper.style.bottom = "auto";
+            helper.style.zIndex = "1101";
+            helper.style.visibility = "visible";
+            helper.style.opacity = "1";
+            helper.style.boxSizing = "border-box";
+            helper.style.borderWidth = "2px";
+            helper.style.borderStyle = "double";
+            helper.style.borderColor = "lightblue";
+            helper.style.background = "rgba(47, 40, 153, 0.75)";
+            helper.style.padding = "6px";
+            helper.style.color = "white";
+            helper.style.maxWidth = "min(30vw, 45vh)";
+            helper.style.maxHeight = "28vh";
+            helper.style.overflowY = "auto";
+            helper.style.pointerEvents = "none";
+            helper.style.marginTop = "0";
+            helperCard.style.position = "relative";
+            helperCard.style.top = "0";
+            helperCard.style.right = "0";
+            helperCard.style.left = "0";
+            helperCard.style.display = "block";
+            helperCard.style.pointerEvents = "none";
+            helperCard.style.cursor = "default";
+        }
+
+        function updateHoverPreviewPosition() {
+            enforceHoverPreviewInlineStyles();
+            var preview = document.getElementById("hover-preview-box");
+            if (preview.style.display === "" || preview.style.display === "none") {
+                return;
+            }
+            var offset_x = 18;
+            var offset_y = 18;
+            var min_margin = 8;
+            var left_pos = mouse_x + offset_x;
+            var top_pos = mouse_y + offset_y;
+            var preview_rect = preview.getBoundingClientRect();
+            if (left_pos + preview_rect.width > window.innerWidth - min_margin) {
+                left_pos = mouse_x - preview_rect.width - offset_x;
+            }
+            if (top_pos + preview_rect.height > window.innerHeight - min_margin) {
+                top_pos = mouse_y - preview_rect.height - offset_y;
+            }
+            if (left_pos < min_margin) {
+                left_pos = min_margin;
+            }
+            if (top_pos < min_margin) {
+                top_pos = min_margin;
+            }
+            preview.style.left = left_pos + "px";
+            preview.style.top = top_pos + "px";
+        }
+
+        function showHoverPreview() {
+            var preview = document.getElementById("hover-preview-box");
+            if (!hover_preview_enabled) {
+                preview.style.display = "none";
+                clearHoverHelperText();
+                return;
+            }
+            preview.style.display = "flex";
+            updateHoverPreviewPosition();
+        }
+
+        function hideHoverPreview() {
+            var preview = document.getElementById("hover-preview-box");
+            preview.style.display = "none";
+            clearHoverHelperText();
+        }
+
+        function clearHoverHelperText() {
+            var helper = document.getElementById("helper-text-box");
+            helper.style.display = "none";
+            helper.innerHTML = "";
+        }
+
+        function setHoverHelperText(help_text, highlight_retreat=false) {
+            if (!hover_preview_enabled) {
+                clearHoverHelperText();
+                return;
+            }
+            if (help_text === undefined || help_text === null || help_text === "") {
+                clearHoverHelperText();
+                return;
+            }
+            var normalized_helper_text = String(help_text).trim().toLowerCase();
+            if (normalized_helper_text === "" || normalized_helper_text === "none" || normalized_helper_text === "nothing here") {
+                clearHoverHelperText();
+                return;
+            }
+            help_text = help_text.replaceAll("\n", "<br>");
+            if (highlight_retreat) {
+                help_text = help_text.replaceAll("RETREAT", `<b style="color:red; font-size:x-large;">RETREAT</b>`);
+            }
+            help_text = '<h2 style="color: yellow; margin: 0 0 2px 0;">Additional Info:</h2><p style="color: white; margin: 0;">' + help_text + '</p>';
+            var helper = document.getElementById("helper-text-box");
+            helper.style.display = "block";
+            helper.style.visibility = "visible";
+            helper.style.opacity = "1";
+            helper.innerHTML = help_text;
+            updateHoverPreviewPosition();
+        }
+
+        function resetHoverPreviewCardRotation() {
+            var helperCard = document.getElementById("LargeHelperCard");
+            helperCard.style.transform = "none";
+            helperCard.style.transformOrigin = "center center";
+        }
+
+        function rotateHoverPreviewCardCounterClockwise() {
+            var helperCard = document.getElementById("LargeHelperCard");
+            helperCard.style.transform = "rotate(-90deg)";
+            helperCard.style.transformOrigin = "center center";
+        }
+
         function changeDef(image_src) {
             var current_image_src = image_src;
             if (current_image_src.includes("http")) {
@@ -1820,12 +2485,15 @@
                 current_image_src = "/" + current_image_src;
             }
             console.log(current_image_src);
+            clearHoverHelperText();
             if (!(pledges_array.includes(current_image_src))) {
                 var og_image_src = image_src.replace("CroppedImages", "CardImages");
                 helperCard = document.getElementById("LargeHelperCard");
                 helperCard.src=og_image_src;
+                resetHoverPreviewCardRotation();
                 helperCard.style.width = current_helper_width;
                 helperCard.style.height = current_helper_height;
+                showHoverPreview();
             } else {
                 changeDefRotate(image_src);
             }
@@ -1835,8 +2503,11 @@
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
+            resetHoverPreviewCardRotation();
             helperCard.style.width = current_helper_width;
             helperCard.style.height = current_helper_height;
+            clearHoverHelperText();
+            showHoverPreview();
             var target_deck_id = "count-" + user_num;
             var e = document.getElementById(target_deck_id);
             e.innerHTML = `<p>` + card_count + `</p>`;
@@ -1845,69 +2516,60 @@
 
         function changeDefRotate(image_src) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            if (helper_is_large === "F") {
+            var is_planet_image = image_src.includes("PlanetImages") || image_src.includes("RotatedPlanetImages");
+            if (is_planet_image) {
                 og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
-            } else {
+            } else if (helper_is_large === "T") {
                 og_image_src = image_src.replace("CardImages", "RotatedCardImages");
             }
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
-            if (helper_is_large === "T") {
+            if (is_planet_image) {
+                rotateHoverPreviewCardCounterClockwise();
+            } else {
+                resetHoverPreviewCardRotation();
+            }
+            if (is_planet_image) {
+                helperCard.style.width = current_helper_width;
+                helperCard.style.height = current_helper_height;
+            } else if (helper_is_large === "T") {
                 helperCard.style.width = current_helper_height;
                 helperCard.style.height = current_helper_width;
             } else {
                 helperCard.style.width = current_helper_width;
                 helperCard.style.height = current_helper_height;
             }
+            clearHoverHelperText();
+            showHoverPreview();
         }
 
         function changeDefRotateAndHelp(image_src, help_text) {
-            var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            if (helper_is_large === "F") {
-                og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
-            }
+            var og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
-            if (helper_is_large === "T") {
-                helperCard.style.width = current_helper_height;
-                helperCard.style.height = current_helper_width;
-            } else {
-                helperCard.style.width = current_helper_width;
-                helperCard.style.height = current_helper_height;
-            }
-            help_text = help_text.replaceAll("\n", "<br>")
-            help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
-            console.log(help_text);
-            var helper = document.getElementById("helper-text-box")
-            helper.style.left = mouse_x + 'px';
-            helper.style.top = mouse_y + 'px';
-            helper.style.display = "Block";
-            helper.innerHTML = help_text;
+            rotateHoverPreviewCardCounterClockwise();
+            helperCard.style.width = current_helper_width;
+            helperCard.style.height = current_helper_height;
+            showHoverPreview();
+            setHoverHelperText(help_text);
         }
 
         function changeDefAndHelp(image_src, help_text) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             changeDef(og_image_src);
-            help_text = help_text.replaceAll("\n", "<br>")
-            help_text = help_text.replaceAll("RETREAT", `<b style="color:red; font-size:x-large;">RETREAT</b>`);
-            help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
-            console.log(help_text);
-            var helper = document.getElementById("helper-text-box")
-            helper.style.left = mouse_x + 'px';
-            helper.style.top = mouse_y + 'px';
-            helper.style.display = "Block";
-            helper.innerHTML = help_text;
+            setHoverHelperText(help_text, highlight_retreat=true);
         }
 
         function changeDefOut() {
-            var helper = document.getElementById("helper-text-box")
-            helper.style.display = "None";
+            choice_context_hover_request_id += 1;
+            hideHoverPreview();
         }
 
         function changeDefDeckOut(user_num) {
             var target_deck_id = "count-" + user_num;
             var e = document.getElementById(target_deck_id);
             e.style.display = "none";
+            hideHoverPreview();
         }
 
         function showDiscard(discard_id) {
@@ -1924,6 +2586,7 @@
         function getCursor(event) {
             mouse_x = event.clientX;
             mouse_y = event.clientY;
+            updateHoverPreviewPosition();
         }
 
         function showRemoved(removed_id) {

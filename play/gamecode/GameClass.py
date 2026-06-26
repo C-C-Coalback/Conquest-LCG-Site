@@ -843,6 +843,48 @@ class Game:
             elif general_imaging_format == "All Planets":
                 self.show_choices_as_images = ["P" for _ in range(len(choices_array))]
 
+    def infer_choice_preview_tag(self, choice_name):
+        """
+        Infers which preview mode to use for a choice.
+
+        :param choice_name: Choice text.
+        :return: "Y" for card preview, "P" for planet preview, or "N" for no preview.
+        """
+        if not isinstance(choice_name, str):
+            return "N"
+        trimmed_choice_name = choice_name.strip()
+        if not trimmed_choice_name:
+            return "N"
+        if FindCard.check_if_planet_exists(trimmed_choice_name, self.planet_cards_array):
+            return "P"
+        found_card = self.preloaded_find_card(trimmed_choice_name)
+        if found_card is not None and found_card.get_name().lower() == trimmed_choice_name.lower():
+            return "Y"
+        lowered_choice_name = trimmed_choice_name.lower()
+        for i in range(len(self.planet_cards_array)):
+            lowered_planet_name = self.planet_cards_array[i].get_name().lower()
+            if lowered_choice_name.startswith(lowered_planet_name + " "):
+                return "P"
+        for card_name in self.cards_dict:
+            lowered_card_name = card_name.lower()
+            if lowered_choice_name.startswith(lowered_card_name + " "):
+                return "Y"
+        return "N"
+
+    def get_choice_image_tags_for_send(self):
+        """
+        Builds the image-tag array for the current choices by inferring card/planet matches.
+
+        :return: List of tags with one entry per choice.
+        """
+        if not self.choices_available:
+            return []
+        tags = []
+        for i in range(len(self.choices_available)):
+            inferred_tag = self.infer_choice_preview_tag(self.choices_available[i])
+            tags.append(inferred_tag)
+        return tags
+
     async def send_search(self, force=False):
         card_string = ""
         if self.rearranging_deck:
@@ -861,12 +903,10 @@ class Game:
                           + self.what_to_do_with_searched_card + "/" + card_string
         elif self.choices_available and self.name_player_making_choices:
             choices_array = []
-            if len(self.show_choices_as_images) == len(self.choices_available):
-                for i in range(len(self.choices_available)):
-                    choices_array.append(self.choices_available[i] + "|" + self.show_choices_as_images[i])
-            else:
-                for i in range(len(self.choices_available)):
-                    choices_array.append(self.choices_available[i] + "|" + "N")
+            self.show_choices_as_images = self.get_choice_image_tags_for_send()
+            for i in range(len(self.choices_available)):
+                choice_text = str(self.choices_available[i])
+                choices_array.append(choice_text + "|" + self.show_choices_as_images[i])
             card_string = "/".join(choices_array)
             card_string = "GAME_INFO/CHOICE/" + self.name_player_making_choices + "/" \
                           + self.choice_context + "/" + card_string
@@ -952,6 +992,38 @@ class Game:
             info_string += self.player_mobiling + "/"
         elif self.battle_ability_to_resolve:
             info_string += self.player_resolving_battle_ability + "/"
+        elif self.phase == "COMMAND":
+            if self.committing_warlords:
+                if not self.p1.committed_warlord and not self.p2.committed_warlord:
+                    info_string += self.player_with_initiative + "/"
+                elif not self.p1.committed_warlord:
+                    info_string += self.name_1 + "/"
+                elif not self.p2.committed_warlord:
+                    info_string += self.name_2 + "/"
+                elif not self.p1.committed_synapse:
+                    info_string += self.name_1 + "/"
+                elif not self.p2.committed_synapse:
+                    info_string += self.name_2 + "/"
+                else:
+                    info_string += self.player_with_initiative + "/"
+            else:
+                if not self.p1.has_passed and not self.p2.has_passed:
+                    info_string += self.player_with_initiative + "/"
+                elif not self.p1.has_passed:
+                    info_string += self.name_1 + "/"
+                elif not self.p2.has_passed:
+                    info_string += self.name_2 + "/"
+                else:
+                    info_string += self.player_with_initiative + "/"
+        elif self.phase == "HEADQUARTERS":
+            if not self.p1.has_passed and not self.p2.has_passed:
+                info_string += self.player_with_initiative + "/"
+            elif not self.p1.has_passed:
+                info_string += self.name_1 + "/"
+            elif not self.p2.has_passed:
+                info_string += self.name_2 + "/"
+            else:
+                info_string += self.player_with_initiative + "/"
         elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
             if self.start_battle_deepstrike:
                 info_string += self.name_player_deepstriking + "/"
@@ -1030,6 +1102,20 @@ class Game:
         elif self.phase == "COMMAND":
             if self.committing_warlords:
                 info_string += "Commit Warlords/"
+                if self.p1.committed_warlord and 0 <= self.p1.warlord_commit_location < len(self.planet_array):
+                    info_string += self.name_1 + " warlord committed: " + \
+                                   self.get_planet_name(self.p1.warlord_commit_location) + "/"
+                if self.p2.committed_warlord and 0 <= self.p2.warlord_commit_location < len(self.planet_array):
+                    info_string += self.name_2 + " warlord committed: " + \
+                                   self.get_planet_name(self.p2.warlord_commit_location) + "/"
+                if self.p1.search_synapse_in_hq():
+                    if self.p1.committed_synapse and 0 <= self.p1.synapse_commit_location < len(self.planet_array):
+                        info_string += self.name_1 + " synapse committed: " + \
+                                       self.get_planet_name(self.p1.synapse_commit_location) + "/"
+                if self.p2.search_synapse_in_hq():
+                    if self.p2.committed_synapse and 0 <= self.p2.synapse_commit_location < len(self.planet_array):
+                        info_string += self.name_2 + " synapse committed: " + \
+                                       self.get_planet_name(self.p2.synapse_commit_location) + "/"
             elif self.before_command_struggle:
                 info_string += "Before command struggle/"
             elif self.after_command_struggle:
