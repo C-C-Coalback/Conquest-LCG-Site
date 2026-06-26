@@ -398,6 +398,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                 card = shadowsun_player.get_card_in_discard(shadowsun_player.aiming_reticle_coords_discard)
                 if not player.check_if_can_attach_card(card, planet_pos, unit_pos):
                     return False
+            elif ability.get_reaction_name() == "Superiority":
+                if planet_pos != self.last_planet_checked_command_struggle:
+                    return False
         elif ability_type == "Action":
             if ability.action_chosen == "Preemptive Barrage":
                 if player.get_ranged_given_pos(planet_pos, unit_pos):
@@ -696,7 +699,12 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Commitment":
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
         elif self.what_is_required_automated == "Command not Commitment":
-            if self.after_command_struggle:
+            if self.during_command_struggle:
+                for i in range(len(primary_player.cards)):
+                    if primary_player.cards[i] == "Superiority":
+                        if primary_player.get_resources() > 0:
+                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+            elif self.after_command_struggle:
                 valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Mobile":

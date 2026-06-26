@@ -623,6 +623,27 @@ ability_targets_dictionary = {
             "Ability Type": "Reaction"
         }
     },
+    "Superiority": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": True,
+            "Ability Type": "Reaction"
+        }
+    },
     "Commander Shadowsun hand": {
         "Num Stages": 2,
         "Type 1": "Hand",
