@@ -93,6 +93,15 @@ Use this as the gameplay baseline when selecting legal actions.
 - If inferred tabletop rules and API legal action tokens disagree, the API legal list is authoritative for execution.
 - Use this rules digest for prioritization and planning among legal options only.
 
+### AI account limitation policy
+- Use a fixed AI account instead of creating new user accounts per run.
+- Server policy is configured through:
+  - `AI_CONTROL_ENFORCE_ALLOWED_USERNAMES` (default: `true`)
+  - `AI_CONTROL_ALLOWED_USERNAMES` (default: `basicai`)
+- AI control endpoints reject actions for players outside the allowlist.
+- This does **not** prevent running multiple games at once with the same allowed account.
+- For local scripts, set `CONQUEST_AI_PLAYER` (or pass `--player`) to an allowed account.
+
 ### Source documents
 - `Learn-to-Play-web.pdf` (official Learn to Play)
 - `Rules-Reference-web.pdf` (official Rules Reference Guide)
@@ -110,7 +119,7 @@ Use this as the gameplay baseline when selecting legal actions.
 
 ## Preconditions
 - Server is reachable at `http://localhost:8000`.
-- Account already exists.
+- Account already exists and is in `AI_CONTROL_ALLOWED_USERNAMES` when AI account restriction is enabled.
 - Deck exists for that account under `decks/DeckStorage/<username>/`.
 
 ## Lobby control over websocket

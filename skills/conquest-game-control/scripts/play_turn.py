@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 from dataclasses import dataclass
 from typing import Any
@@ -180,7 +181,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Watch a live Conquest game and autoplay legal actions when your player is active.",
     )
-    parser.add_argument("--player", required=True, help="Exact in-game player name.")
+    parser.add_argument(
+        "--player",
+        default=os.environ.get("CONQUEST_AI_PLAYER", "basicai").strip(),
+        help="Exact in-game player name (defaults to CONQUEST_AI_PLAYER or 'basicai').",
+    )
     parser.add_argument("--game-id", default="", help="Target game ID. If omitted, auto-discovers by player name.")
     parser.add_argument("--base-url", default="http://localhost:8000", help="Server base URL.")
     parser.add_argument("--run-seconds", type=float, default=180.0, help="How long to watch for turns.")
@@ -196,6 +201,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    if not args.player:
+        raise SystemExit("Player name cannot be empty. Set --player or CONQUEST_AI_PLAYER.")
     client = Client(base_url=args.base_url, timeout=args.timeout)
 
     game_id = args.game_id.strip()
