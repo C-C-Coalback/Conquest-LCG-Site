@@ -191,4 +191,7 @@ _ai_control_usernames = [
 ]
 if not _ai_control_usernames:
     _ai_control_usernames = ["basicai"]
+_ai_control_usernames.append("conqueror")
+_ai_control_usernames.append("conqueror1")
+_ai_control_usernames.append("conqueror2")
 AI_CONTROL_ALLOWED_USERNAMES = tuple(_ai_control_usernames)
