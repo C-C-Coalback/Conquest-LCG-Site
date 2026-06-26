@@ -644,6 +644,16 @@ ability_targets_dictionary = {
             "Ability Type": "Reaction"
         }
     },
+    "Gift of Isha": {
+        "Num Stages": 1,
+        "Type 1": "Planet",
+        "Restrictions 1": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": False,
+            "Not Same Planet Unit": False
+        }
+    },
     "Commander Shadowsun hand": {
         "Num Stages": 2,
         "Type 1": "Hand",
@@ -1157,4 +1167,12 @@ action_ability_starts = {
         "Ready Required": False,
         "Exhaust Required": False
     },
+    "Gift of Isha": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False
+    }
 }

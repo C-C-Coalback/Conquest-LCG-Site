@@ -146,6 +146,11 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
             if game.count_planets_in_play() <= 1:
                 return False
             return True
+        if action_ability == "Gift of Isha":
+            for i in range(len(primary_player.discard)):
+                card = game.preloaded_find_card(primary_player.discard[i])
+                if card.get_card_type() == "Army" and card.get_faction() == "Eldar":
+                    return True
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):
