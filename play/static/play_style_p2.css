@@ -589,7 +589,6 @@ h4 {
 .in-game-settings-slider-option {
     display: flex;
     align-items: center;
-    gap: 6px;
 }
 
 #setting-preview-size {
