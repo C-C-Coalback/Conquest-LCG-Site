@@ -5,11 +5,10 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .gamecode import GameClass
 import os
-from .gamecode import Initfunctions, FindCard
+from .gamecode import Initfunctions
 import threading
 import traceback
 import datetime
-import copy
 from django.contrib.auth.models import User
 from django.db.utils import OperationalError, ProgrammingError
 import update_settings
@@ -998,18 +997,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 try:
                     game_relevant_string = message[1] + "|||SpecialAction/" + "/".join(message[2:])
                     active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
-                    if message[2] == "pass-P1":
-                        if message[1] == active_games[current_game_id].name_1:
-                            active_games[current_game_id].automated_1_has_passed_action = True
-                        elif message[1] == active_games[current_game_id].name_2:
-                            active_games[current_game_id].automated_2_has_passed_action = True
-                        await active_games[current_game_id].update_automated_info()
-                        await active_games[current_game_id].send_automated_info()
-                    else:
-                        await active_games[current_game_id].update_game_event(message[1], ["action-button"], same_thread=True)
-                        active_games[current_game_id].automated_1_has_passed_action = False
-                        active_games[current_game_id].automated_2_has_passed_action = False
-                        await active_games[current_game_id].update_game_event(message[1], message[2:])
+                    await active_games[current_game_id].update_game_event_combat_turn_special_action(message[1], message[2:])
                     game_state_changed = True
                 except:
                     try:

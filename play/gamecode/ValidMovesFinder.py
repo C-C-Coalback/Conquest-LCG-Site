@@ -1,6 +1,7 @@
 import copy
 import os
 import re
+
 from .AbilityTargetsDictionary import ability_targets_dictionary
 from .DetectPossibleActions import detect_possible_actions
 
@@ -86,6 +87,9 @@ def check_if_deploy_event_action_card_is_currently_legal(self, primary_player, h
             return False
         if primary_player.get_resources() >= secondary_player.get_resources():
             return False
+    elif ability == "Tzeentch's Firestorm":
+        if primary_player.get_resources() == 0:
+            return False
     ability_needs_followup = ability in ability_targets_dictionary
     if possible_deploy_actions is None:
         possible_deploy_actions = detect_possible_actions(
@@ -126,6 +130,9 @@ def update_automated_attributes(self):
     elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
         self.what_is_required_automated = "Indirect"
         self.automated_player_waited_on = self.player_with_initiative
+        player, other_player = self.get_players_given_name(self.automated_player_waited_on)
+        if player.indirect_damage_applied >= player.total_indirect_damage:
+            self.automated_player_waited_on = other_player.name_player
     elif self.choices_available:
         self.what_is_required_automated = "Choice"
         self.automated_player_waited_on = self.name_player_making_choices
@@ -220,7 +227,7 @@ def update_automated_attributes(self):
                 self.what_is_required_automated = "Retreat Turn"
                 self.automated_player_waited_on = self.player_with_combat_turn
             else:
-                if not self.automated_1_has_passed_action or not self.automated_2_has_passed_action:
+                if (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.bot_is_present:  # Remove bot_is_present requirement if you want to manually test action windows between combat turns
                     self.automated_player_waited_on = self.get_action_window_between_combat_turns_player()
                     self.what_is_required_automated = "Action Window Between Combat Turns"
                 else:
@@ -258,6 +265,8 @@ def add_valid_move(valid_moves, player, card_zone, planet_pos=-1, unit_pos=-1, h
         valid_moves.append("IN_PLAY/" + player.number + "/" + str(planet_pos) + "/" + str(unit_pos))
     elif card_zone == "HAND":
         valid_moves.append("HAND/" + player.number + "/" + str(hand_pos))
+    elif card_zone == "IN_DISCARD":
+        valid_moves.append("IN_DISCARD/" + player.number + "/" + str(discard_pos))
     elif card_zone == "CHOICE":
         valid_moves.append("CHOICE/" + str(choice_pos))
     elif card_zone == "SEARCH":
@@ -321,6 +330,7 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
     forbidden_card_type = target_restrictions["Forbidden Card Type"]
     required_traits = target_restrictions["Required Traits"]
     forbidden_traits = target_restrictions["Forbidden Traits"]
+    same_planet = target_restrictions["Same Planet"]
     targets = target_restrictions["Target"]
     special_restrictions = target_restrictions["Special"]
     ability_type = target_restrictions["Ability Type"]
@@ -353,13 +363,43 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
         for trait in forbidden_traits:
             if player.check_for_trait_given_pos(planet_pos, unit_pos, trait):
                 return False
+    if same_planet:
+        if planet_pos != ability.get_planet_pos():
+            return False
     if special_restrictions:
         if ability_type == "Reaction":
             if ability.get_reaction_name() == "Cato's Stronghold":
                 if planet_pos not in ability.misc_list:
                     return False
+            elif ability.get_reaction_name() == "Alaitoc Shrine":
+                full_position = (int(player.get_number()), planet_pos, unit_pos)
+                if full_position not in player.allowed_units_alaitoc_shrine:
+                    return False
             elif ability.get_reaction_name() == "Sicarius's Chosen":
                 if abs(ability.get_planet_pos() - planet_pos) != 1:
+                    return False
+            elif ability.get_reaction_name() == "Shrouded Harlequin":
+                if planet_pos == -2:
+                    return False
+            elif ability.get_reaction_name() == "Spiritseer Erathal":
+                if planet_pos == ability.get_planet_pos() and unit_pos == ability.get_unit_pos():
+                    return False
+                if player.get_damage_given_pos(planet_pos, unit_pos) == 0:
+                    return False
+            elif ability.get_reaction_name() == "Commander Shadowsun hand":
+                shadowsun_player = ability.get_player_resolving_reaction()
+                shadowsun_player = self.get_player_given_name(shadowsun_player)
+                card = shadowsun_player.get_card_in_hand(shadowsun_player.aiming_reticle_coords_hand)
+                if not player.check_if_can_attach_card(card, planet_pos, unit_pos):
+                    return False
+            elif ability.get_reaction_name() == "Commander Shadowsun discard":
+                shadowsun_player = ability.get_player_resolving_reaction()
+                shadowsun_player = self.get_player_given_name(shadowsun_player)
+                card = shadowsun_player.get_card_in_discard(shadowsun_player.aiming_reticle_coords_discard)
+                if not player.check_if_can_attach_card(card, planet_pos, unit_pos):
+                    return False
+            elif ability.get_reaction_name() == "Superiority":
+                if planet_pos != self.last_planet_checked_command_struggle:
                     return False
         elif ability_type == "Action":
             if ability.action_chosen == "Preemptive Barrage":
@@ -382,6 +422,24 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                 if ability.chosen_first_card:
                     if ability.misc_target_planet != planet_pos:
                         return False
+            elif ability.action_chosen == "Kraktoof Hall":
+                if not ability.chosen_first_card:
+                    other_player = player.get_other_player()
+                    if len(other_player.cards_in_play[planet_pos + 1]) + len(player.cards_in_play[planet_pos + 1]) < 2:
+                        return False
+                    if player.get_damage_given_pos(planet_pos, unit_pos) == 0:
+                        return False
+                if ability.chosen_first_card:
+                    if ability.misc_target_planet != planet_pos:
+                        return False
+            elif ability.action_chosen == "Tellyporta Pad":
+                if planet_pos == self.round_number:
+                    return False
+            elif ability.action_chosen == "Archon's Terror":
+                if planet_pos == -2 and not player.get_ready_given_pos(planet_pos, unit_pos):
+                    return False
+                if player.get_unique_given_pos(planet_pos, unit_pos):
+                    return False
         elif ability == "Planet":
             pass
     if targets and enemy_ability:
@@ -390,17 +448,20 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
     return True
 
 
-def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos, target_restrictions, planet_pos=-1):
+def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos, target_restrictions, planet_pos=-1, ability_type=""):
     faction_hand_card = target_restrictions["Faction"]
     card_type_hand_card = target_restrictions["Card Type"]
     max_cost_hand_card = target_restrictions["Max Cost"]
     payment_hand_card = target_restrictions["Payment"]
     card_enters_play = target_restrictions["Card Enters Play"]
     card = player.get_card_in_hand(hand_pos)
+    if ability_type == "Reaction":
+        if ability.get_reaction_name() == "Commander Shadowsun hand":
+            if card.get_ability() == "Shadowsun's Stealth Cadre":
+                return True
     if faction_hand_card:
-        if faction_hand_card:
-            if faction_hand_card != card.get_faction():
-                return False
+        if faction_hand_card != card.get_faction():
+            return False
     if card_type_hand_card:
         if card_type_hand_card != card.get_card_type():
             return False
@@ -421,11 +482,44 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
     return True
 
 
-def find_all_valid_hand_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1):
+def find_all_valid_hand_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1, ability_type=""):
     valid_moves = []
     for i in range(len(primary_player.cards)):
-        if check_if_single_card_in_hand_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=planet_pos):
+        if check_if_single_card_in_hand_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=planet_pos, ability_type=ability_type):
             valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+    return valid_moves
+
+
+def check_if_single_card_in_discard_is_valid_target(self, ability, player, discard_pos, target_restrictions, planet_pos=-1, ability_type=""):
+    faction_card = target_restrictions["Faction"]
+    card_type_card = target_restrictions["Card Type"]
+    max_cost_card = target_restrictions["Max Cost"]
+    card_enters_play = target_restrictions["Card Enters Play"]
+    card = player.get_card_in_discard(discard_pos)
+    if ability_type == "Reaction":
+        if ability.get_reaction_name() == "Commander Shadowsun discard":
+            if card.get_ability() == "Shadowsun's Stealth Cadre":
+                return True
+    if faction_card:
+        if faction_hand_card != card.get_faction():
+            return False
+    if card_type_card:
+        if card_type_card != card.get_card_type():
+            return False
+    if max_cost_card:
+        if card.get_cost() > max_cost_card:
+            return False
+    if card_enters_play:
+        if not player.check_if_card_can_enter_play(card, planet_pos=planet_pos, triggered_card_effect=True):
+            return False
+    return True
+
+
+def find_all_valid_discard_locations_given_restrictions(self, ability, primary_player, secondary_player, target_restrictions, planet_pos=-1, ability_type=""):
+    valid_moves = []
+    for i in range(len(primary_player.discard)):
+        if check_if_single_card_in_discard_is_valid_target(self, ability, primary_player, i, target_restrictions, planet_pos=planet_pos, ability_type=ability_type):
+            valid_moves = add_valid_move(valid_moves, primary_player, "IN_DISCARD", discard_pos=i)
     return valid_moves
 
 
@@ -476,6 +570,12 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
         elif self.what_is_required_automated == "Discount":
             valid_moves = primary_player.get_playable_borders()
+            hand_disc = primary_player.search_hand_for_discounts(self.card_to_deploy.get_faction(), self.card_to_deploy.get_traits())
+            if hand_disc > 0:
+                if self.card_to_deploy.get_faction() == "Orks":
+                    for i in range(len(primary_player.cards)):
+                        if primary_player.cards[i] == "Bigga Is Betta":
+                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
             if self.card_to_deploy.get_cost() <= primary_player.get_resources() - self.discounts_applied:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
             if not valid_moves:
@@ -599,7 +699,12 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Commitment":
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
         elif self.what_is_required_automated == "Command not Commitment":
-            if self.after_command_struggle:
+            if self.during_command_struggle:
+                for i in range(len(primary_player.cards)):
+                    if primary_player.cards[i] == "Superiority":
+                        if primary_player.get_resources() > 0:
+                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+            elif self.after_command_struggle:
                 valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Mobile":
@@ -621,6 +726,10 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Bodyguard":
             valid_moves = primary_player.get_playable_borders()
+        elif self.what_is_required_automated == "Indirect":
+            valid_moves = primary_player.get_playable_borders()
+            if not valid_moves:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Outside Combat":
             valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
@@ -723,7 +832,20 @@ def determine_valid_moves(self):
                 type_target = target_restriction_data["Type " + stage_number]
                 target_restrictions = target_restriction_data["Restrictions " + stage_number]
                 print("Target:", type_target)
-                print("Restrctions:", target_restrictions)
+                print("Restrictions:", target_restrictions)
+                if type_target == "Special":
+                    if self.action_object.action_chosen == "Khymera Den":
+                        for i in range(7):
+                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                                if primary_player.get_name_given_pos(i, j) == "Khymera":
+                                    if primary_player.get_aiming_reticle_in_play(i, j) != "blue":
+                                        valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                        for i in range(len(primary_player.headquarters)):
+                            if primary_player.get_name_given_pos(-2, i) == "Khymera":
+                                if primary_player.get_aiming_reticle_in_play(-2, i) != "blue":
+                                    valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
+                    if self.action_object.misc_counter > 0:
+                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
@@ -733,7 +855,13 @@ def determine_valid_moves(self):
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
                     )
                 if type_target == "Planet":
-                    if target_restrictions["Non-first"]:
+                    if self.action_object.action_chosen == "Wildrider Squadron":
+                        for i in range(7):
+                            if not self.planets_in_play_array[i]:
+                                continue
+                            if abs(i - self.action_object.get_planet_pos()) == 1:
+                                valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
+                    elif target_restrictions["Non-first"]:
                         valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
                     else:
                         valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
@@ -755,9 +883,22 @@ def determine_valid_moves(self):
                     valid_moves = find_all_valid_unit_locations_given_restrictions(
                         self, self.reactions_needing_resolving[0], primary_player, secondary_player, target_restrictions
                     )
+                if type_target == "Hand":
+                    valid_moves = find_all_valid_hand_locations_given_restrictions(
+                        self, self.reactions_needing_resolving[0], primary_player, secondary_player,
+                        target_restrictions, planet_pos=self.reactions_needing_resolving[0].get_planet_pos(), ability_type="Reaction"
+                    )
+                    if current_reaction == "Banshee Power Sword":
+                        valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+                if type_target == "Discard":
+                    valid_moves = find_all_valid_discard_locations_given_restrictions(
+                        self, self.reactions_needing_resolving[0], primary_player, secondary_player,
+                        target_restrictions, planet_pos=self.reactions_needing_resolving[0].get_planet_pos(), ability_type="Reaction"
+                    )
                 if type_target == "Planet":
-                    valid_moves = add_valid_planets_as_valid_moves(self, valid_moves, primary_player, secondary_player,
-                                                                   current_reaction, target_restrictions, misc_pla=-1)
+                    valid_moves = add_valid_planets_as_valid_moves(
+                        self, valid_moves, primary_player, secondary_player, current_reaction, target_restrictions,
+                        misc_pla=-1, unit_pla=self.reactions_needing_resolving[0].get_planet_pos())
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Interrupt":

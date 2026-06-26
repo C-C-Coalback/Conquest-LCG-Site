@@ -2899,6 +2899,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.reset_choices_available()
         if game_update_string[1] == "0":
             self.shadowsun_chose_hand = True
+            self.reactions_needing_resolving[0].chosen_first_card = False
             self.reactions_needing_resolving[0].set_reaction_name("Commander Shadowsun hand")
             self.location_hand_attachment_shadowsun = -1
             self.resolving_search_box = False
@@ -2906,6 +2907,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         else:
             self.reactions_needing_resolving[0].set_reaction_name("Commander Shadowsun discard")
             self.shadowsun_chose_hand = False
+            self.reactions_needing_resolving[0].chosen_first_card = False
             self.location_attachment_discard_shadowsun = -1
             self.name_player_making_choices = name
             self.resolving_search_box = False

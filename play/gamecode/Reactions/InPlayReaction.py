@@ -41,7 +41,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.complete_nullify()
                 self.delete_reaction()
         elif current_reaction == "Commander Shadowsun hand":
-            if self.location_hand_attachment_shadowsun != -1:
+            if self.reactions_needing_resolving[0].chosen_first_card:
                 if planet_pos == primary_player.warlord_commit_location:
                     if game_update_string[1] == primary_player.number:
                         player_receiving_attachment = primary_player
@@ -64,7 +64,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         await self.send_update_message("Invalid target")
         elif current_reaction == "Commander Shadowsun discard":
-            if self.location_attachment_discard_shadowsun != -1:
+            if self.reactions_needing_resolving[0].chosen_first_card:
                 if planet_pos == primary_player.warlord_commit_location:
                     if game_update_string[1] == primary_player.number:
                         player_receiving_attachment = primary_player

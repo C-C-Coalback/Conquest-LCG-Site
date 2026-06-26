@@ -935,6 +935,13 @@ class Game:
                 self.anything_changed_since_last_send = True
             await self.send_update_message(initiative_string)
 
+    def count_planets_in_play(self):
+        count = 0
+        for i in range(len(self.planets_in_play_array)):
+            if self.planets_in_play_array[i]:
+                count += 1
+        return count
+
     async def begin_asking_nullify(self, primary_player, secondary_player, effect_name, cost_card, game_update_string,
                                    nullify_context, nullified_card_pos=-1):
         await self.send_update_message(
@@ -980,7 +987,7 @@ class Game:
             else:
                 info_string += self.name_2 + "/"
         elif self.reactions_needing_resolving:
-            info_string += self.reactions_needing_resolving[0].get_player_resolving_reaction()[0] + "/"
+            info_string += self.reactions_needing_resolving[0].get_player_resolving_reaction() + "/"
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
             info_string += self.player_mobiling + "/"
         elif self.battle_ability_to_resolve:
@@ -1084,8 +1091,7 @@ class Game:
                 info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
             elif not self.check_if_battle_taking_place():
                 info_string += "Outside Battle/"
-            elif self.mode == "Normal" and (
-                    not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
+            elif self.mode == "Normal" and (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.check_style_of_bot() != "ARG" and self.bot_is_present:
                 info_string += "Action Window: " + self.get_action_window_between_combat_turns_player() + "/"
             elif self.ranged_skirmish_active:
                 info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
@@ -1401,6 +1407,40 @@ class Game:
                                             rickety_warbuggy=rickety_warbuggy, actual_area_effect=True)
         self.number_of_units_left_to_suffer_damage = \
             secondary_player.get_number_of_units_at_planet(chosen_planet)
+
+    def check_style_of_bot(self):
+        """
+        Checks what "style" the bot is. (ARG - Neural Network with WebSocket interface)
+        "Other" refers to the REST API framework (I think, correct if wrong).
+        This is only used for distinguishing the different ways the AIs handle combat turn action windows
+        (Other - dedicated action window for all, ARG - dedicated action window only for AIs)
+
+        :return: string of the type of bot.
+        """
+        if "conqueror" in self.name_1 or "conqueror" in self.name_2:
+            return "ARG"
+        return "Other"
+
+    async def update_game_event_combat_turn_special_action(self, name, game_update_string):
+        """
+        Used by the ARG style of bot to process combat turn actions windows.
+
+        :param name: player_name, string
+        :param game_update_string: list of strings containing data on what was clicked on.
+        :return: None
+        """
+        if game_update_string[0] == "pass-P1":
+            if name == self.name_1:
+                self.automated_1_has_passed_action = True
+            elif name == self.name_2:
+                self.automated_2_has_passed_action = True
+            await self.update_automated_info()
+            await self.send_automated_info()
+        else:
+            await self.update_game_event(name, ["action-button"], same_thread=True)
+            self.automated_1_has_passed_action = False
+            self.automated_2_has_passed_action = False
+            await self.update_game_event(name, game_update_string)
 
     async def update_game_event_action(self, name, game_update_string):
         if name == self.action_object.player_with_action:
@@ -6149,53 +6189,51 @@ class Game:
             self.p1.has_passed = False
             self.p2.has_passed = False
 
+    def check_valid_indirect_damage_target(self, player, planet_pos, unit_pos):
+        if (self.location_of_indirect == "HQ" and planet_pos == -2) or \
+                (self.location_of_indirect == "PLANET" and planet_pos != -2 and self.planet_of_indirect == planet_pos) or \
+                self.location_of_indirect == "ALL":
+            if player.get_card_type_given_pos(planet_pos, unit_pos) in self.valid_targets_for_indirect:
+                if player.get_faction_given_pos(planet_pos, unit_pos) == \
+                        self.faction_of_cards_for_indirect or not \
+                        self.faction_of_cards_for_indirect:
+                    if (not self.indirect_exhaust_only or not player.get_ready_given_pos(planet_pos, unit_pos)) and \
+                            (self.forbidden_traits_indirect == "" or not player.check_for_trait_given_pos(
+                                planet_pos, unit_pos, self.forbidden_traits_indirect)):
+                        return True
+        return False
+
     async def apply_indirect_damage(self, name, game_update_string):
         if name == self.name_1 or name == self.name_2:
             if name == self.name_1:
                 player = self.p1
             else:
                 player = self.p2
-            if player.indirect_damage_applied < player.total_indirect_damage:
-                if len(game_update_string) == 1:
-                    if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
-                        player.indirect_damage_applied = 999
-                        await self.send_update_message(
-                            player.name_player + " stops placing indirect damage"
-                        )
-                if self.location_of_indirect == "HQ" or self.location_of_indirect == "ALL":
-                    if len(game_update_string) == 3:
-                        if game_update_string[0] == "HQ":
-                            if game_update_string[1] == player.get_number():
-                                if player.get_card_type_given_pos(-2, int(game_update_string[2])) in \
-                                        self.valid_targets_for_indirect:
-                                    if player.get_faction_given_pos(
-                                            -2, int(game_update_string[2])) == \
-                                            self.faction_of_cards_for_indirect or not \
-                                            self.faction_of_cards_for_indirect:
-                                        player.increase_indirect_damage_at_pos(-2, int(game_update_string[2]), 1)
-                if self.location_of_indirect == "PLANET" or self.location_of_indirect == "ALL":
-                    if len(game_update_string) == 4:
-                        if game_update_string[0] == "IN_PLAY":
-                            if self.planet_of_indirect == int(game_update_string[2]) \
-                                    or self.location_of_indirect == "ALL":
-                                if game_update_string[1] == player.get_number():
-                                    if player.get_card_type_given_pos(
-                                            int(game_update_string[2]), int(game_update_string[3])) \
-                                            in self.valid_targets_for_indirect and \
-                                            (not self.indirect_exhaust_only or not player.get_ready_given_pos(
-                                                int(game_update_string[2]), int(game_update_string[3]))) and \
-                                            (self.forbidden_traits_indirect == ""
-                                             or not player.check_for_trait_given_pos(
-                                                        int(game_update_string[2]), int(game_update_string[3]),
-                                                        self.forbidden_traits_indirect)):
-                                        if player.get_faction_given_pos(
-                                                int(game_update_string[2]), int(game_update_string[3])) == \
-                                                self.faction_of_cards_for_indirect or not \
-                                                self.faction_of_cards_for_indirect:
-                                            player.increase_indirect_damage_at_pos(int(game_update_string[2]),
-                                                                                   int(game_update_string[3]), 1)
-        if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and \
-                self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1" or game_update_string[0] == "pass-P2":
+                    player.indirect_damage_applied = 999
+                    await self.send_update_message(
+                        player.name_player + " stops placing indirect damage"
+                    )
+            else:
+                planet_pos = -1
+                unit_pos = -1
+                if len(game_update_string) == 3:
+                    if game_update_string[0] == "HQ":
+                        if game_update_string[1] == player.get_number():
+                            planet_pos = -2
+                            unit_pos = int(game_update_string[2])
+                elif len(game_update_string) == 4:
+                    if game_update_string[0] == "IN_PLAY":
+                        if game_update_string[1] == player.get_number():
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                if planet_pos == -1 or unit_pos == -1:
+                    return None
+                if player.indirect_damage_applied < player.total_indirect_damage:
+                    if self.check_valid_indirect_damage_target(player, planet_pos, unit_pos):
+                        player.increase_indirect_damage_at_pos(planet_pos, unit_pos, 1)
+        if self.p1.indirect_damage_applied >= self.p1.total_indirect_damage and self.p2.indirect_damage_applied >= self.p2.total_indirect_damage:
             await self.resolve_indirect_damage_applied()
             if self.battle_ability_to_resolve == "Diamat":
                 self.damage_from_atrox = True
@@ -6208,6 +6246,7 @@ class Game:
             self.forbidden_traits_indirect = ""
             self.p1.total_indirect_damage = 0
             self.p2.total_indirect_damage = 0
+        return None
 
     async def resolve_indirect_damage_applied(self):
         self.first_card_damaged = True
