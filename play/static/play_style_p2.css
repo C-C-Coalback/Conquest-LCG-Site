@@ -26,14 +26,25 @@ h4 {
     overflow-x: scroll;
 }
 
-#helper-text-box {
+#hover-preview-box {
     position: fixed;
     display: none;
-    z-index: 1000;
+    z-index: 1100;
+    pointer-events: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+#helper-text-box {
+    position: relative;
+    display: none;
     border-width: 2px;
     border-style: double;
     border-color: lightblue;
     background: rgba(47, 40, 153, 0.3);
+    max-width: min(30vw, 45vh);
+    pointer-events: none;
 }
 
 #mistarget-info {
@@ -176,13 +187,13 @@ h4 {
 }
 
 #LargeHelperCard {
-    position: absolute;
-    top: 0%;
-    right: 0%;
-    height:30vh;
-    width: min(15vw, 22.1vh);
+    position: relative;
+    height:40vh;
+    width: min(20vw, 29.5vh);
     z-index: 1000;
-    cursor: pointer;
+    cursor: default;
+    pointer-events: none;
+    display: block;
 }
 
 .Card-div {
@@ -535,6 +546,65 @@ h4 {
     width: 70px;
 }
 
+#in-game-settings-div {
+    position:absolute;
+    right:150px;
+    bottom:calc(135px + 20vh);
+    height: 35px;
+    width: 130px;
+    z-index: 1002;
+}
+
+#open-in-game-settings {
+    width: 130px;
+    height: 35px;
+}
+
+#in-game-settings-dialog {
+    position: absolute;
+    right: 10px;
+    bottom: calc(165px + 20vh);
+    width: 280px;
+    max-width: 30vw;
+    border: 5px solid blue;
+    background: rgba(210, 210, 210, 0.98);
+    color: #111;
+    z-index: 1200;
+    display: none;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+#in-game-settings-header {
+    margin: 0 0 8px 0;
+    color: #1a1a1a;
+}
+
+.in-game-settings-option {
+    display: block;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.in-game-settings-slider-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#setting-preview-size {
+    flex: 1;
+}
+
+#setting-preview-size-value {
+    min-width: 42px;
+    text-align: right;
+}
+
+#close-in-game-settings {
+    width: 100%;
+}
+
 #request-action-div {
     position: absolute;
     right:10px;
@@ -792,8 +862,15 @@ h4 {
     border: 2px solid aqua;
 }
 
+#choices-container {
+    width: 100%;
+}
+
 #header-choices-container {
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.2;
     text-align: center;
 }
 
@@ -808,6 +885,10 @@ h4 {
     margin-top: 10px;
     padding: 2px 5px;
     width: 100%;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.2;
+    height: auto;
 }
 
 .hand-card {
@@ -834,8 +915,8 @@ legend {
     width: 14vw;
     max-width: 14vw;
     min-height: 4vh;
-    max-height: 20vh;
-    top: 40%;
+    max-height: 21.5vh;
+    top: 24%;
     border: 5px solid blue;
     right: 0;
     z-index: 1000;
