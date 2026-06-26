@@ -665,6 +665,27 @@ ability_targets_dictionary = {
             "Card Enters Play": False,
         }
     },
+    "Craftworld Gate": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
     "Commander Shadowsun hand": {
         "Num Stages": 2,
         "Type 1": "Hand",
@@ -1185,5 +1206,24 @@ action_ability_starts = {
         "Once Per Phase": False,
         "Ready Required": False,
         "Exhaust Required": False
-    }
+    },
+    "Craftworld Gate": {
+        "Special": False,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Must Be Unit": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Same Planet": False
+        }
+    },
 }
