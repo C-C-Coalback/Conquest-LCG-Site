@@ -654,6 +654,17 @@ ability_targets_dictionary = {
             "Not Same Planet Unit": False
         }
     },
+    "Banshee Power Sword": {
+        "Num Stages": 1,
+        "Type 1": "Hand",
+        "Restrictions 1": {
+            "Faction": None,
+            "Card Type": None,
+            "Max Cost": None,
+            "Payment": False,
+            "Card Enters Play": False,
+        }
+    },
     "Commander Shadowsun hand": {
         "Num Stages": 2,
         "Type 1": "Hand",

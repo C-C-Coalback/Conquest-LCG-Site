@@ -888,6 +888,8 @@ def determine_valid_moves(self):
                         self, self.reactions_needing_resolving[0], primary_player, secondary_player,
                         target_restrictions, planet_pos=self.reactions_needing_resolving[0].get_planet_pos(), ability_type="Reaction"
                     )
+                    if current_reaction == "Banshee Power Sword":
+                        valid_moves = add_valid_move(valid_moves, primary_player, "pass")
                 if type_target == "Discard":
                     valid_moves = find_all_valid_discard_locations_given_restrictions(
                         self, self.reactions_needing_resolving[0], primary_player, secondary_player,
