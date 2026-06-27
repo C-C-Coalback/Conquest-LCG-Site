@@ -1037,8 +1037,8 @@ class Game:
                     active_player = self.name_1
                 info_string += active_player + "/"
             else:
-                if self.mode == "Normal" and (
-                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
+                if (self.mode == "Normal" and (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action)
+                        and self.bot_is_present and self.check_style_of_bot() != "ARG"):
                     info_string += self.get_action_window_between_combat_turns_player() + "/"
                 else:
                     info_string += self.player_with_combat_turn + "/"
