@@ -180,6 +180,53 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
             if primary_player.get_resources() == 0:
                 return False
             return primary_player.count_units_in_play_all() > 1
+        if action_ability == "Even the Odds":
+            for i in range(len(primary_player.headquarters)):
+                attachments = primary_player.get_all_attachments_at_pos(-2, i)
+                for j in range(len(attachments)):
+                    for k in range(len(primary_player.headquarters)):
+                        if i != k:
+                            if primary_player.check_if_can_attach_card(attachments[j], -2, k):
+                                return True
+                    for k in range(7):
+                        for l in range(len(primary_player.cards_in_play[k + 1])):
+                            if primary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    attachments = primary_player.get_all_attachments_at_pos(i, j)
+                    for k in range(len(attachments)):
+                        for l in range(len(primary_player.headquarters)):
+                            if primary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+                        for l in range(7):
+                            for m in range(len(primary_player.cards_in_play[l + 1])):
+                                if i != l or j != m:
+                                    if primary_player.check_if_can_attach_card(attachments[j], l, m):
+                                        return True
+            for i in range(len(secondary_player.headquarters)):
+                attachments = secondary_player.get_all_attachments_at_pos(-2, i)
+                for j in range(len(attachments)):
+                    for k in range(len(secondary_player.headquarters)):
+                        if i != k:
+                            if secondary_player.check_if_can_attach_card(attachments[j], -2, k):
+                                return True
+                    for k in range(7):
+                        for l in range(len(secondary_player.cards_in_play[k + 1])):
+                            if secondary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+            for i in range(7):
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    attachments = secondary_player.get_all_attachments_at_pos(i, j)
+                    for k in range(len(attachments)):
+                        for l in range(len(secondary_player.headquarters)):
+                            if secondary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+                        for l in range(7):
+                            for m in range(len(secondary_player.cards_in_play[l + 1])):
+                                if i != l or j != m:
+                                    if secondary_player.check_if_can_attach_card(attachments[j], l, m):
+                                        return True
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):

@@ -1384,18 +1384,11 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_object.action_chosen == "Even the Odds":
         if self.action_object.chosen_first_card:
             if self.action_object.misc_player_storage == game_update_string[1]:
-                if game_update_string[1] == "1":
-                    player_owning_card = self.p1
-                else:
-                    player_owning_card = self.p2
                 origin_planet, origin_pos, origin_attach_pos = self.action_object.misc_target_attachment
                 dest_planet = int(game_update_string[2])
                 dest_pos = int(game_update_string[3])
                 can_continue = True
                 if player_owning_card.name_player == secondary_player.name_player:
-                    if secondary_player.get_immune_to_enemy_card_abilities(dest_planet, dest_pos):
-                        can_continue = False
-                        await self.send_update_message("Immune to enemy card abilities.")
                     if secondary_player.get_immune_to_enemy_events(dest_planet, dest_pos):
                         can_continue = False
                         await self.send_update_message("Immune to enemy events.")

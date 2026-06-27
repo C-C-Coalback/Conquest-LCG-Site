@@ -433,7 +433,7 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     if ability.misc_target_planet != planet_pos:
                         return False
             elif ability.action_chosen == "Tellyporta Pad":
-                if planet_pos == self.round_number:
+                if planet_pos == self.round_number or not self.planets_in_play_array[self.round_number]:
                     return False
             elif ability.action_chosen == "Archon's Terror":
                 if planet_pos == -2 and not player.get_ready_given_pos(planet_pos, unit_pos):
@@ -447,6 +447,13 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     return False
             elif ability.action_chosen == "Command-link Drone":
                 if planet_pos == ability.get_planet_pos() and unit_pos == ability.get_unit_pos():
+                    return False
+            elif ability.action_chosen == "Even the Odds":
+                og_pla, og_pos, og_att = ability.misc_target_attachment
+                if og_pla == planet_pos and og_pos == unit_pos:
+                    return False
+                attachment = player.get_attachment_at_pos(og_pla, og_pos, og_att)
+                if not player.check_if_can_attach_card(attachment, planet_pos, unit_pos):
                     return False
         elif ability == "Planet":
             pass
@@ -535,6 +542,14 @@ def find_all_valid_unit_locations_given_restrictions(self, ability, primary_play
     valid_moves = []
     own_unit = target_restrictions["Own Unit"]
     enemy_unit = target_restrictions["Enemy Unit"]
+    if target_restrictions["Ability Type"] == "Action":
+        if ability.action_chosen == "Even the Odds":
+            if ability.misc_player_storage == primary_player.get_number():
+                own_unit = True
+                enemy_unit = False
+            else:
+                own_unit = False
+                enemy_unit = True
     if own_unit:
         for i in range(len(primary_player.headquarters)):
             if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, -2, i, target_restrictions, misc_pla=planet_pos):
@@ -852,8 +867,77 @@ def determine_valid_moves(self):
                             if primary_player.get_name_given_pos(-2, i) == "Khymera":
                                 if primary_player.get_aiming_reticle_in_play(-2, i) != "blue":
                                     valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
-                    if self.action_object.misc_counter > 0:
-                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                        if self.action_object.misc_counter > 0:
+                            valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                    if self.action_object.action_chosen == "Even the Odds":
+                        for i in range(len(primary_player.headquarters)):
+                            attachments = primary_player.get_all_attachments_at_pos(-2, i)
+                            for j in range(len(attachments)):
+                                valid_attachment = False
+                                attachment = attachments[j]
+                                for k in range(len(primary_player.headquarters)):
+                                    if i != k:
+                                        if primary_player.check_if_can_attach_card(attachment, -2, k):
+                                            valid_attachment = True
+                                for k in range(7):
+                                    for l in range(len(primary_player.cards_in_play[k + 1])):
+                                        if primary_player.check_if_can_attach_card(attachment, k, l):
+                                            valid_attachment = True
+                                if valid_attachment:
+                                    valid_moves = add_valid_move(valid_moves, primary_player, "ATTACHMENT", planet_pos=-2, unit_pos=i, attachment_pos=j)
+                        for i in range(7):
+                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                                attachments = primary_player.get_all_attachments_at_pos(i, j)
+                                for k in range(len(attachments)):
+                                    valid_attachment = False
+                                    attachment = attachments[k]
+                                    for l in range(len(primary_player.headquarters)):
+                                        if primary_player.check_if_can_attach_card(attachment, -2, l):
+                                            valid_attachment = True
+                                    for l in range(7):
+                                        for m in range(len(primary_player.cards_in_play[l + 1])):
+                                            if i != l or j != m:
+                                                if primary_player.check_if_can_attach_card(attachment, l, m):
+                                                    valid_attachment = True
+                                    if valid_attachment:
+                                        valid_moves = add_valid_move(
+                                            valid_moves, primary_player,"ATTACHMENT",
+                                            planet_pos=i, unit_pos=j, attachment_pos=k
+                                        )
+                        for i in range(len(secondary_player.headquarters)):
+                            attachments = secondary_player.get_all_attachments_at_pos(-2, i)
+                            for j in range(len(attachments)):
+                                valid_attachment = False
+                                attachment = attachments[j]
+                                for k in range(len(secondary_player.headquarters)):
+                                    if i != k:
+                                        if secondary_player.check_if_can_attach_card(attachment, -2, k):
+                                            valid_attachment = True
+                                for k in range(7):
+                                    for l in range(len(secondary_player.cards_in_play[k + 1])):
+                                        if secondary_player.check_if_can_attach_card(attachment, k, l):
+                                            valid_attachment = True
+                                if valid_attachment:
+                                    valid_moves = add_valid_move(valid_moves, secondary_player, "ATTACHMENT", planet_pos=-2, unit_pos=i, attachment_pos=j)
+                        for i in range(7):
+                            for j in range(len(secondary_player.cards_in_play[i + 1])):
+                                attachments = secondary_player.get_all_attachments_at_pos(i, j)
+                                for k in range(len(attachments)):
+                                    valid_attachment = False
+                                    attachment = attachments[k]
+                                    for l in range(len(secondary_player.headquarters)):
+                                        if secondary_player.check_if_can_attach_card(attachment, -2, l):
+                                            valid_attachment = True
+                                    for l in range(7):
+                                        for m in range(len(secondary_player.cards_in_play[l + 1])):
+                                            if i != l or j != m:
+                                                if secondary_player.check_if_can_attach_card(attachment, l, m):
+                                                    valid_attachment = True
+                                    if valid_attachment:
+                                        valid_moves = add_valid_move(
+                                            valid_moves, secondary_player,"ATTACHMENT",
+                                            planet_pos=i, unit_pos=j, attachment_pos=k
+                                        )
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()

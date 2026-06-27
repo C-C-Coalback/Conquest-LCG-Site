@@ -792,6 +792,31 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Even the Odds": {
+        "Num Stages": 2,
+        "Type 1": "Special",
+        "Restrictions 1": {
+
+        },
+        "Type 2": "In Play",
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -1295,6 +1320,14 @@ action_ability_starts = {
         }
     },
     "Command-link Drone": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+    },
+    "Even the Odds": {
         "Special": True,
         "Requires Hand Card": False,
         "Requires In Play Card": False,
