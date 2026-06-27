@@ -25,13 +25,21 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
         card = primary_player.get_card_given_pos(-2, i)
         if card.get_has_action_while_in_play():
             if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
-                print("card has action and right phase")
                 ability = primary_player.get_ability_given_pos(-2, i)
                 if ability in action_ability_starts:
                     prereqs = action_ability_starts[ability]
-                    print("checking if action can start")
                     if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=-2, card=card):
                         possible_action_locations = add_action(possible_action_locations, "HQ/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
+        attachments = primary_player.get_all_attachments_at_pos(-2, i)
+        for k in range(len(attachments)):
+            card = attachments[k]
+            if card.get_has_action_while_in_play():
+                if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
+                    ability = card.get_ability()
+                    if ability in action_ability_starts:
+                        prereqs = action_ability_starts[ability]
+                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card, planet_pos=-2, attachment_pos=k):
+                            possible_action_locations = add_action(possible_action_locations, "ATTACHMENT/HQ/" + str(primary_player.number) + "/" + str(i) + "/" + str(k), combat_turn_action=combat_turn_action)
     for i in range(7):
         for j in range(len(primary_player.cards_in_play[i + 1])):
             card = primary_player.get_card_given_pos(i, j)
@@ -44,6 +52,16 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                         print("checking if action can start")
                         if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=i, card=card):
                             possible_action_locations = add_action(possible_action_locations, "IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j), combat_turn_action=combat_turn_action)
+            attachments = primary_player.get_all_attachments_at_pos(i, j)
+            for k in range(len(attachments)):
+                card = attachments[k]
+                if card.get_has_action_while_in_play():
+                    if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
+                        ability = card.get_ability()
+                        if ability in action_ability_starts:
+                            prereqs = action_ability_starts[ability]
+                            if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card, planet_pos=i, attachment_pos=k):
+                                possible_action_locations = add_action(possible_action_locations, "ATTACHMENT/IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j) + "/" + str(k), combat_turn_action=combat_turn_action)
     if combat_turn_action:
         possible_action_locations.append("pass-P1")
     return possible_action_locations
@@ -121,7 +139,7 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
     return True
 
 
-def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos=-1, card=None):
+def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos=-1, card=None, attachment_pos=-1):
     requires_hand_card = prereqs["Requires Hand Card"]
     requires_in_play_card = prereqs["Requires In Play Card"]
     once_per_phase = prereqs["Once Per Phase"]
@@ -158,6 +176,10 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                 card = game.preloaded_find_card(primary_player.discard[i])
                 if card.get_card_type() == "Army" and card.get_faction() == "Eldar":
                     return True
+        if action_ability == "Command-link Drone":
+            if primary_player.get_resources() == 0:
+                return False
+            return primary_player.count_units_in_play_all() > 1
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):

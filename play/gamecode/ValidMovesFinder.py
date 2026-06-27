@@ -445,6 +445,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     return False
                 if len(player.get_all_attachments_at_pos(planet_pos, unit_pos)) == 0:
                     return False
+            elif ability.action_chosen == "Command-link Drone":
+                if planet_pos == ability.get_planet_pos() and unit_pos == ability.get_unit_pos():
+                    return False
         elif ability == "Planet":
             pass
     if targets and enemy_ability:

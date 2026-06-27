@@ -771,6 +771,27 @@ ability_targets_dictionary = {
             "Not Same Planet Unit": False,
         }
     },
+    "Command-link Drone": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -1273,4 +1294,12 @@ action_ability_starts = {
             "Same Planet": False
         }
     },
+    "Command-link Drone": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+    }
 }
