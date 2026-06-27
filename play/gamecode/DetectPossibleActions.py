@@ -12,8 +12,6 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
     :param combat_turn_action: whether we are in a combat turn action window
     :return: possible action locations: list of strings of possible actions
     """
-
-
     possible_action_locations = []
     for i in range(len(primary_player.cards)):
         card = game.preloaded_find_card(primary_player.cards[i])
@@ -147,6 +145,9 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
             if len(primary_player.get_all_attachments_at_pos(planet_pos, unit_pos)) == 0:
                 return False
             if planet_pos != -2 and game.count_planets_in_play() < 2:
+                return False
+        if action_ability == "Deception":
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                 return False
     return True
 
