@@ -455,6 +455,17 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                 attachment = player.get_attachment_at_pos(og_pla, og_pos, og_att)
                 if not player.check_if_can_attach_card(attachment, planet_pos, unit_pos):
                     return False
+            elif ability.action_chosen == "Ambush Platform":
+                other_player = player.get_other_player()
+                own_unit = not enemy_ability
+                not_own_attach = not own_unit
+                if own_unit:
+                    attachment_card = player.get_card_in_hand(player.aiming_reticle_coords_hand_2)
+                else:
+                    attachment_card = other_player.get_card_in_hand(other_player.aiming_reticle_coords_hand_2)
+                if player.check_if_can_attach_card(attachment_card, planet_pos, unit_pos, not_own_attach):
+                    return True
+                return False
         elif ability == "Planet":
             pass
     if targets and enemy_ability:
@@ -479,7 +490,16 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
             return False
     if card_type_hand_card:
         if card_type_hand_card != card.get_card_type():
-            return False
+            if ability_type == "Action":
+                if ability.action_chosen == "Ambush Platform":
+                    if card.get_ability() in ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]:
+                        pass
+                    else:
+                        return False
+                else:
+                    return False
+            else:
+                return False
     if max_cost_hand_card:
         if card.get_cost() > max_cost_hand_card:
             return False
@@ -493,6 +513,40 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
                 return False
     if card_enters_play:
         if not player.check_if_card_can_enter_play(card, planet_pos=planet_pos, triggered_card_effect=True):
+            return False
+    if ability_type == "Action":
+        if ability.action_chosen == "Ambush Platform":
+            print("ambush platform")
+            attachment_card = card
+            primary_player = player
+            secondary_player = player.get_other_player()
+            if attachment_card.planet_attachment:
+                return False
+            not_own_attach = False
+            for i in range(len(primary_player.headquarters)):
+                if primary_player.check_if_can_attach_card(
+                        attachment_card, -2, i, not_own_attachment=not_own_attach
+                ):
+                    return True
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if primary_player.check_if_can_attach_card(
+                            attachment_card, i, j, not_own_attachment=not_own_attach
+                    ):
+                        return True
+            not_own_attach = True
+            for i in range(len(secondary_player.headquarters)):
+                if secondary_player.check_if_can_attach_card(
+                        attachment_card, -2, i, not_own_attachment=not_own_attach
+                ):
+                    return True
+            for i in range(7):
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    if secondary_player.check_if_can_attach_card(
+                            attachment_card, i, j,
+                            not_own_attachment=not_own_attach
+                    ):
+                        return True
             return False
     return True
 
@@ -949,7 +1003,7 @@ def determine_valid_moves(self):
                                                                      planet_pos=i, unit_pos=j, attachment_pos=k)
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
-                        self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
+                        self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos(), ability_type="Action"
                     )
                 if type_target == "In Play":
                     valid_moves = find_all_valid_unit_locations_given_restrictions(

@@ -259,6 +259,37 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                         if attachments[k].get_limited():
                             return True
             return False
+        if action_ability == "Ambush Platform":
+            for a in range(len(primary_player.cards)):
+                attachment_card = primary_player.get_card_in_hand(a)
+                if attachment_card.planet_attachment:
+                    return False
+                not_own_attach = False
+                for i in range(len(primary_player.headquarters)):
+                    if primary_player.check_if_can_attach_card(
+                            attachment_card, -2, i, not_own_attachment=not_own_attach
+                    ):
+                        return True
+                for i in range(7):
+                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                        if primary_player.check_if_can_attach_card(
+                                attachment_card, i, j, not_own_attachment=not_own_attach
+                        ):
+                            return True
+                not_own_attach = True
+                for i in range(len(secondary_player.headquarters)):
+                    if secondary_player.check_if_can_attach_card(
+                            attachment_card, -2, i, not_own_attachment=not_own_attach
+                    ):
+                        return True
+                for i in range(7):
+                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                        if secondary_player.check_if_can_attach_card(
+                                attachment_card, i, j,
+                                not_own_attachment=not_own_attach
+                        ):
+                            return True
+            return False
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):

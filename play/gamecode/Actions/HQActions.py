@@ -217,6 +217,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     elif ability == "Ambush Platform":
                         if card.get_ready():
                             self.action_object.action_chosen = ability
+                            self.action_object.chosen_first_card = False
                             primary_player.set_aiming_reticle_in_play(-2, int(game_update_string[2]), "blue")
                             primary_player.exhaust_given_pos(-2, int(game_update_string[2]))
                         else:

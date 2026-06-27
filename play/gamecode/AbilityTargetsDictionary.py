@@ -845,6 +845,38 @@ ability_targets_dictionary = {
             "Ability Type": "Action"
         }
     },
+    "Ambush Platform": {
+        "Num Stages": 2,
+        "Type 1": "Hand",
+        "Restrictions 1": {
+            "Faction": None,
+            "Card Type": "Attachment",
+            "Max Cost": None,
+            "Payment": True,
+            "Payment Details": {
+                "Deploy": True
+            },
+            "Card Enters Play": False,
+        },
+        "Type 2": "In Play",
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -1390,4 +1422,12 @@ action_ability_starts = {
             "Same Planet": False
         }
     },
+    "Ambush Platform": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False
+    }
 }
