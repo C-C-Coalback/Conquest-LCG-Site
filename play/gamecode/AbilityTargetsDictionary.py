@@ -1334,5 +1334,13 @@ action_ability_starts = {
         "Once Per Phase": False,
         "Ready Required": False,
         "Exhaust Required": False,
+    },
+    "Calculated Strike": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
     }
 }

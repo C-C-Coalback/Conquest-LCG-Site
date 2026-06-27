@@ -2,6 +2,18 @@ from .AbilityTargetsDictionary import action_ability_starts
 
 
 def detect_possible_actions(game, primary_player, secondary_player, combat_turn_action=False):
+    """
+    Identifies any "Action:" effects that can be played in the current game-state.
+    Does not return more standard elements such as which cards be deployed.
+
+    :param game: the game
+    :param primary_player: player with priority
+    :param secondary_player: other player
+    :param combat_turn_action: whether we are in a combat turn action window
+    :return: possible action locations: list of strings of possible actions
+    """
+
+
     possible_action_locations = []
     for i in range(len(primary_player.cards)):
         card = game.preloaded_find_card(primary_player.cards[i])
@@ -176,6 +188,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                 card = game.preloaded_find_card(primary_player.discard[i])
                 if card.get_card_type() == "Army" and card.get_faction() == "Eldar":
                     return True
+            return False
         if action_ability == "Command-link Drone":
             if primary_player.get_resources() == 0:
                 return False
@@ -227,6 +240,24 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                                 if i != l or j != m:
                                     if secondary_player.check_if_can_attach_card(attachments[j], l, m):
                                         return True
+            return False
+        if action_ability == "Calculated Strike":
+            for i in range(len(secondary_player.headquarters)):
+                if secondary_player.headquarters[i].get_limited():
+                    return True
+                attachments = secondary_player.get_all_attachments_at_pos(-2, i)
+                for k in range(len(attachments)):
+                    if attachments[k].get_limited():
+                        return True
+            for i in range(7):
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    if secondary_player.cards_in_play[i + 1][j].get_limited():
+                        return True
+                    attachments = secondary_player.get_all_attachments_at_pos(i, j)
+                    for k in range(len(attachments)):
+                        if attachments[k].get_limited():
+                            return True
+            return False
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):

@@ -67,7 +67,7 @@ def check_if_deploy_action_has_non_pass_followup(self, primary_player, ability):
         self.action_object = original_action_object
 
 
-def check_if_deploy_event_action_card_is_currently_legal(self, primary_player, hand_pos, possible_deploy_actions=None):
+def check_if_deploy_event_action_card_is_currently_legal(self, primary_player, hand_pos, possible_deploy_actions=None): # Unused
     card = primary_player.get_card_in_hand(hand_pos)
     if card is None:
         return False
@@ -604,11 +604,7 @@ def determine_valid_moves(self):
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Deploy Turn":
-            if self.mode == "ACTION" and self.card_to_deploy is None:
-                valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=True)
-                if not valid_moves:
-                    valid_moves = add_valid_move(valid_moves, primary_player, "pass")
-            elif self.card_to_deploy is None:
+            if self.card_to_deploy is None:
                 deploy_action_locations = detect_possible_actions(
                     self, primary_player, secondary_player, combat_turn_action=False
                 )
@@ -616,10 +612,8 @@ def determine_valid_moves(self):
                 for i in range(len(primary_player.cards)):
                     playability = primary_player.determine_playability(primary_player.cards[i])
                     if playability == "playable":
-                        if not check_if_deploy_event_action_card_is_currently_legal(
-                                self, primary_player, i, possible_deploy_actions=deploy_action_locations):
-                            continue
-                        valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+                        if self.preloaded_find_card(primary_player.cards[i]).get_card_type() != "Event":
+                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
             else:
                 selected_card = self.card_to_deploy
@@ -714,10 +708,8 @@ def determine_valid_moves(self):
                     for i in range(len(primary_player.cards)):
                         playability = primary_player.determine_playability(primary_player.cards[i])
                         if playability == "playable":
-                            if not check_if_deploy_event_action_card_is_currently_legal(
-                                    self, primary_player, i, possible_deploy_actions=deploy_action_locations):
-                                continue
-                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+                            if self.preloaded_find_card(primary_player.cards[i]).get_card_type() != "Event":
+                                valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
                     valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Commitment":
             valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
@@ -938,6 +930,23 @@ def determine_valid_moves(self):
                                             valid_moves, secondary_player,"ATTACHMENT",
                                             planet_pos=i, unit_pos=j, attachment_pos=k
                                         )
+                    if self.action_object.action_chosen == "Calculated Strike":
+                        for i in range(len(secondary_player.headquarters)):
+                            if secondary_player.headquarters[i].get_limited():
+                                valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
+                            attachments = secondary_player.get_all_attachments_at_pos(-2, i)
+                            for k in range(len(attachments)):
+                                if attachments[k].get_limited():
+                                    valid_moves = add_valid_move(valid_moves, secondary_player, "ATTACHMENT", planet_pos=-2, unit_pos=i, attachment_pos=k)
+                        for i in range(7):
+                            for j in range(len(secondary_player.cards_in_play[i + 1])):
+                                if secondary_player.cards_in_play[i + 1][j].get_limited():
+                                    valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
+                                attachments = secondary_player.get_all_attachments_at_pos(i, j)
+                                for k in range(len(attachments)):
+                                    if attachments[k].get_limited():
+                                        valid_moves = add_valid_move(valid_moves, secondary_player, "ATTACHMENT",
+                                                                     planet_pos=i, unit_pos=j, attachment_pos=k)
                 if type_target == "Hand":
                     valid_moves = find_all_valid_hand_locations_given_restrictions(
                         self, self.action_object, primary_player, secondary_player, target_restrictions, planet_pos=self.action_object.get_planet_pos()
