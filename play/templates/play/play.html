@@ -752,10 +752,17 @@
                 automated_required_action === "Headquarters Action" ||
                 automated_required_action === "Outside Combat"
             ) {
+                var mapped_tokens = nonPassActions.slice(0, 2).map((token) => describeActionToken(token));
                 if (nonPassActions.length === 0) {
                     return "No legal actions are currently available, so PASS is the right move.";
+                } else if (nonPassActions.length === 1) {
+                    const preview = nonPassActions.slice(0, 2).map((token) => describeActionToken(token)).join(" or ");
+                } else {
+                    if (mapped_tokens[0] === mapped_tokens[1]) {
+                        mapped_tokens = mapped_tokens.slice(0, 1);
+                    }
                 }
-                const preview = nonPassActions.slice(0, 2).map((token) => describeActionToken(token)).join(" or ");
+                const preview = mapped_tokens.join(" or ");
                 return "You can " + preview + ".";
             }
             if (nonPassActions.length === 0 && legalActions.length > 0) {
