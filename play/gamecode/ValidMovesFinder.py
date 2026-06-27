@@ -440,6 +440,11 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     return False
                 if player.get_unique_given_pos(planet_pos, unit_pos):
                     return False
+            elif ability.action_chosen == "Squadron Redeployment":
+                if planet_pos != -2 and self.count_planets_in_play() < 2:
+                    return False
+                if len(player.get_all_attachments_at_pos(planet_pos, unit_pos)) == 0:
+                    return False
         elif ability == "Planet":
             pass
     if targets and enemy_ability:
@@ -861,10 +866,11 @@ def determine_valid_moves(self):
                                 continue
                             if abs(i - self.action_object.get_planet_pos()) == 1:
                                 valid_moves = add_valid_move(valid_moves, None, "PLANETS", planet_pos=i)
-                    elif target_restrictions["Non-first"]:
-                        valid_moves = add_active_non_first_planets_as_valid_moves(self, valid_moves)
                     else:
-                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                        valid_moves = add_valid_planets_as_valid_moves(
+                            self, valid_moves, primary_player, secondary_player, self.action_object.action_chosen,
+                            target_restrictions, misc_pla=self.action_object.misc_target_planet
+                        )
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Reaction":

@@ -3860,6 +3860,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments():
                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                        self.action_object.misc_target_planet = planet_pos
                         self.action_object.misc_target_unit = (planet_pos, unit_pos)
                         self.action_object.chosen_first_card = True
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")

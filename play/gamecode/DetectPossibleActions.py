@@ -106,10 +106,17 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
             if primary_player.get_ranged_given_pos(planet_pos, unit_pos):
                 return False
         if action_ability == "Tellyporta Pad":
-            if planet_pos == game.round_number:
+            if planet_pos == game.round_number or not game.planets_in_play_array[game.round_number]:
                 return False
         if action_ability == "Archon's Terror":
             if primary_player.get_unique_given_pos(planet_pos, unit_pos):
+                return False
+        if action_ability == "Squadron Redeployment":
+            if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                return False
+            if len(primary_player.get_all_attachments_at_pos(planet_pos, unit_pos)) == 0:
+                return False
+            if planet_pos != -2 and game.count_planets_in_play() < 2:
                 return False
     return True
 
