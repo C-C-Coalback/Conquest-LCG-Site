@@ -18,7 +18,7 @@ def change_settings(request):
         if request.user.is_authenticated:
             username = request.user.username
             zoom = str(1.0)
-            volume = str(int(request.POST["Volume"]) / 100)
+            volume = str(int(float(request.POST["Volume"])) / 100)
             cardback = request.POST["Cardback"]
             if not cardback:
                 cardback = None

@@ -1037,8 +1037,8 @@ class Game:
                     active_player = self.name_1
                 info_string += active_player + "/"
             else:
-                if self.mode == "Normal" and (
-                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
+                if (self.mode == "Normal" and (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action)
+                        and self.bot_is_present and self.check_style_of_bot() != "ARG"):
                     info_string += self.get_action_window_between_combat_turns_player() + "/"
                 else:
                     info_string += self.player_with_combat_turn + "/"
@@ -1068,6 +1068,8 @@ class Game:
         elif self.choices_available:
             info_string += "Choice: " + self.choice_context + "/"
             info_string += "User: " + self.name_player_making_choices + "/"
+            if self.choice_context == "Resolve Battle Ability?" and self.battle_ability_to_resolve:
+                info_string += "Resolve battle ability: " + self.battle_ability_to_resolve + "/"
         elif self.interrupts_waiting_on_resolution:
             info_string += "Effect: " + self.interrupts_waiting_on_resolution[0].get_interrupt_name() + "/"
             info_string += "User: " + self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() + "/"
@@ -1091,31 +1093,34 @@ class Game:
                 info_string += "Deepstrike: " + self.name_player_deepstriking + "/"
             elif not self.check_if_battle_taking_place():
                 info_string += "Outside Battle/"
-            elif self.mode == "Normal" and (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and self.check_style_of_bot() != "ARG" and self.bot_is_present:
-                info_string += "Action Window: " + self.get_action_window_between_combat_turns_player() + "/"
-            elif self.ranged_skirmish_active:
-                info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
             else:
-                info_string += "Active: " + self.player_with_combat_turn + "/"
+                if self.ranged_skirmish_active:
+                    info_string += "Combat Step: RANGED Skirmish/"
+                else:
+                    info_string += "Combat Step: Normal Combat/"
+                if self.mode == "Normal" and (
+                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) \
+                        and self.check_style_of_bot() != "ARG" and self.bot_is_present:
+                    info_string += "Action Window: " + self.get_action_window_between_combat_turns_player() + "/"
+                elif self.ranged_skirmish_active:
+                    info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
+                else:
+                    info_string += "Active: " + self.player_with_combat_turn + "/"
         elif self.phase == "DEPLOY":
             info_string += "Active: " + self.player_with_deploy_turn + "/"
         elif self.phase == "COMMAND":
             if self.committing_warlords:
                 info_string += "Commit Warlords/"
-                if self.p1.committed_warlord and 0 <= self.p1.warlord_commit_location < len(self.planet_array):
-                    info_string += self.name_1 + " warlord committed: " + \
-                                   self.get_planet_name(self.p1.warlord_commit_location) + "/"
-                if self.p2.committed_warlord and 0 <= self.p2.warlord_commit_location < len(self.planet_array):
-                    info_string += self.name_2 + " warlord committed: " + \
-                                   self.get_planet_name(self.p2.warlord_commit_location) + "/"
+                if self.p1.committed_warlord:
+                    info_string += self.name_1 + " warlord committed./"
+                if self.p2.committed_warlord:
+                    info_string += self.name_2 + " warlord committed./"
                 if self.p1.search_synapse_in_hq():
-                    if self.p1.committed_synapse and 0 <= self.p1.synapse_commit_location < len(self.planet_array):
-                        info_string += self.name_1 + " synapse committed: " + \
-                                       self.get_planet_name(self.p1.synapse_commit_location) + "/"
+                    if self.p1.committed_synapse:
+                        info_string += self.name_1 + " synapse committed./"
                 if self.p2.search_synapse_in_hq():
-                    if self.p2.committed_synapse and 0 <= self.p2.synapse_commit_location < len(self.planet_array):
-                        info_string += self.name_2 + " synapse committed: " + \
-                                       self.get_planet_name(self.p2.synapse_commit_location) + "/"
+                    if self.p2.committed_synapse:
+                        info_string += self.name_2 + " synapse committed./"
             elif self.before_command_struggle:
                 info_string += "Before command struggle/"
             elif self.after_command_struggle:
@@ -1136,6 +1141,16 @@ class Game:
 
     async def send_planet_array(self, force=False):
         planet_string = "GAME_INFO/PLANETS/"
+        activity_prompt_planet = -1
+        activity_reaction_names = [
+            "Frontier World Egulth", "Quarantined World Arkos", "Mordatyne", "Helvetis",
+            "Zadruk Prime", "Hostaryn XXI", "Deltadurne", "Caldera",
+            "Hangyz", "Forge World Dagon"
+        ]
+        if self.asking_if_reaction and self.reactions_needing_resolving:
+            current_reaction_name = self.reactions_needing_resolving[0].get_reaction_name()
+            if self.choice_context == current_reaction_name and current_reaction_name in activity_reaction_names:
+                activity_prompt_planet = self.reactions_needing_resolving[0].get_planet_pos()
         for i in range(len(self.planet_array)):
             if self.planets_in_play_array[i]:
                 planet_string += self.planet_array[i]
@@ -1145,8 +1160,21 @@ class Game:
                 planet_string += "|I"
             else:
                 planet_string += "|N"
+            reticle_color = ""
             if self.planet_aiming_reticle_position == i:
-                planet_string += "|red|"
+                reticle_color = "red"
+            elif activity_prompt_planet == i:
+                reticle_color = "blue"
+            elif self.phase == "COMMAND" and (self.committing_warlords or self.before_command_struggle):
+                commit_preview_players = []
+                if self.p1.committed_warlord and self.p1.warlord_commit_location == i:
+                    commit_preview_players.append(self.name_1)
+                if self.p2.committed_warlord and self.p2.warlord_commit_location == i:
+                    commit_preview_players.append(self.name_2)
+                if commit_preview_players:
+                    reticle_color = "green:" + ",".join(commit_preview_players)
+            if reticle_color:
+                planet_string += "|" + reticle_color + "|"
             else:
                 planet_string += "||"
             for j in range(len(self.p1.attachments_at_planet[i])):

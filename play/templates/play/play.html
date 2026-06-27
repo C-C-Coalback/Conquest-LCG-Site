@@ -605,6 +605,9 @@
                 if (row_text.startsWith("active (ranged):")) {
                     return true;
                 }
+                if (row_text.startsWith("combat step: ranged")) {
+                    return true;
+                }
             }
             return false;
         }
@@ -673,6 +676,19 @@
             return "";
         }
 
+        function isCurrentPlanetName(candidate_name) {
+            var normalized_candidate = sanitizeChoiceContextText(candidate_name).toLowerCase();
+            if (!normalized_candidate) {
+                return false;
+            }
+            for (var i = 0; i < current_planet_names.length; i++) {
+                if (sanitizeChoiceContextText(current_planet_names[i]).toLowerCase() === normalized_candidate) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         function buildTurnHint() {
             if (!automated_required_action) {
                 return "";
@@ -736,10 +752,17 @@
                 automated_required_action === "Headquarters Action" ||
                 automated_required_action === "Outside Combat"
             ) {
+                var mapped_tokens = nonPassActions.slice(0, 2).map((token) => describeActionToken(token));
                 if (nonPassActions.length === 0) {
                     return "No legal actions are currently available, so PASS is the right move.";
+                } else if (nonPassActions.length === 1) {
+                    const preview = nonPassActions.slice(0, 2).map((token) => describeActionToken(token)).join(" or ");
+                } else {
+                    if (mapped_tokens[0] === mapped_tokens[1]) {
+                        mapped_tokens = mapped_tokens.slice(0, 1);
+                    }
                 }
-                const preview = nonPassActions.slice(0, 2).map((token) => describeActionToken(token)).join(" or ");
+                const preview = mapped_tokens.join(" or ");
                 return "You can " + preview + ".";
             }
             if (nonPassActions.length === 0 && legalActions.length > 0) {
@@ -1153,6 +1176,11 @@
         function showChoiceContextPreview(route_text, is_planet_context, helper_text) {
             if (is_planet_context) {
                 changeDefRotate(route_text);
+                var helper_card = document.getElementById("LargeHelperCard");
+                if (helper_card) {
+                    helper_card.style.width = current_helper_height;
+                    helper_card.style.height = current_helper_width;
+                }
             } else {
                 changeDef(route_text);
             }
@@ -1180,6 +1208,10 @@
             var normalized_name = inferred_card_name.split(" ").join("_");
             var card_route_text = "/static/images/CardImages/" + normalized_name + ".jpg";
             var planet_route_text = "/static/images/PlanetImages/" + normalized_name + ".jpg";
+            if (isCurrentPlanetName(inferred_card_name)) {
+                showChoiceContextPreview(planet_route_text, true, helper_text);
+                return;
+            }
             var card_image_test = new Image();
             card_image_test.onload = function() {
                 if (request_id !== choice_context_hover_request_id) {
@@ -1328,8 +1360,20 @@
                                 }
                             }
                             if (card_data_split.length >= 3) {
-                                if (card_data_split[2] !== "") {
-                                    full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
+                                var reticle_token = card_data_split[2];
+                                var reticle_color = "";
+                                if (reticle_token !== "") {
+                                    var reticle_token_split = reticle_token.split(":");
+                                    reticle_color = reticle_token_split[0];
+                                    if (reticle_token_split.length > 1) {
+                                        var allowed_reticle_users = reticle_token_split.slice(1).join(":").split(",");
+                                        if (!allowed_reticle_users.includes("{{ user.username }}")) {
+                                            reticle_color = "";
+                                        }
+                                    }
+                                }
+                                if (reticle_color !== "") {
+                                    full_string += `<img src=\"/static/images/aiming_reticle_` + reticle_color + `.png\" alt=\"bugged\" class=\"large-aiming-reticle\"></img>`;
                                 }
                             }
                             full_string += `<div class="attachments-planet-1">`;

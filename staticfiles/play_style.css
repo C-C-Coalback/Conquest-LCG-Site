@@ -580,8 +580,8 @@ h4 {
 
 #in-game-settings-div {
     position:absolute;
-    right:150px;
-    bottom:calc(135px + 20vh);
+    right:10px;
+    bottom:calc(165px + 20vh);
     height: 35px;
     width: 130px;
     z-index: 1002;
