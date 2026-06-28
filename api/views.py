@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from play.consumers import create_bot_game, get_active_games, get_lobbies, persist_runtime_state
 from play import turn_notifier
 from decks.consumers import deck_check_and_save
+import os
 
 
 def _json_error(error_message, status=400, **extra):
@@ -655,6 +656,44 @@ def receive_raw_deck_text(request):
         response = {
             "status": result_of_saving["message"]
         }
+    except KeyError as e:
+        response = {
+            "status": "error",
+            "error": f"Missing required field: {str(e)}"
+        }
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": "server error 500",
+            "details": str(e)
+        }
+    return JsonResponse(response)
+
+
+@csrf_exempt
+def request_deck_text_given_name(request):
+    if request.method != "POST":
+        return _json_error("Only POST requests allowed", status=405)
+    data = _extract_request_data(request)
+    try:
+        bot_name = data["name"]
+        deck_name = data["deck_name"]
+        account_error = _validate_ai_control_player(bot_name)
+        if account_error is not None:
+            return account_error
+        target_deck_dir = os.getcwd() + "/decks/DeckStorage/" + bot_name + "/" + deck_name
+        if not os.path.exists(target_deck_dir):
+            response = {
+                "status": "error",
+                "error": "Deck does not exist"
+            }
+        else:
+            with open(target_deck_dir, "r") as file:
+                deck_text = file.read()
+            response = {
+                "status": "success",
+                "deck_text": deck_text
+            }
     except KeyError as e:
         response = {
             "status": "error",
