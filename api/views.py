@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from play.consumers import create_bot_game, get_active_games, get_lobbies, persist_runtime_state
 from play import turn_notifier
+from decks.consumers import deck_check_and_save
 
 
 def _json_error(error_message, status=400, **extra):
@@ -623,6 +624,36 @@ def create_bot_room(request):
         response = {
             "status": "success",
             "id": game_id
+        }
+    except KeyError as e:
+        response = {
+            "status": "error",
+            "error": f"Missing required field: {str(e)}"
+        }
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": "server error 500",
+            "details": str(e)
+        }
+    return JsonResponse(response)
+
+
+@csrf_exempt
+def receive_raw_deck_text(request):
+    if request.method != "POST":
+        return _json_error("Only POST requests allowed", status=405)
+    data = _extract_request_data(request)
+    try:
+        bot_name = data["name"]
+        deck = data["deck_text"]
+        account_error = _validate_ai_control_player(bot_name)
+        if account_error is not None:
+            return account_error
+        print(deck)
+        result_of_saving = deck_check_and_save(bot_name, deck)
+        response = {
+            "status": result_of_saving["message"]
         }
     except KeyError as e:
         response = {
