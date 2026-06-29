@@ -1044,6 +1044,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Catachan Devils Patrol: make a choice":
         chosen_choice = self.choices_available[int(game_update_string[1])]
         if chosen_choice == "Take Damage":
+            self.catachan_devils_damage_queued = True
             primary_player.assign_damage_to_pos(self.attacker_planet,
                                                 self.attacker_position, 2,
                                                 shadow_field_possible=True,

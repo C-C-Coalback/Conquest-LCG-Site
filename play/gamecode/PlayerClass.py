@@ -2212,6 +2212,7 @@ class Player:
             if pla == planet_pos:
                 if pos == unit_pos:
                     self.game.last_defender_position = (num, pla, -1)
+                    self.game.last_defender_id = -1
                 if pos > unit_pos:
                     pos -= 1
                     self.game.last_defender_position = (num, pla, pos)
@@ -2974,6 +2975,16 @@ class Player:
             if self.get_resources() < resources_to_spend:
                 return False
         return True
+
+    def get_location_of_unit_given_id(self, id_value):
+        for i in range(len(self.headquarters)):
+            if self.get_id_given_pos(-2, i) == id_value:
+                return -2, i
+        for i in range(7):
+            for j in range(len(self.cards_in_play[i + 1])):
+                if self.get_id_given_pos(i, j) == id_value:
+                    return i, j
+        return -1, -1
 
     def get_id_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:

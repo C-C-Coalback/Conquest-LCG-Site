@@ -105,6 +105,7 @@ async def declare_defender(self, name, game_update_string):
                             self.last_defender_position = (secondary_player.number,
                                                            self.defender_planet,
                                                            self.defender_position)
+            self.last_defender_id = secondary_player.get_id_given_pos(self.defender_planet, self.defender_position)
             if can_continue and self.shadow_thorns_body_allowed:
                 if secondary_player.search_attachments_at_pos(
                         self.defender_planet, self.defender_position,

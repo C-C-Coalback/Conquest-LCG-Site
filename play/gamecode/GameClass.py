@@ -171,6 +171,8 @@ class Game:
         self.defender_position = -1
         self.p1_has_warlord = False
         self.p2_has_warlord = False
+        self.last_defender_id = -1
+        self.catachan_devils_damage_queued = False
         self.allow_damage_abilities_defender = True
         self.damage_abilities_defender_active = False
         self.debug_mode = None
@@ -4043,6 +4045,8 @@ class Game:
                         if self.attacker_position == i:
                             self.attacker_planet = -1
                             self.attacker_position = -1
+                            self.catachan_devils_damage_queued = False
+                            self.last_defender_id = -1
                             if self.attack_being_resolved:
                                 self.attack_resolution_cleanup = True
                                 self.attack_being_resolved = False
@@ -8102,6 +8106,12 @@ class Game:
                 if self.p2.castellan_crowe_relevant:
                     self.choice_context = "Use Psychic Ward?"
                     await self.send_update_message("Switched to offering Psychic Ward")
+        if self.catachan_devils_damage_queued and self.safety_check():
+            self.catachan_devils_damage_queued = False
+            attacker, defender = self.get_players_given_name(self.player_with_combat_turn)
+            def_pla, def_pos = defender.get_location_of_unit_given_id(self.last_defender_id)
+            if def_pla != -1:
+                await self.update_game_event(attacker.name_player, ["IN_PLAY", defender.get_number(), str(def_pla), str(def_pos)], same_thread=True)
         if not same_thread:
             await self.update_game_event("", [], same_thread=True)
             await self.send_everything()
