@@ -4534,6 +4534,7 @@ class Player:
                     if headquarters_list[i].get_ability(bloodied_relevant=True) == "Commander Shadowsun":
                         self.game.create_reaction("Commander Shadowsun", self.name_player,
                                                   (int(self.number), planet_pos - 1, -1))
+                    self.headquarters[i].unit_just_committed = True
                     self.move_unit_to_planet(-2, i, planet_pos - 1, card_effect=False)
                     last_element_index = len(self.cards_in_play[planet_pos]) - 1
                     if self.get_ability_given_pos(planet_pos - 1, last_element_index) == "Ardent Auxiliaries":
@@ -5614,6 +5615,7 @@ class Player:
                 for j in range(len(self.headquarters[i].get_attachments())):
                     self.headquarters[i].get_attachments()[j].set_once_per_round_used(False)
                 self.headquarters[i].area_effect_eor = 0
+                self.headquarters[i].unit_just_committed = False
                 self.headquarters[i].brutal_eor = False
                 self.headquarters[i].flying_eor = False
                 self.headquarters[i].armorbane_eor = False
@@ -5636,6 +5638,7 @@ class Player:
                 for k in range(len(self.cards_in_play[i + 1][j].get_attachments())):
                     self.cards_in_play[i + 1][j].get_attachments()[k].set_once_per_round_used(False)
                 self.cards_in_play[i + 1][j].area_effect_eor = 0
+                self.cards_in_play[i + 1][j].unit_just_committed = False
                 self.cards_in_play[i + 1][j].brutal_eor = False
                 self.cards_in_play[i + 1][j].flying_eor = False
                 self.cards_in_play[i + 1][j].armorbane_eor = False

@@ -2974,10 +2974,12 @@ async def start_resolving_reaction(self, name, game_update_string):
             num_warlords = 0
             for k in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 if primary_player.get_card_type_given_pos(planet_pos, k) == "Warlord" or primary_player.name_player in primary_player.cards_in_play[planet_pos + 1][k].hit_by_frenzied_wulfen_names:
-                    num_warlords += 1
+                    if primary_player.cards_in_play[planet_pos + 1][k].unit_just_committed:
+                        num_warlords += 1
             for k in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 if secondary_player.get_card_type_given_pos(planet_pos, k) == "Warlord" or primary_player.name_player in secondary_player.cards_in_play[planet_pos + 1][k].hit_by_frenzied_wulfen_names:
-                    num_warlords += 1
+                    if secondary_player.cards_in_play[planet_pos + 1][k].unit_just_committed:
+                        num_warlords += 1
             if num_warlords < 2:
                 self.delete_reaction()
         elif current_reaction == "Seekers of Pleasure":

@@ -23,6 +23,7 @@ class Card:
         self.card_type = card_type
         self.valid_target_vow_of_honor = False
         self.is_unit = False
+        self.unit_just_committed = False
         if self.card_type == "Army" or self.card_type == "Warlord"\
                 or self.card_type == "Token" or self.card_type == "Synapse":
             self.is_unit = True
