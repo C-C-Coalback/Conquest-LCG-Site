@@ -108,6 +108,16 @@
         <div>No completed games recorded yet.</div>
         {% endif %}
     </div>
+    <br>
+    <div>
+        <h2>Delete Profile</h2>
+        <p>(Deletes your account and all saved account data.)</p>
+        <form method="post" action="/accounts/delete_profile/"
+              onsubmit="return confirm('Are you sure you want to delete your profile? This cannot be undone.');">
+            {% csrf_token %}
+            <button type="submit">Delete Profile</button>
+        </form>
+    </div>
     {% else %}
     <h2>You are not logged in.</h2>
     {% endif %}

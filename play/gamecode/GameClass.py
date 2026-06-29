@@ -18,6 +18,7 @@ import sys
 from . import ValidMovesFinder
 from . import Commands
 from .. import profile_records
+from channels.layers import get_channel_layer
 
 
 class Game:
@@ -682,14 +683,26 @@ class Game:
             return True
         return False
 
+    async def _broadcast_to_game_group(self, message):
+        """Broadcasts a message to all websocket clients in this game's room group."""
+        channel_layer = get_channel_layer()
+        if channel_layer is None:
+            return
+        await channel_layer.group_send(
+            f"play_{self.game_id}",
+            {"type": "chat.message", "message": message}
+        )
+
     async def send_update_message(self, message):
         """
         Sends a message from the server to all users in the current room.
 
         :param message: string containing the message.
         """
-        if self.game_sockets:
-            await self.game_sockets[0].receive_game_update(message)
+        if message.startswith("GAME_INFO"):
+            await self._broadcast_to_game_group(message)
+        else:
+            await self._broadcast_to_game_group("server: " + message)
 
     def reset_action_data(self):
         """
@@ -1037,8 +1050,9 @@ class Game:
                     active_player = self.name_1
                 info_string += active_player + "/"
             else:
-                if (self.mode == "Normal" and (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action)
-                        and self.bot_is_present and self.check_style_of_bot() != "ARG"):
+                if self.mode == "Normal" and (
+                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) \
+                        and self.check_style_of_bot() != "ARG" and self.bot_is_present:
                     info_string += self.get_action_window_between_combat_turns_player() + "/"
                 else:
                     info_string += self.player_with_combat_turn + "/"
@@ -3188,7 +3202,7 @@ class Game:
             message = name + ": " + "/".join(message)
             print("receive:", message)
             self.chat_messages.append(message)
-            await self.game_sockets[0].broadcast_chat_message(message)
+            await self._broadcast_to_game_group(message)
 
     async def quick_battle_ability_resolution(self, name, game_update_string, winner: PlayerClass.Player, loser: PlayerClass.Player):
         planet_pos = self.last_planet_checked_for_battle

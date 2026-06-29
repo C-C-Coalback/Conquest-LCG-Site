@@ -176,7 +176,7 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
                                     await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                                       "Enslaved faction does not match faction of unit.")
                             else:
-                                await self.game_sockets[0].receive_game_update(
+                                await self.send_update_message(
                                     "Mind Shackle Scarab on own unit not supported"
                                 )
                             self.action_cleanup()

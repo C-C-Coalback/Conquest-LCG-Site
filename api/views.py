@@ -1,9 +1,10 @@
 import json
+from pathlib import Path
 from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from play.consumers import create_bot_game, get_active_games, get_lobbies, persist_runtime_state
+from play.consumers import create_bot_game, get_active_games, get_lobbies, join_lobby_for_player, persist_runtime_state
 from play import turn_notifier
 from decks.consumers import deck_check_and_save
 import os
@@ -33,6 +34,47 @@ def _extract_request_data(request):
     if not data:
         data = request.POST.dict()
     return data
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_SKILLS_ROOT = _PROJECT_ROOT / "skills"
+_SKILL_FILENAMES = {"skill.md", "skills.md"}
+
+
+def _collect_skill_files():
+    if not _SKILLS_ROOT.exists():
+        return []
+    discovered_files = []
+    for markdown_file in _SKILLS_ROOT.rglob("*.md"):
+        if markdown_file.name.lower() in _SKILL_FILENAMES:
+            discovered_files.append(markdown_file)
+    discovered_files.sort(key=lambda file_path: str(file_path.relative_to(_SKILLS_ROOT)))
+    return discovered_files
+
+
+def _serialize_skill_file(skill_file_path, include_content=True):
+    relative_repo_path = skill_file_path.relative_to(_PROJECT_ROOT).as_posix()
+    relative_skill_path = skill_file_path.relative_to(_SKILLS_ROOT)
+    skill_id = relative_skill_path.parent.as_posix()
+    if not skill_id or skill_id == ".":
+        skill_id = skill_file_path.stem.lower()
+    payload = {
+        "skill_id": skill_id,
+        "filename": skill_file_path.name,
+        "path": relative_repo_path,
+        "content_url": f"/api/skills/{skill_id}/",
+    }
+    if include_content:
+        try:
+            payload["content"] = skill_file_path.read_text(encoding="utf-8")
+        except Exception:
+            payload["content"] = ""
+            payload["content_error"] = "Unable to read skill file"
+    return payload
+
+
+def _get_serialized_skills(include_content=True):
+    skill_files = _collect_skill_files()
+    return [_serialize_skill_file(skill_file_path, include_content=include_content) for skill_file_path in skill_files]
 
 
 def _normalize_username(username):
@@ -377,7 +419,10 @@ def index(request):
     return JsonResponse({
         "status": "success",
         "endpoints": {
+            "skills": "/api/skills/",
+            "skill_detail": "/api/skills/<skill_id>/",
             "lobbies": "/api/lobbies/",
+            "join_lobby": "/api/join_lobby/",
             "games": "/api/games/",
             "create_bot_room": "/api/create_bot_room/",
             "game_state": "/api/game/<game_id>/agent_state/?player=<player_name>",
@@ -392,10 +437,36 @@ def index(request):
     })
 
 
+def skills(request):
+    include_content = str(request.GET.get("include_content", "true")).strip().lower() not in ["0", "false", "no"]
+    serialized_skills = _get_serialized_skills(include_content=include_content)
+    return JsonResponse({
+        "status": "success",
+        "skills": serialized_skills,
+        "count": len(serialized_skills),
+    })
+
+
+def skill_detail(request, skill_id):
+    skill_id = str(skill_id).strip().strip("/")
+    if not skill_id:
+        return _json_error("Missing required path parameter: skill_id", status=400)
+    serialized_skills = _get_serialized_skills(include_content=True)
+    for skill in serialized_skills:
+        if skill["skill_id"] == skill_id:
+            return JsonResponse({
+                "status": "success",
+                "skill": skill,
+            })
+    return _json_error("Skill not found", status=404, skill_id=skill_id)
+
 def lobbies(request):
     active_lobbies, spectator_games = get_lobbies()
     lobby_rows = []
     for i in range(len(active_lobbies[0])):
+        lobby_id = ""
+        if len(active_lobbies) > 9 and i < len(active_lobbies[9]):
+            lobby_id = active_lobbies[9][i]
         lobby_rows.append({
             "host_player": active_lobbies[0][i],
             "guest_player": active_lobbies[1][i],
@@ -406,6 +477,7 @@ def lobbies(request):
             "guest_deck": active_lobbies[6][i],
             "created_at": active_lobbies[7][i],
             "first_player_decider": active_lobbies[8][i],
+            "lobby_id": lobby_id,
         })
     spectator_rows = []
     for game in spectator_games:
@@ -424,6 +496,23 @@ def lobbies(request):
         "lobbies": lobby_rows,
         "spectator_games": spectator_rows,
     })
+
+
+@csrf_exempt
+def join_lobby(request):
+    if request.method != "POST":
+        return _json_error("Only POST requests allowed", status=405)
+    data = _extract_request_data(request)
+    lobby_id = str(data.get("lobby_id", data.get("id", ""))).strip()
+    host_player = str(data.get("host_player", data.get("host", ""))).strip()
+    guest_player = str(data.get("guest_player", data.get("player", ""))).strip()
+    guest_deck = str(data.get("guest_deck", data.get("deck", ""))).strip()
+    join_result = join_lobby_for_player(host_player, guest_player, guest_deck=guest_deck, lobby_id=lobby_id)
+    status_code = int(join_result.get("http_status", 200))
+    response = dict(join_result)
+    if "http_status" in response:
+        del response["http_status"]
+    return JsonResponse(response, status=status_code)
 
 
 def games(request):

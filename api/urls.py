@@ -4,7 +4,10 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("skills/", views.skills, name="skills"),
+    path("skills/<path:skill_id>/", views.skill_detail, name="skill_detail"),
     path("lobbies/", views.lobbies, name="lobbies"),
+    path("join_lobby/", views.join_lobby, name="join_lobby"),
     path("games/", views.games, name="games"),
     path("game/<str:game_id>/agent_state/", views.agent_state, name="agent_state"),
     path("game/<str:game_id>/agent_action/", views.agent_action, name="agent_action"),
