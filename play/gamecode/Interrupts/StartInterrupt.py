@@ -388,7 +388,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
             self.delete_interrupt()
         elif current_interrupt == "Magus Harid":
-            interrupt.misc_player_storage = "RESOLVING MAGUS HARID"
+            self.misc_player_storage = "RESOLVING MAGUS HARID"
             card_name = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             await self.send_update_message("Magus is deploying a " + card_name)
             card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
