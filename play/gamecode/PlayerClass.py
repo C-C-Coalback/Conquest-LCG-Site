@@ -447,8 +447,7 @@ class Player:
     async def conclude_setup_sends(self):
         await self.send_removed_cards()
         await self.send_hand()
-        for i in range(len(self.game.game_sockets)):
-            await self.game.send_update_message("Setup of " + self.name_player + " finished.")
+        await self.game.send_update_message("Setup of " + self.name_player + " finished.")
         await self.send_hq()
         await self.send_units_at_all_planets()
         await self.send_resources()

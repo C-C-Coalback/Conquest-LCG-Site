@@ -4,12 +4,14 @@ from django.contrib.auth.forms import UsernameField
 from django import forms
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.views.decorators.http import require_POST
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import authenticate, get_user_model, password_validation
+from django.contrib.auth import authenticate, get_user_model, password_validation, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 import os
+import shutil
 import update_settings
 
 
@@ -17,16 +19,46 @@ def change_settings(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
             username = request.user.username
-            zoom = str(1.0)
-            volume = str(int(float(request.POST["Volume"])) / 100)
-            cardback = request.POST["Cardback"]
+            raw_volume = request.POST.get("Volume", "100")
+            try:
+                volume_percent = float(raw_volume)
+            except (TypeError, ValueError):
+                volume_percent = 100.0
+            volume_percent = max(0.0, min(100.0, volume_percent))
+            volume = str(volume_percent / 100)
+            cardback = request.POST.get("Cardback")
             if not cardback:
                 cardback = None
-            background = request.POST["Background"]
+            background = request.POST.get("Background")
             if not background:
                 background = None
             update_settings.update_settings(username, volume=volume, cardback=cardback, background=background)
     return redirect("/settings/")
+
+@require_POST
+def delete_profile(request):
+    if not request.user.is_authenticated:
+        return redirect("/settings/")
+    user = request.user
+    username = user.username
+    base_dir = os.getcwd()
+    logout(request)
+    paths_to_remove = [
+        os.path.join(base_dir, "user_preferences_storage", username + ".json"),
+        os.path.join(base_dir, "user_preferences_storage", username + ".txt"),
+        os.path.join(base_dir, "media", username + ".jpg"),
+        os.path.join(base_dir, "decks", "DeckStorage", username),
+    ]
+    for path in paths_to_remove:
+        try:
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            elif os.path.exists(path):
+                os.remove(path)
+        except OSError:
+            pass
+    user.delete()
+    return redirect("/")
 
 
 class CustomBaseUserCreationForm(forms.ModelForm):

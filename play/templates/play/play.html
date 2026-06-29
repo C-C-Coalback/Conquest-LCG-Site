@@ -301,14 +301,17 @@
 
     const roomName = JSON.parse(document.getElementById('game-id').textContent);
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
-        const gameSocket = new WebSocket(
-	    ws_scheme
-            + '://'
-            + window.location.host
-            + '/ws/play/'
-            + roomName
-            + '/'
-        );
+        function buildGameSocketUrl() {
+            return ws_scheme
+                + '://'
+                + window.location.host
+                + '/ws/play/'
+                + roomName
+                + '/';
+        }
+
+        const gameSocket = new WebSocket(buildGameSocketUrl());
+        window.gameSocket = gameSocket;
 
         var current_zoom = 1;
 
@@ -469,6 +472,229 @@
         var hover_preview_scale_percent = 100;
         var choice_context_hover_request_id = 0;
         var current_planet_names = ["", "", "", "", "", "", ""];
+        var helper_text_vertical_offset_px = 0;
+        var socket_recovery_scheduled = false;
+        var socket_reconnect_delay_ms = 1200;
+        var socket_recovery_timeout_id = null;
+        var socket_disconnect_notice_shown = false;
+        var socket_reconnect_attempt_count = 0;
+        var automated_state_sync_in_flight = false;
+        var automated_state_sync_timeout_id = null;
+        var automated_state_last_sync_at_ms = 0;
+        var automated_state_sync_min_interval_ms = 350;
+        var api_action_fallback_in_flight = false;
+
+        function reconnectGameSocket() {
+            var activeSocket = window.gameSocket;
+            if (activeSocket && (activeSocket.readyState === WebSocket.OPEN || activeSocket.readyState === WebSocket.CONNECTING)) {
+                return;
+            }
+            var newSocket = new WebSocket(buildGameSocketUrl());
+            if (activeSocket) {
+                newSocket.onopen = activeSocket.onopen;
+                newSocket.onmessage = activeSocket.onmessage;
+                newSocket.onclose = activeSocket.onclose;
+            }
+            window.gameSocket = newSocket;
+        }
+
+        function sendGameSocketMessage(message_text) {
+            var activeSocket = window.gameSocket;
+            if (!activeSocket || activeSocket.readyState !== WebSocket.OPEN) {
+                scheduleSocketRecovery(`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
+                if (!activeSocket || activeSocket.readyState === WebSocket.CLOSED) {
+                    reconnectGameSocket();
+                }
+                scheduleAutomatedStateSync(120);
+                return false;
+            }
+            try {
+                activeSocket.send(JSON.stringify({
+                    'message': message_text
+                }));
+                return true;
+            } catch (error) {
+                console.debug("Socket send failed", error);
+                scheduleSocketRecovery(`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
+                reconnectGameSocket();
+                scheduleAutomatedStateSync(120);
+                return false;
+            }
+        }
+
+        function isApiFallbackEligibleActionToken(action_token) {
+            if (!action_token || action_token === "action-button") {
+                return false;
+            }
+            if (isPassToken(action_token)) {
+                return true;
+            }
+            if (action_token.startsWith("SPECIAL_ACTION_")) {
+                return true;
+            }
+            if (action_token.includes("/")) {
+                return true;
+            }
+            return false;
+        }
+
+        async function attemptApiActionFallback(action_token) {
+            if (!isApiFallbackEligibleActionToken(action_token)) {
+                return false;
+            }
+            if (api_action_fallback_in_flight) {
+                return false;
+            }
+            api_action_fallback_in_flight = true;
+            try {
+                const fallback_response = await fetch(
+                    '/api/game/' + roomName + '/agent_action/',
+                    {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            player: "{{ user.username }}",
+                            action: action_token
+                        })
+                    }
+                );
+                if (!fallback_response.ok) {
+                    return false;
+                }
+                const fallback_payload = await fallback_response.json();
+                if (!fallback_payload || fallback_payload.status !== "success") {
+                    return false;
+                }
+                if (fallback_payload.game) {
+                    applyAutomatedStateSnapshot(fallback_payload.game);
+                }
+                scheduleAutomatedStateSync(120);
+                return true;
+            } catch (error) {
+                console.debug("API action fallback failed", error);
+                return false;
+            } finally {
+                api_action_fallback_in_flight = false;
+            }
+        }
+
+        function scheduleSocketRecovery(disconnect_warning_text) {
+            var textarea = document.getElementById('chat-log');
+            var reconnect_notice = document.getElementById('socket-reconnect-notice');
+            if (!socket_disconnect_notice_shown && !reconnect_notice) {
+                socket_disconnect_notice_shown = true;
+                var warning_html = disconnect_warning_text || `<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`;
+                if (disconnect_warning_text) {
+                    warning_html = disconnect_warning_text;
+                }
+                textarea.innerHTML += (`<span id="socket-reconnect-notice">` + warning_html + `<b style="color: orange"> Reconnecting...</b></span><br>`);
+            }
+            if (!socket_recovery_scheduled) {
+                socket_recovery_scheduled = true;
+                if (socket_recovery_timeout_id !== null) {
+                    window.clearTimeout(socket_recovery_timeout_id);
+                }
+                var next_reconnect_delay_ms = Math.min(
+                    Math.round(socket_reconnect_delay_ms * Math.pow(1.6, socket_reconnect_attempt_count)),
+                    10000
+                );
+                socket_recovery_timeout_id = window.setTimeout(function() {
+                    socket_recovery_scheduled = false;
+                    socket_reconnect_attempt_count += 1;
+                    reconnectGameSocket();
+                    socket_recovery_timeout_id = null;
+                }, next_reconnect_delay_ms);
+            }
+            textarea.scrollTop = textarea.scrollHeight;
+        }
+
+        function setChoicePanelToNothingHere() {
+            var choice_collapse = document.getElementById("search-collapse");
+            if (!choice_collapse) {
+                return;
+            }
+            choice_collapse.innerHTML = `<div id="choices-container"><div id="header-choices-container">Nothing here</div></div>`;
+            choice_collapse.style.maxWidth = `10vw`;
+            choice_collapse.style.minWidth = `10vw`;
+        }
+
+        function applyAutomatedStateSnapshot(game_snapshot) {
+            if (!game_snapshot) {
+                return;
+            }
+            const turn_snapshot = game_snapshot.turn || {};
+            const interaction_snapshot = game_snapshot.interaction || {};
+            const search_and_choices_snapshot = game_snapshot.search_and_choices || {};
+
+            automated_required_action = String(turn_snapshot.required_action_type || "");
+            automated_waited_on = String(turn_snapshot.active_player || "");
+            automated_legal_actions = Array.isArray(interaction_snapshot.legal_actions)
+                ? interaction_snapshot.legal_actions.map((entry) => String(entry))
+                : [];
+
+            if (automated_required_action === "Choice") {
+                automated_misc_type = "CHOICE";
+                automated_misc_details = String(search_and_choices_snapshot.choice_context || "");
+            } else {
+                automated_misc_type = "";
+                automated_misc_details = "";
+            }
+
+            const has_choices = Array.isArray(search_and_choices_snapshot.choices_available)
+                && search_and_choices_snapshot.choices_available.length > 0;
+            const has_search_cards = Array.isArray(search_and_choices_snapshot.search_cards)
+                && search_and_choices_snapshot.search_cards.length > 0;
+            if (!has_choices && !has_search_cards) {
+                setChoicePanelToNothingHere();
+            }
+            renderInfoBox();
+        }
+
+        async function syncAutomatedStateFromApi() {
+            if (automated_state_sync_in_flight) {
+                return;
+            }
+            const now_ms = Date.now();
+            const elapsed_since_last_sync = now_ms - automated_state_last_sync_at_ms;
+            if (elapsed_since_last_sync < automated_state_sync_min_interval_ms) {
+                const retry_delay_ms = automated_state_sync_min_interval_ms - elapsed_since_last_sync + 30;
+                scheduleAutomatedStateSync(retry_delay_ms);
+                return;
+            }
+            automated_state_sync_in_flight = true;
+            automated_state_last_sync_at_ms = now_ms;
+            try {
+                const state_response = await fetch(
+                    '/api/game/' + roomName + '/agent_state/?player=' + encodeURIComponent("{{ user.username }}"),
+                    { credentials: 'same-origin' }
+                );
+                if (!state_response.ok) {
+                    return;
+                }
+                const state_payload = await state_response.json();
+                if (!state_payload || state_payload.status !== "success" || !state_payload.game) {
+                    return;
+                }
+                applyAutomatedStateSnapshot(state_payload.game);
+            } catch (error) {
+                console.debug("Automated state sync failed", error);
+            } finally {
+                automated_state_sync_in_flight = false;
+            }
+        }
+
+        function scheduleAutomatedStateSync(delay_ms = 220) {
+            if (automated_state_sync_timeout_id !== null) {
+                window.clearTimeout(automated_state_sync_timeout_id);
+            }
+            automated_state_sync_timeout_id = window.setTimeout(function() {
+                automated_state_sync_timeout_id = null;
+                syncAutomatedStateFromApi();
+            }, delay_ms);
+        }
 
         function escapeHtml(text) {
             if (text === undefined || text === null) {
@@ -612,6 +838,65 @@
             return false;
         }
 
+        function normalizeInfoOwnerName(name_text) {
+            if (name_text === undefined || name_text === null) {
+                return "";
+            }
+            var normalized_name = String(name_text).trim();
+            if (!normalized_name) {
+                return "";
+            }
+            var lowered_name = normalized_name.toLowerCase();
+            if (lowered_name === "unspecified" || lowered_name === "none") {
+                return "";
+            }
+            while (normalized_name.endsWith(".")) {
+                normalized_name = normalized_name.slice(0, -1).trim();
+            }
+            return normalized_name;
+        }
+
+        function inferInfoBoxOwnerFromRows(info_rows) {
+            if (!info_rows || info_rows.length === 0) {
+                return "";
+            }
+            var owner_prefixes = [
+                "User:",
+                "Active:",
+                "Active (RANGED):",
+                "Action Window:",
+                "Shield:",
+                "Nullify:",
+                "Deepstrike:"
+            ];
+            for (var i = 0; i < info_rows.length; i++) {
+                var row_text = String(info_rows[i] || "").trim();
+                if (!row_text) {
+                    continue;
+                }
+                for (var j = 0; j < owner_prefixes.length; j++) {
+                    var owner_prefix = owner_prefixes[j];
+                    if (row_text.startsWith(owner_prefix)) {
+                        return normalizeInfoOwnerName(row_text.slice(owner_prefix.length));
+                    }
+                }
+            }
+            return "";
+        }
+
+        function resolveInfoBoxColor(info_box_owner, info_rows) {
+            var my_name = "{{ user.username }}";
+            var inferred_owner = inferInfoBoxOwnerFromRows(info_rows);
+            if (inferred_owner) {
+                return inferred_owner === my_name ? "green" : "red";
+            }
+            var normalized_owner = normalizeInfoOwnerName(info_box_owner);
+            if (normalized_owner === my_name) {
+                return "green";
+            }
+            return "red";
+        }
+
         function extractPlanetIndexFromActionToken(token) {
             if (!token || isPassToken(token)) {
                 return -1;
@@ -696,8 +981,13 @@
             const myName = "{{ user.username }}";
             const legalActions = automated_legal_actions || [];
             const nonPassActions = legalActions.filter((token) => !isPassToken(token));
-            if (automated_waited_on && automated_waited_on !== myName) {
-                return "Waiting on " + automated_waited_on + " to act.";
+            const inferredOwner = inferInfoBoxOwnerFromRows(latest_info_box_rows);
+            let effectiveWaitedOn = automated_waited_on;
+            if (inferredOwner) {
+                effectiveWaitedOn = inferredOwner;
+            }
+            if (effectiveWaitedOn && effectiveWaitedOn !== myName) {
+                return "Waiting on " + effectiveWaitedOn + " to act.";
             }
             if (automated_required_action === "Action Window Between Combat Turns") {
                 if (nonPassActions.length === 0) {
@@ -1175,16 +1465,11 @@
 
         function showChoiceContextPreview(route_text, is_planet_context, helper_text) {
             if (is_planet_context) {
-                changeDefRotate(route_text);
-                var helper_card = document.getElementById("LargeHelperCard");
-                if (helper_card) {
-                    helper_card.style.width = current_helper_height;
-                    helper_card.style.height = current_helper_width;
-                }
+                changeDefRotateAndHelp(route_text, helper_text, 0);
             } else {
                 changeDef(route_text);
+                setHoverHelperText(helper_text);
             }
-            setHoverHelperText(helper_text);
         }
         function showChoiceContextHelp(choice_context, choice_context_card) {
             if (!hover_preview_enabled) {
@@ -1321,7 +1606,21 @@
             return true;
         }
 
-        gameSocket.onmessage = function(e) {
+        window.gameSocket.onopen = function(e) {
+            socket_recovery_scheduled = false;
+            if (socket_recovery_timeout_id !== null) {
+                window.clearTimeout(socket_recovery_timeout_id);
+                socket_recovery_timeout_id = null;
+            }
+            socket_disconnect_notice_shown = false;
+            socket_reconnect_attempt_count = 0;
+            var reconnect_notice = document.getElementById('socket-reconnect-notice');
+            if (reconnect_notice) {
+                reconnect_notice.remove();
+            }
+            scheduleAutomatedStateSync(120);
+        };
+        window.gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
             if (split_data[0] === "GAME_INFO") {
@@ -1472,21 +1771,37 @@
                         setPlanetAppearances(first_pos_in_play, forced_width, stored_focused_planet);
                     }
                 } else if (split_data[1] === "INFO_BOX") {
-                    var color = "red";
-                    if (split_data[2] === "{{ user.username }}") {
-                        color = "green";
+                    var info_rows = [];
+                    for (var i = 3; i < split_data.length; i++) {
+                        info_rows.push(split_data[i]);
                     }
+                    var color = resolveInfoBoxColor(split_data[2], info_rows);
                     latest_info_box_rows = [];
                     latest_info_box_color = color;
-                    for (var i = 3; i < split_data.length; i++) {
-                        latest_info_box_rows.push(split_data[i]);
+                    for (var i = 0; i < info_rows.length; i++) {
+                        latest_info_box_rows.push(info_rows[i]);
                     }
                     renderInfoBox();
+                    var inferred_info_owner = inferInfoBoxOwnerFromRows(info_rows);
+                    var should_sync_automated_state = !inferred_info_owner;
+                    if (!should_sync_automated_state && automated_waited_on && automated_waited_on !== inferred_info_owner) {
+                        should_sync_automated_state = true;
+                    }
+                    if (should_sync_automated_state) {
+                        scheduleAutomatedStateSync(120);
+                    }
                 } else if (split_data[1] === "AUTOMATED_DATA") {
                     const automatedData = parseAutomatedDataMessage(data.message);
                     if (automatedData !== null) {
                         automated_required_action = automatedData.required;
-                        automated_waited_on = automatedData.waitedOn;
+                        var inferred_info_owner_from_latest_rows = inferInfoBoxOwnerFromRows(latest_info_box_rows);
+                        if (inferred_info_owner_from_latest_rows && automatedData.waitedOn &&
+                                automatedData.waitedOn !== inferred_info_owner_from_latest_rows) {
+                            automated_waited_on = inferred_info_owner_from_latest_rows;
+                            scheduleAutomatedStateSync(120);
+                        } else {
+                            automated_waited_on = automatedData.waitedOn;
+                        }
                         automated_legal_actions = automatedData.actions;
                     }
                     renderInfoBox();
@@ -2086,11 +2401,9 @@
             textarea.scrollTop = textarea.scrollHeight;
         };
 
-        gameSocket.onclose = function(e) {
+        window.gameSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
-            document.querySelector('#chat-log').innerHTML += (`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
-            var textarea = document.getElementById('chat-log');
-            textarea.scrollTop = textarea.scrollHeight;
+            scheduleSocketRecovery(`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
         };
 
         document.querySelector('#chat-message-input').focus();
@@ -2103,9 +2416,7 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            gameSocket.send(JSON.stringify({
-                'message': 'CHAT_MESSAGE/' + message
-            }));
+            sendGameSocketMessage('CHAT_MESSAGE/' + message);
             messageInputDom.value = '';
         };
 
@@ -2118,9 +2429,7 @@
 
         function contextMenuUsage(value) {
             message_to_send = "CONTEXT_MENU/" + value + "/" + active_string_id;
-            gameSocket.send(JSON.stringify({
-                'message': message_to_send
-            }));
+            sendGameSocketMessage(message_to_send);
         }
 
         function hideMenu() {
@@ -2216,13 +2525,30 @@
                     <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Destroy"></li>
                 </ul>`
             }
-            contextMenu.style.left = mouse_x + 'px';
-            var pos_y = mouse_y;
-            if (pos_y > window.screen.availHeight * (3 / 5)) {
+            var click_x = mouse_x;
+            var click_y = mouse_y;
+            if (e && typeof e.clientX === "number") {
+                click_x = e.clientX;
+            }
+            if (e && typeof e.clientY === "number") {
+                click_y = e.clientY;
+            }
+            contextMenu.style.position = "fixed";
+            contextMenu.style.zIndex = "1000";
+            contextMenu.style.display = "block";
+            var menu_rect = contextMenu.getBoundingClientRect();
+            var min_margin = 8;
+            var max_left = Math.max(min_margin, window.innerWidth - menu_rect.width - min_margin);
+            var max_top = Math.max(min_margin, window.innerHeight - menu_rect.height - min_margin);
+            var pos_x = click_x;
+            var pos_y = click_y;
+            if (pos_y > window.innerHeight * (3 / 5)) {
                 pos_y = pos_y - maxDiff;
             }
-            contextMenu.style.top = pos_y + 'px';
-            contextMenu.style.display = "Block";
+            pos_x = Math.max(min_margin, Math.min(pos_x, max_left));
+            pos_y = Math.max(min_margin, Math.min(pos_y, max_top));
+            contextMenu.style.left = pos_x + "px";
+            contextMenu.style.top = pos_y + "px";
         }
 
         function changeHelperSize() {
@@ -2234,14 +2560,46 @@
             applyHoverPreviewSizeSettings();
         }
 
-        function testImageButton(button_id) {
-            var evt = window.event;
-            if (evt.button === 0) {
-                gameSocket.send(JSON.stringify({
-                    'message': 'BUTTON PRESSED/' + button_id
-                }));
+        function isPrimaryPointerButtonEvent(evt) {
+            if (!evt) {
+                return true;
+            }
+            if (typeof evt.button === "number") {
+                return evt.button === 0;
+            }
+            if (typeof evt.which === "number") {
+                return evt.which === 1;
+            }
+            return true;
+        }
+
+        function testImageButton(button_id, evt) {
+            var normalized_event = evt || window.event || null;
+            if (!isPrimaryPointerButtonEvent(normalized_event)) {
+                return;
+            }
+            var sent_over_socket = sendGameSocketMessage('BUTTON PRESSED/' + button_id);
+            if (!sent_over_socket) {
+                attemptApiActionFallback(button_id);
             }
         };
+
+        function isInteractiveDragTarget(target_element) {
+            if (!target_element) {
+                return false;
+            }
+            if (target_element.closest) {
+                var interactive_parent = target_element.closest(
+                    "input, button, select, textarea, option, label, a, [contenteditable='true']"
+                );
+                if (interactive_parent) {
+                    return true;
+                }
+            }
+            var tag_name = target_element.tagName ? target_element.tagName.toLowerCase() : "";
+            return tag_name === "input" || tag_name === "button" || tag_name === "select" ||
+                tag_name === "textarea" || tag_name === "option" || tag_name === "label" || tag_name === "a";
+        }
 
         const dragElements = document.querySelectorAll(".draggable");
 
@@ -2266,13 +2624,9 @@
             element.style.top = newTopValue + `px`;
 
             if (element.id === "info-box") {
-                gameSocket.send(JSON.stringify({
-                    'message': 'UPDATE_INFO_BOX_LOCATION/' + newLeftValue + '/' + newTopValue
-                }));
+                sendGameSocketMessage('UPDATE_INFO_BOX_LOCATION/' + newLeftValue + '/' + newTopValue);
             } else if (element.id === "search-collapse") {
-                gameSocket.send(JSON.stringify({
-                    'message': 'UPDATE_CHOICE_BOX_LOCATION/' + newLeftValue + '/' + newTopValue
-                }));
+                sendGameSocketMessage('UPDATE_CHOICE_BOX_LOCATION/' + newLeftValue + '/' + newTopValue);
             }
         }
 
@@ -2307,9 +2661,7 @@
                     element.style.left = last_initial_hand_pos_x + `px`;
                 } else if (replaced_card_id !== "-1") {
                     if (last_moved_hand_id !== "-1") {
-                        gameSocket.send(JSON.stringify({
-                            'message': 'REARRANGE_HAND/' + last_moved_hand_id + '/' + replaced_card_id
-                        }));
+                        sendGameSocketMessage('REARRANGE_HAND/' + last_moved_hand_id + '/' + replaced_card_id);
                     }
                 }
             } else {
@@ -2337,7 +2689,18 @@
         }
 
         dragElements.forEach((element) => {
+            element.setAttribute("draggable", "false");
+            element.addEventListener("dragstart", (e) => {
+                e.preventDefault();
+            });
             element.addEventListener("mousedown", (e) => {
+                if (e.button !== 0) {
+                    return;
+                }
+                if (isInteractiveDragTarget(e.target)) {
+                    return;
+                }
+                e.preventDefault();
                 const onMove = (event) => onMouseDrag(event, element);
 
                 document.addEventListener("mousemove", onMove);
@@ -2399,7 +2762,7 @@
             preview.style.pointerEvents = "none";
             preview.style.flexDirection = "column";
             preview.style.alignItems = "flex-start";
-            preview.style.gap = "2px";
+            preview.style.gap = "0";
             preview.style.overflow = "visible";
             helper.style.position = "relative";
             helper.style.left = "0";
@@ -2420,7 +2783,7 @@
             helper.style.maxHeight = "28vh";
             helper.style.overflowY = "auto";
             helper.style.pointerEvents = "none";
-            helper.style.marginTop = "0";
+            helper.style.marginTop = helper_text_vertical_offset_px.toString() + "px";
             helperCard.style.position = "relative";
             helperCard.style.top = "0";
             helperCard.style.right = "0";
@@ -2428,6 +2791,7 @@
             helperCard.style.display = "block";
             helperCard.style.pointerEvents = "none";
             helperCard.style.cursor = "default";
+            helperCard.style.objectFit = "contain";
         }
 
         function updateHoverPreviewPosition() {
@@ -2477,11 +2841,11 @@
 
         function clearHoverHelperText() {
             var helper = document.getElementById("helper-text-box");
+            helper_text_vertical_offset_px = 0;
             helper.style.display = "none";
             helper.innerHTML = "";
         }
-
-        function setHoverHelperText(help_text, highlight_retreat=false) {
+        function setHoverHelperText(help_text, highlight_retreat=false, helper_offset_px=0) {
             if (!hover_preview_enabled) {
                 clearHoverHelperText();
                 return;
@@ -2495,6 +2859,7 @@
                 clearHoverHelperText();
                 return;
             }
+            helper_text_vertical_offset_px = helper_offset_px;
             help_text = help_text.replaceAll("\n", "<br>");
             if (highlight_retreat) {
                 help_text = help_text.replaceAll("RETREAT", `<b style="color:red; font-size:x-large;">RETREAT</b>`);
@@ -2535,6 +2900,7 @@
                 helperCard = document.getElementById("LargeHelperCard");
                 helperCard.src=og_image_src;
                 resetHoverPreviewCardRotation();
+                helperCard.style.objectFit = "contain";
                 helperCard.style.width = current_helper_width;
                 helperCard.style.height = current_helper_height;
                 showHoverPreview();
@@ -2548,6 +2914,7 @@
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
             resetHoverPreviewCardRotation();
+            helperCard.style.objectFit = "contain";
             helperCard.style.width = current_helper_width;
             helperCard.style.height = current_helper_height;
             clearHoverHelperText();
@@ -2573,8 +2940,9 @@
             } else {
                 resetHoverPreviewCardRotation();
             }
+            helperCard.style.objectFit = "contain";
             if (is_planet_image) {
-                helperCard.style.width = current_helper_width;
+                helperCard.style.width = "auto";
                 helperCard.style.height = current_helper_height;
             } else if (helper_is_large === "T") {
                 helperCard.style.width = current_helper_height;
@@ -2587,21 +2955,22 @@
             showHoverPreview();
         }
 
-        function changeDefRotateAndHelp(image_src, help_text) {
+        function changeDefRotateAndHelp(image_src, help_text, helper_offset_px=-34) {
             var og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
             rotateHoverPreviewCardCounterClockwise();
-            helperCard.style.width = current_helper_width;
+            helperCard.style.objectFit = "contain";
+            helperCard.style.width = "auto";
             helperCard.style.height = current_helper_height;
             showHoverPreview();
-            setHoverHelperText(help_text);
+            setHoverHelperText(help_text, false, helper_offset_px);
         }
 
         function changeDefAndHelp(image_src, help_text) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             changeDef(og_image_src);
-            setHoverHelperText(help_text, highlight_retreat=true);
+            setHoverHelperText(help_text, true);
         }
 
         function changeDefOut() {

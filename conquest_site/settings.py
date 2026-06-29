@@ -55,13 +55,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'conquest_site.urls'
@@ -133,11 +133,11 @@ USE_TZ = True
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -163,13 +163,31 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
 ASGI_APPLICATION = "conquest_site.asgi.application"
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-            "capacity": 1500,
-            "expiry": 10
+_channel_redis_host = os.environ.get("CHANNEL_REDIS_HOST", "127.0.0.1")
+_channel_redis_port = int(os.environ.get("CHANNEL_REDIS_PORT", "6379"))
+_force_memory_channels = os.environ.get("USE_INMEMORY_CHANNEL_LAYER", "").lower() in ["1", "true", "yes"]
+_redis_available_for_channels = False
+if not _force_memory_channels:
+    try:
+        with socket.create_connection((_channel_redis_host, _channel_redis_port), timeout=0.25):
+            _redis_available_for_channels = True
+    except OSError:
+        _redis_available_for_channels = False
+
+if _redis_available_for_channels:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(_channel_redis_host, _channel_redis_port)],
+                "capacity": 1500,
+                "expiry": 10
+            },
         },
-    },
-}
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }

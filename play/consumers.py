@@ -3,6 +3,7 @@ import random
 import string
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.layers import get_channel_layer
 from .gamecode import GameClass
 import os
 from .gamecode import Initfunctions
@@ -29,7 +30,7 @@ planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 blackstone_errata_cards_array = Initfunctions.init_blackstone_errata_cards()
 
-active_lobbies = [[], [], [], [], [], [], [], [], []]
+active_lobbies = [[], [], [], [], [], [], [], [], [], []]
 spectator_games = []  # Format: (p_one_name, p_two_name, game_id, end_time)
 active_games = []
 players_in_lobby = []
@@ -54,6 +55,36 @@ _runtime_state_lock = threading.RLock()
 _runtime_state_loaded = False
 _runtime_state_loading = False
 _runtime_state_version = 1
+_cleaned_play_room_groups = set()
+_cleaned_play_room_groups_lock = threading.RLock()
+
+
+def _maybe_clear_stale_play_room_group(channel_layer, room_group_name):
+    if channel_layer is None or not room_group_name or not room_group_name.startswith("play_"):
+        return
+    if channel_layer.__class__.__name__ != "RedisChannelLayer":
+        return
+    with _cleaned_play_room_groups_lock:
+        if room_group_name in _cleaned_play_room_groups:
+            return
+        _cleaned_play_room_groups.add(room_group_name)
+    try:
+        import redis
+        redis_host = os.environ.get("CHANNEL_REDIS_HOST", "127.0.0.1")
+        redis_port = int(os.environ.get("CHANNEL_REDIS_PORT", "6379"))
+        redis_prefix = getattr(channel_layer, "prefix", "asgi")
+        if isinstance(redis_prefix, bytes):
+            redis_prefix = redis_prefix.decode("utf-8")
+        redis_group_key = f"{redis_prefix}:group:{room_group_name}"
+        redis_client = redis.Redis(
+            host=redis_host,
+            port=redis_port,
+            socket_connect_timeout=0.25,
+            socket_timeout=0.25,
+        )
+        redis_client.delete(redis_group_key)
+    except Exception:
+        pass
 
 
 def _write_runtime_error(trace_text):
@@ -200,6 +231,7 @@ def _serialize_current_runtime_state():
 
 def persist_runtime_state():
     _ensure_runtime_state_loaded()
+    _ensure_lobby_id_column()
     with _runtime_state_lock:
         try:
             runtime_state = _serialize_current_runtime_state()
@@ -367,6 +399,7 @@ def prune_spectator_games():
 
 def get_lobbies():
     _ensure_runtime_state_loaded()
+    _ensure_lobby_id_column()
     prune_spectator_games()
     return active_lobbies, spectator_games
 
@@ -374,6 +407,167 @@ def get_lobbies():
 def get_active_games():
     _ensure_runtime_state_loaded()
     return active_games
+
+
+def _generate_unique_lobby_id():
+    characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    known_ids = set()
+    if len(active_lobbies) > 9:
+        for i in range(len(active_lobbies[9])):
+            lobby_id = str(active_lobbies[9][i]).strip()
+            if lobby_id:
+                known_ids.add(lobby_id)
+    for i in range(len(active_games)):
+        known_ids.add(active_games[i].game_id)
+    while True:
+        generated_id = ''.join(random.choice(characters) for _ in range(16))
+        if generated_id not in known_ids:
+            return generated_id
+
+
+def _ensure_lobby_id_column():
+    if len(active_lobbies) < 10:
+        active_lobbies.append([])
+    while len(active_lobbies[9]) < len(active_lobbies[0]):
+        active_lobbies[9].append(_generate_unique_lobby_id())
+
+
+def _build_lobby_create_message(index):
+    _ensure_lobby_id_column()
+    return "Create lobby/" + active_lobbies[0][index] + "/" + active_lobbies[1][index] + "/" + \
+           active_lobbies[2][index] + "/" + active_lobbies[3][index] + "/" + active_lobbies[4][index] + "/" + \
+           active_lobbies[7][index] + "/" + active_lobbies[8][index] + "/" + active_lobbies[9][index]
+
+
+def _remove_lobby_at_index(index):
+    for i in range(len(active_lobbies)):
+        del active_lobbies[i][index]
+
+
+def _find_lobby_index_by_identifier(identifier):
+    _ensure_lobby_id_column()
+    identifier = str(identifier).strip()
+    if not identifier:
+        return -1
+    for i in range(len(active_lobbies[0])):
+        if active_lobbies[9][i] == identifier:
+            return i
+        if active_lobbies[0][i] == identifier:
+            return i
+    return -1
+
+def _serialize_lobby_row(index):
+    _ensure_lobby_id_column()
+    return {
+        "host_player": active_lobbies[0][index],
+        "guest_player": active_lobbies[1][index],
+        "visibility": active_lobbies[2][index],
+        "errata": active_lobbies[3][index],
+        "sector": active_lobbies[4][index],
+        "host_deck": active_lobbies[5][index],
+        "guest_deck": active_lobbies[6][index],
+        "created_at": active_lobbies[7][index],
+        "first_player_decider": active_lobbies[8][index],
+        "lobby_id": active_lobbies[9][index],
+    }
+
+
+def _broadcast_lobby_state_update():
+    channel_layer = get_channel_layer()
+    if channel_layer is None:
+        return
+    messages = ["Delete lobby"]
+    condition_lobby.acquire()
+    try:
+        _ensure_lobby_id_column()
+        for i in range(len(active_lobbies[0])):
+            messages.append(_build_lobby_create_message(i))
+    finally:
+        condition_lobby.release()
+    try:
+        for message in messages:
+            async_to_sync(channel_layer.group_send)(
+                "lobby", {"type": "chat.message", "message": message}
+            )
+    except Exception:
+        _write_runtime_error(traceback.format_exc())
+
+
+def join_lobby_for_player(host_player, guest_player, guest_deck="", lobby_id=""):
+    _ensure_runtime_state_loaded()
+    _ensure_lobby_id_column()
+    host_player = str(host_player).strip()
+    guest_player = str(guest_player).strip()
+    guest_deck = str(guest_deck).strip()
+    lobby_id = str(lobby_id).strip()
+    if not host_player and not lobby_id:
+        return {"status": "error", "error": "Missing required field: lobby_id (or host_player)", "http_status": 400}
+    if not guest_player:
+        return {"status": "error", "error": "Missing required field: guest_player", "http_status": 400}
+    if host_player == guest_player:
+        return {"status": "error", "error": "Host and guest players must be different", "http_status": 400}
+    updated_lobby = None
+    should_broadcast = False
+    condition_lobby.acquire()
+    try:
+        target_lobby_index = -1
+        if lobby_id:
+            target_lobby_index = _find_lobby_index_by_identifier(lobby_id)
+        if target_lobby_index == -1 and host_player:
+            for i in range(len(active_lobbies[0])):
+                if active_lobbies[0][i] == host_player:
+                    target_lobby_index = i
+                    break
+        if target_lobby_index == -1:
+            return {
+                "status": "error",
+                "error": "Lobby not found",
+                "http_status": 404,
+                "host_player": host_player,
+                "lobby_id": lobby_id
+            }
+        if active_lobbies[2][target_lobby_index] == "Private":
+            return {
+                "status": "error",
+                "error": "Lobby is private and cannot be joined through the public REST endpoint",
+                "http_status": 403,
+                "host_player": active_lobbies[0][target_lobby_index],
+                "lobby_id": active_lobbies[9][target_lobby_index]
+            }
+        current_guest = active_lobbies[1][target_lobby_index]
+        if current_guest and current_guest != guest_player:
+            return {
+                "status": "error",
+                "error": "Lobby already has a guest",
+                "http_status": 409,
+                "host_player": active_lobbies[0][target_lobby_index],
+                "lobby_id": active_lobbies[9][target_lobby_index],
+                "guest_player": current_guest
+            }
+        if current_guest != guest_player:
+            active_lobbies[1][target_lobby_index] = guest_player
+            should_broadcast = True
+        if guest_deck and active_lobbies[6][target_lobby_index] != guest_deck:
+            active_lobbies[6][target_lobby_index] = guest_deck
+            should_broadcast = True
+        updated_lobby = _serialize_lobby_row(target_lobby_index)
+        if should_broadcast:
+            condition_lobby.notify_all()
+    finally:
+        condition_lobby.release()
+    if should_broadcast:
+        _broadcast_lobby_state_update()
+    resolved_host_player = host_player
+    if updated_lobby is not None and not resolved_host_player:
+        resolved_host_player = updated_lobby["host_player"]
+    return {
+        "status": "success",
+        "host_player": resolved_host_player,
+        "guest_player": guest_player,
+        "lobby_id": updated_lobby["lobby_id"] if updated_lobby else lobby_id,
+        "lobby": updated_lobby,
+        "http_status": 200
+    }
 
 
 def create_bot_game(name_bot_1, name_bot_2, game_id, errata="No Errata", sector="Traxis Sector", deck_1="", deck_2="", private=False):
@@ -501,9 +695,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
         for i in range(len(active_lobbies[0])):
-            message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                      + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] +\
-                      "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
+            message = _build_lobby_create_message(i)
             await self.chat_message({"type": "chat.message", "message": message})
         print("CURRENT SPEC")
         print(spectator_games)
@@ -546,6 +738,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         print("receive:", message)
         condition_lobby.acquire()
         condition_games.acquire()
+        _ensure_lobby_id_column()
         if split_message[0] == "Select Deck":
             for i in range(len(active_lobbies[0])):
                 if active_lobbies[0][i] == self.name:
@@ -590,29 +783,19 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             active_lobbies[6].append("")
             active_lobbies[7].append(datetime.datetime.today().strftime("%I:%M%p, %B %d, %Y"))
             active_lobbies[8].append(split_message[5])
+            _ensure_lobby_id_column()
             print(active_lobbies)
             le = len(active_lobbies[0]) - 1
-            split_message[0] += "/" + active_lobbies[0][le] + "/" + active_lobbies[1][le] + \
-                                "/" + active_lobbies[2][le] + "/" + active_lobbies[3][le] + \
-                                "/" + active_lobbies[4][le] + "/" + active_lobbies[7][le] + \
-                                "/" + active_lobbies[8][le]
-            print(split_message[0])
+            message = _build_lobby_create_message(le)
+            print(message)
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "chat.message", "message": split_message[0]}
+                self.room_group_name, {"type": "chat.message", "message": message}
             )
         if message == "Remove lobby":
             i = 0
             while i < len(active_lobbies[0]):
                 if active_lobbies[0][i] == self.name:
-                    del active_lobbies[0][i]
-                    del active_lobbies[1][i]
-                    del active_lobbies[2][i]
-                    del active_lobbies[3][i]
-                    del active_lobbies[4][i]
-                    del active_lobbies[5][i]
-                    del active_lobbies[6][i]
-                    del active_lobbies[7][i]
-                    del active_lobbies[8][i]
+                    _remove_lobby_at_index(i)
                     i += -1
                 i += 1
             print(active_lobbies)
@@ -621,56 +804,67 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 self.room_group_name, {"type": "chat.message", "message": message}
             )
             for i in range(len(active_lobbies[0])):
-                message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/"\
-                          + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
-                          "/" + active_lobbies[7][i]
+                message = _build_lobby_create_message(i)
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
         message = message.split(sep="/")
         if len(message) > 1:
             if message[0] == "Join lobby":
-                for i in range(len(active_lobbies[0])):
-                    if active_lobbies[0][i] == message[1]:
-                        active_lobbies[1][i] = self.name
-                        active_lobbies[6][i] = split_message[2]
+                target_lobby_index = _find_lobby_index_by_identifier(message[1])
+                if target_lobby_index != -1:
+                    active_lobbies[1][target_lobby_index] = self.name
+                    if len(split_message) > 2:
+                        active_lobbies[6][target_lobby_index] = split_message[2]
                 message = "Delete lobby"
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
                 for i in range(len(active_lobbies[0])):
-                    message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
-                              "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
+                    message = _build_lobby_create_message(i)
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
             if message[0] == "Leave lobby":
-                for i in range(len(active_lobbies[0])):
-                    if active_lobbies[0][i] == message[1]:
-                        active_lobbies[1][i] = ""
+                target_lobby_index = _find_lobby_index_by_identifier(message[1])
+                if target_lobby_index != -1 and active_lobbies[1][target_lobby_index] == self.name:
+                    active_lobbies[1][target_lobby_index] = ""
                 message = "Delete lobby"
                 await self.channel_layer.group_send(
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
                 for i in range(len(active_lobbies[0])):
-                    message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i]
+                    message = _build_lobby_create_message(i)
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
             if message[0] == "Start game":
                 print("Code to start game")
-                game_id = ''.join(
-                    random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-                print(game_id)
+                requested_lobby_identifier = ""
+                if len(message) > 1:
+                    requested_lobby_identifier = message[1]
                 first_name = ""
                 second_name = ""
                 game_num = -1
                 for i in range(len(active_lobbies[0])):
-                    if active_lobbies[0][i] == self.name:
+                    if active_lobbies[0][i] == self.name and (
+                        not requested_lobby_identifier or
+                        active_lobbies[0][i] == requested_lobby_identifier or
+                        active_lobbies[9][i] == requested_lobby_identifier
+                    ):
                         first_name = active_lobbies[0][i]
                         second_name = active_lobbies[1][i]
                         game_num = i
+                        break
+                if game_num == -1:
+                    print("No matching lobby found for start game request.")
+                    condition_lobby.notify_all()
+                    condition_lobby.release()
+                    condition_games.notify_all()
+                    condition_games.release()
+                    return None
+                game_id = active_lobbies[9][game_num]
+                print(game_id)
                 errata = active_lobbies[3][game_num]
                 sector = active_lobbies[4][game_num]
                 deck_1 = active_lobbies[5][game_num]
@@ -713,15 +907,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 i = 0
                 while i < len(active_lobbies[0]):
                     if active_lobbies[0][i] == self.name:
-                        del active_lobbies[0][i]
-                        del active_lobbies[1][i]
-                        del active_lobbies[2][i]
-                        del active_lobbies[3][i]
-                        del active_lobbies[4][i]
-                        del active_lobbies[5][i]
-                        del active_lobbies[6][i]
-                        del active_lobbies[7][i]
-                        del active_lobbies[8][i]
+                        _remove_lobby_at_index(i)
                         i += -1
                     i += 1
                 message = "Delete lobby"
@@ -729,9 +915,7 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     self.room_group_name, {"type": "chat.message", "message": message}
                 )
                 for i in range(len(active_lobbies[0])):
-                    message = "Create lobby/" + active_lobbies[0][i] + "/" + active_lobbies[1][i] + "/" \
-                              + active_lobbies[2][i] + "/" + active_lobbies[3][i] + "/" + active_lobbies[4][i] + \
-                              "/" + active_lobbies[7][i] + "/" + active_lobbies[8][i]
+                    message = _build_lobby_create_message(i)
                     await self.channel_layer.group_send(
                         self.room_group_name, {"type": "chat.message", "message": message}
                     )
@@ -811,6 +995,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             if not active_games[game_id_if_exists].game_sockets:
                 active_games[game_id_if_exists].game_sockets.append(self)
         # Join room group
+        _maybe_clear_stale_play_room_group(self.channel_layer, self.room_group_name)
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
