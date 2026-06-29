@@ -191,3 +191,24 @@ else:
             "BACKEND": "channels.layers.InMemoryChannelLayer",
         },
     }
+
+def _env_flag(name, default):
+    return os.environ.get(name, default).strip().lower() in ["1", "true", "yes", "on"]
+
+
+# AI control account policy:
+# - When enforced, AI REST control endpoints may only act as configured account(s).
+# - This limits account sprawl from agents creating/using arbitrary usernames.
+# - A single allowed account can still participate in multiple simultaneous games.
+AI_CONTROL_ENFORCE_ALLOWED_USERNAMES = _env_flag("AI_CONTROL_ENFORCE_ALLOWED_USERNAMES", "true")
+_ai_control_usernames = [
+    username.strip()
+    for username in os.environ.get("AI_CONTROL_ALLOWED_USERNAMES", "basicai").split(",")
+    if username.strip()
+]
+if not _ai_control_usernames:
+    _ai_control_usernames = ["basicai"]
+_ai_control_usernames.append("conqueror")
+_ai_control_usernames.append("conqueror1")
+_ai_control_usernames.append("conqueror2")
+AI_CONTROL_ALLOWED_USERNAMES = tuple(_ai_control_usernames)

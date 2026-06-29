@@ -743,6 +743,140 @@ ability_targets_dictionary = {
             "Ability Type": "Reaction"
         }
     },
+    "Squadron Redeployment": {
+        "Num Stages": 2,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": True,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        },
+        "Type 2": "Planet",
+        "Restrictions 2": {
+            "Non-first": False,
+            "Icons": None,
+            "Not Same Planet": True,
+            "Not Same Planet Unit": False,
+        }
+    },
+    "Command-link Drone": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
+    "Even the Odds": {
+        "Num Stages": 2,
+        "Type 1": "Special",
+        "Restrictions 1": {
+
+        },
+        "Type 2": "In Play",
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
+    "Calculated Strike": {
+        "Num Stages": 1,
+        "Type 1": "Special",
+        "Restrictions 1": {
+
+        },
+    },
+    "Deception": {
+        "Num Stages": 1,
+        "Type 1": "In Play",
+        "Restrictions 1": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": ["Elite"],
+            "Same Planet": False,
+            "Special": False,
+            "Target": True,
+            "Ability Type": "Action"
+        }
+    },
+    "Ambush Platform": {
+        "Num Stages": 2,
+        "Type 1": "Hand",
+        "Restrictions 1": {
+            "Faction": None,
+            "Card Type": "Attachment",
+            "Max Cost": None,
+            "Payment": True,
+            "Payment Details": {
+                "Deploy": True
+            },
+            "Card Enters Play": False,
+        },
+        "Type 2": "In Play",
+        "Restrictions 2": {
+            "Unit Only": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Unique": False,
+            "Ready": False,
+            "Exhaust": False,
+            "Faction": None,
+            "Card Type": None,
+            "Forbidden Card Type": None,
+            "Required Traits": [],
+            "Forbidden Traits": [],
+            "Same Planet": False,
+            "Special": True,
+            "Target": False,
+            "Ability Type": "Action"
+        }
+    },
     "Ferrin": {
         "Num Stages": 1,
         "Type 1": "In Play",
@@ -1226,4 +1360,74 @@ action_ability_starts = {
             "Same Planet": False
         }
     },
+    "Squadron Redeployment": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Must Be Unit": True,
+            "Own Unit": True,
+            "Enemy Unit": False,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Same Planet": False
+        }
+    },
+    "Command-link Drone": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+    },
+    "Even the Odds": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+    },
+    "Calculated Strike": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+    },
+    "Deception": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": True,
+        "Once Per Phase": False,
+        "Ready Required": False,
+        "Exhaust Required": False,
+        "Attributes In Play Card": {
+            "At Planet": True,
+            "At HQ": True,
+            "Must Be Unit": True,
+            "Own Unit": True,
+            "Enemy Unit": True,
+            "Faction": None,
+            "Card Type": "Army",
+            "Forbidden Card Type": None,
+            "Same Planet": False
+        }
+    },
+    "Ambush Platform": {
+        "Special": True,
+        "Requires Hand Card": False,
+        "Requires In Play Card": False,
+        "Once Per Phase": False,
+        "Ready Required": True,
+        "Exhaust Required": False
+    }
 }

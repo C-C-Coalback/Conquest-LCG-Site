@@ -2,6 +2,16 @@ from .AbilityTargetsDictionary import action_ability_starts
 
 
 def detect_possible_actions(game, primary_player, secondary_player, combat_turn_action=False):
+    """
+    Identifies any "Action:" effects that can be played in the current game-state.
+    Does not return more standard elements such as which cards be deployed.
+
+    :param game: the game
+    :param primary_player: player with priority
+    :param secondary_player: other player
+    :param combat_turn_action: whether we are in a combat turn action window
+    :return: possible action locations: list of strings of possible actions
+    """
     possible_action_locations = []
     for i in range(len(primary_player.cards)):
         card = game.preloaded_find_card(primary_player.cards[i])
@@ -25,13 +35,21 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
         card = primary_player.get_card_given_pos(-2, i)
         if card.get_has_action_while_in_play():
             if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
-                print("card has action and right phase")
                 ability = primary_player.get_ability_given_pos(-2, i)
                 if ability in action_ability_starts:
                     prereqs = action_ability_starts[ability]
-                    print("checking if action can start")
                     if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=-2, card=card):
                         possible_action_locations = add_action(possible_action_locations, "HQ/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
+        attachments = primary_player.get_all_attachments_at_pos(-2, i)
+        for k in range(len(attachments)):
+            card = attachments[k]
+            if card.get_has_action_while_in_play():
+                if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
+                    ability = card.get_ability()
+                    if ability in action_ability_starts:
+                        prereqs = action_ability_starts[ability]
+                        if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card, planet_pos=-2, attachment_pos=k):
+                            possible_action_locations = add_action(possible_action_locations, "ATTACHMENT/HQ/" + str(primary_player.number) + "/" + str(i) + "/" + str(k), combat_turn_action=combat_turn_action)
     for i in range(7):
         for j in range(len(primary_player.cards_in_play[i + 1])):
             card = primary_player.get_card_given_pos(i, j)
@@ -44,6 +62,16 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                         print("checking if action can start")
                         if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, planet_pos=i, card=card):
                             possible_action_locations = add_action(possible_action_locations, "IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j), combat_turn_action=combat_turn_action)
+            attachments = primary_player.get_all_attachments_at_pos(i, j)
+            for k in range(len(attachments)):
+                card = attachments[k]
+                if card.get_has_action_while_in_play():
+                    if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
+                        ability = card.get_ability()
+                        if ability in action_ability_starts:
+                            prereqs = action_ability_starts[ability]
+                            if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card, planet_pos=i, attachment_pos=k):
+                                possible_action_locations = add_action(possible_action_locations, "ATTACHMENT/IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j) + "/" + str(k), combat_turn_action=combat_turn_action)
     if combat_turn_action:
         possible_action_locations.append("pass-P1")
     return possible_action_locations
@@ -106,15 +134,25 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
             if primary_player.get_ranged_given_pos(planet_pos, unit_pos):
                 return False
         if action_ability == "Tellyporta Pad":
-            if planet_pos == game.round_number:
+            if planet_pos == game.round_number or not game.planets_in_play_array[game.round_number]:
                 return False
         if action_ability == "Archon's Terror":
             if primary_player.get_unique_given_pos(planet_pos, unit_pos):
                 return False
+        if action_ability == "Squadron Redeployment":
+            if not primary_player.get_ready_given_pos(planet_pos, unit_pos):
+                return False
+            if len(primary_player.get_all_attachments_at_pos(planet_pos, unit_pos)) == 0:
+                return False
+            if planet_pos != -2 and game.count_planets_in_play() < 2:
+                return False
+        if action_ability == "Deception":
+            if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
+                return False
     return True
 
 
-def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos=-1, card=None):
+def check_if_action_can_start(game, action_ability, prereqs, primary_player, secondary_player, planet_pos=-1, card=None, attachment_pos=-1):
     requires_hand_card = prereqs["Requires Hand Card"]
     requires_in_play_card = prereqs["Requires In Play Card"]
     once_per_phase = prereqs["Once Per Phase"]
@@ -151,6 +189,107 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                 card = game.preloaded_find_card(primary_player.discard[i])
                 if card.get_card_type() == "Army" and card.get_faction() == "Eldar":
                     return True
+            return False
+        if action_ability == "Command-link Drone":
+            if primary_player.get_resources() == 0:
+                return False
+            return primary_player.count_units_in_play_all() > 1
+        if action_ability == "Even the Odds":
+            for i in range(len(primary_player.headquarters)):
+                attachments = primary_player.get_all_attachments_at_pos(-2, i)
+                for j in range(len(attachments)):
+                    for k in range(len(primary_player.headquarters)):
+                        if i != k:
+                            if primary_player.check_if_can_attach_card(attachments[j], -2, k):
+                                return True
+                    for k in range(7):
+                        for l in range(len(primary_player.cards_in_play[k + 1])):
+                            if primary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    attachments = primary_player.get_all_attachments_at_pos(i, j)
+                    for k in range(len(attachments)):
+                        for l in range(len(primary_player.headquarters)):
+                            if primary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+                        for l in range(7):
+                            for m in range(len(primary_player.cards_in_play[l + 1])):
+                                if i != l or j != m:
+                                    if primary_player.check_if_can_attach_card(attachments[j], l, m):
+                                        return True
+            for i in range(len(secondary_player.headquarters)):
+                attachments = secondary_player.get_all_attachments_at_pos(-2, i)
+                for j in range(len(attachments)):
+                    for k in range(len(secondary_player.headquarters)):
+                        if i != k:
+                            if secondary_player.check_if_can_attach_card(attachments[j], -2, k):
+                                return True
+                    for k in range(7):
+                        for l in range(len(secondary_player.cards_in_play[k + 1])):
+                            if secondary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+            for i in range(7):
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    attachments = secondary_player.get_all_attachments_at_pos(i, j)
+                    for k in range(len(attachments)):
+                        for l in range(len(secondary_player.headquarters)):
+                            if secondary_player.check_if_can_attach_card(attachments[j], k, l):
+                                return True
+                        for l in range(7):
+                            for m in range(len(secondary_player.cards_in_play[l + 1])):
+                                if i != l or j != m:
+                                    if secondary_player.check_if_can_attach_card(attachments[j], l, m):
+                                        return True
+            return False
+        if action_ability == "Calculated Strike":
+            for i in range(len(secondary_player.headquarters)):
+                if secondary_player.headquarters[i].get_limited():
+                    return True
+                attachments = secondary_player.get_all_attachments_at_pos(-2, i)
+                for k in range(len(attachments)):
+                    if attachments[k].get_limited():
+                        return True
+            for i in range(7):
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    if secondary_player.cards_in_play[i + 1][j].get_limited():
+                        return True
+                    attachments = secondary_player.get_all_attachments_at_pos(i, j)
+                    for k in range(len(attachments)):
+                        if attachments[k].get_limited():
+                            return True
+            return False
+        if action_ability == "Ambush Platform":
+            for a in range(len(primary_player.cards)):
+                attachment_card = primary_player.get_card_in_hand(a)
+                if attachment_card.planet_attachment:
+                    return False
+                not_own_attach = False
+                for i in range(len(primary_player.headquarters)):
+                    if primary_player.check_if_can_attach_card(
+                            attachment_card, -2, i, not_own_attachment=not_own_attach
+                    ):
+                        return True
+                for i in range(7):
+                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                        if primary_player.check_if_can_attach_card(
+                                attachment_card, i, j, not_own_attachment=not_own_attach
+                        ):
+                            return True
+                not_own_attach = True
+                for i in range(len(secondary_player.headquarters)):
+                    if secondary_player.check_if_can_attach_card(
+                            attachment_card, -2, i, not_own_attachment=not_own_attach
+                    ):
+                        return True
+                for i in range(7):
+                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                        if secondary_player.check_if_can_attach_card(
+                                attachment_card, i, j,
+                                not_own_attachment=not_own_attach
+                        ):
+                            return True
+            return False
     if requires_hand_card:
         for i in range(len(primary_player.cards)):
             if check_single_card_in_hand(game, action_ability, prereqs, primary_player, secondary_player, planet_pos, i):

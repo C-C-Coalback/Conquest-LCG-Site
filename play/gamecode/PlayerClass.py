@@ -531,6 +531,10 @@ class Player:
                     cost = cost - available_discounts
                     if cost < best_cost:
                         best_cost = cost
+        if card.get_card_type() == "Attachment":
+            for i in range(len(self.headquarters)):
+                if self.get_ability_given_pos(-2, i) == "Ambush Platform":
+                    best_cost = best_cost - 1
         return best_cost
 
     def determine_playability(self, card_name):
@@ -562,8 +566,6 @@ class Player:
                             if card.get_card_type() == "Attachment":
                                 if card.planet_attachment:
                                     return "playable"
-                                non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre",
-                                                                            "Escort Drone"]
                                 not_own_attach = False
                                 for i in range(len(self.headquarters)):
                                     if self.check_if_can_attach_card(

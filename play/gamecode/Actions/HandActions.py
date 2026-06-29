@@ -1225,14 +1225,12 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
             primary_player = self.p1
         else:
             primary_player = self.p2
-        card = FindCard.find_card(primary_player.cards[int(game_update_string[2])], self.card_array,
-                                  self.cards_dict, self.apoka_errata_cards, self.cards_that_have_errata)
-        if card.get_card_type() == "Attachment" or card.get_ability() == "Gun Drones" or \
-                card.get_ability() == "Shadowsun's Stealth Cadre" or \
-                card.get_ability() == "Escort Drone":
+        card = self.preloaded_find_card(primary_player.cards[int(game_update_string[2])])
+        if card.get_card_type() == "Attachment" or card.get_ability() in ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]:
             if not card.get_limited() or primary_player.can_play_limited:
                 primary_player.aiming_reticle_coords_hand_2 = int(game_update_string[2])
                 primary_player.aiming_reticle_color = "blue"
+                self.action_object.chosen_first_card = True
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Cannot Deploy Card",
                                                   "Already played a Limited card.")

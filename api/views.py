@@ -1,10 +1,13 @@
 import json
 from pathlib import Path
 from asgiref.sync import async_to_sync
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from play.consumers import create_bot_game, get_active_games, get_lobbies, join_lobby_for_player, persist_runtime_state
 from play import turn_notifier
+from decks.consumers import deck_check_and_save
+import os
 
 
 def _json_error(error_message, status=400, **extra):
@@ -72,6 +75,46 @@ def _serialize_skill_file(skill_file_path, include_content=True):
 def _get_serialized_skills(include_content=True):
     skill_files = _collect_skill_files()
     return [_serialize_skill_file(skill_file_path, include_content=include_content) for skill_file_path in skill_files]
+
+
+def _normalize_username(username):
+    return str(username).strip().lower()
+
+
+def _ai_control_is_restricted():
+    return bool(getattr(settings, "AI_CONTROL_ENFORCE_ALLOWED_USERNAMES", False))
+
+
+def _get_allowed_ai_usernames():
+    configured = getattr(settings, "AI_CONTROL_ALLOWED_USERNAMES", ())
+    if isinstance(configured, str):
+        configured = [configured]
+    allowed = set()
+    for username in configured:
+        normalized_username = _normalize_username(username)
+        if normalized_username:
+            allowed.add(normalized_username)
+    return allowed
+
+
+def _validate_ai_control_player(player):
+    if not _ai_control_is_restricted():
+        return None
+    allowed_usernames = _get_allowed_ai_usernames()
+    if not allowed_usernames:
+        return _json_error(
+            "AI control account restriction is enabled but no allowed usernames are configured",
+            status=500,
+        )
+    normalized_player = _normalize_username(player)
+    if normalized_player not in allowed_usernames:
+        return _json_error(
+            "Player is not allowed for AI control endpoints",
+            status=403,
+            player=player,
+            allowed_ai_accounts=sorted(allowed_usernames),
+        )
+    return None
 
 
 def _find_game(game_id):
@@ -386,7 +429,11 @@ def index(request):
             "game_action": "/api/game/<game_id>/agent_action/",
             "game_command": "/api/game/<game_id>/agent_command/",
             "game_webhooks": "/api/games/<game_id>/webhooks/",
-        }
+        },
+        "ai_control_account_policy": {
+            "enforced": _ai_control_is_restricted(),
+            "allowed_usernames": sorted(_get_allowed_ai_usernames()),
+        },
     })
 
 
@@ -498,6 +545,10 @@ def agent_state(request, game_id):
     if game is None:
         return _json_error("Game not found", status=404, game_id=game_id)
     requested_player = request.GET.get("player", "").strip()
+    if requested_player:
+        account_error = _validate_ai_control_player(requested_player)
+        if account_error is not None:
+            return account_error
     return JsonResponse({
         "status": "success",
         "game": _get_game_snapshot(game, requested_player=requested_player),
@@ -516,6 +567,9 @@ def agent_action(request, game_id):
     action = str(data.get("action", "")).strip()
     if not player:
         return _json_error("Missing required field: player")
+    account_error = _validate_ai_control_player(player)
+    if account_error is not None:
+        return account_error
     if player not in [game.name_1, game.name_2]:
         return _json_error("Player is not part of this game", player=player, game_id=game_id)
     if not action:
@@ -561,6 +615,9 @@ def agent_command(request, game_id):
     command = str(data.get("command", "")).strip()
     if not player:
         return _json_error("Missing required field: player")
+    account_error = _validate_ai_control_player(player)
+    if account_error is not None:
+        return account_error
     if player not in [game.name_1, game.name_2]:
         return _json_error("Player is not part of this game", player=player, game_id=game_id)
     if not command:
@@ -634,6 +691,10 @@ def create_bot_room(request):
     try:
         bot_name_1 = data["name1"]
         bot_name_2 = data["name2"]
+        for bot_name in [bot_name_1, bot_name_2]:
+            account_error = _validate_ai_control_player(bot_name)
+            if account_error is not None:
+                return account_error
         game_id = data["id"]
         private = str(data.get("private", "False")).lower() in ["true", "1", "yes"]
         errata = str(data.get("errata", "No Errata"))
@@ -654,6 +715,74 @@ def create_bot_room(request):
             "status": "success",
             "id": game_id
         }
+    except KeyError as e:
+        response = {
+            "status": "error",
+            "error": f"Missing required field: {str(e)}"
+        }
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": "server error 500",
+            "details": str(e)
+        }
+    return JsonResponse(response)
+
+
+@csrf_exempt
+def receive_raw_deck_text(request):
+    if request.method != "POST":
+        return _json_error("Only POST requests allowed", status=405)
+    data = _extract_request_data(request)
+    try:
+        bot_name = data["name"]
+        deck = data["deck_text"]
+        account_error = _validate_ai_control_player(bot_name)
+        if account_error is not None:
+            return account_error
+        print(deck)
+        result_of_saving = deck_check_and_save(bot_name, deck)
+        response = {
+            "status": result_of_saving["message"]
+        }
+    except KeyError as e:
+        response = {
+            "status": "error",
+            "error": f"Missing required field: {str(e)}"
+        }
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": "server error 500",
+            "details": str(e)
+        }
+    return JsonResponse(response)
+
+
+@csrf_exempt
+def request_deck_text_given_name(request):
+    if request.method != "POST":
+        return _json_error("Only POST requests allowed", status=405)
+    data = _extract_request_data(request)
+    try:
+        bot_name = data["name"]
+        deck_name = data["deck_name"]
+        account_error = _validate_ai_control_player(bot_name)
+        if account_error is not None:
+            return account_error
+        target_deck_dir = os.getcwd() + "/decks/DeckStorage/" + bot_name + "/" + deck_name
+        if not os.path.exists(target_deck_dir):
+            response = {
+                "status": "error",
+                "error": "Deck does not exist"
+            }
+        else:
+            with open(target_deck_dir, "r") as file:
+                deck_text = file.read()
+            response = {
+                "status": "success",
+                "deck_text": deck_text
+            }
     except KeyError as e:
         response = {
             "status": "error",
