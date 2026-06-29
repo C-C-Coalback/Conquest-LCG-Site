@@ -8580,7 +8580,7 @@ class Player:
                 j = 0
                 while j < len(self.cards_in_play[i + 1]):
                     if self.cards_in_play[i + 1][j].get_card_type() == "Warlord":
-                        self.move_unit_at_planet_to_hq(i, j)
+                        self.move_unit_at_planet_to_hq(i, j, is_a_move=False)
                         return None
                     j = j + 1
         return None
@@ -8607,42 +8607,44 @@ class Player:
             elif self.aiming_reticle_coords_hand < old_pos:
                 self.aiming_reticle_coords_hand = self.aiming_reticle_coords_hand + 1
 
-    def move_unit_at_planet_to_hq(self, planet_id, unit_id):
-        if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
-            if self.defense_battery_check(planet_id):
-                self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
-        other_player = self.get_other_player()
-        for i in range(len(other_player.cards_in_play[planet_id + 1])):
-            if other_player.get_ability_given_pos(planet_id, i) == "Hydra Flak Tank":
-                if not other_player.get_once_per_phase_used_given_pos(planet_id, i):
+    def move_unit_at_planet_to_hq(self, planet_id, unit_id, is_a_move=True):
+        if is_a_move:
+            if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+                if self.defense_battery_check(planet_id):
                     self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
-                    if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", planet_id, i):
-                        self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
-                                                  (int(other_player.number), planet_id, i))
-        if not self.check_if_already_have_reaction("Homing Beacon"):
-            for i in range(len(self.headquarters)):
-                if self.get_ability_given_pos(-2, i) == "Homing Beacon":
-                    if self.get_ready_given_pos(-2, i):
-                        self.game.create_reaction("Homing Beacon", self.name_player, (int(self.number), -2, i))
+            other_player = self.get_other_player()
+            for i in range(len(other_player.cards_in_play[planet_id + 1])):
+                if other_player.get_ability_given_pos(planet_id, i) == "Hydra Flak Tank":
+                    if not other_player.get_once_per_phase_used_given_pos(planet_id, i):
+                        self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
+                        if not other_player.check_if_already_have_reaction_of_position("Hydra Flak Tank", planet_id, i):
+                            self.game.create_reaction("Hydra Flak Tank", other_player.name_player,
+                                                      (int(other_player.number), planet_id, i))
+            if not self.check_if_already_have_reaction("Homing Beacon"):
+                for i in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, i) == "Homing Beacon":
+                        if self.get_ready_given_pos(-2, i):
+                            self.game.create_reaction("Homing Beacon", self.name_player, (int(self.number), -2, i))
         self.headquarters.append(copy.deepcopy(self.cards_in_play[planet_id + 1][unit_id]))
         last_element_index = len(self.headquarters) - 1
         self.remove_card_from_play(planet_id, unit_id, proper_remove=False, new_position=(-2, last_element_index))
-        self.aunla_prince_check(-2, last_element_index, planet_id)
-        for i in range(len(self.headquarters)):
-            if i != last_element_index:
-                if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
-                    if not self.get_once_per_phase_used_given_pos(-2, i):
-                        if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", -2, i):
-                            self.game.create_interrupt("Frontline Counsellor", self.name_player,
-                                                       (int(self.number), -2, i), extra_info=planet_id)
-        for i in range(7):
-            if i != planet_id:
-                for j in range(len(self.cards_in_play[i + 1])):
-                    if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
-                        if not self.get_once_per_phase_used_given_pos(i, j):
-                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", i, j):
+        if is_a_move:
+            self.aunla_prince_check(-2, last_element_index, planet_id)
+            for i in range(len(self.headquarters)):
+                if i != last_element_index:
+                    if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
+                        if not self.get_once_per_phase_used_given_pos(-2, i):
+                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", -2, i):
                                 self.game.create_interrupt("Frontline Counsellor", self.name_player,
-                                                           (int(self.number), i, j), extra_info=planet_id)
+                                                           (int(self.number), -2, i), extra_info=planet_id)
+            for i in range(7):
+                if i != planet_id:
+                    for j in range(len(self.cards_in_play[i + 1])):
+                        if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
+                            if not self.get_once_per_phase_used_given_pos(i, j):
+                                if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", i, j):
+                                    self.game.create_interrupt("Frontline Counsellor", self.name_player,
+                                                               (int(self.number), i, j), extra_info=planet_id)
         if self.get_ability_given_pos(-2, last_element_index) == "Growing Tide":
             if planet_id == self.game.round_number:
                 self.game.create_interrupt("Growing Tide", self.name_player,
@@ -8974,7 +8976,7 @@ class Player:
 
     def move_all_at_planet_to_hq(self, planet_id):
         while self.cards_in_play[planet_id + 1]:
-            self.move_unit_at_planet_to_hq(planet_id, 0)
+            self.move_unit_at_planet_to_hq(planet_id, 0, is_a_move=False)
 
     def discard_planet_attachments(self, planet_id):
         while self.attachments_at_planet[planet_id]:

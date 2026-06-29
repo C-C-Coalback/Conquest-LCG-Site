@@ -19,6 +19,7 @@ from . import ValidMovesFinder
 from . import Commands
 from .. import profile_records
 from channels.layers import get_channel_layer
+from django.conf import settings
 
 
 class Game:
@@ -685,6 +686,8 @@ class Game:
 
     async def _broadcast_to_game_group(self, message):
         """Broadcasts a message to all websocket clients in this game's room group."""
+        if not settings.configured:
+            return
         channel_layer = get_channel_layer()
         if channel_layer is None:
             return
