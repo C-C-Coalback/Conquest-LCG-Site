@@ -1148,6 +1148,8 @@ class Game:
                 info_string += "??????/"
         elif self.phase == "HEADQUARTERS":
             info_string += "HQ action & reaction window/"
+        elif self.phase == "FIN":
+            info_string += "Game is complete."
         else:
             info_string += "??????/"
         if self.last_info_box_string != info_string or force:
