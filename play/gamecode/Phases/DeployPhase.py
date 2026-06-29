@@ -535,7 +535,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                     secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False,
                                                           by_enemy_unit=False)
     self.bigga_is_betta_active = False
-    if self.misc_player_storage == "ZADRUK PRIME":
+    if self.misc_player_storage in ["ZADRUK PRIME", "RESOLVING MAGUS HARID", "RESOLVING DARK ALLEGIANCE", "RESOLVING Ice World Hydras IV"]:
         self.misc_player_storage = ""
     if played_card == "SUCCESS":
         if damage_to_take > 0:
