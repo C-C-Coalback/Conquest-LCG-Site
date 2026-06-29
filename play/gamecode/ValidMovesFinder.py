@@ -646,15 +646,16 @@ def determine_valid_moves(self):
             for i in range(len(self.choices_available)):
                 valid_moves = add_valid_move(valid_moves, primary_player, "CHOICE", choice_pos=i)
         elif self.what_is_required_automated == "Discount":
-            valid_moves = primary_player.get_playable_borders()
-            hand_disc = primary_player.search_hand_for_discounts(self.card_to_deploy.get_faction(), self.card_to_deploy.get_traits())
-            if hand_disc > 0:
-                if self.card_to_deploy.get_faction() == "Orks":
-                    for i in range(len(primary_player.cards)):
-                        if primary_player.cards[i] == "Bigga Is Betta":
-                            valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
-            if self.card_to_deploy.get_cost() <= primary_player.get_resources() - self.discounts_applied:
-                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            if self.card_to_deploy is not None:
+                valid_moves = primary_player.get_playable_borders()
+                hand_disc = primary_player.search_hand_for_discounts(self.card_to_deploy.get_faction(), self.card_to_deploy.get_traits())
+                if hand_disc > 0:
+                    if self.card_to_deploy.get_faction() == "Orks":
+                        for i in range(len(primary_player.cards)):
+                            if primary_player.cards[i] == "Bigga Is Betta":
+                                valid_moves = add_valid_move(valid_moves, primary_player, "HAND", hand_pos=i)
+                if self.card_to_deploy.get_cost() <= primary_player.get_resources() - self.discounts_applied:
+                    valid_moves = add_valid_move(valid_moves, primary_player, "pass")
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Deploy Turn":
