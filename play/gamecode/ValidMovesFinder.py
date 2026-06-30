@@ -570,7 +570,7 @@ def check_if_single_card_in_discard_is_valid_target(self, ability, player, disca
             if card.get_ability() == "Shadowsun's Stealth Cadre":
                 return True
     if faction_card:
-        if faction_hand_card != card.get_faction():
+        if faction_card != card.get_faction():
             return False
     if card_type_card:
         if card_type_card != card.get_card_type():
