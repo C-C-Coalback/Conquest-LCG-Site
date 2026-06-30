@@ -1999,6 +1999,7 @@ class Game:
                 print(e)
             self.profile_result_recorded = True
         await self.send_update_message(victory_string)
+
     def check_if_any_planets_in_play(self):
         for i in range(len(self.planets_in_play_array)):
             if self.planets_in_play_array[i]:
@@ -4388,10 +4389,10 @@ class Game:
                         if self.planets_in_play_array[self.p1.headquarters[i].move_to_planet_end_of_phase_planet]:
                             stored_val_dest = self.p1.headquarters[i].move_to_planet_end_of_phase_planet
                             self.p1.headquarters[i].move_to_planet_end_of_phase_planet = -1
-                            self.p1.move_unit_to_planet(
+                            if self.p1.move_unit_to_planet(
                                 -2, i, stored_val_dest, force=True
-                            )
-                            i = i - 1
+                            ):
+                                i = i - 1
             i = i + 1
         for i in range(7):
             j = 0
@@ -4402,10 +4403,10 @@ class Game:
                             self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet]:
                             stored_val_dest = self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet
                             self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet = -1
-                            self.p1.move_unit_to_planet(
+                            if self.p1.move_unit_to_planet(
                                 i, j, stored_val_dest, force=True
-                            )
-                            j = j - 1
+                            ):
+                                j = j - 1
                 j = j + 1
         i = 0
         while i < len(self.p2.headquarters):
@@ -4416,10 +4417,10 @@ class Game:
                             self.p2.headquarters[i].move_to_planet_end_of_phase_planet]:
                             stored_val_dest = self.p2.headquarters[i].move_to_planet_end_of_phase_planet
                             self.p2.headquarters[i].move_to_planet_end_of_phase_planet = -1
-                            self.p2.move_unit_to_planet(
+                            if self.p2.move_unit_to_planet(
                                 -2, i, stored_val_dest, force=True
-                            )
-                            i = i - 1
+                            ):
+                                i = i - 1
             i = i + 1
         for i in range(7):
             j = 0
@@ -4430,10 +4431,10 @@ class Game:
                             self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet]:
                             stored_val_dest = self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet
                             self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet = -1
-                            self.p2.move_unit_to_planet(
+                            if self.p2.move_unit_to_planet(
                                 i, j, stored_val_dest, force=True
-                            )
-                            j = j - 1
+                            ):
+                                j = j - 1
                 j = j + 1
         if self.phase == "COMMAND":
             self.committing_warlords = True
@@ -4454,8 +4455,8 @@ class Game:
             self.p1.idden_base_active = False
             self.p2.idden_base_detransform(force=True)
             self.p2.idden_base_active = False
-        sacrifice_locations = self.p1.sacrifice_check_eop()
-        sacrifice_locations = self.p2.sacrifice_check_eop()
+        self.p1.sacrifice_check_eop()
+        self.p2.sacrifice_check_eop()
         self.conclude_mind_shackle_scarab()
         if last_phase == "COMBAT":
             self.p1.start_agras_preachings_deployment()

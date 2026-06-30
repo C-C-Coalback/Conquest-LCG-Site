@@ -5788,21 +5788,13 @@ class Player:
         return None
 
     def sacrifice_check_eop(self):
-        sacrificed_locations = [False, False, False, False, False, False, False, False]
         i = 0
         while i < len(self.headquarters):
             if self.headquarters[i].get_sacrifice_end_of_phase():
                 if self.sacrifice_card_in_hq(i):
-                    sacrificed_locations[0] = True
                     i = i - 1
-            elif self.headquarters[i].quick_construct:
+            elif self.headquarters[i].quick_construct or self.headquarters[i].saint_celestine_active:
                 if self.sacrifice_card_in_hq(i):
-                    sacrificed_locations[0] = True
-                    i = i - 1
-                    self.draw_card()
-            elif self.headquarters[i].saint_celestine_active:
-                if self.sacrifice_card_in_hq(i):
-                    sacrificed_locations[0] = True
                     i = i - 1
                     self.draw_card()
             i = i + 1
@@ -5811,15 +5803,12 @@ class Player:
             while unit_pos < len(self.cards_in_play[planet_pos + 1]):
                 if self.cards_in_play[planet_pos + 1][unit_pos].get_sacrifice_end_of_phase():
                     if self.sacrifice_card_in_play(planet_pos, unit_pos):
-                        sacrificed_locations[planet_pos + 1] = True
                         unit_pos = unit_pos - 1
                 elif self.cards_in_play[planet_pos + 1][unit_pos].saint_celestine_active:
                     if self.sacrifice_card_in_play(planet_pos, unit_pos):
-                        sacrificed_locations[planet_pos + 1] = True
                         unit_pos = unit_pos - 1
                         self.draw_card()
                 unit_pos += 1
-        return sacrificed_locations
 
     def clear_effects_end_of_cs(self):
         for i in range(len(self.headquarters)):
