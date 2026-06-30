@@ -1111,6 +1111,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     try:
                         with open("errorslog.txt", "a") as f:
                             f.write(traceback.format_exc())
+                        await active_games[current_game_id].resolve_chat_message(self.name, ["", "savegame"])
                     except:
                         pass
                     await self.receive_game_update(

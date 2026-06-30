@@ -2392,6 +2392,8 @@ class Player:
             del self.cards_in_reserve_hq[0]
 
     def add_to_hq(self, card_object):
+        if card_object.get_card_type() == "Attachment":
+            return False
         if card_object.get_unique():
             if self.search_for_unique_card(card_object.name):
                 self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "The card is unique, and you already control a copy of that card.")
@@ -2993,6 +2995,10 @@ class Player:
 
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
                            is_owner_of_card=True, triggered_card_effect=True, deepstrike=False):
+        if card.get_card_type() == "Attachment":
+            return -1
+        if card.get_card_type() == "Support":
+            return -1
         if position == -2:
             return self.add_to_hq(card)
         if card.get_unique():
