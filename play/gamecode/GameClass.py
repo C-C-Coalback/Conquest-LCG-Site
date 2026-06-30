@@ -193,6 +193,7 @@ class Game:
         self.mode = "Normal"
         self.stored_mode = self.mode
         self.preemptive_destroy_interrupts_allowed = True
+        self.condition_main_game = threading.Condition()
         self.condition_sub_game = threading.Condition()
         self.condition_discounting = threading.Condition()
         self.planet_aiming_reticle_active = False
@@ -780,6 +781,7 @@ class Game:
         :param name: name of the user who joined, unused.
         :return: None
         """
+        self.condition_main_game.acquire()
         await self.send_decks(force=True)
         await self.p1.send_hand(force=True)
         await self.p2.send_hand(force=True)
@@ -801,6 +803,8 @@ class Game:
         await self.send_initiative(force=True)
         await self.update_automated_info()
         await self.send_automated_info(force=True)
+        self.condition_main_game.notify_all()
+        self.condition_main_game.release()
 
     async def send_decks(self, force=False):
         """
@@ -7598,6 +7602,8 @@ class Game:
         ValidMovesFinder.update_automated_attributes(self)
 
     async def update_game_event(self, name, game_update_string, same_thread=False):
+        if not same_thread:
+            self.condition_main_game.acquire()
         resolved_subroutine = False
         game_update_string = self.change_to_reserve(game_update_string)
         print(game_update_string)
@@ -8109,6 +8115,9 @@ class Game:
             await self.update_game_event("", [], same_thread=True)
             await self.send_everything()
         self.anything_changed_since_last_send = False
+        if not same_thread:
+            self.condition_main_game.notify_all()
+            self.condition_main_game.release()
 
     def cancel_debug_mode(self):
         self.debug_mode = None

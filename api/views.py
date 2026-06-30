@@ -363,50 +363,55 @@ def _apply_agent_action(game, player, action_token):
 
 
 def _get_game_snapshot(game, requested_player=""):
-    async_to_sync(game.update_automated_info)()
+    game.condition_main_game.acquire()
     try:
-        turn_notifier.maybe_notify_turn_changed(game)
-    except Exception:
-        pass
-    legal_actions = list(game.clickable_items_automated)
-    active_player = game.automated_player_waited_on
-    requested_player_is_active = bool(requested_player and requested_player == active_player)
-    event_log_lines = game.game_events_as_mono_string.splitlines()
-    state = {
-        "game_id": game.game_id,
-        "phase": game.phase,
-        "mode": game.mode,
-        "round_number": game.round_number,
-        "sector": game.sector,
-        "bot_is_present": bool(game.bot_is_present),
-        "players": {
-            "1": _serialize_player(game.p1),
-            "2": _serialize_player(game.p2),
-        },
-        "planets": _serialize_planets(game),
-        "turn": {
-            "player_with_initiative": game.player_with_initiative,
-            "player_with_deploy_turn": game.player_with_deploy_turn,
-            "player_with_combat_turn": game.player_with_combat_turn,
-            "active_player": active_player,
-            "required_action_type": game.what_is_required_automated,
-            "battle_in_progress": bool(game.battle_in_progress),
-            "ranged_skirmish_active": bool(game.ranged_skirmish_active),
-            "last_planet_checked_for_battle": game.last_planet_checked_for_battle,
-        },
-        "interaction": {
-            "requested_player": requested_player,
-            "requested_player_is_active": requested_player_is_active,
-            "legal_actions": legal_actions,
-            "legal_actions_for_requested_player": legal_actions if requested_player_is_active else [],
-            "action_token_format": "Use one token from legal_actions exactly (examples: pass-P1, CHOICE/0, IN_PLAY/1/2/0).",
-        },
-        "search_and_choices": _serialize_search_and_choices(game),
-        "chat_messages": list(game.chat_messages),
-        "event_log_tail": event_log_lines[-300:],
-        "saved_replay_moves_count": len(game.saved_moves),
-        "saved_replay_index": game.saved_move_id,
-    }
+        async_to_sync(game.update_automated_info)()
+        try:
+            turn_notifier.maybe_notify_turn_changed(game)
+        except Exception:
+            pass
+        legal_actions = list(game.clickable_items_automated)
+        active_player = game.automated_player_waited_on
+        requested_player_is_active = bool(requested_player and requested_player == active_player)
+        event_log_lines = game.game_events_as_mono_string.splitlines()
+        state = {
+            "game_id": game.game_id,
+            "phase": game.phase,
+            "mode": game.mode,
+            "round_number": game.round_number,
+            "sector": game.sector,
+            "bot_is_present": bool(game.bot_is_present),
+            "players": {
+                "1": _serialize_player(game.p1),
+                "2": _serialize_player(game.p2),
+            },
+            "planets": _serialize_planets(game),
+            "turn": {
+                "player_with_initiative": game.player_with_initiative,
+                "player_with_deploy_turn": game.player_with_deploy_turn,
+                "player_with_combat_turn": game.player_with_combat_turn,
+                "active_player": active_player,
+                "required_action_type": game.what_is_required_automated,
+                "battle_in_progress": bool(game.battle_in_progress),
+                "ranged_skirmish_active": bool(game.ranged_skirmish_active),
+                "last_planet_checked_for_battle": game.last_planet_checked_for_battle,
+            },
+            "interaction": {
+                "requested_player": requested_player,
+                "requested_player_is_active": requested_player_is_active,
+                "legal_actions": legal_actions,
+                "legal_actions_for_requested_player": legal_actions if requested_player_is_active else [],
+                "action_token_format": "Use one token from legal_actions exactly (examples: pass-P1, CHOICE/0, IN_PLAY/1/2/0).",
+            },
+            "search_and_choices": _serialize_search_and_choices(game),
+            "chat_messages": list(game.chat_messages),
+            "event_log_tail": event_log_lines[-300:],
+            "saved_replay_moves_count": len(game.saved_moves),
+            "saved_replay_index": game.saved_move_id,
+        }
+    finally:
+        game.condition_main_game.notify_all()
+        game.condition_main_game.release()
     return state
 
 
