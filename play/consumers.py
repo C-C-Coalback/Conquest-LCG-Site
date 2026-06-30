@@ -1123,7 +1123,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     print("Found room")
                     current_game_id = i
             if current_game_id != -1:
-                if active_games[i].safety_check():
+                if active_games[current_game_id].safety_check():
                     command_used = message[1]
                     position_card = message[2:]
                     print(command_used)
