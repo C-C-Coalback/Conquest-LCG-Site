@@ -4371,6 +4371,10 @@ class Game:
                 self.create_interrupt("Mephiston", self.name_2, (2, pla, pos))
         self.p1.has_passed = False
         self.p2.has_passed = False
+        if self.p1.search_synapse_in_hq():
+            self.p1.committed_synapse = False
+        if self.p2.search_synapse_in_hq():
+            self.p2.committed_synapse = False
         self.last_planet_checked_for_battle = -1
         self.p1.muster_the_guard_count = 0
         self.p2.muster_the_guard_count = 0
