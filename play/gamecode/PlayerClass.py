@@ -599,6 +599,39 @@ class Player:
                 if card.get_has_action_while_in_hand():
                     if card.allowed_phases_while_in_hand == "ALL" or \
                             card.allowed_phases_while_in_hand == self.game.phase:
+                        if card.get_ambush():
+                            if self.determine_lowest_possible_cost_of_card(card) <= self.get_resources():
+                                if card.get_card_type() == "Army":
+                                    if self.check_if_card_can_enter_play(card, triggered_card_effect=False):
+                                        return "playable"
+                                elif card.get_card_type() == "Attachment":
+                                    not_own_attach = False
+                                    for i in range(len(self.headquarters)):
+                                        if self.check_if_can_attach_card(
+                                                card, -2, i, not_own_attachment=not_own_attach
+                                        ):
+                                            return "playable"
+                                    for i in range(7):
+                                        for j in range(len(self.cards_in_play[i + 1])):
+                                            if self.check_if_can_attach_card(
+                                                    card, i, j, not_own_attachment=not_own_attach
+                                            ):
+                                                return "playable"
+                                    not_own_attach = True
+                                    other_player = self.get_other_player()
+                                    for i in range(len(other_player.headquarters)):
+                                        if other_player.check_if_can_attach_card(
+                                                card, -2, i, not_own_attachment=not_own_attach
+                                        ):
+                                            return "playable"
+                                    for i in range(7):
+                                        for j in range(len(other_player.cards_in_play[i + 1])):
+                                            if other_player.check_if_can_attach_card(
+                                                    card, i, j,
+                                                    not_own_attachment=not_own_attach
+                                            ):
+                                                return "playable"
+                            return "unplayable"
                         if card.get_cost() <= self.get_resources():
                             if card.get_ability() in self.events_requiring_battle:
                                 if self.game.check_if_battle_taking_place():

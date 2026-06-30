@@ -1987,7 +1987,6 @@ class Game:
         elif winner_name == self.name_2:
             self.p2.is_the_winner = True
         if not self.profile_result_recorded:
-            "FIN"
             try:
                 profile_records.record_finished_game_result(self, winner_name, reason)
             except Exception as e:

@@ -19,7 +19,7 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
             if card.get_allowed_phases_while_in_hand() == "ALL" or \
                     card.get_allowed_phases_while_in_hand() == game.phase:
                 if primary_player.get_ambush_of_card(card):
-                    if primary_player.determine_playability(card.get_name()):
+                    if primary_player.determine_playability(card.get_name()) == "playable":
                         possible_action_locations = add_action(possible_action_locations, "HAND/" + str(primary_player.number) + "/" + str(i), combat_turn_action=combat_turn_action)
                 elif card.get_cost(urien_relevant=primary_player.urien_relevant) <= primary_player.resources:
                     ability = card.get_ability()

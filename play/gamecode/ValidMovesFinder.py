@@ -887,7 +887,32 @@ def determine_valid_moves(self):
             valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=True)
         elif self.what_is_required_automated == "Action":
             if self.action_object.action_chosen == "Ambush":
-                valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                if self.card_to_deploy is None:
+                    valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+                elif self.card_to_deploy.get_card_type() == "Army":
+                    valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                elif self.card_to_deploy.get_card_type() == "Attachment":
+                    selected_card = self.card_to_deploy
+                    for i in range(len(primary_player.headquarters)):
+                        if primary_player.check_if_can_attach_card(
+                                selected_card, -2, i, not_own_attachment=False):
+                            valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
+                    for i in range(7):
+                        for j in range(len(primary_player.cards_in_play[i + 1])):
+                            if primary_player.check_if_can_attach_card(
+                                    selected_card, i, j, not_own_attachment=False):
+                                valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i,
+                                                             unit_pos=j)
+                    for i in range(len(secondary_player.headquarters)):
+                        if secondary_player.check_if_can_attach_card(
+                                selected_card, -2, i, not_own_attachment=True):
+                            valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
+                    for i in range(7):
+                        for j in range(len(secondary_player.cards_in_play[i + 1])):
+                            if secondary_player.check_if_can_attach_card(
+                                    selected_card, i, j, not_own_attachment=True):
+                                valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i,
+                                                             unit_pos=j)
             elif self.action_object.action_chosen in ability_targets_dictionary:
                 target_restriction_data = ability_targets_dictionary[self.action_object.action_chosen]
                 num_stages = target_restriction_data["Num Stages"]
