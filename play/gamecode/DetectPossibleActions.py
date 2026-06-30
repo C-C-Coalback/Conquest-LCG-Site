@@ -67,11 +67,12 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                 card = attachments[k]
                 if card.get_has_action_while_in_play():
                     if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
-                        ability = card.get_ability()
-                        if ability in action_ability_starts:
-                            prereqs = action_ability_starts[ability]
-                            if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card, planet_pos=i, attachment_pos=k):
-                                possible_action_locations = add_action(possible_action_locations, "ATTACHMENT/IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j) + "/" + str(k), combat_turn_action=combat_turn_action)
+                        if card.name_owner == primary_player.get_name_player():
+                            ability = card.get_ability()
+                            if ability in action_ability_starts:
+                                prereqs = action_ability_starts[ability]
+                                if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card, planet_pos=i, attachment_pos=k):
+                                    possible_action_locations = add_action(possible_action_locations, "ATTACHMENT/IN_PLAY/" + str(primary_player.number) + "/" + str(i) + "/" + str(j) + "/" + str(k), combat_turn_action=combat_turn_action)
     if combat_turn_action:
         possible_action_locations.append("pass-P1")
     return possible_action_locations
