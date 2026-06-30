@@ -666,7 +666,7 @@
             }
             automated_state_sync_in_flight = true;
             automated_state_last_sync_at_ms = now_ms;
-            try {
+            try { // 99% sure this code is the cause of freezing problems.
                 const state_response = await fetch(
                     '/api/game/' + roomName + '/agent_state/?player=' + encodeURIComponent("{{ user.username }}"),
                     { credentials: 'same-origin' }
@@ -686,13 +686,13 @@
             }
         }
 
-        function scheduleAutomatedStateSync(delay_ms = 220) {
+        function scheduleAutomatedStateSync(delay_ms = 220) { // FIXME: EXTREMELY SLOW
             if (automated_state_sync_timeout_id !== null) {
                 window.clearTimeout(automated_state_sync_timeout_id);
             }
             automated_state_sync_timeout_id = window.setTimeout(function() {
                 automated_state_sync_timeout_id = null;
-                syncAutomatedStateFromApi();
+                // syncAutomatedStateFromApi();
             }, delay_ms);
         }
 
