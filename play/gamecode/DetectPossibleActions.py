@@ -262,8 +262,6 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Ambush Platform":
             for a in range(len(primary_player.cards)):
                 attachment_card = primary_player.get_card_in_hand(a)
-                if attachment_card.planet_attachment:
-                    return False
                 not_own_attach = False
                 for i in range(len(primary_player.headquarters)):
                     if primary_player.check_if_can_attach_card(

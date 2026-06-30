@@ -113,8 +113,7 @@ def _find_active_game_by_id(game_id):
 def _game_is_finished(game):
     if game is None:
         return True
-    phase = getattr(game, "phase", "")
-    if isinstance(phase, str) and phase.startswith("FIN"):
+    if game.game_is_complete:
         return True
     try:
         if game.p1.is_the_winner or game.p2.is_the_winner:

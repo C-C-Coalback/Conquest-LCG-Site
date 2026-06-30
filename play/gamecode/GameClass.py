@@ -47,6 +47,7 @@ class Game:
         print("\n\nerrata text\n\n" + errata)
         self.battle_in_progress = False
         self.bot_is_present = bot_is_present
+        self.game_is_complete = False
         self.saved_moves = []
         self.saved_move_id = 0
         self.profile_result_recorded = False
@@ -192,7 +193,6 @@ class Game:
         self.mode = "Normal"
         self.stored_mode = self.mode
         self.preemptive_destroy_interrupts_allowed = True
-        self.condition_main_game = threading.Condition()
         self.condition_sub_game = threading.Condition()
         self.condition_discounting = threading.Condition()
         self.planet_aiming_reticle_active = False
@@ -780,7 +780,6 @@ class Game:
         :param name: name of the user who joined, unused.
         :return: None
         """
-        self.condition_main_game.acquire()
         await self.send_decks(force=True)
         await self.p1.send_hand(force=True)
         await self.p2.send_hand(force=True)
@@ -802,8 +801,6 @@ class Game:
         await self.send_initiative(force=True)
         await self.update_automated_info()
         await self.send_automated_info(force=True)
-        self.condition_main_game.notify_all()
-        self.condition_main_game.release()
 
     async def send_decks(self, force=False):
         """
@@ -1150,8 +1147,6 @@ class Game:
                 info_string += "??????/"
         elif self.phase == "HEADQUARTERS":
             info_string += "HQ action & reaction window/"
-        elif self.phase.startswith("FIN"):
-            info_string += "Game is complete."
         else:
             info_string += "??????/"
         if self.last_info_box_string != info_string or force:
@@ -1986,13 +1981,13 @@ class Game:
 
     async def send_victory_proper(self, winner_name, reason):
         victory_string = "GAME_INFO/VICTORY_MESSAGE/" + winner_name + "/" + reason
+        self.game_is_complete = True
         if winner_name == self.name_1:
             self.p1.is_the_winner = True
         elif winner_name == self.name_2:
             self.p2.is_the_winner = True
-        if not self.phase.startswith("FIN"):
-            self.phase = "FIN/" + reason.replace("/", "-")
         if not self.profile_result_recorded:
+            "FIN"
             try:
                 profile_records.record_finished_game_result(self, winner_name, reason)
             except Exception as e:
@@ -2013,7 +2008,7 @@ class Game:
         self.before_command_struggle = False
         self.after_command_struggle = False
         self.battle_in_progress = False
-        self.phase = "FIN/NO_PLANETS_REMAINING"
+        self.game_is_complete = True
         if self.p1.is_the_winner or self.p2.is_the_winner:
             return True
         p1_icons = self.p1.get_icons_on_captured()
@@ -7604,8 +7599,6 @@ class Game:
         ValidMovesFinder.update_automated_attributes(self)
 
     async def update_game_event(self, name, game_update_string, same_thread=False):
-        if not same_thread:
-            self.condition_main_game.acquire()
         resolved_subroutine = False
         game_update_string = self.change_to_reserve(game_update_string)
         print(game_update_string)
@@ -8117,9 +8110,6 @@ class Game:
             await self.update_game_event("", [], same_thread=True)
             await self.send_everything()
         self.anything_changed_since_last_send = False
-        if not same_thread:
-            self.condition_main_game.notify_all()
-            self.condition_main_game.release()
 
     def cancel_debug_mode(self):
         self.debug_mode = None
@@ -8788,7 +8778,7 @@ class Game:
                 i = i - 1
             i = i + 1
         if self.round_number > 6:
-            self.phase = "FIN/IF WINNER UNDECIDED,/PLAYER WHO WON LAST/BATTLE IS THE WINNER/GO HOME."
+            self.game_is_complete = True
         self.swap_initiative()
 
     def swap_initiative(self):

@@ -241,9 +241,6 @@ def update_automated_attributes(self):
             self.automated_player_waited_on = self.name_1
         else:
             self.automated_player_waited_on = self.name_2
-    elif self.phase.startswith("FIN"):
-        self.what_is_required_automated = "Game Over"
-        self.automated_player_waited_on = ""
     elif self.phase == "SETUP":
         self.what_is_required_automated = "SETUP"
         if not self.p1.deck_loaded:

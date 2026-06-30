@@ -2714,6 +2714,8 @@ class Player:
                 )
             else:
                 return False
+        if card.get_card_type() != "Attachment":
+            return False
         name_owner = self.name_player
         if not_own_attachment:
             if self.number == "1":

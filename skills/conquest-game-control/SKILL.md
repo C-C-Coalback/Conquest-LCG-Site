@@ -249,7 +249,7 @@ And log per step:
 
 ## Turn loop
 1. Pull `agent_state`.
-2. Stop if phase starts with `FIN`.
+2. ~~Stop if phase starts with `FIN`.~~ CHANGED: please replace with a game complete check that does not rely on phase (was breaking my neural network). I recommend simply not having any legal actions if the game is completed.
 3. If not active player, wait/poll.
 4. If active:
    - rank/select a legal action (win-seeking heuristic),

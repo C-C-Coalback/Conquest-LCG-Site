@@ -233,9 +233,12 @@ def main() -> int:
         active_player = str(turn.get("active_player", ""))
         required_action_type = str(turn.get("required_action_type", ""))
 
-        if phase.startswith("FIN"):
-            print("[STOP] Game finished.")
-            break
+
+        # FIXME: Replace with game.game_is_complete check instead
+        # FIN phase removed because it was crashing my NN.
+        # if phase.startswith("FIN"):
+        #     print("[STOP] Game finished.")
+        #     break
 
         # Determine if it's our turn using multiple signals
         interaction = state.get("interaction", {})
