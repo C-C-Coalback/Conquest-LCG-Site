@@ -211,7 +211,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                     attachments = primary_player.get_all_attachments_at_pos(i, j)
                     for k in range(len(attachments)):
                         for l in range(len(primary_player.headquarters)):
-                            if primary_player.check_if_can_attach_card(attachments[j], k, l):
+                            if primary_player.check_if_can_attach_card(attachments[j], -2, l):
                                 return True
                         for l in range(7):
                             for m in range(len(primary_player.cards_in_play[l + 1])):
@@ -234,7 +234,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                     attachments = secondary_player.get_all_attachments_at_pos(i, j)
                     for k in range(len(attachments)):
                         for l in range(len(secondary_player.headquarters)):
-                            if secondary_player.check_if_can_attach_card(attachments[j], k, l):
+                            if secondary_player.check_if_can_attach_card(attachments[j], -2, l):
                                 return True
                         for l in range(7):
                             for m in range(len(secondary_player.cards_in_play[l + 1])):
