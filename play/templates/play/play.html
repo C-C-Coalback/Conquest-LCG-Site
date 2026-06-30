@@ -1742,6 +1742,11 @@
                         var encountered_in_play_planet = "false";
                         var first_pos_in_play = -1;
                         for (var i = 0; i < newPlanetsArray.length; i++) {
+                            if (newPlanetsArray[0] === "true") {
+                                document.getElementById("player-1-cards-planet-" + (i).toString()).style.display = "block";
+                                document.getElementById("player-2-cards-planet-" + (i).toString()).style.display = "block";
+                                document.getElementById("div-PLANETS-" + (i).toString()).style.display = "block";
+                            }
                             if (newPlanetsArray[i] === "true") {
                                 encountered_in_play_planet = "true";
                                 if (first_pos_in_play === -1) {
