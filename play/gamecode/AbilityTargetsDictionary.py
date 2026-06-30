@@ -980,7 +980,7 @@ action_ability_starts = {
         "Exhaust Required": False
     },
     "Veteran Brother Maxos": {
-        "Special": False,
+        "Special": True,
         "Requires Hand Card": True,
         "Requires In Play Card": False,
         "Once Per Phase": False,

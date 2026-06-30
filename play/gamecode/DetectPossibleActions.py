@@ -130,6 +130,9 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
         if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == forbidden_card_type_card:
             return False
     if special:
+        if action_ability == "Veteran Brother Maxos":
+            if planet_pos == -2:
+                return False
         if action_ability == "Preemptive Barrage":
             if primary_player.get_ranged_given_pos(planet_pos, unit_pos):
                 return False
@@ -366,6 +369,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Haemonculus Tormentor":
             if primary_player.get_resources() > 0:
                 return True
+            return False
     if not special and not requires_hand_card and not requires_in_play_card:
         return True
     return False
