@@ -913,7 +913,7 @@ class Player:
         else:
             ability = self.cards_in_play[planet_id + 1][unit_id].deepstrike_card_name
         if ability == "The Prince's Might":
-            if not self.game.apoka:
+            if self.game.apoka:
                 self.game.set_queued_mistarget_message(self.name_player, "Event Not Resolved", "The Prince's Might is banned under this ruleset.")
                 self.the_princes_might_active[planet_id] = True
         if ability == "Webway Schemes":
