@@ -445,6 +445,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             elif ability.action_chosen == "Command-link Drone":
                 if planet_pos == ability.get_planet_pos() and unit_pos == ability.get_unit_pos():
                     return False
+                card = self.preloaded_find_card("Command-link Drone")
+                if not player.check_if_can_attach_card(card, planet_pos, unit_pos):
+                    return False
             elif ability.action_chosen == "Even the Odds":
                 og_pla, og_pos, og_att = ability.misc_target_attachment
                 if og_pla == planet_pos and og_pos == unit_pos:
