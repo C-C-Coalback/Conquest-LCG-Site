@@ -1079,7 +1079,7 @@ action_ability_starts = {
             "At HQ": False,
             "Must Be Unit": True,
             "Own Unit": True,
-            "Enemy Unit": True,
+            "Enemy Unit": False,
             "Faction": None,
             "Card Type": None,
             "Forbidden Card Type": None,
