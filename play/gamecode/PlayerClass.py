@@ -1207,7 +1207,7 @@ class Player:
                     return True
         elif ability == "Noble Shining Spears":
             if not self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
-                if self.get_mobile_given_pos(hurt_planet, hurt_pos):
+                if self.get_mobile_given_pos(hurt_pla, hurt_pos):
                     return True
         elif planet_pos == hurt_pla and hurt_pos == unit_pos:
             can_faith = False
