@@ -212,7 +212,7 @@ ability_targets_dictionary = {
         "Restrictions 1": {
             "Unit Only": True,
             "Own Unit": True,
-            "Enemy Unit": True,
+            "Enemy Unit": False,
             "Unique": False,
             "Ready": False,
             "Exhaust": False,
