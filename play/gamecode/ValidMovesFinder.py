@@ -409,6 +409,8 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                 if ability.misc_target_planet != planet_pos:
                     return False
             elif ability.action_chosen == "Suppressive Fire":
+                if planet_pos == -2:
+                    return False
                 if not ability.chosen_first_card:
                     other_player = player.get_other_player()
                     for i in range(len(other_player.cards_in_play[planet_pos + 1])):

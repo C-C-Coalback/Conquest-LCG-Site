@@ -16,7 +16,7 @@ import update_settings
 from . import turn_notifier
 
 
-RUNTIME_STATE_PERSIST_ENABLED = True
+RUNTIME_STATE_PERSIST_ENABLED = False
 ban_list_apoka = [
     "Bonesinger Choir", "Squiggoth Brute", "Corrupted Teleportarium", "Gun Drones", "Archon's Palace",
     "Land Speeder Vengeance", "Sowing Chaos", "Smasha Gun Battery", "The Prince's Might", "Purveyor of Hubris", "Doom",
