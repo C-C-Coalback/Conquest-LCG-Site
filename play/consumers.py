@@ -16,6 +16,7 @@ import update_settings
 from . import turn_notifier
 
 
+RUNTIME_STATE_PERSIST_ENABLED = True
 ban_list_apoka = [
     "Bonesinger Choir", "Squiggoth Brute", "Corrupted Teleportarium", "Gun Drones", "Archon's Palace",
     "Land Speeder Vengeance", "Sowing Chaos", "Smasha Gun Battery", "The Prince's Might", "Purveyor of Hubris", "Doom",
@@ -229,18 +230,20 @@ def _serialize_current_runtime_state():
 
 
 def persist_runtime_state():
-    _ensure_runtime_state_loaded()
-    _ensure_lobby_id_column()
-    with _runtime_state_lock:
-        try:
-            runtime_state = _serialize_current_runtime_state()
-            target_file = _get_runtime_state_file_path()
-            temp_file = target_file + ".tmp"
-            with open(temp_file, "w") as f:
-                json.dump(runtime_state, f)
-            os.replace(temp_file, target_file)
-        except Exception:
-            _write_runtime_error(traceback.format_exc())
+    global RUNTIME_STATE_PERSIST_ENABLED
+    if RUNTIME_STATE_PERSIST_ENABLED:
+        _ensure_runtime_state_loaded()
+        _ensure_lobby_id_column()
+        with _runtime_state_lock:
+            try:
+                runtime_state = _serialize_current_runtime_state()
+                target_file = _get_runtime_state_file_path()
+                temp_file = target_file + ".tmp"
+                with open(temp_file, "w") as f:
+                    json.dump(runtime_state, f)
+                os.replace(temp_file, target_file)
+            except Exception:
+                _write_runtime_error(traceback.format_exc())
 
 
 def _restore_runtime_state_from_disk():
