@@ -140,6 +140,11 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Tellyporta Pad":
             if planet_pos == game.round_number or not game.planets_in_play_array[game.round_number]:
                 return False
+        if action_ability == "Kraktoof Hall":
+            if primary_player.get_damage_given_pos(planet_pos, unit_pos) == 0:
+                return False
+            if len(primary_player.cards_in_play[planet_pos + 1]) + len(secondary_player.cards_in_play[planet_pos + 1]) < 2:
+                return False
         if action_ability == "Archon's Terror":
             if primary_player.get_unique_given_pos(planet_pos, unit_pos):
                 return False

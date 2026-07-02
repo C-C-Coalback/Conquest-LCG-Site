@@ -1068,7 +1068,7 @@ action_ability_starts = {
         "Exhaust Required": True
     },
     "Kraktoof Hall": {
-        "Special": False,
+        "Special": True,
         "Requires Hand Card": False,
         "Requires In Play Card": True,
         "Once Per Phase": False,
