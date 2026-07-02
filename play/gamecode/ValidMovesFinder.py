@@ -414,10 +414,13 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     for i in range(len(other_player.cards_in_play[planet_pos + 1])):
                         if other_player.get_ready_given_pos(planet_pos, i):
                             if other_player.get_card_type_given_pos(planet_pos, i) != "Warlord":
-                                return True
+                                if not other_player.get_immune_to_enemy_events(planet_pos, i):
+                                    return True
                     return False
                 if ability.chosen_first_card:
                     if ability.misc_target_planet != planet_pos:
+                        return False
+                    if other_player.get_immune_to_enemy_events(planet_pos, unit_pos):
                         return False
             elif ability.action_chosen == "Kraktoof Hall":
                 if not ability.chosen_first_card:
