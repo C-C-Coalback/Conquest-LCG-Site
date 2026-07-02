@@ -75,6 +75,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                               "Card is not ready.")
+                    elif ability == "Nazdreg's Flash Gitz":
+                        if not card.get_ready():
+                            if not card.get_once_per_phase_used():
+                                primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False, preventable=False)
+                                card.set_once_per_phase_used(True)
+                                primary_player.ready_given_pos(planet_pos, unit_pos)
+                                self.action_cleanup()
                     elif ability == "Slumbering Tomb":
                         if card.get_ready():
                             self.action_object.action_chosen = ability

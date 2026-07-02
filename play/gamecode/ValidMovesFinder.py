@@ -179,7 +179,7 @@ def update_automated_attributes(self):
                 self.automated_player_waited_on = self.name_2
             else:
                 self.automated_player_waited_on = self.name_1
-    elif self.action_object.action_chosen:
+    elif self.mode == "ACTION":
         self.what_is_required_automated = "Action"
         self.automated_player_waited_on = self.action_object.player_with_action
     elif self.mode == "RETREAT":
@@ -894,7 +894,9 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Action Window Between Combat Turns":
             valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=True)
         elif self.what_is_required_automated == "Action":
-            if self.action_object.action_chosen == "Ambush":
+            if not self.action_object.action_chosen:
+                valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+            elif self.action_object.action_chosen == "Ambush":
                 if self.card_to_deploy is None:
                     valid_moves = add_valid_move(valid_moves, primary_player, "pass")
                 elif self.card_to_deploy.get_card_type() == "Army":
