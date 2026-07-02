@@ -944,8 +944,11 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         # FIXME: Needs Django Channels dev team to fix this issue
         try:
             await self.send(text_data=json.dumps({"message": message}))
-        except autobahn.exception.Disconnected:
-            await self.close()
+        except:
+            try:
+                await self.close()
+            except:
+                pass
 
     async def disconnect(self, close_code):
         # Leave room group

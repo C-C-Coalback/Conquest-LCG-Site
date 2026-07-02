@@ -1086,7 +1086,12 @@ class Game:
             info_string += "Ambush discounts/God help you/"
             info_string += self.action_object.player_with_action + "/"
         elif self.choices_available:
-            info_string += "Choice: " + self.choice_context + "/"
+            if self.asking_if_interrupt:
+                info_string += "Choice: Interrupt/"
+            elif self.asking_if_reaction:
+                info_string += "Choice: Reaction/"
+            else:
+                info_string += "Choice: " + self.choice_context + "/"
             info_string += "User: " + self.name_player_making_choices + "/"
             if self.choice_context == "Resolve Battle Ability?" and self.battle_ability_to_resolve:
                 info_string += "Resolve battle ability: " + self.battle_ability_to_resolve + "/"
@@ -4770,7 +4775,7 @@ class Game:
                                          (int(primary_player.number), att_pla, att_pos),
                                          additional_info=primary_player.get_id_given_pos(planet_pos, unit_pos))
                 if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Pincer Tail"):
-                    self.create_reaction("Pincer Tail", secondary_player.name_player, pos_holder)
+                    self.create_reaction("Pincer Tail", secondary_player.name_player, (int(primary_player.number), planet_pos, unit_pos))
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if secondary_player.search_attachments_at_pos(
                         att_pla, att_pos, "Last Breath"):

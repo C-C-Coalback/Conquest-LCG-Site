@@ -302,6 +302,7 @@
     const roomName = JSON.parse(document.getElementById('game-id').textContent);
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         function buildGameSocketUrl() {
+            console.log("Building socket")
             return ws_scheme
                 + '://'
                 + window.location.host
