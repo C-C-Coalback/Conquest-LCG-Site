@@ -71,7 +71,7 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.exhaust_given_pos(-2, 0)
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HQ", "1", "0"])
-        await self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), True)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), True)
 
     async def test_ork_kannon(self):
         random.seed(42)

@@ -832,9 +832,9 @@ class Player:
                     single_card_string += attachments_list[a].get_name()
                     if attachments_list[a].get_name() in self.cards_that_have_errata:
                         if self.game.apoka:
-                            card_array[i] = card_array[i] + "_apoka"
+                            single_card_string = single_card_string + "_apoka"
                         elif self.game.blackstone:
-                            card_array[i] = card_array[i] + "_blackstone"
+                            single_card_string = single_card_string + "_blackstone"
                     single_card_string += "+"
                     if attachments_list[a].get_ready():
                         single_card_string += "R"
@@ -1391,9 +1391,9 @@ class Player:
                             single_card_string += attachments_list[a].get_name()
                             if attachments_list[a].get_name() in self.cards_that_have_errata:
                                 if self.game.apoka:
-                                    card_array[i] = card_array[i] + "_apoka"
+                                    single_card_string = single_card_string + "_apoka"
                                 elif self.game.blackstone:
-                                    card_array[i] = card_array[i] + "_blackstone"
+                                    single_card_string = single_card_string + "_blackstone"
                             single_card_string += "+"
                             if attachments_list[a].get_ready():
                                 single_card_string += "R"
@@ -1410,9 +1410,9 @@ class Player:
                         single_card_string = current_card.get_name()
                         if single_card_string in self.cards_that_have_errata:
                             if self.game.apoka:
-                                card_array[i] = card_array[i] + "_apoka"
+                                single_card_string = single_card_string + "_apoka"
                             elif self.game.blackstone:
-                                card_array[i] = card_array[i] + "_blackstone"
+                                single_card_string = single_card_string + "_blackstone"
                         single_card_string = single_card_string + "|"
                         if current_card.ready:
                             single_card_string += "R|"
@@ -1480,7 +1480,7 @@ class Player:
 
     def increase_sweep_given_pos_eor(self, planet_id, unit_id, value):
         if planet_id == -2:
-            self.headquarters[unit_ud].sweep_eor += value
+            self.headquarters[unit_id].sweep_eor += value
             return None
         self.cards_in_play[planet_id + 1][unit_id].sweep_eor += value
         return None
@@ -1502,7 +1502,7 @@ class Player:
 
     def increase_sweep_given_pos_eop(self, planet_id, unit_id, value):
         if planet_id == -2:
-            self.headquarters[unit_ud].sweep_eop += value
+            self.headquarters[unit_id].sweep_eop += value
             return None
         self.cards_in_play[planet_id + 1][unit_id].sweep_eop += value
         return None
@@ -3025,7 +3025,7 @@ class Player:
 
     def get_id_given_pos(self, planet_pos, unit_pos):
         if planet_pos == -2:
-            return self.headquarters[unit].card_id
+            return self.headquarters[unit_pos].card_id
         return self.cards_in_play[planet_pos + 1][unit_pos].card_id
 
     def add_card_to_planet(self, card, position, sacrifice_end_of_phase=False, already_exhausted=False,
@@ -7726,6 +7726,7 @@ class Player:
 
     def destroy_all_cards_in_hq(self, ignore_uniques=True, units_only=True, enemy_event=False):
         i = 0
+        other_player = self.get_other_player()
         while i < len(self.headquarters):
             card_type = self.headquarters[i].get_card_type()
             if ignore_uniques and units_only:
@@ -7735,8 +7736,8 @@ class Player:
                         i = i - 1
                     elif not self.get_immune_to_enemy_events(-2, i, power=True):
                         if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
-                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
-                                                 (int(secondary_player.number), -2, -1))
+                            self.create_reaction("Flayed Ones Revenants", other_player.name_player,
+                                                 (int(other_player.number), -2, -1))
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -7747,8 +7748,8 @@ class Player:
                         i = i - 1
                     elif not self.get_immune_to_enemy_events(-2, i, power=True):
                         if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
-                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
-                                                 (int(secondary_player.number), -2, -1))
+                            self.create_reaction("Flayed Ones Revenants", other_player.name_player,
+                                                 (int(other_player.number), -2, -1))
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -7759,8 +7760,8 @@ class Player:
                         i = i - 1
                     elif not self.get_immune_to_enemy_events(-2, i, power=True):
                         if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
-                            self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
-                                                 (int(secondary_player.number), -2, -1))
+                            self.create_reaction("Flayed Ones Revenants", other_player.name_player,
+                                                 (int(other_player.number), -2, -1))
                         self.destroy_card_in_hq(i)
                         i = i - 1
                 i = i + 1
@@ -7770,8 +7771,8 @@ class Player:
                     i = i - 1
                 elif not self.get_immune_to_enemy_events(-2, i, power=True):
                     if self.get_ability_given_pos(-2, i) == "Flayed Ones Revenants":
-                        self.create_reaction("Flayed Ones Revenants", secondary_player.name_player,
-                                             (int(secondary_player.number), -2, -1))
+                        self.create_reaction("Flayed Ones Revenants", other_player.name_player,
+                                             (int(other_player.number), -2, -1))
                     self.destroy_card_in_hq(i)
                     i = i - 1
                 i = i + 1
