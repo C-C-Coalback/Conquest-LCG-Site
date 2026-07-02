@@ -617,7 +617,7 @@ ability_targets_dictionary = {
             "Forbidden Card Type": None,
             "Required Traits": [],
             "Forbidden Traits": [],
-            "Same Planet": False,
+            "Same Planet": True,
             "Special": True,
             "Target": True,
             "Ability Type": "Reaction"
