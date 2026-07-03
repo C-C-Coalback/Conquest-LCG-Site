@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.views.decorators.http import require_POST
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import authenticate, get_user_model, password_validation, logout
+from django.contrib.auth import password_validation, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect

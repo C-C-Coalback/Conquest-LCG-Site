@@ -17,9 +17,6 @@ import os
 import sys
 from . import ValidMovesFinder
 from . import Commands
-from .. import profile_records
-from channels.layers import get_channel_layer
-from django.conf import settings
 
 
 class Game:
@@ -687,28 +684,14 @@ class Game:
             return True
         return False
 
-    async def _broadcast_to_game_group(self, message):
-        """Broadcasts a message to all websocket clients in this game's room group."""
-        if not settings.configured:
-            return
-        channel_layer = get_channel_layer()
-        if channel_layer is None:
-            return
-        await channel_layer.group_send(
-            f"play_{self.game_id}",
-            {"type": "chat.message", "message": message}
-        )
-
     async def send_update_message(self, message):
         """
         Sends a message from the server to all users in the current room.
 
         :param message: string containing the message.
         """
-        if message.startswith("GAME_INFO"):
-            await self._broadcast_to_game_group(message)
-        else:
-            await self._broadcast_to_game_group("server: " + message)
+        if self.game_sockets:
+            await self.game_sockets[0].receive_game_update(message)
 
     def reset_action_data(self):
         """
@@ -1995,12 +1978,6 @@ class Game:
             self.p1.is_the_winner = True
         elif winner_name == self.name_2:
             self.p2.is_the_winner = True
-        if not self.profile_result_recorded:
-            try:
-                profile_records.record_finished_game_result(self, winner_name, reason)
-            except Exception as e:
-                print(e)
-            self.profile_result_recorded = True
         await self.send_update_message(victory_string)
 
     def check_if_any_planets_in_play(self):
@@ -2008,49 +1985,6 @@ class Game:
             if self.planets_in_play_array[i]:
                 return True
         return False
-
-    async def resolve_no_planets_remaining_endgame(self):
-        if self.check_if_any_planets_in_play():
-            return False
-        self.committing_warlords = False
-        self.before_command_struggle = False
-        self.after_command_struggle = False
-        self.battle_in_progress = False
-        self.game_is_complete = True
-        if self.p1.is_the_winner or self.p2.is_the_winner:
-            return True
-        p1_icons = self.p1.get_icons_on_captured()
-        p2_icons = self.p2.get_icons_on_captured()
-        p1_icon_win = p1_icons[0] > 2 or p1_icons[1] > 2 or p1_icons[2] > 2
-        p2_icon_win = p2_icons[0] > 2 or p2_icons[1] > 2 or p2_icons[2] > 2
-        if p1_icon_win and not p2_icon_win:
-            winner_name = self.name_1
-            reason = "icons on captured planets"
-        elif p2_icon_win and not p1_icon_win:
-            winner_name = self.name_2
-            reason = "icons on captured planets"
-        elif self.last_player_to_capture_planet == self.name_1:
-            winner_name = self.name_1
-            reason = "capturing the last available planet"
-        elif self.last_player_to_capture_planet == self.name_2:
-            winner_name = self.name_2
-            reason = "capturing the last available planet"
-        elif len(self.p1.victory_display) > len(self.p2.victory_display):
-            winner_name = self.name_1
-            reason = "capturing more planets when none remained"
-        elif len(self.p2.victory_display) > len(self.p1.victory_display):
-            winner_name = self.name_2
-            reason = "capturing more planets when none remained"
-        else:
-            winner_name = "???"
-            reason = "no planets remained and no clear winner"
-        await self.send_update_message(
-            "----GAME END----"
-            "Victory for " + winner_name + "; " + reason + "."
-            "----GAME END----"
-        )
-        await self.send_victory_proper(winner_name, reason)
-        return True
 
     def determine_last_planet(self):
         last = -1
@@ -3213,7 +3147,8 @@ class Game:
             message = name + ": " + "/".join(message)
             print("receive:", message)
             self.chat_messages.append(message)
-            await self._broadcast_to_game_group(message)
+            if self.game_sockets:
+                await self.game_sockets[0].broadcast_chat_message(message)
 
     async def quick_battle_ability_resolution(self, name, game_update_string, winner: PlayerClass.Player, loser: PlayerClass.Player):
         planet_pos = self.last_planet_checked_for_battle
@@ -4445,9 +4380,6 @@ class Game:
                 j = j + 1
         if self.phase == "COMMAND":
             self.committing_warlords = True
-            if not self.check_if_any_planets_in_play():
-                await self.resolve_no_planets_remaining_endgame()
-                return None
         if self.phase == "COMBAT":
             if self.p1.search_card_in_hq("'idden Base"):
                 self.p1.idden_base_transform()

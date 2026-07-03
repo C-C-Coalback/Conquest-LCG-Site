@@ -10,11 +10,7 @@
 <link rel="stylesheet" href="{% static 'play_style.css' %}">
 {% endif %}
 <div class="box" onmousemove="getCursor(event)">
-    <div id="hover-preview-box">
-        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard" onclick="changeHelperSize()">
-        <div id="helper-text-box">
-
-        </div>
+    <div id="helper-text-box">
 
     </div>
     <div id="contextMenu" class="context-menu">
@@ -177,35 +173,12 @@
             </div>
         </div>
     </div>
+    <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="LargeHelperCard" onclick="changeHelperSize()">
     <div id="increase-zoom-div">
         <input id="inc-zoom" type="button" value="Zoom In" onclick="increaseZoom();">
     </div>
     <div id="decrease-zoom-div">
         <input id="dec-zoom" type="button" value="Zoom Out" onclick="decreaseZoom();">
-    </div>
-    <div id="in-game-settings-div">
-        <input id="open-in-game-settings" type="button" value="In-Game Settings" onclick="toggleInGameSettingsDialog();">
-    </div>
-    <div id="in-game-settings-dialog">
-        <h3 id="in-game-settings-header">In-Game Settings</h3>
-        <label class="in-game-settings-option">
-            <input id="setting-toggle-hints" type="checkbox" checked onchange="setHintsEnabled(this.checked)">
-            Toggle Hints in the info-box
-        </label>
-        <label style="display:none" class="in-game-settings-option">
-            <input id="setting-toggle-tutorial" type="checkbox" onchange="setTutorialModeEnabled(this.checked)">
-            Toggle tutorial mode (we'll add later)
-        </label>
-        <div class="in-game-settings-option in-game-settings-slider-option">
-            <label for="setting-preview-size">Preview size</label>
-            <input id="setting-preview-size" type="range" min="70" max="170" step="5" value="100" oninput="setHoverPreviewScalePercent(this.value)">
-            <span id="setting-preview-size-value">100%</span>
-        </div>
-        <label class="in-game-settings-option">
-            <input id="setting-toggle-preview" type="checkbox" checked onchange="setHoverPreviewEnabled(this.checked)">
-            Toggle preview-on-hover on/off
-        </label>
-        <input id="close-in-game-settings" type="button" value="Close" onclick="hideInGameSettingsDialog();">
     </div>
     <div id="pass-player-1">
         <input id="pass-P1" type="button" value="PASS" onclick="testImageButton(this.id);">
@@ -271,17 +244,6 @@
         return result;
     }
 
-    function escapeHtmlAttribute(value) {
-        if (value === undefined || value === null) {
-            return "";
-        }
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("\"", "&quot;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;");
-    }
-
     function replaceCardbacksText_2(original_string) {
         var result = original_string.replaceAll("Cardback", cardback_2);
         return result;
@@ -301,18 +263,14 @@
 
     const roomName = JSON.parse(document.getElementById('game-id').textContent);
 	var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
-        function buildGameSocketUrl() {
-            console.log("Building socket")
-            return ws_scheme
-                + '://'
-                + window.location.host
-                + '/ws/play/'
-                + roomName
-                + '/';
-        }
-
-        const gameSocket = new WebSocket(buildGameSocketUrl());
-        window.gameSocket = gameSocket;
+        const gameSocket = new WebSocket(
+	    ws_scheme
+            + '://'
+            + window.location.host
+            + '/ws/play/'
+            + roomName
+            + '/'
+        );
 
         var current_zoom = 1;
 
@@ -460,731 +418,6 @@
         var num_cards_in_hand = 0;
         var active_string_id = "";
         var stored_focused_planet = -1;
-        var latest_info_box_rows = [];
-        var latest_info_box_color = "red";
-        var automated_required_action = "";
-        var automated_waited_on = "";
-        var automated_legal_actions = [];
-        var automated_misc_type = "";
-        var automated_misc_details = "";
-        var hints_enabled = true;
-        var tutorial_mode_enabled = false;
-        var hover_preview_enabled = true;
-        var hover_preview_scale_percent = 100;
-        var choice_context_hover_request_id = 0;
-        var current_planet_names = ["", "", "", "", "", "", ""];
-        var helper_text_vertical_offset_px = 0;
-        var socket_recovery_scheduled = false;
-        var socket_reconnect_delay_ms = 1200;
-        var socket_recovery_timeout_id = null;
-        var socket_disconnect_notice_shown = false;
-        var socket_reconnect_attempt_count = 0;
-        var automated_state_sync_in_flight = false;
-        var automated_state_sync_timeout_id = null;
-        var automated_state_last_sync_at_ms = 0;
-        var automated_state_sync_min_interval_ms = 350;
-        var api_action_fallback_in_flight = false;
-
-        function reconnectGameSocket() {
-            var activeSocket = window.gameSocket;
-            if (activeSocket && (activeSocket.readyState === WebSocket.OPEN || activeSocket.readyState === WebSocket.CONNECTING)) {
-                return;
-            }
-            var newSocket = new WebSocket(buildGameSocketUrl());
-            if (activeSocket) {
-                newSocket.onopen = activeSocket.onopen;
-                newSocket.onmessage = activeSocket.onmessage;
-                newSocket.onclose = activeSocket.onclose;
-            }
-            window.gameSocket = newSocket;
-        }
-
-        function sendGameSocketMessage(message_text) {
-            var activeSocket = window.gameSocket;
-            if (!activeSocket || activeSocket.readyState !== WebSocket.OPEN) {
-                scheduleSocketRecovery(`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
-                if (!activeSocket || activeSocket.readyState === WebSocket.CLOSED) {
-                    reconnectGameSocket();
-                }
-                scheduleAutomatedStateSync(120);
-                return false;
-            }
-            try {
-                activeSocket.send(JSON.stringify({
-                    'message': message_text
-                }));
-                return true;
-            } catch (error) {
-                console.debug("Socket send failed", error);
-                scheduleSocketRecovery(`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
-                reconnectGameSocket();
-                scheduleAutomatedStateSync(120);
-                return false;
-            }
-        }
-
-        function isApiFallbackEligibleActionToken(action_token) {
-            if (!action_token || action_token === "action-button") {
-                return false;
-            }
-            if (isPassToken(action_token)) {
-                return true;
-            }
-            if (action_token.startsWith("SPECIAL_ACTION_")) {
-                return true;
-            }
-            if (action_token.includes("/")) {
-                return true;
-            }
-            return false;
-        }
-
-        async function attemptApiActionFallback(action_token) {
-            if (!isApiFallbackEligibleActionToken(action_token)) {
-                return false;
-            }
-            if (api_action_fallback_in_flight) {
-                return false;
-            }
-            api_action_fallback_in_flight = true;
-            try {
-                const fallback_response = await fetch(
-                    '/api/game/' + roomName + '/agent_action/',
-                    {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            player: "{{ user.username }}",
-                            action: action_token
-                        })
-                    }
-                );
-                if (!fallback_response.ok) {
-                    return false;
-                }
-                const fallback_payload = await fallback_response.json();
-                if (!fallback_payload || fallback_payload.status !== "success") {
-                    return false;
-                }
-                if (fallback_payload.game) {
-                    applyAutomatedStateSnapshot(fallback_payload.game);
-                }
-                scheduleAutomatedStateSync(120);
-                return true;
-            } catch (error) {
-                console.debug("API action fallback failed", error);
-                return false;
-            } finally {
-                api_action_fallback_in_flight = false;
-            }
-        }
-
-        function scheduleSocketRecovery(disconnect_warning_text) {
-            var textarea = document.getElementById('chat-log');
-            var reconnect_notice = document.getElementById('socket-reconnect-notice');
-            if (!socket_disconnect_notice_shown && !reconnect_notice) {
-                socket_disconnect_notice_shown = true;
-                var warning_html = disconnect_warning_text || `<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`;
-                if (disconnect_warning_text) {
-                    warning_html = disconnect_warning_text;
-                }
-                textarea.innerHTML += (`<span id="socket-reconnect-notice">` + warning_html + `<b style="color: orange"> Reconnecting...</b></span><br>`);
-            }
-            if (!socket_recovery_scheduled) {
-                socket_recovery_scheduled = true;
-                if (socket_recovery_timeout_id !== null) {
-                    window.clearTimeout(socket_recovery_timeout_id);
-                }
-                var next_reconnect_delay_ms = Math.min(
-                    Math.round(socket_reconnect_delay_ms * Math.pow(1.6, socket_reconnect_attempt_count)),
-                    10000
-                );
-                socket_recovery_timeout_id = window.setTimeout(function() {
-                    socket_recovery_scheduled = false;
-                    socket_reconnect_attempt_count += 1;
-                    reconnectGameSocket();
-                    socket_recovery_timeout_id = null;
-                }, next_reconnect_delay_ms);
-            }
-            textarea.scrollTop = textarea.scrollHeight;
-        }
-
-        function setChoicePanelToNothingHere() {
-            var choice_collapse = document.getElementById("search-collapse");
-            if (!choice_collapse) {
-                return;
-            }
-            choice_collapse.innerHTML = `<div id="choices-container"><div id="header-choices-container">Nothing here</div></div>`;
-            choice_collapse.style.maxWidth = `10vw`;
-            choice_collapse.style.minWidth = `10vw`;
-        }
-
-        function applyAutomatedStateSnapshot(game_snapshot) {
-            if (!game_snapshot) {
-                return;
-            }
-            const turn_snapshot = game_snapshot.turn || {};
-            const interaction_snapshot = game_snapshot.interaction || {};
-            const search_and_choices_snapshot = game_snapshot.search_and_choices || {};
-
-            automated_required_action = String(turn_snapshot.required_action_type || "");
-            automated_waited_on = String(turn_snapshot.active_player || "");
-            automated_legal_actions = Array.isArray(interaction_snapshot.legal_actions)
-                ? interaction_snapshot.legal_actions.map((entry) => String(entry))
-                : [];
-
-            if (automated_required_action === "Choice") {
-                automated_misc_type = "CHOICE";
-                automated_misc_details = String(search_and_choices_snapshot.choice_context || "");
-            } else {
-                automated_misc_type = "";
-                automated_misc_details = "";
-            }
-
-            const has_choices = Array.isArray(search_and_choices_snapshot.choices_available)
-                && search_and_choices_snapshot.choices_available.length > 0;
-            const has_search_cards = Array.isArray(search_and_choices_snapshot.search_cards)
-                && search_and_choices_snapshot.search_cards.length > 0;
-            if (!has_choices && !has_search_cards) {
-                setChoicePanelToNothingHere();
-            }
-            renderInfoBox();
-        }
-
-        async function syncAutomatedStateFromApi() {
-            if (automated_state_sync_in_flight) {
-                return;
-            }
-            const now_ms = Date.now();
-            const elapsed_since_last_sync = now_ms - automated_state_last_sync_at_ms;
-            if (elapsed_since_last_sync < automated_state_sync_min_interval_ms) {
-                const retry_delay_ms = automated_state_sync_min_interval_ms - elapsed_since_last_sync + 30;
-                scheduleAutomatedStateSync(retry_delay_ms);
-                return;
-            }
-            automated_state_sync_in_flight = true;
-            automated_state_last_sync_at_ms = now_ms;
-            try { // 99% sure this code is the cause of freezing problems.
-                const state_response = await fetch(
-                    '/api/game/' + roomName + '/agent_state/?player=' + encodeURIComponent("{{ user.username }}"),
-                    { credentials: 'same-origin' }
-                );
-                if (!state_response.ok) {
-                    return;
-                }
-                const state_payload = await state_response.json();
-                if (!state_payload || state_payload.status !== "success" || !state_payload.game) {
-                    return;
-                }
-                applyAutomatedStateSnapshot(state_payload.game);
-            } catch (error) {
-                console.debug("Automated state sync failed", error);
-            } finally {
-                automated_state_sync_in_flight = false;
-            }
-        }
-
-        function scheduleAutomatedStateSync(delay_ms = 220) { // FIXME: EXTREMELY SLOW
-            if (automated_state_sync_timeout_id !== null) {
-                window.clearTimeout(automated_state_sync_timeout_id);
-            }
-            automated_state_sync_timeout_id = window.setTimeout(function() {
-                automated_state_sync_timeout_id = null;
-                // syncAutomatedStateFromApi();
-            }, delay_ms);
-        }
-
-        function escapeHtml(text) {
-            if (text === undefined || text === null) {
-                return ``;
-            }
-            return String(text)
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;");
-        }
-
-        function parseAutomatedDataMessage(message) {
-            const prefix = "GAME_INFO/AUTOMATED_DATA/";
-            if (!message.startsWith(prefix)) {
-                return null;
-            }
-            const rest = message.slice(prefix.length);
-            const firstSlash = rest.indexOf("/");
-            if (firstSlash === -1) {
-                return null;
-            }
-            const secondSlash = rest.indexOf("/", firstSlash + 1);
-            if (secondSlash === -1) {
-                return null;
-            }
-            const required = rest.slice(0, firstSlash);
-            const waitedOn = rest.slice(firstSlash + 1, secondSlash);
-            const actionsText = rest.slice(secondSlash + 1);
-            const actions = actionsText.split("|||").map((entry) => entry.trim()).filter(Boolean);
-            return {
-                required: required,
-                waitedOn: waitedOn,
-                actions: actions,
-            };
-        }
-
-        function parseMiscAutomatedDataMessage(message) {
-            const prefix = "GAME_INFO/MISC_AUTOMATED_DATA/";
-            if (!message.startsWith(prefix)) {
-                return null;
-            }
-            const rest = message.slice(prefix.length);
-            const firstSlash = rest.indexOf("/");
-            if (firstSlash === -1) {
-                return null;
-            }
-            const secondSlash = rest.indexOf("/", firstSlash + 1);
-            if (secondSlash === -1) {
-                return null;
-            }
-            const thirdSlash = rest.indexOf("/", secondSlash + 1);
-            if (thirdSlash === -1) {
-                return null;
-            }
-            const details = rest.slice(thirdSlash + 1);
-            const detailsSplit = details.split("|||");
-            return {
-                detailType: detailsSplit[0] || "",
-                detailText: detailsSplit.slice(1).join("|||") || "",
-            };
-        }
-
-        function isPassToken(token) {
-            return token === "pass" || token === "pass-P1" || token === "pass-P2";
-        }
-
-        function describeActionToken(token) {
-            if (token.startsWith("SPECIAL_ACTION_")) {
-                var special_action_token = token.slice("SPECIAL_ACTION_".length);
-                if (special_action_token.startsWith("HAND/")) {
-                    return "trigger a special action from a card in hand";
-                }
-                if (special_action_token.startsWith("IN_PLAY/")) {
-                    return "trigger a special action from a unit in play";
-                }
-                if (special_action_token.startsWith("HQ/")) {
-                    return "trigger a special action from a card in HQ";
-                }
-                return "trigger a special action";
-            }
-            if (token.startsWith("HAND/")) {
-                return "play/select a card from hand";
-            }
-            if (token.startsWith("IN_PLAY/")) {
-                return "select a unit in play";
-            }
-            if (token.startsWith("HQ/")) {
-                return "select a card in HQ";
-            }
-            if (token.startsWith("PLANETS/")) {
-                return "select a planet";
-            }
-            if (token.startsWith("CHOICE/")) {
-                return "pick an option in the choice panel";
-            }
-            if (token.startsWith("SEARCH/")) {
-                return "pick a card in the search panel";
-            }
-            if (token.startsWith("ATTACHMENT/")) {
-                return "select an attachment target";
-            }
-            if (isPassToken(token)) {
-                return "pass";
-            }
-            return token;
-        }
-
-        function extractPlanetNameFromInfoRows() {
-            if (!latest_info_box_rows || latest_info_box_rows.length === 0) {
-                return "";
-            }
-            for (var i = 0; i < latest_info_box_rows.length; i++) {
-                var row_text = String(latest_info_box_rows[i] || "").trim();
-                if (!row_text) {
-                    continue;
-                }
-                var lowered_row_text = row_text.toLowerCase();
-                if (lowered_row_text.startsWith("resolve battle ability:")) {
-                    return row_text.slice("resolve battle ability:".length).trim();
-                }
-                if (lowered_row_text.startsWith("planet:")) {
-                    return row_text.slice("planet:".length).trim();
-                }
-            }
-            return "";
-        }
-
-        function isRangedSkirmishActiveFromInfoRows() {
-            if (!latest_info_box_rows || latest_info_box_rows.length === 0) {
-                return false;
-            }
-            for (var i = 0; i < latest_info_box_rows.length; i++) {
-                var row_text = String(latest_info_box_rows[i] || "").toLowerCase();
-                if (row_text.startsWith("active (ranged):")) {
-                    return true;
-                }
-                if (row_text.startsWith("combat step: ranged")) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function normalizeInfoOwnerName(name_text) {
-            if (name_text === undefined || name_text === null) {
-                return "";
-            }
-            var normalized_name = String(name_text).trim();
-            if (!normalized_name) {
-                return "";
-            }
-            var lowered_name = normalized_name.toLowerCase();
-            if (lowered_name === "unspecified" || lowered_name === "none") {
-                return "";
-            }
-            while (normalized_name.endsWith(".")) {
-                normalized_name = normalized_name.slice(0, -1).trim();
-            }
-            return normalized_name;
-        }
-
-        function inferInfoBoxOwnerFromRows(info_rows) {
-            if (!info_rows || info_rows.length === 0) {
-                return "";
-            }
-            var owner_prefixes = [
-                "User:",
-                "Active:",
-                "Active (RANGED):",
-                "Action Window:",
-                "Shield:",
-                "Nullify:",
-                "Deepstrike:"
-            ];
-            for (var i = 0; i < info_rows.length; i++) {
-                var row_text = String(info_rows[i] || "").trim();
-                if (!row_text) {
-                    continue;
-                }
-                for (var j = 0; j < owner_prefixes.length; j++) {
-                    var owner_prefix = owner_prefixes[j];
-                    if (row_text.startsWith(owner_prefix)) {
-                        return normalizeInfoOwnerName(row_text.slice(owner_prefix.length));
-                    }
-                }
-            }
-            return "";
-        }
-
-        function resolveInfoBoxColor(info_box_owner, info_rows) {
-            var my_name = "{{ user.username }}";
-            var inferred_owner = inferInfoBoxOwnerFromRows(info_rows);
-            if (inferred_owner) {
-                return inferred_owner === my_name ? "green" : "red";
-            }
-            var normalized_owner = normalizeInfoOwnerName(info_box_owner);
-            if (normalized_owner === my_name) {
-                return "green";
-            }
-            return "red";
-        }
-
-        function extractPlanetIndexFromActionToken(token) {
-            if (!token || isPassToken(token)) {
-                return -1;
-            }
-            var split_token = token.split("/");
-            if (split_token.length < 2) {
-                return -1;
-            }
-            var parsed_index = -1;
-            if (split_token[0] === "PLANETS" && split_token.length >= 2) {
-                parsed_index = parseInt(split_token[1], 10);
-            } else if (split_token[0] === "IN_PLAY" && split_token.length >= 3) {
-                parsed_index = parseInt(split_token[2], 10);
-            } else if (split_token[0] === "RESERVE" && split_token.length >= 3) {
-                parsed_index = parseInt(split_token[2], 10);
-            } else if (split_token[0] === "ATTACHMENT" && split_token.length >= 4) {
-                if (split_token[1] === "IN_PLAY") {
-                    parsed_index = parseInt(split_token[3], 10);
-                } else if (split_token[1] === "PLANETS") {
-                    parsed_index = parseInt(split_token[3], 10);
-                }
-            }
-            if (isNaN(parsed_index) || parsed_index < 0 || parsed_index >= current_planet_names.length) {
-                return -1;
-            }
-            return parsed_index;
-        }
-
-        function inferPlanetNameFromAutomatedActions() {
-            var legal_actions = automated_legal_actions || [];
-            var found_planet_index = -1;
-            for (var i = 0; i < legal_actions.length; i++) {
-                var maybe_planet_index = extractPlanetIndexFromActionToken(legal_actions[i]);
-                if (maybe_planet_index === -1) {
-                    continue;
-                }
-                if (found_planet_index === -1) {
-                    found_planet_index = maybe_planet_index;
-                } else if (found_planet_index !== maybe_planet_index) {
-                    return "";
-                }
-            }
-            if (found_planet_index === -1) {
-                return "";
-            }
-            return sanitizeChoiceContextText(current_planet_names[found_planet_index]);
-        }
-
-        function inferActivePlanetName(choice_context_text="") {
-            var info_planet_name = sanitizeChoiceContextText(extractPlanetNameFromInfoRows());
-            if (info_planet_name) {
-                return info_planet_name;
-            }
-            var automated_planet_name = inferPlanetNameFromAutomatedActions();
-            if (automated_planet_name) {
-                return automated_planet_name;
-            }
-            var normalized_context = sanitizeChoiceContextText(choice_context_text).toLowerCase();
-            if (normalized_context === "resolve battle ability?") {
-                return "";
-            }
-            return "";
-        }
-
-        function isCurrentPlanetName(candidate_name) {
-            var normalized_candidate = sanitizeChoiceContextText(candidate_name).toLowerCase();
-            if (!normalized_candidate) {
-                return false;
-            }
-            for (var i = 0; i < current_planet_names.length; i++) {
-                if (sanitizeChoiceContextText(current_planet_names[i]).toLowerCase() === normalized_candidate) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function buildTurnHint() {
-            if (!automated_required_action) {
-                return "";
-            }
-            const myName = "{{ user.username }}";
-            const legalActions = automated_legal_actions || [];
-            const nonPassActions = legalActions.filter((token) => !isPassToken(token));
-            const inferredOwner = inferInfoBoxOwnerFromRows(latest_info_box_rows);
-            let effectiveWaitedOn = automated_waited_on;
-            if (inferredOwner) {
-                effectiveWaitedOn = inferredOwner;
-            }
-            if (effectiveWaitedOn && effectiveWaitedOn !== myName) {
-                return "Waiting on " + effectiveWaitedOn + " to act.";
-            }
-            if (automated_required_action === "Action Window Between Combat Turns") {
-                if (nonPassActions.length === 0) {
-                    return "Only optional actions are available right now, so PASS is the correct way to continue combat.";
-                }
-                return "You can trigger an action with a highlighted card, or click PASS to continue to the next combat turn.";
-            }
-            if (automated_required_action === "Combat Turn") {
-                const rangedSkirmishActive = isRangedSkirmishActiveFromInfoRows();
-                if (nonPassActions.length === 0) {
-                    if (rangedSkirmishActive) {
-                        return "Ranged skirmish is active. You have no legal ranged attacks, so click PASS to continue to normal combat attacks.";
-                    }
-                    return "No legal attacks are available, so PASS is the only valid combat-turn action.";
-                }
-                if (rangedSkirmishActive) {
-                    const hasAttackDeclaration = nonPassActions.some((token) => token.startsWith("IN_PLAY/"));
-                    if (!hasAttackDeclaration) {
-                        return "Ranged skirmish is active. You can use a special action now, or click PASS to continue to normal combat attacks.";
-                    }
-                }
-                const ownPrefix = "IN_PLAY/" + own_player_number + "/";
-                if (own_player_number !== "0" && nonPassActions.every((token) => token.startsWith(ownPrefix))) {
-                    if (rangedSkirmishActive) {
-                        return "Ranged skirmish is active. Select one of your ready ranged units to declare as attacker.";
-                    }
-                    return "Select one of your ready units to declare as attacker.";
-                }
-                if (nonPassActions.every((token) => token.startsWith("IN_PLAY/"))) {
-                    if (rangedSkirmishActive) {
-                        return "Ranged skirmish is active. Select an enemy unit as defender for the current ranged attack.";
-                    }
-                    return "Select an enemy unit as defender for the current attack.";
-                }
-                return "Resolve combat by selecting one of the highlighted legal targets.";
-            }
-            if (automated_required_action === "Commitment") {
-                return "Select a planet to commit your warlord.";
-            }
-            if (automated_required_action === "Choice") {
-                if (automated_misc_type === "CHOICE" && automated_misc_details) {
-                    return "Make a choice: " + automated_misc_details;
-                }
-                return "Pick one of the available choices in the choice panel.";
-            }
-            if (automated_required_action === "Search") {
-                return "Pick a card from the search panel.";
-            }
-            if (
-                automated_required_action === "Deploy Turn" ||
-                automated_required_action === "Command not Commitment" ||
-                automated_required_action === "Headquarters Action" ||
-                automated_required_action === "Outside Combat"
-            ) {
-                var mapped_tokens = nonPassActions.slice(0, 2).map((token) => describeActionToken(token));
-                if (nonPassActions.length === 0) {
-                    return "No legal actions are currently available, so PASS is the right move.";
-                } else if (nonPassActions.length === 1) {
-                    const preview = nonPassActions.slice(0, 2).map((token) => describeActionToken(token)).join(" or ");
-                } else {
-                    if (mapped_tokens[0] === mapped_tokens[1]) {
-                        mapped_tokens = mapped_tokens.slice(0, 1);
-                    }
-                }
-                const preview = mapped_tokens.join(" or ");
-                return "You can " + preview + ".";
-            }
-            if (nonPassActions.length === 0 && legalActions.length > 0) {
-                return "PASS is the only legal action right now.";
-            }
-            return "Required step: " + automated_required_action + ".";
-        }
-
-        function renderInfoBox() {
-            const infoBox = document.getElementById("info-box");
-            if (!infoBox) {
-                return;
-            }
-            infoBox.innerHTML = ``;
-            for (var i = 0; i < latest_info_box_rows.length; i++) {
-                const row = escapeHtml(latest_info_box_rows[i]);
-                infoBox.innerHTML += `<p class="info-box-sub" style="color:` + latest_info_box_color + `;">` + row + `</p>`;
-            }
-            const activePlanetName = inferActivePlanetName();
-            if (activePlanetName) {
-                infoBox.innerHTML += `<p class="info-box-sub" style="color:#1f4a7a;font-weight:700;margin-top:4px;">Planet: ` + escapeHtml(activePlanetName) + `</p>`;
-            }
-            const hintText = buildTurnHint();
-            if (hints_enabled && hintText) {
-                infoBox.innerHTML += `<p class="info-box-sub" style="color:#7a4d00;font-weight:700;margin-top:4px;">Hint: ` + escapeHtml(hintText) + `</p>`;
-            }
-        }
-
-        function syncInGameSettingsControls() {
-            var hintsToggle = document.getElementById("setting-toggle-hints");
-            if (hintsToggle) {
-                hintsToggle.checked = hints_enabled;
-            }
-            var tutorialToggle = document.getElementById("setting-toggle-tutorial");
-            if (tutorialToggle) {
-                tutorialToggle.checked = tutorial_mode_enabled;
-            }
-            var previewToggle = document.getElementById("setting-toggle-preview");
-            if (previewToggle) {
-                previewToggle.checked = hover_preview_enabled;
-            }
-            var previewScale = document.getElementById("setting-preview-size");
-            if (previewScale) {
-                previewScale.value = hover_preview_scale_percent.toString();
-            }
-            var previewScaleValue = document.getElementById("setting-preview-size-value");
-            if (previewScaleValue) {
-                previewScaleValue.innerHTML = hover_preview_scale_percent.toString() + "%";
-            }
-        }
-
-        function showInGameSettingsDialog() {
-            var settingsDialog = document.getElementById("in-game-settings-dialog");
-            if (!settingsDialog) {
-                return;
-            }
-            syncInGameSettingsControls();
-            settingsDialog.style.display = "block";
-        }
-
-        function hideInGameSettingsDialog() {
-            var settingsDialog = document.getElementById("in-game-settings-dialog");
-            if (!settingsDialog) {
-                return;
-            }
-            settingsDialog.style.display = "none";
-        }
-
-        function toggleInGameSettingsDialog() {
-            var settingsDialog = document.getElementById("in-game-settings-dialog");
-            if (!settingsDialog) {
-                return;
-            }
-            if (settingsDialog.style.display === "block") {
-                hideInGameSettingsDialog();
-            } else {
-                showInGameSettingsDialog();
-            }
-        }
-
-        function setHintsEnabled(enabled) {
-            hints_enabled = !!enabled;
-            renderInfoBox();
-        }
-
-        function setTutorialModeEnabled(enabled) {
-            tutorial_mode_enabled = !!enabled;
-        }
-
-        function setHoverPreviewEnabled(enabled) {
-            hover_preview_enabled = !!enabled;
-            if (!hover_preview_enabled) {
-                changeDefOut();
-            }
-        }
-
-        function setHoverPreviewScalePercent(percentValue) {
-            var parsedPercent = parseInt(percentValue, 10);
-            if (isNaN(parsedPercent)) {
-                parsedPercent = 100;
-            }
-            if (parsedPercent < 70) {
-                parsedPercent = 70;
-            }
-            if (parsedPercent > 170) {
-                parsedPercent = 170;
-            }
-            hover_preview_scale_percent = parsedPercent;
-            var previewScaleValue = document.getElementById("setting-preview-size-value");
-            if (previewScaleValue) {
-                previewScaleValue.innerHTML = hover_preview_scale_percent.toString() + "%";
-            }
-            applyHoverPreviewSizeSettings();
-        }
-
-        function applyHoverPreviewSizeSettings() {
-            var scaleMultiplier = hover_preview_scale_percent / 100;
-            if (helper_is_large === "T") {
-                current_helper_width = (50 * scaleMultiplier).toFixed(1) + "vh";
-                current_helper_height = (68 * scaleMultiplier).toFixed(1) + "vh";
-            } else {
-                current_helper_width = "min(" + (20 * scaleMultiplier).toFixed(1) + "vw, "
-                    + (29.5 * scaleMultiplier).toFixed(1) + "vh)";
-                current_helper_height = (40 * scaleMultiplier).toFixed(1) + "vh";
-            }
-            var helperCard = document.getElementById("LargeHelperCard");
-            if (helperCard) {
-                helperCard.style.width = current_helper_width;
-                helperCard.style.height = current_helper_height;
-            }
-        }
 
         function playSound(url) {
             console.log(url);
@@ -1233,26 +466,6 @@
 
         function updateDisplays(hideUnrevealedPlanets) {
 
-        }
-
-        function determineForcedWidth() {
-            var forced_width = "0vw";
-            if (stored_focused_planet !== -1) {
-                var num_excess_planets = 0;
-                var first_pos_in_play = -1;
-                for (var i = 0; i < inPlayPlanets.length; i++) {
-                    if (inPlayPlanets[i] === "true") {
-                        if (first_pos_in_play === -1) {
-                            first_pos_in_play = i;
-                        }
-                    }
-                }
-                num_excess_planets = first_pos_in_play;
-                var width_excess_planets = 10;
-                var available_width = width_excess_planets * num_excess_planets;
-                forced_width = available_width.toString() + "vw";
-            }
-            return forced_width
         }
 
         function setPlanetAppearances(first_pos_in_play, forced_width, focused_planet) {
@@ -1360,12 +573,7 @@
             if (focused_planet !== -1) {
                 planet_width_value = "10vw";
             }
-            var value_width_integer = parseInt(forced_width.replace("vw", ""))
-            var value_planet_width_integer = parseInt(planet_width_value.replace("vw", ""))
             updateGridTemplateColumns(first_pos_in_play, focused_planet);
-            var zoom_value = current_zoom;
-            forced_width = (value_width_integer * zoom_value).toString() + "vw";
-            planet_width_value = (value_planet_width_integer * zoom_value).toString() + "vw";
             for (var i = 0; i < inPlayPlanets.length; i++) {
                 if (i === focused_planet) {
                     document.getElementById("player-1-cards-planet-" + (i).toString()).style.maxWidth = forced_width;
@@ -1380,248 +588,7 @@
             console.log("Hopefully changed planets");
         }
 
-        function sanitizeChoiceContextText(choice_context) {
-            if (choice_context === undefined || choice_context === null) {
-                return "";
-            }
-            return String(choice_context).trim();
-        }
-
-        function inferChoiceContextCardName(choice_context) {
-            var candidate = sanitizeChoiceContextText(choice_context);
-            if (!candidate) {
-                return "";
-            }
-            if (candidate.includes(":")) {
-                candidate = candidate.split(":")[0].trim();
-            }
-            while (candidate.endsWith("?")) {
-                candidate = candidate.slice(0, -1).trim();
-            }
-            if (!candidate) {
-                return "";
-            }
-            var lowered_candidate = candidate.toLowerCase();
-            if (lowered_candidate.startsWith("use ")) {
-                candidate = candidate.slice(4).trim();
-                lowered_candidate = candidate.toLowerCase();
-            }
-            if (lowered_candidate.endsWith(" scrying")) {
-                candidate = candidate.slice(0, -8).trim();
-                lowered_candidate = candidate.toLowerCase();
-            }
-            if (!candidate) {
-                return "";
-            }
-            var generic_prefixes = [
-                "choose ",
-                "target ",
-                "amount ",
-                "gains ",
-                "interrupt ",
-                "remove ",
-                "rearranging ",
-            ];
-            for (var i = 0; i < generic_prefixes.length; i++) {
-                if (lowered_candidate.startsWith(generic_prefixes[i])) {
-                    return "";
-                }
-            }
-            var generic_contexts = [
-                "choice hidden",
-                "yes",
-                "no",
-                "nothing here",
-                "resolve battle ability",
-            ];
-            if (generic_contexts.includes(lowered_candidate)) {
-                return "";
-            }
-            return candidate;
-        }
-
-        function buildChoiceContextHelperText(choice_context, choice_context_card="") {
-            var prompt_text = sanitizeChoiceContextText(choice_context);
-            if (!prompt_text) {
-                return "Choose one of the available options.";
-            }
-            var lowered_prompt = prompt_text.toLowerCase();
-            var helper_text = "Prompt: " + prompt_text;
-            var inferred_planet_name = sanitizeChoiceContextText(choice_context_card);
-            if (!inferred_planet_name) {
-                inferred_planet_name = inferActivePlanetName(prompt_text);
-            }
-            if (lowered_prompt.includes("hangyz")) {
-                helper_text += "\nYes resolves the Hangyz effect.\nNo skips the effect.";
-            } else if (lowered_prompt.startsWith("choose ") || lowered_prompt.startsWith("target ")) {
-                helper_text += "\nSelect the option that matches this prompt.";
-            } else {
-                helper_text += "\nFor Yes/No prompts, Yes resolves the effect and No skips it.";
-            }
-            if (inferred_planet_name) {
-                helper_text += "\nPlanet: " + inferred_planet_name;
-            }
-            return helper_text;
-        }
-
-        function showChoiceContextPreview(route_text, is_planet_context, helper_text) {
-            if (is_planet_context) {
-                changeDefRotateAndHelp(route_text, helper_text, 0);
-            } else {
-                changeDef(route_text);
-                setHoverHelperText(helper_text);
-            }
-        }
-        function showChoiceContextHelp(choice_context, choice_context_card) {
-            if (!hover_preview_enabled) {
-                return;
-            }
-            choice_context_hover_request_id += 1;
-            var request_id = choice_context_hover_request_id;
-            var inferred_card_name = sanitizeChoiceContextText(choice_context_card);
-            if (!inferred_card_name) {
-                inferred_card_name = inferChoiceContextCardName(choice_context);
-            }
-            if (!inferred_card_name) {
-                inferred_card_name = inferActivePlanetName(choice_context);
-            }
-            var helper_text = buildChoiceContextHelperText(choice_context, inferred_card_name);
-            if (!inferred_card_name) {
-                changeDef("/static/images/CardImages/Cardback.jpg");
-                setHoverHelperText(helper_text);
-                return;
-            }
-            var normalized_name = inferred_card_name.split(" ").join("_");
-            var card_route_text = "/static/images/CardImages/" + normalized_name + ".jpg";
-            var planet_route_text = "/static/images/PlanetImages/" + normalized_name + ".jpg";
-            if (isCurrentPlanetName(inferred_card_name)) {
-                showChoiceContextPreview(planet_route_text, true, helper_text);
-                return;
-            }
-            var card_image_test = new Image();
-            card_image_test.onload = function() {
-                if (request_id !== choice_context_hover_request_id) {
-                    return;
-                }
-                var current_choice_header = document.getElementById("header-choices-container");
-                if (!current_choice_header) {
-                    return;
-                }
-                showChoiceContextPreview(card_route_text, false, helper_text);
-            };
-            card_image_test.onerror = function() {
-                if (request_id !== choice_context_hover_request_id) {
-                    return;
-                }
-                var planet_image_test = new Image();
-                planet_image_test.onload = function() {
-                    if (request_id !== choice_context_hover_request_id) {
-                        return;
-                    }
-                    var current_choice_header = document.getElementById("header-choices-container");
-                    if (!current_choice_header) {
-                        return;
-                    }
-                    showChoiceContextPreview(planet_route_text, true, helper_text);
-                };
-                planet_image_test.onerror = function() {
-                    if (request_id !== choice_context_hover_request_id) {
-                        return;
-                    }
-                    changeDef("/static/images/CardImages/Cardback.jpg");
-                    setHoverHelperText(helper_text);
-                };
-                planet_image_test.src = planet_route_text;
-            };
-            card_image_test.src = card_route_text;
-        }
-
-        function calculateChoiceBoxMaxWidthVw(choice_context_text, split_data) {
-            var longest_length = sanitizeChoiceContextText(choice_context_text).length;
-            for (var i = 4; i < split_data.length; i++) {
-                var option_text = split_data[i];
-                var pipe_index = option_text.lastIndexOf("|");
-                if (pipe_index !== -1) {
-                    option_text = option_text.slice(0, pipe_index);
-                }
-                if (option_text.length > longest_length) {
-                    longest_length = option_text.length;
-                }
-            }
-            if (longest_length > 40) {
-                return 26;
-            }
-            if (longest_length > 30) {
-                return 22;
-            }
-            if (longest_length > 22) {
-                return 18;
-            }
-            if (longest_length > 16) {
-                return 14;
-            }
-            return 10;
-        }
-
-        function applyStoredDraggablePosition(target_element, stored_left_value, stored_top_value, reset_if_bottom_right=false) {
-            if (!target_element) {
-                return false;
-            }
-            var parsed_left = parseFloat(stored_left_value);
-            var parsed_top = parseFloat(stored_top_value);
-            if (isNaN(parsed_left) || isNaN(parsed_top)) {
-                return false;
-            }
-            var box_rect = target_element.getBoundingClientRect();
-            var box_width = box_rect.width;
-            var box_height = box_rect.height;
-            if (!(box_width > 0)) {
-                box_width = target_element.offsetWidth;
-            }
-            if (!(box_height > 0)) {
-                box_height = target_element.offsetHeight;
-            }
-            var min_margin = 8;
-            var max_left = Math.max(min_margin, window.innerWidth - box_width - min_margin);
-            var max_top = Math.max(min_margin, window.innerHeight - box_height - min_margin);
-            var overflow_tolerance = 60;
-            if (
-                parsed_left < (min_margin - overflow_tolerance) ||
-                parsed_left > (max_left + overflow_tolerance) ||
-                parsed_top < (min_margin - overflow_tolerance) ||
-                parsed_top > (max_top + overflow_tolerance)
-            ) {
-                return false;
-            }
-            if (reset_if_bottom_right) {
-                if (parsed_left >= (max_left - 4) && parsed_top >= (max_top - 4)) {
-                    return false;
-                }
-            }
-            var clamped_left = Math.max(min_margin, Math.min(parsed_left, max_left));
-            var clamped_top = Math.max(min_margin, Math.min(parsed_top, max_top));
-            target_element.style.right = `auto`;
-            target_element.style.bottom = `auto`;
-            target_element.style.left = clamped_left + `px`;
-            target_element.style.top = clamped_top + `px`;
-            return true;
-        }
-
-        window.gameSocket.onopen = function(e) {
-            socket_recovery_scheduled = false;
-            if (socket_recovery_timeout_id !== null) {
-                window.clearTimeout(socket_recovery_timeout_id);
-                socket_recovery_timeout_id = null;
-            }
-            socket_disconnect_notice_shown = false;
-            socket_reconnect_attempt_count = 0;
-            var reconnect_notice = document.getElementById('socket-reconnect-notice');
-            if (reconnect_notice) {
-                reconnect_notice.remove();
-            }
-            scheduleAutomatedStateSync(120);
-        };
-        window.gameSocket.onmessage = function(e) {
+        gameSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_data = data.message.split("/");
             if (split_data[0] === "GAME_INFO") {
@@ -1630,15 +597,9 @@
                     var had_in_play_planet = "false";
                     for (var i = 2; i < split_data.length; i++) {
                         var card_data_split = split_data[i].split("|");
-                        var raw_planet_name = card_data_split[0];
-                        current_planet_names[i - 2] = "";
-                        if (raw_planet_name !== "CardbackRotated") {
-                            current_planet_names[i - 2] = raw_planet_name;
-                        }
-                        var card_name = raw_planet_name;
+                        var card_name = card_data_split[0];
                         let string_id = (i-2).toString();
                         var additional_helper_text = card_data_split[5];
-                        var safe_helper_text = escapeHtmlAttribute(additional_helper_text);
                         if (card_name === "CardbackRotated") {
                             newPlanetsArray.push("false");
                         } else {
@@ -1653,27 +614,15 @@
                         if (typeof(element) != 'undefined' && element != null)
                         {
                             document.getElementById(container_id).innerHTML = ``;
-                            var full_string = `<div><input type=\"image\" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` data-helpertext=\"` + safe_helper_text + `\" onclick=\"testImageButton(this.id);\" class=\"planet\"  onmouseover=\"changeDefRotateAndHelp(this.src, this.dataset.helpertext)\" onmouseout=\"changeDefOut()\">`
+                            var full_string = `<div><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` data-helpertext="` + additional_helper_text + `" onclick="testImageButton(this.id);" class="planet"  onmouseover="changeDefRotateAndHelp(this.src, this.dataset.helpertext)" onmouseout="changeDefOut()">`
                             if (card_data_split.length >= 2) {
                                 if (card_data_split[1] === "I") {
                                     full_string += `<img src="/static/images/PlanetImages/InfestationToken.png" alt="bugged" class="infestation-token"></img>`;
                                 }
                             }
                             if (card_data_split.length >= 3) {
-                                var reticle_token = card_data_split[2];
-                                var reticle_color = "";
-                                if (reticle_token !== "") {
-                                    var reticle_token_split = reticle_token.split(":");
-                                    reticle_color = reticle_token_split[0];
-                                    if (reticle_token_split.length > 1) {
-                                        var allowed_reticle_users = reticle_token_split.slice(1).join(":").split(",");
-                                        if (!allowed_reticle_users.includes("{{ user.username }}")) {
-                                            reticle_color = "";
-                                        }
-                                    }
-                                }
-                                if (reticle_color !== "") {
-                                    full_string += `<img src=\"/static/images/aiming_reticle_` + reticle_color + `.png\" alt=\"bugged\" class=\"large-aiming-reticle\"></img>`;
+                                if (card_data_split[2] !== "") {
+                                    full_string += `<img src="/static/images/aiming_reticle_` + card_data_split[2] + `.png" alt="bugged" class="large-aiming-reticle"></img>`;
                                 }
                             }
                             full_string += `<div class="attachments-planet-1">`;
@@ -1743,11 +692,6 @@
                         var encountered_in_play_planet = "false";
                         var first_pos_in_play = -1;
                         for (var i = 0; i < newPlanetsArray.length; i++) {
-                            if (newPlanetsArray[0] === "true") {
-                                document.getElementById("player-1-cards-planet-" + (i).toString()).style.display = "block";
-                                document.getElementById("player-2-cards-planet-" + (i).toString()).style.display = "block";
-                                document.getElementById("div-PLANETS-" + (i).toString()).style.display = "block";
-                            }
                             if (newPlanetsArray[i] === "true") {
                                 encountered_in_play_planet = "true";
                                 if (first_pos_in_play === -1) {
@@ -1773,51 +717,34 @@
                                 stored_focused_planet = -1;
                             }
                         }
-                        var forced_width = determineForcedWidth();
+                        var forced_width = "0vw";
+                        if (stored_focused_planet !== -1) {
+                            var num_excess_planets = 0;
+                            var first_pos_in_play = -1;
+                            for (var i = 0; i < inPlayPlanets.length; i++) {
+                                if (inPlayPlanets[i] === "true") {
+                                    if (first_pos_in_play === -1) {
+                                        first_pos_in_play = i;
+                                    }
+                                }
+                            }
+                            num_excess_planets = first_pos_in_play;
+                            var width_excess_planets = 10;
+                            var available_width = width_excess_planets * num_excess_planets;
+                            var forced_width = available_width.toString() + "vw";
+                        }
                         setPlanetAppearances(first_pos_in_play, forced_width, stored_focused_planet);
                     }
                 } else if (split_data[1] === "INFO_BOX") {
-                    var info_rows = [];
+                    document.getElementById('info-box').innerHTML = ``;
+                    var color = "red";
+                    if (split_data[2] === "{{ user.username }}") {
+                        color = "green";
+                    }
                     for (var i = 3; i < split_data.length; i++) {
-                        info_rows.push(split_data[i]);
+                        var full_string = `<p class="info-box-sub" style="color:` + color + `;">` + split_data[i] + `</p>`
+                        document.getElementById("info-box").innerHTML += full_string;
                     }
-                    var color = resolveInfoBoxColor(split_data[2], info_rows);
-                    latest_info_box_rows = [];
-                    latest_info_box_color = color;
-                    for (var i = 0; i < info_rows.length; i++) {
-                        latest_info_box_rows.push(info_rows[i]);
-                    }
-                    renderInfoBox();
-                    var inferred_info_owner = inferInfoBoxOwnerFromRows(info_rows);
-                    var should_sync_automated_state = !inferred_info_owner;
-                    if (!should_sync_automated_state && automated_waited_on && automated_waited_on !== inferred_info_owner) {
-                        should_sync_automated_state = true;
-                    }
-                    if (should_sync_automated_state) {
-                        scheduleAutomatedStateSync(120);
-                    }
-                } else if (split_data[1] === "AUTOMATED_DATA") {
-                    const automatedData = parseAutomatedDataMessage(data.message);
-                    if (automatedData !== null) {
-                        automated_required_action = automatedData.required;
-                        var inferred_info_owner_from_latest_rows = inferInfoBoxOwnerFromRows(latest_info_box_rows);
-                        if (inferred_info_owner_from_latest_rows && automatedData.waitedOn &&
-                                automatedData.waitedOn !== inferred_info_owner_from_latest_rows) {
-                            automated_waited_on = inferred_info_owner_from_latest_rows;
-                            scheduleAutomatedStateSync(120);
-                        } else {
-                            automated_waited_on = automatedData.waitedOn;
-                        }
-                        automated_legal_actions = automatedData.actions;
-                    }
-                    renderInfoBox();
-                } else if (split_data[1] === "MISC_AUTOMATED_DATA") {
-                    const miscData = parseMiscAutomatedDataMessage(data.message);
-                    if (miscData !== null) {
-                        automated_misc_type = miscData.detailType;
-                        automated_misc_details = miscData.detailText;
-                    }
-                    renderInfoBox();
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
                     var target_victory_display_id = "victory-display-player-" + split_data[2];
                     document.getElementById(target_victory_display_id).innerHTML = ``;
@@ -1948,12 +875,11 @@
                             var hale = card_data_split[4];
                             var border_type = card_data_split[5];
                             var additional_helper_text = card_data_split[6];
-                            var safe_helper_text = escapeHtmlAttribute(additional_helper_text);
                             var aiming_reticle = card_data_split[7];
                             var attachment_data_position = 8;
                             var deepstrike = "False";
                             var original_text = "";
-                            var enlarge_card_formula = ` data-helpertext=\"` + safe_helper_text + `\" onmouseover=\"changeDefAndHelp(this.src, this.dataset.helpertext)\" onmouseleave=\"changeDefOut()\"`;
+                            var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
                             if (hale === "D") {
                                 if (target_user === "{{ user.username }}") {
                                     original_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -2079,7 +1005,6 @@
                         var hale = card_data_split[4];
                         var border_type = card_data_split[5];
                         var additional_helper_text = card_data_split[6];
-                        var safe_helper_text = escapeHtmlAttribute(additional_helper_text);
                         var attachment_start_id = 8;
                         var target = card_data_split[7];
                         let string_id = (i-4).toString();
@@ -2087,7 +1012,7 @@
                         if (tokenNames.includes(card_name)) {
                             card_class = "Token-Card";
                         }
-                        var enlarge_card_formula = ` data-helpertext="` + safe_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
+                        var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
                         if (hale === "D") {
                             if (target_user === "{{ user.username }}") {
                                 original_text = "/static/images/CardImages/" + card_name + ".jpg";
@@ -2199,58 +1124,43 @@
                         el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
                     }
                 } else if (split_data[1] === "CHOICE") {
-                    changeDefOut();
-                    var choice_context_text = split_data[3];
-                    var full_string = `<div id="choices-container">`;
+                    var full_string = `<div id="choices-container"><div id="header-choices-container">`;
                     if (split_data[2] === "{{ user.username }}") {
-                        var inferred_context_card = inferChoiceContextCardName(choice_context_text);
-                        if (!inferred_context_card) {
-                            inferred_context_card = inferActivePlanetName(choice_context_text);
-                        }
-                        var safe_choice_context_attr = escapeHtmlAttribute(choice_context_text);
-                        var safe_choice_context_card_attr = escapeHtmlAttribute(inferred_context_card);
-                        full_string += `<div id="header-choices-container" data-choicecontext="` + safe_choice_context_attr + `" data-choicecontextcard="` + safe_choice_context_card_attr + `" onmouseover="showChoiceContextHelp(this.dataset.choicecontext, this.dataset.choicecontextcard)" onmouseout="changeDefOut()">` + escapeHtml(choice_context_text) + `</div>`;
+                        full_string = full_string + split_data[3];
                     } else {
-                        full_string += `<div id="header-choices-container">Choice Hidden</div>`;
+                        full_string = full_string + `Choice Hidden`;
                     }
+                    full_string = full_string + `</div>`;
                     console.log(split_data)
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
                             var choice_data = split_data[i].split("|");
                             if (choice_data.length === 2) {
                                 if (choice_data[1] === "N") {
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefOut()" onmouseout="changeDefOut()"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
                                 } else if (choice_data[1] === "P") {
                                     var card_name = choice_data[0];
                                     let string_id = (i-4).toString();
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/PlanetImages/" + card_name + ".jpg";
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefRotate(this.dataset.cardsrc)" onmouseout="changeDefOut()"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefRotate(this.dataset.cardsrc)"><br>`
                                 } else {
                                     var card_name = choice_data[0];
                                     let string_id = (i-4).toString();
                                     string_id = "CHOICE/" + string_id;
                                     card_name = card_name.split(' ').join('_');
                                     var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDef(this.dataset.cardsrc)" onmouseout="changeDefOut()"><br>`
+                                    full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" data-cardsrc="` + route_text + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDef(this.dataset.cardsrc)"><br>`
                                 }
                             } else {
-                                full_string += `<input id="CHOICE/` + (i-4).toString() + `" class="choice" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);" onmouseover="changeDefOut()" onmouseout="changeDefOut()"><br>`
+                                full_string += `<input id="CHOICE/` + (i-4).toString() + `" type="button" value="` + choice_data[0] + `" onclick="testImageButton(this.id);"><br>`
                             }
                         }
                     }
                     full_string += `</div>`;
-                    var choice_collapse = document.getElementById("search-collapse");
-                    choice_collapse.innerHTML = full_string;
-                    if (split_data[2] === "{{ user.username }}") {
-                        var choice_box_max_width = calculateChoiceBoxMaxWidthVw(choice_context_text, split_data);
-                        choice_collapse.style.maxWidth = choice_box_max_width.toString() + `vw`;
-                        choice_collapse.style.minWidth = `10vw`;
-                    } else {
-                        choice_collapse.style.maxWidth = `10vw`;
-                        choice_collapse.style.minWidth = `10vw`;
-                    }
+                    document.getElementById("search-collapse").innerHTML = full_string;
+                    document.getElementById("search-collapse").style.maxWidth = `10vw`;
                 } else if (split_data[1] === "SOUND") {
                     console.log("trying to play sound")
                     var soundUrl = "/static/sounds/" + split_data[2] + ".wav";
@@ -2279,7 +1189,6 @@
                 } else if (split_data[1] === "VICTORY_MESSAGE") {
                     displayVictoryMessage(split_data[2], split_data[3]);
                 } else if (split_data[1] === "SEARCH") {
-                    changeDefOut();
                     var full_string = `<div id="choices-container"><div id="header-choices-container">` + split_data[3] + `</div>`;
                     if (split_data[2] === "{{ user.username }}") {
                         for (var i = 4; i < split_data.length; i++) {
@@ -2369,26 +1278,21 @@
 
                         if (box_choice_h !== "-1" && box_choice_v !== "-1") {
                             var box_choice = document.getElementById("search-collapse");
-                            if (!applyStoredDraggablePosition(box_choice, box_choice_h, box_choice_v)) {
-                                box_choice.style.left = ``;
-                                box_choice.style.top = ``;
-                                box_choice.style.right = `0`;
-                                box_choice.style.bottom = `auto`;
-                            }
+
+                            box_choice.style.left = box_choice_h + `px`;
+                            box_choice.style.top = box_choice_v + `px`;
                         }
 
                         if (box_info_h !== "-1" && box_info_v !== "-1") {
                             var box_info = document.getElementById("info-box");
-                            if (!applyStoredDraggablePosition(box_info, box_info_h, box_info_v, true)) {
-                                box_info.style.left = ``;
-                                box_info.style.top = ``;
-                                box_info.style.right = `0`;
-                                box_info.style.bottom = `auto`;
-                            }
+
+                            box_info.style.left = box_info_h + `px`;
+                            box_info.style.top = box_info_v + `px`;
                         }
                     }
                 }
                 applyZoom();
+            } else if (split_data[1] === "AUTOMATED_DATA" || split_data[1] === "MISC_AUTOMATED_DATA") {
 
             } else {
                 var text = data.message;
@@ -2407,9 +1311,11 @@
             textarea.scrollTop = textarea.scrollHeight;
         };
 
-        window.gameSocket.onclose = function(e) {
+        gameSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
-            scheduleSocketRecovery(`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
+            document.querySelector('#chat-log').innerHTML += (`<b style="color: red">WARNING: YOU WERE DISCONNECTED!</b>`);
+            var textarea = document.getElementById('chat-log');
+            textarea.scrollTop = textarea.scrollHeight;
         };
 
         document.querySelector('#chat-message-input').focus();
@@ -2422,20 +1328,22 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            sendGameSocketMessage('CHAT_MESSAGE/' + message);
+            gameSocket.send(JSON.stringify({
+                'message': 'CHAT_MESSAGE/' + message
+            }));
             messageInputDom.value = '';
         };
 
-        var current_helper_width = "min(20vw, 29.5vh)";
-        var current_helper_height = "40vh";
-        applyHoverPreviewSizeSettings();
-        syncInGameSettingsControls();
+        var current_helper_width = "min(15vw, 22.1vh)";
+        var current_helper_height = "30vh";
 
         document.onclick = hideMenu;
 
         function contextMenuUsage(value) {
             message_to_send = "CONTEXT_MENU/" + value + "/" + active_string_id;
-            sendGameSocketMessage(message_to_send);
+            gameSocket.send(JSON.stringify({
+                'message': message_to_send
+            }));
         }
 
         function hideMenu() {
@@ -2531,108 +1439,61 @@
                     <li class="contextMenuOption"><input onclick="contextMenuUsage(this.value)" class="contextMenuButton" type="button" value="Destroy"></li>
                 </ul>`
             }
-            var click_x = mouse_x;
-            var click_y = mouse_y;
-            if (e && typeof e.clientX === "number") {
-                click_x = e.clientX;
-            }
-            if (e && typeof e.clientY === "number") {
-                click_y = e.clientY;
-            }
-            contextMenu.style.position = "fixed";
-            contextMenu.style.zIndex = "1000";
-            contextMenu.style.display = "block";
-            var menu_rect = contextMenu.getBoundingClientRect();
-            var min_margin = 8;
-            var max_left = Math.max(min_margin, window.innerWidth - menu_rect.width - min_margin);
-            var max_top = Math.max(min_margin, window.innerHeight - menu_rect.height - min_margin);
-            var pos_x = click_x;
-            var pos_y = click_y;
-            if (pos_y > window.innerHeight * (3 / 5)) {
+            contextMenu.style.left = mouse_x + 'px';
+            var pos_y = mouse_y;
+            if (pos_y > window.screen.availHeight * (3 / 5)) {
                 pos_y = pos_y - maxDiff;
             }
-            pos_x = Math.max(min_margin, Math.min(pos_x, max_left));
-            pos_y = Math.max(min_margin, Math.min(pos_y, max_top));
-            contextMenu.style.left = pos_x + "px";
-            contextMenu.style.top = pos_y + "px";
+            contextMenu.style.top = pos_y + 'px';
+            contextMenu.style.display = "Block";
         }
 
         function changeHelperSize() {
+            helperCard = document.getElementById("LargeHelperCard");
             if (helper_is_large === "F") {
+                helperCard.style.width = "44.2vh";
+                helperCard.style.height = "60vh";
                 helper_is_large = "T";
+                current_helper_width = "44.2vh";
+                current_helper_height = "60vh";
             } else {
+                helperCard.style.width = "min(15vw, 22.1vh)";
+                helperCard.style.height = "30vh";
                 helper_is_large = "F";
+                current_helper_width = "min(15vw, 22.1vh)";
+                current_helper_height = "30vh";
             }
-            applyHoverPreviewSizeSettings();
         }
 
-        function isPrimaryPointerButtonEvent(evt) {
-            if (!evt) {
-                return true;
-            }
-            if (typeof evt.button === "number") {
-                return evt.button === 0;
-            }
-            if (typeof evt.which === "number") {
-                return evt.which === 1;
-            }
-            return true;
-        }
-
-        function testImageButton(button_id, evt) {
-            var normalized_event = evt || window.event || null;
-            if (!isPrimaryPointerButtonEvent(normalized_event)) {
-                return;
-            }
-            var sent_over_socket = sendGameSocketMessage('BUTTON PRESSED/' + button_id);
-            if (!sent_over_socket) {
-                attemptApiActionFallback(button_id);
+        function testImageButton(button_id) {
+            var evt = window.event;
+            if (evt.button === 0) {
+                gameSocket.send(JSON.stringify({
+                    'message': 'BUTTON PRESSED/' + button_id
+                }));
             }
         };
-
-        function isInteractiveDragTarget(target_element) {
-            if (!target_element) {
-                return false;
-            }
-            if (target_element.closest) {
-                var interactive_parent = target_element.closest(
-                    "input, button, select, textarea, option, label, a, [contenteditable='true']"
-                );
-                if (interactive_parent) {
-                    return true;
-                }
-            }
-            var tag_name = target_element.tagName ? target_element.tagName.toLowerCase() : "";
-            return tag_name === "input" || tag_name === "button" || tag_name === "select" ||
-                tag_name === "textarea" || tag_name === "option" || tag_name === "label" || tag_name === "a";
-        }
 
         const dragElements = document.querySelectorAll(".draggable");
 
         function onMouseDrag(event, element) {
-            var computedStyle = window.getComputedStyle(element);
-            var leftValue = parseFloat(computedStyle.left);
-            var topValue = parseFloat(computedStyle.top);
-            var rect = element.getBoundingClientRect();
-            if (isNaN(leftValue)) {
-                leftValue = rect.left;
-            }
-            if (isNaN(topValue)) {
-                topValue = rect.top;
-            }
+            let leftValue = parseInt(window.getComputedStyle(element).left);
+            let topValue = parseInt(window.getComputedStyle(element).top);
 
             var newLeftValue = `${leftValue + event.movementX}`;
             var newTopValue = `${topValue + event.movementY}`;
 
-            element.style.right = `auto`;
-            element.style.bottom = `auto`;
             element.style.left = newLeftValue + `px`;
             element.style.top = newTopValue + `px`;
 
             if (element.id === "info-box") {
-                sendGameSocketMessage('UPDATE_INFO_BOX_LOCATION/' + newLeftValue + '/' + newTopValue);
+                gameSocket.send(JSON.stringify({
+                    'message': 'UPDATE_INFO_BOX_LOCATION/' + newLeftValue + '/' + newTopValue
+                }));
             } else if (element.id === "search-collapse") {
-                sendGameSocketMessage('UPDATE_CHOICE_BOX_LOCATION/' + newLeftValue + '/' + newTopValue);
+                gameSocket.send(JSON.stringify({
+                    'message': 'UPDATE_CHOICE_BOX_LOCATION/' + newLeftValue + '/' + newTopValue
+                }));
             }
         }
 
@@ -2667,7 +1528,9 @@
                     element.style.left = last_initial_hand_pos_x + `px`;
                 } else if (replaced_card_id !== "-1") {
                     if (last_moved_hand_id !== "-1") {
-                        sendGameSocketMessage('REARRANGE_HAND/' + last_moved_hand_id + '/' + replaced_card_id);
+                        gameSocket.send(JSON.stringify({
+                            'message': 'REARRANGE_HAND/' + last_moved_hand_id + '/' + replaced_card_id
+                        }));
                     }
                 }
             } else {
@@ -2695,18 +1558,7 @@
         }
 
         dragElements.forEach((element) => {
-            element.setAttribute("draggable", "false");
-            element.addEventListener("dragstart", (e) => {
-                e.preventDefault();
-            });
             element.addEventListener("mousedown", (e) => {
-                if (e.button !== 0) {
-                    return;
-                }
-                if (isInteractiveDragTarget(e.target)) {
-                    return;
-                }
-                e.preventDefault();
                 const onMove = (event) => onMouseDrag(event, element);
 
                 document.addEventListener("mousemove", onMove);
@@ -2759,138 +1611,6 @@
             }
         }
 
-        function enforceHoverPreviewInlineStyles() {
-            var preview = document.getElementById("hover-preview-box");
-            var helper = document.getElementById("helper-text-box");
-            var helperCard = document.getElementById("LargeHelperCard");
-            preview.style.position = "fixed";
-            preview.style.zIndex = "1100";
-            preview.style.pointerEvents = "none";
-            preview.style.flexDirection = "column";
-            preview.style.alignItems = "flex-start";
-            preview.style.gap = "0";
-            preview.style.overflow = "visible";
-            helper.style.position = "relative";
-            helper.style.left = "0";
-            helper.style.right = "auto";
-            helper.style.top = "0";
-            helper.style.bottom = "auto";
-            helper.style.zIndex = "1101";
-            helper.style.visibility = "visible";
-            helper.style.opacity = "1";
-            helper.style.boxSizing = "border-box";
-            helper.style.borderWidth = "2px";
-            helper.style.borderStyle = "double";
-            helper.style.borderColor = "lightblue";
-            helper.style.background = "rgba(47, 40, 153, 0.75)";
-            helper.style.padding = "6px";
-            helper.style.color = "white";
-            helper.style.maxWidth = "min(30vw, 45vh)";
-            helper.style.maxHeight = "28vh";
-            helper.style.overflowY = "auto";
-            helper.style.pointerEvents = "none";
-            helper.style.marginTop = helper_text_vertical_offset_px.toString() + "px";
-            helperCard.style.position = "relative";
-            helperCard.style.top = "0";
-            helperCard.style.right = "0";
-            helperCard.style.left = "0";
-            helperCard.style.display = "block";
-            helperCard.style.pointerEvents = "none";
-            helperCard.style.cursor = "default";
-            helperCard.style.objectFit = "contain";
-        }
-
-        function updateHoverPreviewPosition() {
-            enforceHoverPreviewInlineStyles();
-            var preview = document.getElementById("hover-preview-box");
-            if (preview.style.display === "" || preview.style.display === "none") {
-                return;
-            }
-            var offset_x = 18;
-            var offset_y = 18;
-            var min_margin = 8;
-            var left_pos = mouse_x + offset_x;
-            var top_pos = mouse_y + offset_y;
-            var preview_rect = preview.getBoundingClientRect();
-            if (left_pos + preview_rect.width > window.innerWidth - min_margin) {
-                left_pos = mouse_x - preview_rect.width - offset_x;
-            }
-            if (top_pos + preview_rect.height > window.innerHeight - min_margin) {
-                top_pos = mouse_y - preview_rect.height - offset_y;
-            }
-            if (left_pos < min_margin) {
-                left_pos = min_margin;
-            }
-            if (top_pos < min_margin) {
-                top_pos = min_margin;
-            }
-            preview.style.left = left_pos + "px";
-            preview.style.top = top_pos + "px";
-        }
-
-        function showHoverPreview() {
-            var preview = document.getElementById("hover-preview-box");
-            if (!hover_preview_enabled) {
-                preview.style.display = "none";
-                clearHoverHelperText();
-                return;
-            }
-            preview.style.display = "flex";
-            updateHoverPreviewPosition();
-        }
-
-        function hideHoverPreview() {
-            var preview = document.getElementById("hover-preview-box");
-            preview.style.display = "none";
-            clearHoverHelperText();
-        }
-
-        function clearHoverHelperText() {
-            var helper = document.getElementById("helper-text-box");
-            helper_text_vertical_offset_px = 0;
-            helper.style.display = "none";
-            helper.innerHTML = "";
-        }
-        function setHoverHelperText(help_text, highlight_retreat=false, helper_offset_px=0) {
-            if (!hover_preview_enabled) {
-                clearHoverHelperText();
-                return;
-            }
-            if (help_text === undefined || help_text === null || help_text === "") {
-                clearHoverHelperText();
-                return;
-            }
-            var normalized_helper_text = String(help_text).trim().toLowerCase();
-            if (normalized_helper_text === "" || normalized_helper_text === "none" || normalized_helper_text === "nothing here") {
-                clearHoverHelperText();
-                return;
-            }
-            helper_text_vertical_offset_px = helper_offset_px;
-            help_text = help_text.replaceAll("\n", "<br>");
-            if (highlight_retreat) {
-                help_text = help_text.replaceAll("RETREAT", `<b style="color:red; font-size:x-large;">RETREAT</b>`);
-            }
-            help_text = '<h2 style="color: yellow; margin: 0 0 2px 0;">Additional Info:</h2><p style="color: white; margin: 0;">' + help_text + '</p>';
-            var helper = document.getElementById("helper-text-box");
-            helper.style.display = "block";
-            helper.style.visibility = "visible";
-            helper.style.opacity = "1";
-            helper.innerHTML = help_text;
-            updateHoverPreviewPosition();
-        }
-
-        function resetHoverPreviewCardRotation() {
-            var helperCard = document.getElementById("LargeHelperCard");
-            helperCard.style.transform = "none";
-            helperCard.style.transformOrigin = "center center";
-        }
-
-        function rotateHoverPreviewCardCounterClockwise() {
-            var helperCard = document.getElementById("LargeHelperCard");
-            helperCard.style.transform = "rotate(-90deg)";
-            helperCard.style.transformOrigin = "center center";
-        }
-
         function changeDef(image_src) {
             var current_image_src = image_src;
             if (current_image_src.includes("http")) {
@@ -2900,16 +1620,12 @@
                 current_image_src = "/" + current_image_src;
             }
             console.log(current_image_src);
-            clearHoverHelperText();
             if (!(pledges_array.includes(current_image_src))) {
                 var og_image_src = image_src.replace("CroppedImages", "CardImages");
                 helperCard = document.getElementById("LargeHelperCard");
                 helperCard.src=og_image_src;
-                resetHoverPreviewCardRotation();
-                helperCard.style.objectFit = "contain";
                 helperCard.style.width = current_helper_width;
                 helperCard.style.height = current_helper_height;
-                showHoverPreview();
             } else {
                 changeDefRotate(image_src);
             }
@@ -2919,12 +1635,8 @@
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
-            resetHoverPreviewCardRotation();
-            helperCard.style.objectFit = "contain";
             helperCard.style.width = current_helper_width;
             helperCard.style.height = current_helper_height;
-            clearHoverHelperText();
-            showHoverPreview();
             var target_deck_id = "count-" + user_num;
             var e = document.getElementById(target_deck_id);
             e.innerHTML = `<p>` + card_count + `</p>`;
@@ -2933,62 +1645,69 @@
 
         function changeDefRotate(image_src) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
-            var is_planet_image = image_src.includes("PlanetImages") || image_src.includes("RotatedPlanetImages");
-            if (is_planet_image) {
+            if (helper_is_large === "F") {
                 og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
-            } else if (helper_is_large === "T") {
+            } else {
                 og_image_src = image_src.replace("CardImages", "RotatedCardImages");
             }
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
-            if (is_planet_image) {
-                rotateHoverPreviewCardCounterClockwise();
-            } else {
-                resetHoverPreviewCardRotation();
-            }
-            helperCard.style.objectFit = "contain";
-            if (is_planet_image) {
-                helperCard.style.width = "auto";
-                helperCard.style.height = current_helper_height;
-            } else if (helper_is_large === "T") {
+            if (helper_is_large === "T") {
                 helperCard.style.width = current_helper_height;
                 helperCard.style.height = current_helper_width;
             } else {
                 helperCard.style.width = current_helper_width;
                 helperCard.style.height = current_helper_height;
             }
-            clearHoverHelperText();
-            showHoverPreview();
         }
 
-        function changeDefRotateAndHelp(image_src, help_text, helper_offset_px=-34) {
-            var og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
+        function changeDefRotateAndHelp(image_src, help_text) {
+            var og_image_src = image_src.replace("CroppedImages", "CardImages");
+            if (helper_is_large === "F") {
+                og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
+            }
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
-            rotateHoverPreviewCardCounterClockwise();
-            helperCard.style.objectFit = "contain";
-            helperCard.style.width = "auto";
-            helperCard.style.height = current_helper_height;
-            showHoverPreview();
-            setHoverHelperText(help_text, false, helper_offset_px);
+            if (helper_is_large === "T") {
+                helperCard.style.width = current_helper_height;
+                helperCard.style.height = current_helper_width;
+            } else {
+                helperCard.style.width = current_helper_width;
+                helperCard.style.height = current_helper_height;
+            }
+            help_text = help_text.replaceAll("\n", "<br>")
+            help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
+            console.log(help_text);
+            var helper = document.getElementById("helper-text-box")
+            helper.style.left = mouse_x + 'px';
+            helper.style.top = mouse_y + 'px';
+            helper.style.display = "Block";
+            helper.innerHTML = help_text;
         }
 
         function changeDefAndHelp(image_src, help_text) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
             changeDef(og_image_src);
-            setHoverHelperText(help_text, true);
+            help_text = help_text.replaceAll("\n", "<br>")
+            help_text = help_text.replaceAll("RETREAT", `<b style="color:red; font-size:x-large;">RETREAT</b>`);
+            help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
+            console.log(help_text);
+            var helper = document.getElementById("helper-text-box")
+            helper.style.left = mouse_x + 'px';
+            helper.style.top = mouse_y + 'px';
+            helper.style.display = "Block";
+            helper.innerHTML = help_text;
         }
 
         function changeDefOut() {
-            choice_context_hover_request_id += 1;
-            hideHoverPreview();
+            var helper = document.getElementById("helper-text-box")
+            helper.style.display = "None";
         }
 
         function changeDefDeckOut(user_num) {
             var target_deck_id = "count-" + user_num;
             var e = document.getElementById(target_deck_id);
             e.style.display = "none";
-            hideHoverPreview();
         }
 
         function showDiscard(discard_id) {
@@ -3005,7 +1724,6 @@
         function getCursor(event) {
             mouse_x = event.clientX;
             mouse_y = event.clientY;
-            updateHoverPreviewPosition();
         }
 
         function showRemoved(removed_id) {

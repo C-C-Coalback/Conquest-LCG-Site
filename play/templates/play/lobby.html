@@ -120,27 +120,10 @@
             border-color: orangered;
             border-style: double;
         }
-        #admin-redis-warning {
-            background-color: orange;
-            opacity: 0.9;
-            width: 50%;
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 10px;
-            text-align: center;
-            border-width: 2px;
-            border-color: orangered;
-            border-style: double;
-        }
 </style>
 <div id="disconnected-warning">
     <h1 style="color: red;">Warning: You have been disconnected!</h1><h2>You will need to refresh the page.</h2>
 </div>
-{% if show_admin_redis_warning %}
-<div id="admin-redis-warning">
-    <h1 style="color: red;">Admin warning: Redis is unavailable.</h1><h2>WebSocket transport is running in fallback mode until Redis reconnects.</h2>
-</div>
-{% endif %}
 <div id="flex-container">
     <div id="whole-container">
         <input id="create-lobby-submit" type="button" value="Create lobby">
@@ -295,18 +278,7 @@
                     document.getElementById("add_players_to_me").innerHTML += `<p>` + usernames[i] + `</p>`;
                 }
             } else {
-                const first_player_decider = split_string.length > 7 ? split_string[7] : "";
-                const lobby_id = split_string.length > 8 ? split_string[8] : split_string[1];
-                addLobby(
-                    split_string[1],
-                    split_string[2],
-                    split_string[3],
-                    split_string[4],
-                    split_string[5],
-                    split_string[6],
-                    first_player_decider,
-                    lobby_id
-                )
+                addLobby(split_string[1], split_string[2], split_string[3], split_string[4], split_string[5], split_string[6])
             }
         };
 
@@ -421,11 +393,7 @@
             document.body.appendChild(ourAudio);
         }
 
-        function addLobby(nameOfPlayerOne, nameOfPlayerTwo, private, apoka, sector, time, first_player_decider, lobby_id) {
-            var safe_lobby_id = lobby_id;
-            if (!safe_lobby_id) {
-                safe_lobby_id = nameOfPlayerOne;
-            }
+        function addLobby(nameOfPlayerOne, nameOfPlayerTwo, private, apoka, sector, time) {
             var stringToAdd = "";
             stringToAdd = `<div class="box">` + nameOfPlayerOne + `<br>VS<br>`+ nameOfPlayerTwo + `
                 </div><details><summary>Settings</summary>`;
@@ -446,20 +414,18 @@
             stringToAdd += sector + " Sector";
             stringToAdd += "<br>";
             stringToAdd += "Time Created:<br>" + time;
-            stringToAdd += "<br>";
-            stringToAdd += "Lobby ID:<br>" + safe_lobby_id;
             stringToAdd += "</details>";
             document.getElementById("add_to_me").innerHTML += stringToAdd;
             if (nameOfPlayerTwo === "" && nameOfPlayerOne !== "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
-                    `<button id=` + safe_lobby_id + ` onclick="joinLobby(this.id)">
+                    `<button id=` + nameOfPlayerOne + ` onclick="joinLobby(this.id)">
                     Join Lobby
                     </button>`;
             } else if (nameOfPlayerTwo !== "" && nameOfPlayerOne === "{{ user.username }}") {
                 playSound("/static/joinsound.wav");
             } else if (nameOfPlayerTwo === "{{ user.username }}") {
                 document.getElementById("add_to_me").innerHTML +=
-                    `<button id=` + safe_lobby_id + ` onclick="leaveLobby(this.id)">
+                    `<button id=` + nameOfPlayerOne + ` onclick="leaveLobby(this.id)">
                     Leave Lobby
                     </button>`;
             }
@@ -471,7 +437,7 @@
             }
             if (nameOfPlayerOne === "{{ user.username }}" && nameOfPlayerTwo !== "") {
                 document.getElementById("add_to_me").innerHTML +=
-                    `<button id=` + safe_lobby_id + ` onclick="startGame(this.id)">
+                    `<button id=` + nameOfPlayerOne + ` onclick="startGame(this.id)">
                     Start Game
                     </button>`;
             }

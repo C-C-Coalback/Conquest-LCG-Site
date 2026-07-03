@@ -93,21 +93,6 @@
         <div>Cardback: {{ cardback }}</div>
         <div>Background: {{ background }}</div>
     </div>
-    <div class="profile-record">
-        <h2>Match Record</h2>
-        <div>Wins: {{ wins }} | Losses: {{ losses }}</div>
-        {% if match_record %}
-        <ul>
-            {% for match in match_record %}
-            <li>
-                {{ match.result|title }} as {{ match.faction }} vs {{ match.opponent_faction }} (Deck: {{ match.deck_name }})
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <div>No completed games recorded yet.</div>
-        {% endif %}
-    </div>
     <br>
     <div>
         <h2>Delete Profile</h2>

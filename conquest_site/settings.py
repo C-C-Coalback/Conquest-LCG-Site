@@ -55,13 +55,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'conquest_site.urls'
@@ -133,11 +133,11 @@ USE_TZ = True
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -163,52 +163,13 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
 ASGI_APPLICATION = "conquest_site.asgi.application"
-_channel_redis_host = os.environ.get("CHANNEL_REDIS_HOST", "127.0.0.1")
-_channel_redis_port = int(os.environ.get("CHANNEL_REDIS_PORT", "6379"))
-_force_memory_channels = os.environ.get("USE_INMEMORY_CHANNEL_LAYER", "").lower() in ["1", "true", "yes"]
-_redis_available_for_channels = False
-if not _force_memory_channels:
-    try:
-        with socket.create_connection((_channel_redis_host, _channel_redis_port), timeout=0.25):
-            _redis_available_for_channels = True
-    except OSError:
-        _redis_available_for_channels = False
-
-if _redis_available_for_channels:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [(_channel_redis_host, _channel_redis_port)],
-                "capacity": 1500,
-                "expiry": 10
-            },
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+            "capacity": 1500,
+            "expiry": 10
         },
-    }
-else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        },
-    }
-
-def _env_flag(name, default):
-    return os.environ.get(name, default).strip().lower() in ["1", "true", "yes", "on"]
-
-
-# AI control account policy:
-# - When enforced, AI REST control endpoints may only act as configured account(s).
-# - This limits account sprawl from agents creating/using arbitrary usernames.
-# - A single allowed account can still participate in multiple simultaneous games.
-AI_CONTROL_ENFORCE_ALLOWED_USERNAMES = _env_flag("AI_CONTROL_ENFORCE_ALLOWED_USERNAMES", "true")
-_ai_control_usernames = [
-    username.strip()
-    for username in os.environ.get("AI_CONTROL_ALLOWED_USERNAMES", "basicai").split(",")
-    if username.strip()
-]
-if not _ai_control_usernames:
-    _ai_control_usernames = ["basicai"]
-_ai_control_usernames.append("conqueror")
-_ai_control_usernames.append("conqueror1")
-_ai_control_usernames.append("conqueror2")
-AI_CONTROL_ALLOWED_USERNAMES = tuple(_ai_control_usernames)
+    },
+}
