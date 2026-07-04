@@ -676,10 +676,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Ravenous Haruspex":
+            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
             primary_player.add_resources(self.ravenous_haruspex_gain)
-            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-                if primary_player.cards_in_play[planet_pos + 1][i].resolving_attack:
-                    primary_player.set_once_per_phase_used_given_pos(planet_pos, i, True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Parasitic Infection":
