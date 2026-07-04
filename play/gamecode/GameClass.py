@@ -1149,16 +1149,6 @@ class Game:
 
     async def send_planet_array(self, force=False):
         planet_string = "GAME_INFO/PLANETS/"
-        activity_prompt_planet = -1
-        activity_reaction_names = [
-            "Frontier World Egulth", "Quarantined World Arkos", "Mordatyne", "Helvetis",
-            "Zadruk Prime", "Hostaryn XXI", "Deltadurne", "Caldera",
-            "Hangyz", "Forge World Dagon"
-        ]
-        if self.asking_if_reaction and self.reactions_needing_resolving:
-            current_reaction_name = self.reactions_needing_resolving[0].get_reaction_name()
-            if self.choice_context == current_reaction_name and current_reaction_name in activity_reaction_names:
-                activity_prompt_planet = self.reactions_needing_resolving[0].get_planet_pos()
         for i in range(len(self.planet_array)):
             if self.planets_in_play_array[i]:
                 planet_string += self.planet_array[i]
@@ -1171,16 +1161,6 @@ class Game:
             reticle_color = ""
             if self.planet_aiming_reticle_position == i:
                 reticle_color = "red"
-            elif activity_prompt_planet == i:
-                reticle_color = "blue"
-            elif self.phase == "COMMAND" and (self.committing_warlords or self.before_command_struggle):
-                commit_preview_players = []
-                if self.p1.committed_warlord and self.p1.warlord_commit_location == i:
-                    commit_preview_players.append(self.name_1)
-                if self.p2.committed_warlord and self.p2.warlord_commit_location == i:
-                    commit_preview_players.append(self.name_2)
-                if commit_preview_players:
-                    reticle_color = "green:" + ",".join(commit_preview_players)
             if reticle_color:
                 planet_string += "|" + reticle_color + "|"
             else:
