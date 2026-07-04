@@ -10,8 +10,11 @@
 <link rel="stylesheet" href="{% static 'play_style.css' %}">
 {% endif %}
 <div class="box" onmousemove="getCursor(event)">
-    <div id="helper-text-box">
+    <div id="hover-container">
+        <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="AdjacentHelperCard">
+        <div id="helper-text-box">
 
+        </div>
     </div>
     <div id="contextMenu" class="context-menu">
         <ul id="contextOptions">
@@ -179,6 +182,28 @@
     </div>
     <div id="decrease-zoom-div">
         <input id="dec-zoom" type="button" value="Zoom Out" onclick="decreaseZoom();">
+    </div>
+    <div id="in-game-settings-div">
+        <input id="open-in-game-settings" type="button" value="In-Game Settings" onclick="toggleInGameSettingsBox();">
+    </div>
+    <div id="in-game-settings-dialog">
+        <h3 id="in-game-settings-header">In-Game Settings</h3>
+        <!--
+        <label class="in-game-settings-option">
+            <input id="setting-toggle-hints" type="checkbox" checked onchange="setHintsEnabled(this.checked)">
+            Toggle Hints in the info-box
+        </label>
+        -->
+        <div class="in-game-settings-option in-game-settings-slider-option">
+            <label for="setting-preview-size">Preview size</label>
+            <input id="setting-preview-size" type="range" min="70" max="170" step="5" value="100" oninput="setHoverPreviewScalePercent(this.value)">
+            <span id="setting-preview-size-value">100%</span>
+        </div>
+        <label class="in-game-settings-option">
+            <input id="setting-toggle-preview" type="checkbox" checked onchange="toggleAdjacentHoverCard(this.checked)">
+            Toggle preview-on-hover on/off
+        </label>
+        <input id="close-in-game-settings" type="button" value="Close" onclick="toggleInGameSettingsBox();">
     </div>
     <div id="pass-player-1">
         <input id="pass-P1" type="button" value="PASS" onclick="testImageButton(this.id);">
@@ -418,6 +443,11 @@
         var num_cards_in_hand = 0;
         var active_string_id = "";
         var stored_focused_planet = -1;
+        var hover_preview_scale_percent = 100;
+        var current_helper_width = "min(15vw, 22.1vh)";
+        var current_helper_height = "30vh";
+        var current_adj_helper_width = "min(15vw, 22.1vh)";
+        var current_adj_helper_height = "30vh";
 
         function playSound(url) {
             console.log(url);
@@ -430,6 +460,48 @@
                 this.remove(); // Remove when played.
             };
             document.body.appendChild(ourAudio);
+        }
+
+        function toggleAdjacentHoverCard(enabled) {
+            if (enabled) {
+                document.getElementById("AdjacentHelperCard").style.display = "block";
+            } else {
+                document.getElementById("AdjacentHelperCard").style.display = "none";
+            }
+        }
+
+        function toggleInGameSettingsBox() {
+            var settingsDialog = document.getElementById("in-game-settings-dialog");
+            if (settingsDialog.style.display === "block") {
+                settingsDialog.style.display = "none";
+            } else {
+                settingsDialog.style.display = "block";
+            }
+        }
+
+        function setHoverPreviewScalePercent(percentValue) {
+            var parsedPercent = parseInt(percentValue, 10);
+            if (isNaN(parsedPercent)) {
+                parsedPercent = 100;
+            }
+            if (parsedPercent < 70) {
+                parsedPercent = 70;
+            }
+            if (parsedPercent > 170) {
+                parsedPercent = 170;
+            }
+            hover_preview_scale_percent = parsedPercent;
+            var default_adj_helper_width_one = 15 * hover_preview_scale_percent / 100; // vw
+            var default_adj_helper_width_two = 22.1 * hover_preview_scale_percent / 100; // vh
+            var default_adj_helper_height = 30 * hover_preview_scale_percent / 100; // vh
+            current_adj_helper_height = default_adj_helper_height.toString() + "vh"
+            current_adj_helper_width = "min(" + default_adj_helper_width_one.toString() + "vw, " + default_adj_helper_width_two.toString() + "vh)";
+            console.log(current_adj_helper_height)
+            console.log(current_adj_helper_width)
+            var previewScaleValue = document.getElementById("setting-preview-size-value");
+            if (previewScaleValue) {
+                previewScaleValue.innerHTML = hover_preview_scale_percent.toString() + "%";
+            }
         }
 
         function updateGridTemplateColumns(first_pos_in_play, focused_planet) {
@@ -1339,9 +1411,6 @@
             messageInputDom.value = '';
         };
 
-        var current_helper_width = "min(15vw, 22.1vh)";
-        var current_helper_height = "30vh";
-
         document.onclick = hideMenu;
 
         function contextMenuUsage(value) {
@@ -1581,6 +1650,10 @@
 
         function changeDefDeepstrike(image_src) {
             document.getElementById("LargeHelperCard").src=image_src;
+            hover_container = document.getElementById("hover-container");
+            hover_container.style.display = "block";
+            adjacent_helper_card = document.getElementById("AdjacentHelperCard");
+            adjacent_helper_card.src=og_image_src;
         }
 
         function makeMistargetDisappearAndSlide() {
@@ -1631,6 +1704,12 @@
                 helperCard.src=og_image_src;
                 helperCard.style.width = current_helper_width;
                 helperCard.style.height = current_helper_height;
+                hover_container = document.getElementById("hover-container");
+                hover_container.style.display = "block";
+                adjacent_helper_card = document.getElementById("AdjacentHelperCard");
+                adjacent_helper_card.src=og_image_src;
+                adjacent_helper_card.style.width = current_adj_helper_width;
+                adjacent_helper_card.style.height = current_adj_helper_height;
             } else {
                 changeDefRotate(image_src);
             }
@@ -1642,6 +1721,12 @@
             helperCard.src=og_image_src;
             helperCard.style.width = current_helper_width;
             helperCard.style.height = current_helper_height;
+            hover_container = document.getElementById("hover-container");
+            hover_container.style.display = "block";
+            adjacent_helper_card = document.getElementById("AdjacentHelperCard");
+            adjacent_helper_card.src=og_image_src;
+            adjacent_helper_card.style.width = current_adj_helper_width;
+            adjacent_helper_card.style.height = current_adj_helper_height;
             var target_deck_id = "count-" + user_num;
             var e = document.getElementById(target_deck_id);
             e.innerHTML = `<p>` + card_count + `</p>`;
@@ -1655,8 +1740,16 @@
             } else {
                 og_image_src = image_src.replace("CardImages", "RotatedCardImages");
             }
+            var adjacent_helper_card_src = image_src;
+            adjacent_helper_card_src = adjacent_helper_card_src.replace("CardImages", "RotatedCardImages")
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
+            hover_container = document.getElementById("hover-container");
+            hover_container.style.display = "block";
+            adjacent_helper_card = document.getElementById("AdjacentHelperCard");
+            adjacent_helper_card.src=adjacent_helper_card_src;
+            adjacent_helper_card.style.width = current_adj_helper_height;
+            adjacent_helper_card.style.height = current_adj_helper_width;
             if (helper_is_large === "T") {
                 helperCard.style.width = current_helper_height;
                 helperCard.style.height = current_helper_width;
@@ -1671,8 +1764,16 @@
             if (helper_is_large === "F") {
                 og_image_src = image_src.replace("PlanetImages", "RotatedPlanetImages");
             }
+            var adjacent_helper_card_src = image_src;
+            adjacent_helper_card_src = adjacent_helper_card_src.replace("CardImages", "RotatedCardImages")
             helperCard = document.getElementById("LargeHelperCard");
             helperCard.src=og_image_src;
+            hover_container = document.getElementById("hover-container");
+            hover_container.style.display = "block";
+            adjacent_helper_card = document.getElementById("AdjacentHelperCard");
+            adjacent_helper_card.src=adjacent_helper_card_src;
+            adjacent_helper_card.style.width = current_adj_helper_height;
+            adjacent_helper_card.style.height = current_adj_helper_width;
             if (helper_is_large === "T") {
                 helperCard.style.width = current_helper_height;
                 helperCard.style.height = current_helper_width;
@@ -1684,8 +1785,6 @@
             help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
             console.log(help_text);
             var helper = document.getElementById("helper-text-box")
-            helper.style.left = mouse_x + 'px';
-            helper.style.top = mouse_y + 'px';
             helper.style.display = "Block";
             helper.innerHTML = help_text;
         }
@@ -1698,8 +1797,6 @@
             help_text = '<h2 style="color: yellow;">Additional Info:</h2><p style="color: white;">' + help_text + '</p>';
             console.log(help_text);
             var helper = document.getElementById("helper-text-box")
-            helper.style.left = mouse_x + 'px';
-            helper.style.top = mouse_y + 'px';
             helper.style.display = "Block";
             helper.innerHTML = help_text;
         }
@@ -1707,12 +1804,16 @@
         function changeDefOut() {
             var helper = document.getElementById("helper-text-box")
             helper.style.display = "None";
+            hover_container = document.getElementById("hover-container");
+            hover_container.style.display = "none";
+            var adjacent_helper_card = document.getElementById("AdjacentHelperCard");
         }
 
         function changeDefDeckOut(user_num) {
             var target_deck_id = "count-" + user_num;
             var e = document.getElementById(target_deck_id);
             e.style.display = "none";
+            changeDefOut();
         }
 
         function showDiscard(discard_id) {
@@ -1729,6 +1830,17 @@
         function getCursor(event) {
             mouse_x = event.clientX;
             mouse_y = event.clientY;
+            var hover_container = document.getElementById("hover-container");
+            var pos_x = mouse_x + 10;
+            var pos_y = mouse_y;
+            if (pos_y > window.screen.availHeight * (5 / 10) && document.getElementById("AdjacentHelperCard").style.display !== "none") {
+                var integer_height_vh = parseInt(current_helper_height.replace(/\D/g,''));
+                pos_y = pos_y - window.screen.availHeight * integer_height_vh / 100 * 1.2;
+            } else {
+                pos_y = pos_y + 30;
+            }
+            hover_container.style.left = pos_x + 'px';
+            hover_container.style.top = pos_y + 'px';
         }
 
         function showRemoved(removed_id) {
