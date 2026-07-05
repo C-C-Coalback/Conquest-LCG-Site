@@ -427,6 +427,8 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
             if attachment_card.get_card_type() == "Attachment":
                 if attachment_card.planet_attachment:
                     return False
+            if attachment_card.get_limited() and not primary_player.can_play_limited:
+                return False
             not_own_attach = False
             for i in range(len(primary_player.headquarters)):
                 if primary_player.check_if_can_attach_card(
