@@ -1,6 +1,7 @@
 from .. import FindCard
 from .. import CardClasses
 import copy
+from ..Phases import DeployPhase
 
 
 async def update_game_event_action_hq(self, name, game_update_string):
@@ -1095,6 +1096,13 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                               "Card is not ready.")
+    elif self.action_object.action_chosen == "Ambush":
+        if not self.omega_ambush_active:
+            if self.card_type_of_selected_card_in_hand == "Attachment":
+                await DeployPhase.deploy_card_routine_attachment(self, name, game_update_string, True)
+        else:
+            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                              "Subject Omega can only ambush cards at infested planets.")
     elif self.action_object.action_chosen == "Pact of the Haemonculi":
         if game_update_string[1] == self.number_with_deploy_turn:
             if primary_player.sacrifice_card_in_hq(int(game_update_string[2])):
