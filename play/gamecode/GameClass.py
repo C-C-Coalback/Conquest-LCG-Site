@@ -916,9 +916,9 @@ class Game:
             self.show_choices_as_images = []
             card_string = "GAME_INFO/SEARCH//Nothing here"
         if card_string != self.last_search_string or force:
-            self.last_search_string = card_string
             if card_string != self.last_search_string:
                 self.anything_changed_since_last_send = True
+            self.last_search_string = card_string
             await self.send_update_message(card_string)
 
     async def send_initiative(self, force=False):
