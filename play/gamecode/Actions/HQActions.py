@@ -1822,6 +1822,31 @@ async def update_game_event_action_hq(self, name, game_update_string):
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "No faith on that unit.")
+    elif self.action_object.action_chosen == "Even the Odds":
+        if self.action_object.chosen_first_card:
+            if self.action_object.misc_player_storage == game_update_string[1]:
+                origin_planet, origin_pos, origin_attach_pos = self.action_object.misc_target_attachment
+                dest_planet = planet_pos
+                dest_pos = unit_pos
+                can_continue = True
+                if player_owning_card.name_player == secondary_player.name_player:
+                    if secondary_player.get_immune_to_enemy_events(dest_planet, dest_pos):
+                        can_continue = False
+                        await self.send_update_message("Immune to enemy events.")
+                if can_continue:
+                    if player_owning_card.move_attachment_card(origin_planet, origin_pos, origin_attach_pos,
+                                                               dest_planet, dest_pos):
+                        player_owning_card.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+                        self.action_object.chosen_second_card = True
+                        primary_player.resolve_played_any_event()
+                        self.action_cleanup()
+                        self.action_object.chosen_second_card = True
+                        self.action_object.misc_target_attachment = (-1, -1, -1)
+                        self.action_object.misc_player_storage = ""
+                        primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                        primary_player.aiming_reticle_coords_hand = None
+                    else:
+                        await self.send_update_message("Invalid attachment movement.")
     elif self.action_object.action_chosen == "The Wolf Within":
         if game_update_string[1] == primary_player.get_number():
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Space Wolves"):
