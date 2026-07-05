@@ -410,7 +410,7 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
     if payment_hand_card:
         is_deploy = target_restrictions["Payment Details"]["Deploy"]
         if is_deploy:
-            if player.determine_lowest_possible_cost_of_card(card) > player.get_resources():
+            if player.determine_lowest_possible_cost_of_card(card, as_attachment=True) > player.get_resources():
                 return False
         else:
             if card.get_cost() > player.get_resources():

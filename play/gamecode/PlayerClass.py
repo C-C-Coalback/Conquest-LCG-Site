@@ -520,9 +520,14 @@ class Player:
     def set_can_play_limited(self, new_val):
         self.can_play_limited = new_val
 
-    def determine_lowest_possible_cost_of_card(self, card):
+    def determine_lowest_possible_cost_of_card(self, card, as_attachment=False):
         best_cost = card.get_cost()
         if card.get_card_type() == "Army":
+            if as_attachment and card.get_ability() in ["Gun Drones", "Shadowsun's Stealth Cadre", "Escort Drone"]:
+                for i in range(len(self.headquarters)):
+                    if self.get_ability_given_pos(-2, i) == "Ambush Platform":
+                        best_cost = best_cost - 1
+                return best_cost
             best_cost = 999
             for i in range(7):
                 if self.game.planets_in_play_array[i]:
