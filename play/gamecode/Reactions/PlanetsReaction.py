@@ -316,6 +316,23 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 reaction.chosen_first_card = True
                 planet_name = self.planet_array[chosen_planet]
                 await self.send_update_message("You may now move units to " + planet_name + ".")
+    elif current_reaction == "Wildrider Vyper":
+        if og_pla != planet_pos:
+            valid_planet = False
+            for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                if primary_player.cards_in_play[chosen_planet + 1][i].valid_target_ashen_banner:
+                    valid_planet = True
+            for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                if secondary_player.cards_in_play[chosen_planet + 1][i].valid_target_ashen_banner:
+                    valid_planet = True
+            if valid_planet:
+                primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                primary_player.move_unit_to_planet(planet_pos, unit_pos, chosen_planet)
+                self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                self.delete_reaction()
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                    current_reaction + " cannot move to that planet.")
     elif current_reaction == "Cry of the Wind":
         if reaction.chosen_first_card:
             origin_planet, origin_pos = reaction.misc_target_unit

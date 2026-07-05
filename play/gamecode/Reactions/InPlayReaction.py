@@ -664,12 +664,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       current_reaction + " can only target army units.")
         elif current_reaction == "Wildrider Vyper":
-            if game_update_string[1] == "1":
-                player_being_hit = self.p1
-            else:
-                player_being_hit = self.p2
             if og_pla != planet_pos:
-                if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, planet_pos)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
