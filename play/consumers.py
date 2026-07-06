@@ -38,12 +38,15 @@ condition_games = threading.Condition()
 
 
 def get_users():
-    all_users = User.objects.values()
-    usernames = []
-    for i in range(len(all_users)):
-        usernames.append((all_users[i]['username']))
-    with open(os.getcwd() + "/users_list.txt", "w") as user_file:
-        user_file.write("\n".join(usernames))
+    try:
+        all_users = User.objects.values()
+        usernames = []
+        for i in range(len(all_users)):
+            usernames.append((all_users[i]['username']))
+        with open(os.getcwd() + "/users_list.txt", "w") as user_file:
+            user_file.write("\n".join(usernames))
+    except:
+        pass
 
 
 get_users()
