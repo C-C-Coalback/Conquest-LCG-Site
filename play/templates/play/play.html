@@ -819,9 +819,20 @@
                         color = "green";
                     }
                     for (var i = 3; i < split_data.length; i++) {
-                        var full_string = `<p class="info-box-sub" style="color:` + color + `;">` + split_data[i] + `</p>`
-                        document.getElementById("info-box").innerHTML += full_string;
+                        if (split_data[i].length > 0) {
+                            var full_string = `<p class="info-box-sub" style="color:` + color + `;">` + split_data[i] + `</p>`
+                            document.getElementById("info-box").innerHTML += full_string;
+                        }
                     }
+                    console.log("Extra");
+                    console.log(data.extra);
+                    console.log(data)
+                    var extra_data = "Hint: " + data.extra;
+                    if (color === "red") {
+                        extra_data = "Hint: Opponent is acting"
+                    }
+                    var hint_string = `<p class="info-box-sub" style="color: MidnightBlue;">` + extra_data + `</p>`;
+                    document.getElementById("info-box").innerHTML += hint_string;
                 } else if (split_data[1] === "VICTORY_DISPLAY") {
                     var target_victory_display_id = "victory-display-player-" + split_data[2];
                     document.getElementById(target_victory_display_id).innerHTML = ``;

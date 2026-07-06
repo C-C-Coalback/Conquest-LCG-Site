@@ -522,21 +522,24 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def chat_message(self, event):
         message = event["message"]
+        extra = ""
+        if "extra" in event:
+            extra = event["extra"]
         print("send:", message)
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"message": message, "extra": extra}))
 
     async def broadcast_chat_message(self, message):
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat.message", "message": message}
         )
 
-    async def receive_game_update(self, text_update):
+    async def receive_game_update(self, text_update, additional_info=""):
         print("game update received: ", text_update)
         split_text = text_update.split("/")
         if split_text[0] == "GAME_INFO":
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "chat.message", "message": text_update}
+                self.room_group_name, {"type": "chat.message", "message": text_update, "extra": additional_info}
             )
         else:
             text_update = "server: " + text_update

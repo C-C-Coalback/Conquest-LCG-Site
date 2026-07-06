@@ -316,6 +316,7 @@ class Game:
         self.backlash_enabled = True
         self.bigga_is_betta_active = False
         self.last_info_box_string = ""
+        self.last_hint_string = ""
         self.has_chosen_to_resolve = False
         self.asking_if_reaction = False
         self.asking_if_interrupt = False
@@ -684,14 +685,14 @@ class Game:
             return True
         return False
 
-    async def send_update_message(self, message):
+    async def send_update_message(self, message, additional_info=""):
         """
         Sends a message from the server to all users in the current room.
 
         :param message: string containing the message.
         """
         if self.game_sockets:
-            await self.game_sockets[0].receive_game_update(message)
+            await self.game_sockets[0].receive_game_update(message, additional_info=additional_info)
 
     def reset_action_data(self):
         """
@@ -960,97 +961,159 @@ class Game:
         self.first_player_nullified = primary_player.name_player
         self.nullify_context = nullify_context
 
+    def determine_hint(self):
+        hint = "No Hint Available"
+        if self.phase == "SETUP":
+            hint = "No deck loaded; please load one with /loaddeck/[deck_name]"
+        elif self.choosing_unit_for_nullify:
+            hint = "Paying Nullify exhaustion cost, click a valid unit"
+        elif self.manual_bodyguard_resolution:
+            hint = "Click a valid unit with Bodyguard"
+        elif self.rearranging_deck:
+            hint = "Click cards to rearrange them"
+        elif self.cards_in_search_box:
+            hint = "Resolving a deck-search effect, click a card in the search box or pass"
+        elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
+            hint = "Applying indirect damage, click a valid unit"
+        elif self.action_object.action_chosen == "Ambush" and self.mode == "DISCOUNT":
+            hint = "Applying discounts, click a card to apply or pass to stop discounting"
+        elif self.choices_available:
+            if self.asking_if_interrupt:
+                hint = "Yes or No to resolve the interrupt"
+            elif self.asking_if_reaction:
+                hint = "Yes or No to resolve the reaction"
+            else:
+                hint = "Click a choice to resolve it"
+            if self.choice_context == "Resolve Battle Ability?" and self.battle_ability_to_resolve:
+                hint = "Yes or No to resolve the battle ability"
+        elif self.interrupts_waiting_on_resolution:
+            hint = "Resolving interrupt: " + self.interrupts_waiting_on_resolution[0].get_interrupt_name()
+        elif self.stored_damage:
+            hint = "Resolving damage, shield with a card in hand, use an ability, or pass"
+        elif self.resolving_kugath_nurglings:
+            hint = "Resolving Kugath's Nurglings, click a unit to deal damage to"
+        elif self.reactions_needing_resolving:
+            hint = "Resolving reaction: " + self.reactions_needing_resolving[0].get_reaction_name()
+        elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
+            hint = "Resolving Mobile keyword; click a unit then an adjacent planet to move, or pass"
+        elif self.battle_ability_to_resolve:
+            hint = "Resolving battle ability: "+ self.battle_ability_to_resolve
+        elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
+            if self.start_battle_deepstrike:
+                hint = "Resolving deepstrike; click a card in reserve to deepstrike it, or pass"
+            elif not self.check_if_battle_taking_place():
+                hint = "No battle taking place; take an action or pass"
+            else:
+                if self.ranged_skirmish_active:
+                    hint = "Take Ranged combat turn by clicking an attacker then defender, take an action with action button, or pass to pass your combat turn"
+                else:
+                    hint = "Take combat turn by clicking an attacker then defender, take an action with action button, or pass to pass your combat turn"
+        elif self.phase == "DEPLOY":
+            hint = "Deploy a card in your hand by clicking it, then a planet or unit if relevant. Take an action by clicking action, then the card with the action"
+        elif self.phase == "COMMAND":
+            if self.committing_warlords:
+                hint = "Commit your warlord/synapse by clicking a planet"
+                if self.p1.committed_warlord and self.p1.search_synapse_in_hq() and not self.p1.committed_synapse:
+                    hint = "Commit your synapse by clicking a planet"
+                if self.p2.committed_warlord and self.p2.search_synapse_in_hq() and not self.p2.committed_synapse:
+                    hint = "Commit your synapse by clicking a planet"
+            elif self.before_command_struggle:
+                hint = "Pass to begin command struggle"
+            elif self.after_command_struggle:
+                hint = "Pass to continue to combat phase, or take an action"
+            elif self.during_command_struggle:
+                hint = "Pass to continue command struggle, or click a valid card to resolve its effect"
+        elif self.phase == "HEADQUARTERS":
+            hint = "Pass to continue to next round, or take an action"
+        return hint
+
     async def send_info_box(self, force=False):
         info_string = "GAME_INFO/INFO_BOX/"
+        player_being_waited_on = "Unspecified"
         if self.phase == "SETUP":
-            info_string += "Unspecified/"
+            player_being_waited_on = "Unspecified"
         elif self.choosing_unit_for_nullify:
-            info_string += self.name_player_using_nullify + "/"
+            player_being_waited_on = self.name_player_using_nullify
         elif self.manual_bodyguard_resolution:
-            info_string += self.name_player_manual_bodyguard + "/"
+            player_being_waited_on = self.name_player_manual_bodyguard
         elif self.rearranging_deck:
-            info_string += self.name_player_rearranging_deck + "/"
+            player_being_waited_on = self.name_player_rearranging_deck
         elif self.cards_in_search_box:
-            info_string += self.name_player_who_is_searching + "/"
+            player_being_waited_on = self.name_player_who_is_searching
         elif self.p1.total_indirect_damage > 0 or self.p2.total_indirect_damage > 0:
-            info_string += "Unspecified/"
+            player_being_waited_on = "Unspecified"
         elif self.action_object.action_chosen == "Ambush" and self.mode == "DISCOUNT":
-            info_string += self.action_object.player_with_action + "/"
+            player_being_waited_on = self.action_object.player_with_action
         elif self.choices_available:
-            info_string += self.name_player_making_choices + "/"
+            player_being_waited_on = self.name_player_making_choices
         elif self.interrupts_waiting_on_resolution:
-            info_string += self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt() + "/"
+            player_being_waited_on = self.interrupts_waiting_on_resolution[0].get_player_resolving_interrupt()
         elif self.stored_damage:
             if self.stored_damage[0].get_position_unit()[0] == 1:
-                info_string += self.name_1 + "/"
+                player_being_waited_on = self.name_1
             else:
-                info_string += self.name_2 + "/"
+                player_being_waited_on = self.name_2
         elif self.resolving_kugath_nurglings:
             if self.p1.has_initiative:
-                info_string += self.name_1 + "/"
+                player_being_waited_on = self.name_1
             else:
-                info_string += self.name_2 + "/"
+                player_being_waited_on = self.name_2
         elif self.reactions_needing_resolving:
-            info_string += self.reactions_needing_resolving[0].get_player_resolving_reaction() + "/"
+            player_being_waited_on = self.reactions_needing_resolving[0].get_player_resolving_reaction()
         elif not self.p1.mobile_resolved or not self.p2.mobile_resolved:
-            info_string += self.player_mobiling + "/"
+            player_being_waited_on = self.player_mobiling
         elif self.battle_ability_to_resolve:
-            info_string += self.player_resolving_battle_ability + "/"
+            player_being_waited_on = self.player_resolving_battle_ability
         elif self.phase == "COMMAND":
             if self.committing_warlords:
                 if not self.p1.committed_warlord and not self.p2.committed_warlord:
-                    info_string += self.player_with_initiative + "/"
+                    player_being_waited_on = self.player_with_initiative
                 elif not self.p1.committed_warlord:
-                    info_string += self.name_1 + "/"
+                    player_being_waited_on = self.name_1
                 elif not self.p2.committed_warlord:
-                    info_string += self.name_2 + "/"
+                    player_being_waited_on = self.name_2
                 elif not self.p1.committed_synapse:
-                    info_string += self.name_1 + "/"
+                    player_being_waited_on = self.name_1
                 elif not self.p2.committed_synapse:
-                    info_string += self.name_2 + "/"
+                    player_being_waited_on = self.name_2
                 else:
-                    info_string += self.player_with_initiative + "/"
+                    player_being_waited_on = self.player_with_initiative
             else:
                 if not self.p1.has_passed and not self.p2.has_passed:
-                    info_string += self.player_with_initiative + "/"
+                    player_being_waited_on = self.player_with_initiative
                 elif not self.p1.has_passed:
-                    info_string += self.name_1 + "/"
+                    player_being_waited_on = self.name_1
                 elif not self.p2.has_passed:
-                    info_string += self.name_2 + "/"
+                    player_being_waited_on = self.name_2
                 else:
-                    info_string += self.player_with_initiative + "/"
+                    player_being_waited_on = self.player_with_initiative
         elif self.phase == "HEADQUARTERS":
             if not self.p1.has_passed and not self.p2.has_passed:
-                info_string += self.player_with_initiative + "/"
+                player_being_waited_on = self.player_with_initiative
             elif not self.p1.has_passed:
-                info_string += self.name_1 + "/"
+                player_being_waited_on = self.name_1
             elif not self.p2.has_passed:
-                info_string += self.name_2 + "/"
+                player_being_waited_on = self.name_2
             else:
-                info_string += self.player_with_initiative + "/"
+                player_being_waited_on = self.player_with_initiative
         elif self.phase == "COMBAT" or self.herald_of_the_waagh_active:
             if self.start_battle_deepstrike:
-                info_string += self.name_player_deepstriking + "/"
+                player_being_waited_on = self.name_player_deepstriking
             elif not self.check_if_battle_taking_place():
-                active_player = self.name_1
+                player_being_waited_on = self.name_1
                 if self.p1.has_initiative and not self.p1.has_passed:
-                    active_player = self.name_1
+                    player_being_waited_on = self.name_1
                 elif not self.p2.has_passed:
-                    active_player = self.name_2
+                    player_being_waited_on = self.name_2
                 else:
-                    active_player = self.name_1
-                info_string += active_player + "/"
+                    player_being_waited_on = self.name_1
             else:
-                if self.mode == "Normal" and (
-                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) \
-                        and self.check_style_of_bot() != "ARG" and self.bot_is_present:
-                    info_string += self.get_action_window_between_combat_turns_player() + "/"
-                else:
-                    info_string += self.player_with_combat_turn + "/"
+                player_being_waited_on = self.player_with_combat_turn
         elif self.phase == "DEPLOY":
-            info_string += self.player_with_deploy_turn + "/"
+            player_being_waited_on = self.player_with_deploy_turn
         else:
-            info_string += "Unspecified/"
+            player_being_waited_on = "Unspecified"
+        info_string += player_being_waited_on + "/"
         info_string += "Phase: " + self.phase + "/"
         info_string += "Mode: " + self.mode + "/"
         if self.phase == "SETUP":
@@ -1143,10 +1206,12 @@ class Game:
             info_string += "HQ action & reaction window/"
         else:
             info_string += "??????/"
-        if self.last_info_box_string != info_string or force:
+        hint = self.determine_hint()
+        if self.last_info_box_string != info_string or self.last_hint_string != hint or force:
             if not force:
                 self.anything_changed_since_last_send = True
-            await self.send_update_message(info_string)
+            await self.send_update_message(info_string, additional_info=hint)
+            self.last_hint_string = hint
             self.last_info_box_string = info_string
 
     async def send_planet_array(self, force=False):

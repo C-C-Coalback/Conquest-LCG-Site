@@ -967,6 +967,7 @@ legend {
     flex-direction: column;
     pointer-events: auto;
     background: rgb(210, 210, 210);
+    padding-bottom: 10px;
 }
 
 .info-box-sub {
