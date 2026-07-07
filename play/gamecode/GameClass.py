@@ -600,7 +600,7 @@ class Game:
             return False
         if self.rearranging_deck:
             return False
-        if self.mode != "Normal":
+        if self.mode != "Normal" and self.mode != "RETREAT":
             return False
         return True
 
@@ -1004,7 +1004,9 @@ class Game:
             elif not self.check_if_battle_taking_place():
                 hint = "No battle taking place; take an action or pass"
             else:
-                if self.ranged_skirmish_active:
+                if self.mode == "RETREAT":
+                    hint = "Click a unit to retreat it or pass"
+                elif self.ranged_skirmish_active:
                     hint = "Take Ranged combat turn by clicking an attacker then defender, take an action with action button, or pass to pass your combat turn"
                 else:
                     hint = "Take combat turn by clicking an attacker then defender, take an action with action button, or pass to pass your combat turn"
