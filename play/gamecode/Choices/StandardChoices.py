@@ -314,7 +314,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
             self.resolving_search_box = False
             num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-            self.vamii_complex_discount = primary_player.headquarters[pos].counter
+            self.vamii_complex_discount = primary_player.headquarters[pos].counter + primary_player.headquarters[pos].get_damage()
             primary_player.sacrifice_card_in_hq(pos)
     elif self.choice_context == "Raving Cryptek: Increase cost":
         self.misc_target_choice = game_update_string[1]

@@ -177,6 +177,9 @@ class Card:
             return "None"
         return string
 
+    def set_damage(self, amount):
+        self.damage = amount
+
     def remove_damage(self, amount):
         self.damage = self.damage - amount
         if self.damage < 0:
@@ -1174,9 +1177,6 @@ class UnitCard(Card):
 
     def get_damage(self):
         return self.damage
-
-    def set_damage(self, amount):
-        self.damage = amount
 
     def get_command(self):
         command = self.command

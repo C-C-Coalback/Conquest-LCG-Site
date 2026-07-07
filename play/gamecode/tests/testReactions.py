@@ -798,6 +798,33 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         self.assertEqual(test_game.p1.get_ready_given_pos(0, 1), True)
 
+    async def test_vamii_industrial_complex(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content.replace("Captain Cato Sicarius", "Chapter Champion Varn"), test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Ultramarines Dreadnought"]
+        test_game.p2.cards = []
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Vamii Industrial Complex"))
+        test_game.p1.set_damage_given_pos(-2, 1, 2)
+        self.assertEqual(test_game.p1.get_damage_given_pos(-2, 1), 2)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P2", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        self.assertEqual(len(test_game.choices_available), 2)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "1"])
+        self.assertEqual(test_game.p1.resources, 5)
+
 
 if __name__ == "__main__":
     unittest.main()
