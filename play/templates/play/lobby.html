@@ -43,9 +43,6 @@
             position:relative;
             margin:auto;
         }
-        #players-in-lobby {
-
-        }
         #add_players_to_me {
             background-color: lightblue;
             border: 2px solid blue;
@@ -187,6 +184,11 @@
                  Custom Errata
                 </div>
                 <br>
+                <input id="aiopponent" type="checkbox" style="float: left; margin-top: 5px;">
+                <div style="margin-left: 25px; text-align: left;">
+                 AI Opponent (Unavailable)
+                </div>
+                <br>
             </div>
         </div>
         <div id="decks-container-container">
@@ -317,6 +319,7 @@
             const private = document.getElementById("cb").checked;
             const apoka = document.getElementById("apokacb").checked;
             const blackstone = document.getElementById("blackstonecb").checked;
+            const aiopponent = document.getElementById("aiopponent").checked;
             var errata_string = "None";
             if (apoka) {
                 errata_string = "Apoka";
@@ -327,7 +330,7 @@
             const sector = document.getElementById("sector").value;
             const first_player = document.getElementById("first-player").value;
             lobbySocket.send(JSON.stringify({
-                'message': "Create lobby" + "/" + private.toString() + "/" + errata_string + "/" + sector + "/" + deck_name + "/" + first_player
+                'message': "Create lobby" + "/" + private.toString() + "/" + errata_string + "/" + sector + "/" + deck_name + "/" + first_player + "/" + aiopponent
             }));
         };
 

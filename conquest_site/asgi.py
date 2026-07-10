@@ -22,14 +22,17 @@ django_asgi_app = get_asgi_application()
 from chat.routing import websocket_chat_urlpatterns
 from play.routing import websocket_play_urlpatterns
 from decks.routing import websocket_decks_urlpatterns
+from .middleware import TokenAuthMiddleware
 
 websocket_urlpatterns = websocket_chat_urlpatterns + websocket_play_urlpatterns + websocket_decks_urlpatterns
 
+# asgi.py
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
         "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+            AuthMiddlewareStack(TokenAuthMiddleware(URLRouter(websocket_urlpatterns))
+            )
         ),
     }
 )

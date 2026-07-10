@@ -44,11 +44,11 @@ def discord_bot(request):
     sent_lobby_first_players = []
     sent_lobby_second_players = []
     sent_lobby_errata = []
-    for i in range(len(active_lobbies[2])):
-        if active_lobbies[2][i] == "Public":
-            sent_lobby_first_players.append(active_lobbies[0][i])
-            sent_lobby_second_players.append(active_lobbies[1][i])
-            sent_lobby_errata.append(active_lobbies[3][i])
+    for i in range(len(active_lobbies)):
+        if active_lobbies[i][2] == "Public":
+            sent_lobby_first_players.append(active_lobbies[i][0])
+            sent_lobby_second_players.append(active_lobbies[i][1])
+            sent_lobby_errata.append(active_lobbies[i][3])
     data = {"firstPlayers": sent_lobby_first_players,
             "secondPlayers": sent_lobby_second_players, "errata": sent_lobby_errata}
     return JsonResponse(data)
