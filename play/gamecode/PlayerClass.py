@@ -8701,6 +8701,8 @@ class Player:
 
     def resolve_combat_round_ends_effects(self, planet_id):
         can_forward_barracks = False
+        if self.search_card_at_planet(planet_id, "Broderick Worr", bloodied_relevant=True):
+            self.game.worr_retreat_destruction_active = True
         self.mork_blessings_count = 0
         self.defensive_protocols_active = False
         for i in range(len(self.cards_in_play[planet_id + 1])):
@@ -8870,6 +8872,8 @@ class Player:
         return False
 
     def check_if_unit_can_retreat(self, planet_id, unit_id):
+        if planet_id == -2:
+            return False
         if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum":
             if self.get_card_type_given_pos(planet_id, unit_id) != "Warlord":
                 every_worr_check = self.search_for_card_everywhere("Broderick Worr", bloodied_relevant=True)
@@ -8882,15 +8886,8 @@ class Player:
             if self.get_ability_given_pos(planet_id, unit_id) == "Mindless Pain Addict":
                 return False
             own_umbral_check = self.search_card_at_planet(planet_id, "Umbral Preacher")
-            enemy_umbral_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id,
-                                                                                   "Umbral Preacher")
+            enemy_umbral_check = self.game.request_search_for_enemy_card_at_planet(self.number, planet_id, "Umbral Preacher")
             if own_umbral_check or enemy_umbral_check:
-                return False
-            own_worr_check = self.search_card_at_planet(planet_id, "Broderick Worr", bloodied_relevant=True)
-            enemy_worr_check = self.game.request_search_for_enemy_card_at_planet(
-                self.number, planet_id, "Broderick Worr", bloodied_relevant=True)
-            if own_worr_check or enemy_worr_check:
-                self.destroy_card_in_play(planet_id, unit_id)
                 return False
             if not self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
                 other_player = self.get_other_player()
@@ -8903,6 +8900,9 @@ class Player:
 
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if not self.check_if_unit_can_retreat(planet_id, unit_id):
+            return False
+        if self.game.worr_retreat_destruction_active:
+            self.destroy_card_in_play(planet_id, unit_id)
             return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
             if self.defense_battery_check(planet_id):

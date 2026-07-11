@@ -202,6 +202,7 @@ class Game:
         self.hqs_need_sending_outside_normal_sends = False
         self.interrupting_discard_effect_active = False
         self.actions_allowed = True
+        self.worr_retreat_destruction_active = False
         self.storm_of_silence_friendly_unit = True
         self.player_with_action = ""
         self.action_chosen = ""

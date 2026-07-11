@@ -241,6 +241,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             self.combat_round_number += 1
                             self.p1.has_passed = False
                             self.p2.has_passed = False
+                            self.worr_retreat_destruction_active = False
                             self.p1.resolve_combat_round_ends_effects(self.last_planet_checked_for_battle)
                             self.p2.resolve_combat_round_ends_effects(self.last_planet_checked_for_battle)
                             self.reset_combat_turn()
