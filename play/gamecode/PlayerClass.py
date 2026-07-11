@@ -8901,10 +8901,10 @@ class Player:
     def retreat_unit(self, planet_id, unit_id, exhaust=False):
         if not self.check_if_unit_can_retreat(planet_id, unit_id):
             return False
-        if self.game.worr_retreat_destruction_active:
-            self.destroy_card_in_play(planet_id, unit_id)
-            return False
         if self.cards_in_play[planet_id + 1][unit_id].get_card_type() == "Army":
+            if self.game.worr_retreat_destruction_active:
+                self.destroy_card_in_play(planet_id, unit_id)
+                return False
             if self.defense_battery_check(planet_id):
                 self.cards_in_play[planet_id + 1][unit_id].valid_defense_battery_target = True
         mork_count = 0
