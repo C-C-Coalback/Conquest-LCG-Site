@@ -102,11 +102,6 @@ async def declare_attacker(self, name, game_update_string):
             self.create_reaction("Biel-Tan Warp Spiders", player.name_player,
                                  (int(player.number), self.attacker_planet,
                                   self.attacker_position))
-        if player.search_hand_for_card("Rapid Ingress") and player.get_resources() > 0:
-            if self.get_green_icon(self.attacker_planet):
-                if len(player.cards_in_play[self.attacker_planet + 1]) == 1:
-                    self.create_reaction("Rapid Ingress", player.name_player,
-                                         (int(player.number), self.attacker_planet, -1))
         if player.search_hand_for_card("Unexpected Ferocity") and player.get_resources() > 0:
             self.create_reaction("Unexpected Ferocity", player.name_player,
                                  (int(player.number), self.attacker_planet, self.attacker_position))
@@ -124,11 +119,6 @@ async def declare_attacker(self, name, game_update_string):
         if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                 == "Masked Hunter":
             self.create_reaction("Masked Hunter", player.name_player,
-                                 (int(player.number), self.attacker_planet,
-                                  self.attacker_position))
-        if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
-                == "Imperial Fists Legion":
-            self.create_reaction("Imperial Fists Legion", player.name_player,
                                  (int(player.number), self.attacker_planet,
                                   self.attacker_position))
         if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
@@ -220,6 +210,9 @@ async def declare_attacker(self, name, game_update_string):
             self.create_reaction("The Plaguefather's Banner", player.name_player,
                                  (int(player.number), self.attacker_planet,
                                   self.attacker_position))
+        if player.search_attachments_at_pos(self.attacker_planet, self.attacker_position, "Staff of Tomorrow"):
+            self.create_reaction("Staff of Tomorrow", player.name_player, 
+                                 (int(player.number), self.attacker_planet, self.attacker_position))
         attachments = player.get_all_attachments_at_pos(self.attacker_planet, self.attacker_position)
         for i in range(len(attachments)):
             if attachments[i].get_ability() == "Beastmaster's Whip":

@@ -850,14 +850,31 @@
                     var target_deck_id = "current-deck-player-" + split_data[2];
                     var card_name = split_data[3].split(' ').join('_')
                     var card_count = split_data[4];
+                    var extra_data = data.extra.split("|");
+                    var data_orikan_one = extra_data[0].split("/")
+                    var data_orikan_two = extra_data[1].split("/")
+                    var orikan_card_name = "";
+                    console.log(extra_data)
+                    if (data_orikan_one[0] === "{{ user.username }}") {
+                        orikan_card_name = data_orikan_one[1];
+                    } 
+                    if (data_orikan_two[0] === "{{ user.username }}") {
+                        orikan_card_name = data_orikan_two[1];
+                    }
+                    orikan_card_name = orikan_card_name.replaceAll(" ", "_")
+                    if (orikan_card_name === "Cardback") {
+                        orikan_card_name = replaceCardback(orikan_card_name, split_data[2])
+                    }
+                    console.log(orikan_card_name)
+                    console.log("ORIKAN")
                     if (card_name === "Cardback") {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + replaceCardback(card_name, split_data[2]) + `.jpg"
-                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
+                        alt="didnt work" data-orikan="` + orikan_card_name + `" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id, this.dataset.orikan)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
                     } else {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + card_name + `.jpg"
-                        alt="didnt work" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
+                        alt="didnt work" data-orikan="` + orikan_card_name + `" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id, this.dataset.orikan)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
                     }
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
@@ -1726,16 +1743,17 @@
             }
         }
 
-        function changeDefDeck(image_src, card_count, user_num) {
+        function changeDefDeck(image_src, card_count, user_num, orikan_card_name) {
             var og_image_src = image_src.replace("CroppedImages", "CardImages");
+            var orikan_src = "/static/images/CardImages/" +  orikan_card_name + ".jpg";
             helperCard = document.getElementById("LargeHelperCard");
-            helperCard.src=og_image_src;
+            helperCard.src=orikan_src;
             helperCard.style.width = current_helper_width;
             helperCard.style.height = current_helper_height;
             hover_container = document.getElementById("hover-container");
             hover_container.style.display = "block";
             adjacent_helper_card = document.getElementById("AdjacentHelperCard");
-            adjacent_helper_card.src=og_image_src;
+            adjacent_helper_card.src=orikan_src;
             adjacent_helper_card.style.width = current_adj_helper_width;
             adjacent_helper_card.style.height = current_adj_helper_height;
             var target_deck_id = "count-" + user_num;

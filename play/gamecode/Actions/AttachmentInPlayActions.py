@@ -117,8 +117,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         player_owning_card.remove_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
                         card = ArmyCard("Scribe Servo-Skull", "Action: Exhaust this unit to ready an"
                                                               " attachment at this planet.", "Drone.",
-                                        1, "Astra Militarum", "Loyal", 0, 1, 0, False,
-                                        action_in_play=True, allowed_phases_in_play="ALL")
+                                        1, "Astra Militarum", "Loyal", 0, 1, 1, False)
                         primary_player.add_card_to_planet(card, planet_pos, triggered_card_effect=False)
                         self.action_cleanup()
                     elif ability == "Pulsating Carapace":
@@ -313,15 +312,23 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                               "Card is not ready.")
-                    elif ability == "Fabricator Claw Array":
-                        if primary_player.get_ready_given_pos(planet_pos, unit_pos):
-                            primary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
+                    elif ability == "Nemesis Daemonhammer":
+                        if card_chosen.get_ready() and not player_owning_card.get_ready_given_pos(planet_pos, unit_pos):
+                            card_chosen.exhaust_card()
                             self.action_object.action_chosen = ability
-                            self.action_object.misc_target_planet = planet_pos
-                            self.action_object.misc_counter = primary_player.get_attack_given_pos(planet_pos, unit_pos)
+                            self.action_object.misc_counter = 0
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
-                                                              "Attached unit is not ready.")
+                                                              "Card is not ready.")
+                    elif ability == "Overcharged Supa-Shoota":
+                        if card_chosen.get_ready() and not player_owning_card.get_ready_given_pos(planet_pos, unit_pos):
+                            card_chosen.exhaust_card()
+                            primary_player.ready_given_pos(planet_pos, unit_pos)
+                            primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, preventable=False, by_enemy_unit=False)
+                            self.action_cleanup()
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
+                                                              "Card is not ready.")
                     elif ability == "Steed of Slaanesh":
                         if card_chosen.get_ready():
                             card_chosen.exhaust_card()
@@ -425,13 +432,6 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Attachment is a Drone.")
-    elif self.action_object.action_chosen == "Scribe Servo-Skull":
-        if planet_pos == self.action_object.position_of_actioned_card[0]:
-            if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_ready():
-                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].ready_card()
-                self.mask_jain_zar_check_actions(primary_player, secondary_player)
-                primary_player.clear_aiming_reticle_actioned_card()
-                self.action_cleanup()
     elif self.action_object.action_chosen == "Accelerated Gestation":
         if card_chosen.from_magus_harid and card_chosen.name_owner == primary_player.get_name_player():
             if card_chosen.get_card_type() == "Army":
@@ -472,14 +472,6 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
-    elif self.action_object.action_chosen == "Fire Caste Cadre":
-        if self.action_object.position_of_actioned_card[0] == planet_pos and self.action_object.position_of_actioned_card[1] == unit_pos:
-            if card_chosen.name_owner == primary_player.get_name_player():
-                if game_update_string[2] == primary_player.get_number():
-                    primary_player.cards.append(card_chosen.get_name())
-                    del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
-                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                    self.action_cleanup()
     elif self.action_object.action_chosen == "Air Caste Courier":
         if game_update_string[2] == primary_player.get_number():
             if not self.action_object.chosen_first_card:

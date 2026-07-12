@@ -467,32 +467,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
                                                               "Aun'Len cannot trigger that planet.")
-                    elif ability == "Abrasive Squigherder":
-                        if card.get_ready():
-                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                            self.resolving_search_box = True
-                            self.what_to_do_with_searched_card = "DRAW"
-                            self.traits_of_searched_card = "Squig"
-                            self.card_type_of_searched_card = None
-                            self.faction_of_searched_card = None
-                            self.max_cost_of_searched_card = 999
-                            self.all_conditions_searched_card_required = True
-                            self.no_restrictions_on_chosen_card = False
-                            primary_player.number_cards_to_search = 6
-                            for i in range(len(primary_player.headquarters)):
-                                if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
-                                    if primary_player.headquarters[i].counter > 0:
-                                        primary_player.number_cards_to_search += 2
-                            if primary_player.number_cards_to_search > len(primary_player.deck):
-                                primary_player.number_cards_to_search = len(primary_player.deck)
-                            self.cards_in_search_box = primary_player.deck[:primary_player.number_cards_to_search]
-                            self.name_player_who_is_searching = primary_player.name_player
-                            self.number_who_is_searching = primary_player.number
-                            self.mask_jain_zar_check_actions(primary_player, secondary_player)
-                            self.action_cleanup()
-                        else:
-                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
-                                                              "Card is not ready.")
                     elif ability == "Korporal Snagbrat":
                         if not card.get_once_per_phase_used():
                             card.set_once_per_phase_used(True)
@@ -592,23 +566,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
                                                               "Once per phase ability used.")
-                    elif ability == "Fire Caste Cadre":
-                        if not primary_player.get_once_per_round_used_given_pos(planet_pos, unit_pos):
-                            self.action_object.action_chosen = ability
-                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos)
-                        else:
-                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
-                                                              "Once per round ability used.")
-                    elif ability == "Scribe Servo-Skull":
-                        if card_chosen.get_ready():
-                            primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                            self.action_object.action_chosen = ability
-                            player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                            self.action_object.position_of_actioned_card = (planet_pos, unit_pos)
-                        else:
-                            await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
-                                                              "Card is not ready.")
                     elif ability == "Saint Celestine":
                         if not card_chosen.get_once_per_phase_used():
                             if not card_chosen.bloodied:
@@ -2324,18 +2281,23 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Card is not a Cultist unit.")
-    elif self.action_object.action_chosen == "Fabricator Claw Array":
-        if planet_pos == self.action_object.misc_target_planet:
-            if player_owning_card.get_faction_given_pos(planet_pos, unit_pos) == "Necrons":
-                if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                    player_owning_card.remove_damage_from_pos(planet_pos, unit_pos, self.action_object.misc_counter, healing=True)
+    elif self.action_object.action_chosen == "Zodiac's Fury":
+        warlord_pla = primary_player.get_planet_of_warlord()
+        if warlord_pla < 0:
+            await self.send_update_message("Cancelling action; warlord is not at a planet.")
+            self.action_cleanup()
+        elif game_update_string[1] == primary_player.number:
+            if warlord_pla != planet_pos:
+                if primary_player.check_is_unit_at_pos(planet_pos, unit_pos):
+                    primary_player.move_unit_to_planet(planet_pos, unit_pos, warlord_pla)
                     self.action_cleanup()
-                else:
-                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
-                                                      "Card is not an army unit.")
-            else:
-                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
-                                                  "Card is not a Necrons unit.")
+    elif self.action_object.action_chosen == "Nemesis Daemonhammer":
+        if game_update_string[1] == primary_player.number:
+            if primary_player.spend_faith_given_pos(planet_pos, unit_pos, 1):
+                self.action_object.misc_counter += 1
+                if self.action_object.misc_counter > 2:
+                    primary_player.ready_given_pos(self.action_object.position_of_actioned_card[0], self.action_object.position_of_actioned_card[1])
+                    self.action_cleanup()
     elif self.action_object.action_chosen == "Korporal Snagbrat":
         if not self.action_object.chosen_first_card:
             if game_update_string[1] == primary_player.get_number():
@@ -3628,16 +3590,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           "Card is not an Artillery card.")
-    elif self.action_object.action_chosen == "Lucky Shot":
-        if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
-            if player_owning_card.get_ranged_given_pos(planet_pos, unit_pos):
-                player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOP")
-                player_owning_card.cards_in_play[planet_pos + 1][unit_pos].armorbane_eop = True
-                primary_player.resolve_played_any_event()
-                self.action_cleanup()
-            else:
-                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
-                                                  "Card is not a Ranged unit.")
     elif self.action_object.action_chosen == "Ravenous Flesh Hounds":
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(

@@ -268,8 +268,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                         choices.append("Mobile")
                     if card.by_base_area_effect > 0:
                         choices.append("Area Effect")
-                        self.stored_area_effect_value = self.cards_in_play[planet_pos + 1][
-                            unit_pos].by_base_area_effect
+                        self.stored_area_effect_value = card.by_base_area_effect
                     if card.by_base_ranged:
                         choices.append("Ranged")
                     if choices:

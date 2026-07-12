@@ -42,10 +42,6 @@ def blackstone_project_cards_init():
         CardClasses.SupportCard("Administratum Office", "Each unit you control with no printed command icons gains "
                                                         "1 command icon.",
                                 "Location.", 2, "Astra Militarum", "Loyal", True),
-        CardClasses.ArmyCard("Amalgamated Devotee", "This unit gets +1 ATK and +2 HP for each attachment on it. \n"
-                                                    "While this unit has 2 or more attachments it gains"
-                                                    " \"Immune to enemy events.\"", "Tech-Priest.",
-                             4, "Astra Militarum", "Loyal", 2, 3, 2, False),
         CardClasses.AttachmentCard("Planetary Defence Force", "Attach to a planet.\n"
                                                               "Each Guardsman token you control at this planet gains"
                                                               " the Ranged keyword.\n"
@@ -62,8 +58,7 @@ def blackstone_project_cards_init():
         CardClasses.AttachmentCard("Scribe Servo-Skull", "Attach to a Tech-Priest unit. \n"
                                                          "Attached unit gains 1 command icon.\n"
                                                          "Action: Detach this card to have it become a Drone army unit "
-                                                         "with 0 ATK, 1 HP and \"Action: Exhaust this unit to ready an"
-                                                         " attachment at this planet.\"", "Drone.",
+                                                         "with 0 ATK, 1 HP and 1 command icon.", "Drone.",
                                    1, "Astra Militarum", "Loyal", 2, False, required_traits="Tech-Priest",
                                    action_in_play=True, allowed_phases_in_play="ALL", extra_command=1),
         CardClasses.EventCard("Sudden Reinforcements", "Action: Exhaust a Transport unit you control to put into play "
@@ -75,10 +70,9 @@ def blackstone_project_cards_init():
                                                   "non-warlord unit in a player's headquarters.", "Tactic.",
                               1, "Astra Militarum", "Loyal", 2, False, action_in_hand=True,
                               allowed_phases_in_hand="HEADQUARTERS"),
-        CardClasses.ArmyCard("Sicarian Infiltrator", "Deep Strike (2). You may Deep Strike this card as an Action "
-                                                     "during the combat phase. \n"
+        CardClasses.ArmyCard("Sicarian Infiltrator", "Deep Strike (1)."
                                                      "Reaction: After you Deep Strike this unit, place 2 faith on it.",
-                             "Soldier. Skitarii.", 3, "Astra Militarum", "Loyal", 3, 2, 1, False, deepstrike=2),
+                             "Soldier. Skitarii.", 3, "Astra Militarum", "Loyal", 3, 2, 1, False, deepstrike=1),
         CardClasses.AttachmentCard("Spray and Pray", "Attach to a Soldier army unit. \n"
                                                      "Attached unit gains Sweep (X), where X is equal to its"
                                                      " printed ATK. \n"
@@ -86,18 +80,19 @@ def blackstone_project_cards_init():
                                                      " deal damage to this unit equal to the amount prevented.",
                                    "Tactic.", 1, "Astra Militarum", "Common", 1, False, required_traits="Soldier",
                                    type_of_units_allowed_for_attachment="Army"),
-        CardClasses.EventCard("Lucky Shot", "Action: Until the end of the phase, a target Ranged unit gets +1 "
-                                            "ATK and Armorbane.", "Tactic.", 1, "Astra Militarum", "Common", 1, False,
-                              action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Rallying Thunderbolt", "Flying. No Wargear attachments.\n"
                                                      "Reaction: After this unit moves to a planet, ready each unit "
                                                      "with printed cost 3 or greater you control at that planet.",
                              "Vehicle. Elite.", 7, "Astra Militarum", "Common", 3, 5, 3, False,
                              flying=True, wargear_attachments_permitted=False),
-        CardClasses.ArmyCard("Imperial Fists Legion",
-                             "Reaction: After this unit is declared as an attacker, exhaust a target support to remove "
-                             "1 damage from that support.", "Soldier. Imperial Fists.",
-                             1, "Space Marines", "Common", 1, 2, 1, False),
+        CardClasses.ArmyCard("Death Korps Squad", "Entrenched - The first time each round the second combat round begins " \
+                                                  "at this planet, remove 1 damage from this unit "
+                                                  "and this unit gets +2 ATK and +2 HP until the end of the battle.", 
+                             "Soldier. Krieg.", 3, "Astra Militarum", "Common", 3, 3, 1, False),
+        CardClasses.ArmyCard("14th Cadian Shock Regiment", "Entrenched - The first time each round the second combat round begins at this planet, "
+                                                           "remove 1 damage from this unit and deal 1 damage to each enemy unit at this planet. "
+                                                           "If this unit is at a Strongpoint planet, deal 2 damage instead.", 
+                             "Soldier. Cadia.", 4, "Astra Militarum", "Loyal", 2, 4, 1, False),
         CardClasses.EventCard("Righteous Reprisal", "Reaction: After a Space Marines unit you control is damaged by an"
                                                     " attack, exhaust that unit to deal damage equal to twice the"
                                                     " unit's printed ATK to the attacker.", "Power.",
@@ -112,8 +107,8 @@ def blackstone_project_cards_init():
                                                    " until the end of the phase.", "Soldier. Raven Guard.",
                              2, "Space Marines", "Common", 2, 3, 1, False),
         CardClasses.ArmyCard("Dark Angels Purifier", "Deep Strike (2).\n"
-                                                     "Interrupt: When this unit is destroyed, Deep Strike a Dark "
-                                                     "Angels unit you control in reserve at the same planet.",
+                                                     "Interrupt: When this unit is destroyed, Deep Strike a "
+                                                     "unit you control in reserve at the same planet.",
                              "Soldier. Dark Angels.", 3, "Space Marines", "Common", 3, 3, 1, False, deepstrike=2),
         CardClasses.ArmyCard("Parched Neophyte", "Bloodthirst - During a combat round in which 1 or more units have"
                                                  " been destroyed at this planet, this unit gains Retaliate (3).",
@@ -133,18 +128,9 @@ def blackstone_project_cards_init():
                                                           "planet is destroyed, gain 1 resource. "
                                                           "(Limit once per phase)", "Scholar. Imperial Fists.",
                              2, "Space Marines", "Loyal", 1, 2, 2, False),
-        CardClasses.ArmyCard("Bladeguard Veteran Squad", "Reaction: After an attack by this unit against an army unit "
-                                                         "doesn't destroy the defender, ready a target Space Marines "
-                                                         "unit you control. (Limit once per phase)",
-                             "Soldier. Ultramarines.", 3, "Space Marines", "Common", 3, 3, 1, False),
         CardClasses.ArmyCard("Iron Hands Platoon", "Reaction: After an enemy army unit with 2 or more printed command "
                                                    "icons enters play at this planet, deal 1 damage to that unit.",
                              "Soldier. Iron Hands.", 2, "Space Marines", "Common", 2, 3, 1, False),
-        CardClasses.SupportCard("The Phalanx", "This support can be used as a shield card while it is in play. "
-                                               "It has shield icons equal to 2 + the number of tokens on it.\n"
-                                               "Reaction: After your opponent places a planet in their victory display,"
-                                               " place 1 resource on this support.", "Location. Imperial Fists.",
-                                1, "Space Marines", "Loyal", True),
         CardClasses.AttachmentCard("Imposing Presence", "Attach to a Soldier army unit. Limit 1 per unit.\n"
                                                         "While attached unit is ready, each enemy army and token unit "
                                                         "at this planet gets -1 ATK.", "Skill.",
@@ -159,9 +145,11 @@ def blackstone_project_cards_init():
                                               "exhaust this support to put that unit into reserve at a non-first "
                                               "planet from your discard pile.", "Upgrade. Relic.",
                                 2, "Orks", "Loyal", True),
-        CardClasses.ArmyCard("Baddfrag", "Deep Strike (2).\n"
-                                         "Each Vehicle unit you control at this planet gets +1 ATK.",
-                             "Warrior. Blood Axe.", 3, "Orks", "Common", 3, 3, 0, True, deepstrike=2),
+        CardClasses.AttachmentCard("Nemesis Daemonhammer", "Attach to an army unit.\n"
+                                                           "Attached unit gets +2 ATK.\n"
+                                                           "Action: Exhaust this attachment and pay 3 Faith to ready attached unit.", 
+                                   "Wargear. Weapon.", 2, "Space Marines", "Common", 1, False, type_of_units_allowed_for_attachment="Army", 
+                                   action_in_play=True, allowed_phases_in_play="ALL", extra_attack=2),
         CardClasses.ArmyCard("Shok Troopa", "Limited. Retaliate (1).\n"
                                             "Forced Interrupt: When this unit leaves play, deal 1 damage to "
                                             "each unit at this planet.", "Scout. Boyz. Ally.",
@@ -169,9 +157,6 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Cowardly Squig", "No Attachments. \n"
                                                "This unit's ATK is equal to its remaining HP.",
                              "Creature. Squig.", 4, "Orks", "Common", 0, 6, 0, False, no_attachments=True),
-        CardClasses.ArmyCard("Abrasive Squigherder", "Action: Exhaust this unit to Rally 6 a card with the Squig "
-                                                     "trait, add it to your hand.", "Oddboy.",
-                             2, "Orks", "Common", 1, 2, 1, False, action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Immature Squig", "No Attachments.\n"
                                                "You may include up to 6 copies of this card in your deck. \n"
                                                "This unit gets +1 ATK for every other Squig unit at this planet.",
@@ -188,13 +173,6 @@ def blackstone_project_cards_init():
                                                          "from this planet, put a Snotlings token into play under "
                                                          "your control at this planet. ", "Upgrade.",
                                    3, "Orks", "Loyal", 2, False, planet_attachment=True, limit_one_per_unit=True),
-        CardClasses.AttachmentCard("Speed Freakz Warpaint", "Deep Strike (1). \n"
-                                                            "Attach to an Orks army unit.\n"
-                                                            "Attached unit gains the Red trait. \n"
-                                                            "Attached unit gains \"Goes Fasta - This unit gets +3 ATK"
-                                                            " while your opponent has the initiative.\"", "Upgrade.",
-                                   1, "Orks", "Common", 1, False, unit_must_match_faction=True,
-                                   type_of_units_allowed_for_attachment="Army", deepstrike=1),
         CardClasses.SupportCard("Convincing Cutouts", "Action: Exhaust this support to move a target non-warlord unit "
                                                       "you control at a planet without an enemy warlord to your HQ.",
                                 "Upgrade.", 1, "Orks", "Common", False, action_in_play=True,
@@ -207,12 +185,6 @@ def blackstone_project_cards_init():
                                          " army unit, where X is the number of Snotlings tokens exhausted by this"
                                          " effect.", "Tactic.", 1, "Orks", "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
-        CardClasses.AttachmentCard("Necklace of Teef", "Attach to an army unit.\n"
-                                                       "Attached unit gets +1 ATK for each Resource on this"
-                                                       " attachment.\n"
-                                                       "Reaction: After a combat round begins at this planet, place"
-                                                       " 1 Resource on this attachment.", "Wargear.",
-                                   1, "Orks", "Common", 1, False, type_of_units_allowed_for_attachment="Army"),
         CardClasses.EventCard("Blessing of Mork", "Play only during a battle.\n"
                                                   "Combat Action: For the remainder of the combat round, after an Ork "
                                                   "unit you control destroys an army unit by an attack, move 1 damage "
@@ -230,10 +202,15 @@ def blackstone_project_cards_init():
                                                        "number of cards in your hand. (Limit once per combat round)",
                              "Psyker. Oddboy.", 3, "Orks", "Common", 1, 4, 2, False,
                              action_in_play=True, allowed_phases_in_play="COMBAT"),
-        CardClasses.SupportCard("Palace of Slaanesh", "Limited.\n"
-                                                      "Reaction: After the headquarters phase begins, put a "
-                                                      "Cultist token into play at your HQ.",
-                                "Location.", 1, "Chaos", "Common", False, limited=True),
+        CardClasses.AttachmentCard("Overcharged Supa-Shoota", "Attach to a Vehicle unit.\n"
+                                                              "Attached unit gets +1 ATK.\n"
+                                                              "Combat Action: Exhaust this attachment and deal 2 damage to attached unit to ready attached unit.", 
+                                   "Hardpoint. Weapon.", 1, "Orks", "Loyal", 2, False, required_traits="Vehicle", extra_attack=1, action_in_play=True, 
+                                   allowed_phases_in_play="COMBAT"),
+        CardClasses.ArmyCard("Shoddy Swoopa", "No Wargear Attachments. Flying.\n"
+                                              "Forced Reaction: After this unit resolves an attack, discard the top card of your deck. If the " \
+                                              "discarded card has an odd printed cost, ready this unit and deal it 1 unpreventable damage.", 
+                             "Vehicle.", 2, "Orks", "Common", 2, 4, 0, False, flying=True, wargear_attachments_permitted=False),
         CardClasses.EventCard("Test of Faith", "Limit one non-signature Ritual per deck. \n"
                                                "Action: Sacrifice a Cultist token at a planet with a unique unit you "
                                                "control to place 2 Faith tokens on each Cultist and Ritualist unit you "
@@ -277,11 +254,6 @@ def blackstone_project_cards_init():
                                    action_in_play=True, allowed_phases_in_play="COMBAT",
                                    type_of_units_allowed_for_attachment="Army", required_traits="Daemon",
                                    extra_attack=1, extra_health=1),
-        CardClasses.ArmyCard("Chaos Maulerfiend", "No Wargear Attachments.\n"
-                                                  "Reaction: After this unit damages an enemy unit by an attack, "
-                                                  "damage cannot be removed from that unit until the end of the "
-                                                  "round.", "Daemon. War Engine.",
-                             4, "Chaos", "Common", 3, 6, 0, False, wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Screamers", "No Wargear Attachments.\n"
                                           "Flying.", "Daemon. Tzeentch.",
                              1, "Chaos", "Loyal", 2, 1, 0, False, wargear_attachments_permitted=False, flying=True),
@@ -298,10 +270,6 @@ def blackstone_project_cards_init():
         CardClasses.ArmyCard("Havocs of Khorne", "Sweep (1).\n"
                                                  "This unit deals double damage while attacking a damaged unit.",
                              "Warrior. Khorne.", 3, "Chaos", "Common", 2, 3, 1, False, sweep=1),
-        CardClasses.ArmyCard("Khornate Heldrake", "No Wargear Attachments. Flying.\n"
-                                                  "Reaction: After you win a battle at a Technology planet, destroy a "
-                                                  "target enemy army unit.", "Daemon. Khorne. Elite.",
-                             8, "Chaos", "Loyal", 7, 5, 2, False, flying=True, wargear_attachments_permitted=False),
         CardClasses.SupportCard("Decayed Gardens", "Reaction: After the combat phase begins, exhaust this support to "
                                                    "give a target Lumbering unit +3 ATK for its next attack "
                                                    "this phase.", "Location. Nurgle.",
@@ -315,10 +283,6 @@ def blackstone_project_cards_init():
                                                "printed cost 1 or lower is destroyed at this planet, add a "
                                                "Kabalite card in your discard pile to your hand.",
                              "Warrior. Kabalite.", 1, "Dark Eldar", "Loyal", 1, 2, 1, False),
-        CardClasses.ArmyCard("Incubus of the Severed", "This unit cannot be damaged by Area Effect.\n"
-                                                       "Action: If this unit is in your HQ, add it to your hand.",
-                             "Warrior. Kabalite.", 3, "Dark Eldar", "Common", 3, 4, 1, False,
-                             action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.EventCard("Final Expiration", "Action: Deal X damage to a target non-warlord unit. X is equal to "
                                                   "the number of Torture cards in your discard pile.",
                               "Torture. Power.", 3, "Dark Eldar", "Common", 1, False,
@@ -333,7 +297,7 @@ def blackstone_project_cards_init():
                                                  "another target unit at the same planet. (Limit once per phase)",
                              "Assassin. Warrior.", 3, "Dark Eldar", "Loyal", 3, 1, 1, False),
         CardClasses.EventCard("Medusae Pact", "Action: Each player must discard down to 5 cards in hand.",
-                              "Torture. Power.", 1, "Dark Eldar", "Common", 1, False,
+                              "Power.", 1, "Dark Eldar", "Common", 1, False,
                               action_in_hand=True, allowed_phases_in_hand="ALL"),
         CardClasses.ArmyCard("Desperate Captives", "No Wargear Attachments.\n"
                                                    "Interrupt: When you sacrifice this unit, your opponent deals X "
@@ -374,11 +338,6 @@ def blackstone_project_cards_init():
                                                   "While there are 5 or fewer Torture cards in your discard pile, "
                                                   "this unit gains Lumbering.", "Creature. Abomination.",
                              4, "Dark Eldar", "Common", 5, 6, 1, False, wargear_attachments_permitted=False),
-        CardClasses.EventCard("The Price of Success", "Deep Strike (1).\n"
-                                                      "Reaction: After your opponent wins a battle at this planet, "
-                                                      "you may Deep Strike this event to discard two cards at random "
-                                                      "from their hand.", "Tactic.",
-                              -1, "Dark Eldar", "Common", 1, False, deepstrike=1),
         CardClasses.ArmyCard("Swordwind Wave Serpent", "Reaction: After this unit resolves an attack,"
                                                        " move it to an adjacent planet.", "Vehicle. Biel-Tan.",
                              4, "Eldar", "Common", 4, 3, 2, False),
@@ -386,8 +345,6 @@ def blackstone_project_cards_init():
                                                  "Forced Reaction: After a combat round at this planet ends, discard a "
                                                  "card from your hand. If you cannot, sacrifice this unit.",
                              "Elite. Alaitoc.", 6, "Eldar", "Loyal", 0, 7, 1, True),
-        CardClasses.ArmyCard("Storm Guardians", "This unit gets +2 ATK while attacking a Soldier or Warrior unit.",
-                             "Warrior. Alaitoc.", 2, "Eldar", "Common", 2, 2, 1, False),
         CardClasses.ArmyCard("Shadowseer", "Reaction: After an enemy army unit enters play at this planet, "
                                            "exhaust an attachment on this unit to deal 2 damage to that unit.",
                              "Psyker. Harlequin.", 3, "Eldar", "Loyal", 2, 3, 1, False),
@@ -397,11 +354,6 @@ def blackstone_project_cards_init():
                                                     "Reaction: After this unit enters play, a target army unit at this"
                                                     " planet cannot ready until the end of the phase.",
                              "Warrior.", 2, "Eldar", "Common", 2, 1, 1, False, sweep=1),
-        CardClasses.EventCard("Rapid Ingress", "Reaction: After a unit you control is declared as an attacker at a "
-                                               "Strongpoint planet, if it is the only unit you control at that planet, "
-                                               "move a target army unit you control at an adjacent planet to that "
-                                               "planet.", "Tactic.",
-                              1, "Eldar", "Loyal", 2, False),
         CardClasses.EventCard("Unshrouded Truth", "Action: Your opponent may reveal any number of cards in their hand."
                                                   " For each card that was not revealed, gain 1 resource.",
                               "Power. Harlequin.", 2, "Eldar", "Loyal", 2, False,
@@ -453,12 +405,6 @@ def blackstone_project_cards_init():
                                    "Wargear. Armor.", 1, "Tau", "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army",
                                    extra_health=2, action_in_play=True, allowed_phases_in_play="ALL"),
-        CardClasses.ArmyCard("Kroot Infiltrator", "Deep Strike (1).", "Soldier. Kroot.",
-                             2, "Tau", "Common", 2, 4, 0, False, deepstrike=1),
-        CardClasses.ArmyCard("Fire Caste Cadre", "Action: Return an attachment on this unit to your hand. "
-                                                 "(Limit once per round)", "Soldier. Shas'la.",
-                             3, "Tau", "Common", 2, 3, 1, False,
-                             action_in_play=True, allowed_phases_in_play="ALL"),
         CardClasses.ArmyCard("Exertion Drone", "Each non-Ethereal army unit you control at this planet gets +1 HP "
                                                "and gains 1 command icon.\n"
                                                "Forced Reaction: After this unit resolves its attack, move it "
@@ -475,12 +421,6 @@ def blackstone_project_cards_init():
                                                            "remove 1 damage from attached unit.",
                                    "Drone.", 1, "Tau", "Common", 1, False,
                                    type_of_units_allowed_for_attachment="Army"),
-        CardClasses.AttachmentCard("Reeducation Protocol", "Attach to an army unit you control.\n"
-                                                           "Attached unit gains 2 command icons.\n"
-                                                           "Attached unit's ATK and HP are set to 1.",
-                                   "Negotiation.", 1, "Tau", "Loyal", 2, False,
-                                   type_of_units_allowed_for_attachment="Army", must_be_own_unit=True,
-                                   extra_command=2),
         CardClasses.AttachmentCard("Industrial Boom", "Attach to a planet. Limit 1 per planet.\n"
                                                       "Forced Interrupt: When a player wins a command struggle at "
                                                       "attached planet, they draw 1 card and gain 1 resource.",
@@ -589,14 +529,24 @@ def blackstone_project_cards_init():
                                                     "this support and sacrifice a unit at that planet to gain 2 "
                                                     "Resources.", "Location.",
                                 1, "Tyranids", "Common", False),
-        CardClasses.ArmyCard("Repurposed Pariah", "This unit gets +1 ATK and +1 HP for each Psyker unit you control "
-                                                  "at this planet.\n"
-                                                  "Reaction: After an enemy Psyker unit enters play at this planet, "
-                                                  "exhaust it. (Limit once per phase)", "Soldier. Novokh.",
-                             3, "Necrons", "Common", 2, 3, 1, False),
-        CardClasses.SupportCard("Unearthed Crypt", "Interrupt: When an army unit enters your discard pile, exhaust "
-                                                   "this support to draw 1 card.", "Location.",
-                                1, "Necrons", "Common", False),
+        CardClasses.WarlordCard("Orikan the Diviner", "You may look at the top card of any player's deck at any time.", 
+                                "Scholar.", "Necrons", 2, 6, 1, 5, "Bloodied.", 7, 7, 
+                                ["4x Tomb Blade Escort", "2x Temporal Snare", 
+                                 "1x Zodiac's Fury", "1x Staff of Tomorrow"]),
+        CardClasses.ArmyCard("Tomb Blade Escort", "No Wargear Attachments.\n" \
+                                                  "Reaction: After this unit is assigned damage, discard the top " \
+                                                  "card of your deck to use that card as a shield card.", 
+                             "Vehicle. Scout.", 3, "Necrons", "Signature", 2, 3, 1, False, wargear_attachments_permitted=False),
+        CardClasses.EventCard("Temporal Snare", "Interrupt: When your opponent plays a shield card, cancel that card's shielding effect.", 
+                              "Power.", 0, "Necrons", "Signature", 1, False),
+        CardClasses.SupportCard("Zodiac's Fury", "Action: Exhaust this support to move a non-warlord unit you control to a planet with your warlord.", "Location.", 
+                                2, "Necrons", "Signature", True),
+        CardClasses.AttachmentCard("Staff of Tomorrow", "Attach to your warlord.\n" \
+                                                        "Attached unit gets +1 ATK.\n" \
+                                                        "Reaction: After attached unit is declared as an attacker, " \
+                                                        "cancel the remainder of the attack to draw a card.", 
+                                   "Wargear. Weapon.", 1, "Necrons", "Signature", 3, True, 
+                                   type_of_units_allowed_for_attachment="Warlord", extra_attack=1),
         CardClasses.ArmyCard("Thundering Wraith", "Deep Strike (3).\n"
                                                   "Reaction: After you deep strike this unit, target an enemy army "
                                                   "unit. Your opponent must either deal 4 damage to that unit or "
@@ -644,26 +594,11 @@ def blackstone_project_cards_init():
                                                          " discarded unit from your discard pile at a planet, reducing"
                                                          " the cost of that unit by 1.", "Upgrade.",
                                 1, "Necrons", "Common", False, action_in_play=True, allowed_phases_in_play="DEPLOY"),
-        CardClasses.AttachmentCard("Disruption Field", "Attach to a Necrons Vehicle unit you control.\n"
-                                                       "Treat the printed text box of each damaged enemy army unit at "
-                                                       "this planet as if it were blank (except for Traits).",
-                                   "Hardpoint.", 1, "Necrons", "Common", 2, False, required_traits="Vehicle",
-                                   unit_must_match_faction=True, must_be_own_unit=True),
-        CardClasses.ArmyCard("Harbinger of the Storm", "As an additional cost for your opponent to target either this "
-                                                       "planet or a unit at this planet with an event, they must pay"
-                                                       " 2 resources.", "Scholar. Elite.",
-                             5, "Necrons", "Common", 3, 5, 3, True),
         CardClasses.AttachmentCard("Nightmare Shroud", "Attach to a Necrotic Scholar unit. Limit 1 per unit.\n"
                                                        "While attached unit is exhausted, each non-warlord unit at "
                                                        "this planet gets -1 ATK.", "Wargear.",
                                    2, "Necrons", "Common", 2, True, unit_must_match_faction=True,
                                    limit_one_per_unit=True, required_traits="Scholar"),
-        CardClasses.AttachmentCard("Fabricator Claw Array", "Attach to a Necrotic Drone unit you control.\n"
-                                                            "Combat Action: Exhaust attached unit to remove X damage "
-                                                            "from a target Necrotic unit at the same planet. X is "
-                                                            "equal to the ATK of the attached unit.",
-                                   "Wargear.", 1, "Necrons", "Common", 1, False, unit_must_match_faction=True,
-                                   required_traits="Drone", action_in_play=True, allowed_phases_in_play="COMBAT"),
         CardClasses.ArmyCard("Explosive Scarabs", "Reaction: After this unit resolves its attack, sacrifice it to deal "
                                                   "damage equal to it's remaining HP to a target unit at this planet. "
                                                   "(max 4)",

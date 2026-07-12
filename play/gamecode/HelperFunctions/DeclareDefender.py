@@ -423,13 +423,6 @@ async def declare_defender(self, name, game_update_string):
                                 self.defender_planet, self.defender_position) == "Warlord":
                             command = command - 999
                         attack_value += 2 * max(command, 0)
-                    if primary_player.get_ability_given_pos(
-                            self.attacker_planet, self.attacker_position) == "Storm Guardians":
-                        if secondary_player.check_for_trait_given_pos(
-                                self.defender_planet, self.defender_position, "Soldier") or \
-                                secondary_player.check_for_trait_given_pos(
-                                    self.defender_planet, self.defender_position, "Warrior"):
-                            attack_value += 2
                     for i in range(len(primary_player.cards_in_play[self.attacker_planet + 1][
                                            self.attacker_position].get_attachments())):
                         if primary_player.cards_in_play[self.attacker_planet + 1][

@@ -228,14 +228,6 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card has the Drone trait.")
-    elif self.action_object.action_chosen == "Fire Caste Cadre":
-        if self.action_object.position_of_actioned_card[0] == planet_pos and self.action_object.position_of_actioned_card[1] == unit_pos:
-            if card_chosen.name_owner == primary_player.get_name_player():
-                if game_update_string[2] == primary_player.get_number():
-                    primary_player.cards.append(card_chosen.get_name())
-                    del player_owning_card.headquarters[unit_pos].get_attachments()[attachment_pos]
-                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
-                    self.action_cleanup()
     elif self.action_object.action_chosen == "Subdual":
         if card_chosen.name_owner == self.name_1:
             self.p1.deck.insert(0, card_chosen.get_name())

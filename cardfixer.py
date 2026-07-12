@@ -2,7 +2,31 @@ import os
 
 
 replacements = [("Call the Storm", "Call The Storm"),
-                ("Command-Link Drone", "Command-link Drone")]
+                ("Command-Link Drone", "Command-link Drone"), 
+                ("Lucky Shot", "Promethium Mine"), 
+                ("Amalgamated Devotee", "Promethium Mine"), 
+                ("The Phalanx", "Promethium Mine"), 
+                ("Imperial Fists Legion", "Promethium Mine"), 
+                ("Bladeguard Veteran Squad", "Promethium Mine"), 
+                ("Reeducation Protocol", "Promethium Mine"), 
+                ("Kroot Infiltrator", "Promethium Mine"), 
+                ("Fire Caste Cadre", "Promethium Mine"), 
+                ("Rapid Ingress", "Promethium Mine"), 
+                ("Storm Guardians", "Promethium Mine"), 
+                ("Incubus of the Severed", "Promethium Mine"),
+                ("The Price of Success", "Promethium Mine"), 
+                ("Chaos Maulerfiend", "Promethium Mine"), 
+                ("Palace of Slaanesh", "Promethium Mine"), 
+                ("Khornate Heldrake", "Promethium Mine"), 
+                ("Abrasive Squigherder", "Promethium Mine"), 
+                ("Baddfrag", "Promethium Mine"), 
+                ("Necklace of Teef", "Promethium Mine"), 
+                ("Speed Freakz Warpaint", "Promethium Mine"),
+                ("Unearthed Crypt", "Promethium Mine"), 
+                ("Harbinger of the Storm", "Promethium Mine"), 
+                ("Fabricator Claw Array", "Promethium Mine"), 
+                ("Repurposed Pariah", "Promethium Mine"), 
+                ("Disruption Field", "Promethium Mine")]
 
 
 cwd = os.getcwd()

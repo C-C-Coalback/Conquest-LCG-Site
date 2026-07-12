@@ -757,8 +757,6 @@ class Player:
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "Promethium Mine":
                     single_card_string += str(current_card.counter)
-                elif current_card.get_name() == "The Phalanx":
-                    single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "World Engine Beam":
                     single_card_string += str(current_card.counter)
                 elif current_card.get_name() == "Vamii Industrial Complex":
@@ -1161,9 +1159,6 @@ class Player:
                 if self.headquarters[unit_pos].counter > 2:
                     return True
             elif ability == "Humanity's Shield":
-                if self.game.stored_damage[0].get_can_shield():
-                    return True
-            elif ability == "The Phalanx":
                 if self.game.stored_damage[0].get_can_shield():
                     return True
             elif ability == "Dal'yth Sept":
@@ -2008,8 +2003,6 @@ class Player:
                     shields = 2
         if card_object.get_name() == "Humanity's Shield":
             shields = 2
-        if card_object.get_name() == "The Phalanx":
-            shields = self.phalanx_shield_value
         if card_object.get_name() == "Dal'yth Sept":
             if self.dalyth_sept_active:
                 shields = 4
@@ -3168,13 +3161,6 @@ class Player:
                 if enemy_player.contaminated_convoys:
                     self.game.infest_planet(position, enemy_player)
                     enemy_player.summon_token_at_planet("Termagant", position)
-                if self.check_for_trait_given_pos(position, last_element_index, "Psyker"):
-                    for i in range(len(other_player.cards_in_play[position + 1])):
-                        if other_player.get_ability_given_pos(position, i) == "Repurposed Pariah":
-                            if not other_player.get_once_per_phase_used_given_pos(position, i):
-                                self.game.create_reaction("Repurposed Pariah", other_player.name_player,
-                                                          (int(other_player.number), position, i),
-                                                          additional_info=(position, last_element_index))
             ability = self.get_ability_given_pos(position, last_element_index)
             if ability == "Augmented Warriors":
                 self.assign_damage_to_pos(position, last_element_index, 2, preventable=False, by_enemy_unit=False)
@@ -4946,11 +4932,6 @@ class Player:
         other_player = self.get_other_player()
         if self.get_damage_given_pos(planet_id, unit_id) > 0:
             if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
-                for i in range(len(other_player.cards_in_play[planet_id + 1])):
-                    if other_player.search_attachments_at_pos(planet_id, i, "Disruption Field"):
-                        return True
-        if self.get_damage_given_pos(planet_id, unit_id) > 0:
-            if self.get_card_type_given_pos(planet_id, unit_id) == "Army":
                 if other_player.search_card_at_planet(planet_id, "Manipulative Venomthrope", ability_checking=False):
                     if not self.search_card_at_planet(planet_id, "Manipulative Venomthrope", ability_checking=False):
                         if other_player.search_card_at_planet(planet_id, "Manipulative Venomthrope"):
@@ -5109,8 +5090,6 @@ class Player:
         return self.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used
 
     def get_additional_costs_target_planet(self, planet_pos):
-        if self.search_card_at_planet(planet_pos, "Harbinger of the Storm"):
-            return 2
         return 0
 
     def get_immune_to_enemy_card_abilities(self, planet_pos, unit_pos, actual_check=True):
@@ -5126,17 +5105,6 @@ class Player:
             if not self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Vehicle"):
                 for i in range(len(self.cards_in_play[planet_pos + 1])):
                     if self.get_ability_given_pos(planet_pos, i) == "Land Raider":
-                        return True
-            if self.search_card_at_planet(planet_pos, "Harbinger of the Storm"):
-                other_player = self.get_other_player()
-                if actual_check:
-                    if other_player.spend_resources(2):
-                        self.game.queued_message = "Important info: Harbinger of the Storm made " + \
-                                                   other_player.name_player + " spend 2 resource!"
-                    else:
-                        return True
-                else:
-                    if other_player.get_resources() < 2:
                         return True
             if self.search_card_at_planet(planet_pos, "Shas'el Lyst", ready_relevant=True):
                 other_player = self.get_other_player()
@@ -5160,9 +5128,6 @@ class Player:
             return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Frenzied Bloodthirster" and power:
             return True
-        if self.get_ability_given_pos(planet_pos, unit_pos) == "Amalgamated Devotee":
-            if len(self.get_all_attachments_at_pos(planet_pos, unit_pos)) > 1:
-                return True
         if self.get_ability_given_pos(planet_pos, unit_pos) == "Champion of Khorne":
             if self.game.bloodthirst_active[planet_pos]:
                 return True
@@ -6124,8 +6089,6 @@ class Player:
         if planet_id == -2:
             card = self.headquarters[unit_id]
             attack_value = card.get_attack()
-            if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
-                return 1
             if card.get_ability() == "Praetorian Ancient":
                 if self.count_units_in_discard() > 5:
                     attack_value += 2
@@ -6143,8 +6106,6 @@ class Player:
                 if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
                     attack_value += 1
             if card.get_ability() == "Neurotic Obliterator":
-                attack_value += len(card.get_attachments())
-            if card.get_ability() == "Amalgamated Devotee":
                 attack_value += len(card.get_attachments())
             if card.get_ability() == "Pyrrhian Eternals":
                 attack_value += self.discard.count("Pyrrhian Eternals")
@@ -6170,8 +6131,6 @@ class Player:
         card = self.cards_in_play[planet_id + 1][unit_id]
         if card.attack_set_next is not None:
             return card.attack_set_next
-        if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
-            return 1
         if card.attack_set_eop != -1:
             return card.attack_set_eop
         other_player = self.get_other_player()
@@ -6219,8 +6178,6 @@ class Player:
             attack_value = self.get_health_given_pos(planet_id, unit_id) - \
                            self.get_damage_given_pos(planet_id, unit_id)
             return attack_value
-        if ability == "Repurposed Pariah":
-            attack_value += self.count_units_with_trait_at_planet("Psyker", planet_id)
         if ability == "Immature Squig":
             for j in range(len(self.cards_in_play[planet_id + 1])):
                 if j != unit_id:
@@ -6266,8 +6223,6 @@ class Player:
             if self.search_for_card_everywhere("Sivarla Soulbinder"):
                 attack_value += 1
         if ability == "Neurotic Obliterator":
-            attack_value += len(card.get_attachments())
-        if ability == "Amalgamated Devotee":
             attack_value += len(card.get_attachments())
         if ability == "Kabal of the Ebon Law":
             if planet_id != self.game.round_number:
@@ -6361,9 +6316,6 @@ class Player:
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.search_card_in_hq("Kustomisation Station"):
                 attack_value += 1
-        if self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
-            if self.search_card_at_planet(planet_id, "Baddfrag"):
-                attack_value += 1
         if self.get_faction_given_pos(planet_id, unit_id) == "Astra Militarum" and \
                 self.check_for_trait_given_pos(planet_id, unit_id, "Vehicle"):
             if self.get_has_faith_given_pos(planet_id, unit_id):
@@ -6400,11 +6352,6 @@ class Player:
                 condition_present = True
             if attachments[i].get_ability() == "Agonizer of Bren":
                 attack_value += self.count_copies_in_play("Khymera")
-            if attachments[i].get_ability() == "Necklace of Teef":
-                attack_value += attachments[i].get_counter()
-            if attachments[i].get_ability() == "Speed Freakz Warpaint":
-                if self.get_enemy_has_init_for_cards(planet_id, unit_id):
-                    attack_value += 3
             if attachments[i].get_ability() == "Medallion of Betrayal":
                 if self.check_for_trait_given_pos(planet_id, unit_id, "Cultist"):
                     attack_value += 1
@@ -6950,8 +6897,6 @@ class Player:
     def get_health_given_pos(self, planet_id, unit_id):
         if planet_id == -2:
             health = self.headquarters[unit_id].get_health()
-            if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
-                return 1
             if self.headquarters[unit_id].attack == 0:
                 if self.search_card_in_hq("Wraithbone Armour"):
                     health += 1
@@ -6980,8 +6925,6 @@ class Player:
                     health += 4
             if ability == "Neurotic Obliterator":
                 health += len(self.headquarters[unit_id].get_attachments())
-            if ability == "Amalgamated Devotee":
-                health += 2 * len(self.headquarters[unit_id].get_attachments())
             if ability == "Improbable Runt Machine":
                 health += min(len(self.headquarters[unit_id].get_attachments()), 3)
             if ability == "Tenacious Novice Squad":
@@ -7022,8 +6965,6 @@ class Player:
                         health += 1
             return health
         health = self.cards_in_play[planet_id + 1][unit_id].get_health()
-        if self.search_attachments_at_pos(planet_id, unit_id, "Reeducation Protocol"):
-            return 1
         if self.cards_in_play[planet_id + 1][unit_id].attack == 0:
             if self.search_card_in_hq("Wraithbone Armour"):
                 health += 1
@@ -7071,8 +7012,6 @@ class Player:
         if ability != "Knight Paladin Voris":
             if self.search_card_at_planet(planet_id, "Knight Paladin Voris"):
                 health += 1
-        if ability == "Repurposed Pariah":
-            health += self.count_units_with_trait_at_planet("Psyker", planet_id)
         if ability == "Galvax the Bloated":
             for i in range(len(self.cards_in_play[planet_id + 1])):
                 if self.check_for_trait_given_pos(planet_id, i, "Cultist"):
@@ -7096,8 +7035,6 @@ class Player:
                     health += 2
         if ability == "Neurotic Obliterator":
             health += len(card.get_attachments())
-        if ability == "Amalgamated Devotee":
-            health += 2 * len(card.get_attachments())
         if ability == "Hjorvath Coldstorm":
             if self.check_for_enemy_warlord(planet_id, True, self.name_player):
                 health = health - 2
@@ -7382,9 +7319,6 @@ class Player:
             if self.headquarters[i].get_ability() == "Spore Chimney":
                 if phase == "HEADQUARTERS":
                     self.game.create_reaction("Spore Chimney", self.name_player, (int(self.number), -2, i))
-            if self.headquarters[i].get_ability() == "Palace of Slaanesh":
-                if phase == "HEADQUARTERS":
-                    self.game.create_reaction("Palace of Slaanesh", self.name_player, (int(self.number), -2, i))
             if self.headquarters[i].get_ability() == "Promethium Mine":
                 if phase == "DEPLOY" and self.headquarters[i].counter:
                     self.game.create_reaction("Promethium Mine", self.name_player, (int(self.number), -2, i))
@@ -7802,6 +7736,9 @@ class Player:
                 return i
         return -1
 
+    def get_name_of_warlord(self):
+        return self.name_of_warlord
+
     def get_location_of_warlord(self):
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_card_type() == "Warlord":
@@ -7875,18 +7812,22 @@ class Player:
                         self.game.create_reaction("Holy Fusillade", self.name_player, (int(self.number), -2, i))
         for i in range(len(self.cards_in_play[planet_num + 1])):
             self.cards_in_play[planet_num + 1][i].once_per_combat_round_used = False
-            if self.cards_in_play[planet_num + 1][i].get_ability() == "Termagant Horde":
+            ability = self.get_ability_given_pos(planet_num, i)
+            if ability == "14th Cadian Shock Regiment":
+                self.game.create_reaction("14th Cadian Shock Regiment", self.name_player, (int(self.number), planet_num, i))
+            if ability == "Death Korps Squad":
+                self.game.create_reaction("Death Korps Squad", self.name_player, (int(self.number), planet_num, i))
+            if ability == "Termagant Horde":
                 self.game.create_reaction("Termagant Horde", self.name_player, (int(self.number), planet_num, i))
-            if self.cards_in_play[planet_num + 1][i].get_ability() == "Storming Librarian":
+            if ability == "Storming Librarian":
                 self.game.create_reaction("Storming Librarian", self.name_player, (int(self.number), planet_num, i))
-            if self.cards_in_play[planet_num + 1][i].get_ability() == "Crush of Sky-Slashers":
+            if ability == "Crush of Sky-Slashers":
                 self.game.create_reaction("Crush of Sky-Slashers", self.name_player, (int(self.number), planet_num, i))
-            if self.cards_in_play[planet_num + 1][i].get_ability() == "Shard of the Deceiver":
+            if ability == "Shard of the Deceiver":
                 self.game.create_reaction("Shard of the Deceiver", self.name_player, (int(self.number), planet_num, i))
-            if self.get_ability_given_pos(planet_num, i) == "Sathariel the Invokator":
-                self.game.create_reaction("Sathariel the Invokator", self.name_player,
-                                          (int(self.number), planet_num, i))
-            if self.get_ability_given_pos(planet_num, i) == "Devoted Enginseer":
+            if ability == "Sathariel the Invokator":
+                self.game.create_reaction("Sathariel the Invokator", self.name_player, (int(self.number), planet_num, i))
+            if ability == "Devoted Enginseer":
                 if self.get_ready_given_pos(planet_num, i):
                     self.game.create_reaction("Devoted Enginseer", self.name_player,
                                               (int(self.number), planet_num, i))
@@ -7904,9 +7845,6 @@ class Player:
                                               (int(self.number), planet_num, i))
                 if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Cloud of Flies":
                     self.game.create_reaction("Cloud of Flies", self.name_player,
-                                              (int(self.number), planet_num, i))
-                if self.cards_in_play[planet_num + 1][i].get_attachments()[j].get_ability() == "Necklace of Teef":
-                    self.game.create_reaction("Necklace of Teef", self.name_player,
                                               (int(self.number), planet_num, i))
 
     def add_card_to_discard(self, card_name):
@@ -7929,10 +7867,6 @@ class Player:
                                         self.game.create_reaction("Impulsive Loota In Play", self.name_player,
                                                                   (int(self.number), -1, -1))
             if card.get_card_type() == "Army":
-                for i in range(len(self.headquarters)):
-                    if self.get_ability_given_pos(-2, i) == "Unearthed Crypt":
-                        if self.get_ready_given_pos(-2, i):
-                            self.game.create_interrupt("Unearthed Crypt", self.name_player, (int(self.number), -2, i))
                 if card.check_for_a_trait("Ecclesiarchy", self.etekh_trait) or \
                         card.check_for_a_trait("Grey Knights", self.etekh_trait):
                     for i in range(len(self.headquarters)):
@@ -9057,9 +8991,6 @@ class Player:
         for i in range(len(other_player.headquarters)):
             if other_player.get_ability_given_pos(-2, i) == "Dal'yth Sept":
                 self.game.create_reaction("Dal'yth Sept", other_player.name_player,
-                                          (int(other_player.number), -2, i))
-            if other_player.get_ability_given_pos(-2, i) == "The Phalanx":
-                self.game.create_reaction("The Phalanx", other_player.name_player,
                                           (int(other_player.number), -2, i))
         for letter in planet_name:
             if letter == "_":

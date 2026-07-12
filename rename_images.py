@@ -53,4 +53,17 @@ def make_jpg_all():
         os.remove(path + current_image + ".png")
 
 
+def remove_not_required():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = dir_path + '/staticfiles/images/CardImages/'
+    for filename in glob.glob(path+"*.jpg"):
+        base_name = os.path.basename(filename)
+        current_image, ext = os.path.splitext(base_name)
+        card_name = current_image.replace("_", " ")
+        if current_image.endswith("_2") or current_image.endswith("_3") or current_image.endswith("_4") or current_image.endswith("_5"):
+            print("Removing " + current_image)
+            os.remove(path + base_name)
+
+
 make_jpg_all()
+remove_not_required()

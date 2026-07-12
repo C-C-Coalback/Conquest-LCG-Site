@@ -182,7 +182,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 self.nullify_context = "Interrupt"
             if can_continue:
                 dmg = primary_player.cards_in_play[self.interrupts_waiting_on_resolution[0].get_planet_pos() + 1][
-                    interrupts_waiting_on_resolution[0].get_unit_pos()].counter
+                    self.interrupts_waiting_on_resolution[0].get_unit_pos()].counter
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, dmg, rickety_warbuggy=True)
                 self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
                 self.delete_interrupt()

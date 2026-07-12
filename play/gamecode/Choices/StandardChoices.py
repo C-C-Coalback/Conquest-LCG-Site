@@ -2215,6 +2215,30 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             await self.better_shield_card_resolution(
                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                 can_no_mercy=False)
+    elif self.choice_context == "Use Temporal Snare?":
+        if game_update_string[1] == "0":
+            if secondary_player.nullify_check() and self.nullify_enabled:
+                await self.send_update_message(
+                    primary_player.name_player + " wants to play Temporal Snare; "
+                                                 "Nullify window offered.")
+                self.choices_available = ["Yes", "No"]
+                self.name_player_making_choices = secondary_player.name_player
+                self.choice_context = "Use Nullify?"
+                self.nullified_card_pos = -1
+                self.nullified_card_name = "Temporal Snare"
+                self.cost_card_nullified = 0
+                self.nullify_string = "/".join(game_update_string)
+                self.first_player_nullified = primary_player.name_player
+                self.nullify_context = "Temporal Snare"
+            else:
+                self.reset_choices_available()
+                self.create_interrupt("Temporal Snare", name, (-1, -1, -1))
+                self.already_resolving_interrupt = True
+        elif game_update_string[1] == "1":
+            self.reset_choices_available()
+            await self.better_shield_card_resolution(
+                secondary_player.name_player, self.last_shield_string, alt_shields=False,
+                can_no_mercy=False)
     elif self.choice_context == "First Line Rhinos Rally":
         _, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         card_name = self.choices_available[int(game_update_string[1])]
@@ -2847,7 +2871,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     if not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                         if not primary_player.check_if_already_have_reaction_of_position("Sororitas Command Squad",
                                                                                          planet_pos, unit_pos):
-                            self.sororitas_command_squad_value = shields
+                            self.sororitas_command_squad_value = amount
                             self.create_reaction(
                                 "Sororitas Command Squad", primary_player.name_player,
                                 (int(primary_player.number), planet_pos, unit_pos),

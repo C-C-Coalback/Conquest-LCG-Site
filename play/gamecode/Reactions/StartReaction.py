@@ -582,17 +582,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.add_resources(1)
             primary_player.headquarters[unit_pos].decrement_counter()
             self.delete_reaction()
-        elif current_reaction == "Palace of Slaanesh":
-            primary_player.summon_token_at_hq("Cultist")
-            self.delete_reaction()
-        elif current_reaction == "Necklace of Teef":
-            found_necklace = False
-            for i in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
-                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].get_ability() == "Necklace of Teef":
-                    if not found_necklace:
-                        found_necklace = True
-                        primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[i].counter += 1
-            self.delete_reaction()
         elif current_reaction == "Blessing of Mork":
             if primary_player.get_damage_given_pos(planet_pos, unit_pos) < 1:
                 await self.send_update_message("No damage to move!")
@@ -608,11 +597,6 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Fenrisian Wolf Pack":
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
-        elif current_reaction == "Bladeguard Veteran Squad":
-            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
-        elif current_reaction == "The Phalanx":
-            primary_player.headquarters[unit_pos].increment_counter()
             self.delete_reaction()
         elif current_reaction == "Iron Hands Platoon":
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1)
@@ -1464,27 +1448,6 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Howling Exarch":
             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
             reaction.misc_misc = []
-        elif current_reaction == "Rapid Ingress":
-            if primary_player.resources > 0:
-                can_continue = True
-                if self.nullify_enabled:
-                    if secondary_player.nullify_check():
-                        await self.send_update_message(primary_player.name_player + " wants to play " +
-                                                       current_reaction + "; Nullify window offered.")
-                        self.choices_available = ["Yes", "No"]
-                        self.name_player_making_choices = secondary_player.name_player
-                        self.choice_context = "Use Nullify?"
-                        self.nullified_card_pos = -1
-                        self.nullified_card_name = current_reaction
-                        self.cost_card_nullified = 1
-                        self.first_player_nullified = primary_player.name_player
-                        self.nullify_context = "Reaction Event"
-                        can_continue = False
-                if can_continue:
-                    if primary_player.spend_resources(1):
-                        primary_player.discard_card_name_from_hand(current_reaction)
-            else:
-                self.delete_reaction()
         elif current_reaction == "Burgeoning Incubation":
             primary_player.sacrifice_card_in_hq(unit_pos)
         elif current_reaction == "BI: Extra Synapse":
@@ -1591,6 +1554,30 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.player_with_combat_turn = primary_player.get_name_player()
             self.need_to_move_to_hq = True
             self.attack_being_resolved = False
+            self.delete_reaction()
+        elif current_reaction == "Staff of Tomorrow":
+            primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+            self.reset_combat_positions()
+            self.number_with_combat_turn = primary_player.get_number()
+            self.player_with_combat_turn = primary_player.get_name_player()
+            self.need_to_move_to_hq = True
+            self.attack_being_resolved = False
+            primary_player.draw_card()
+            self.delete_reaction()
+        elif current_reaction == "14th Cadian Shock Regiment":
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+            damage = 1
+            if self.get_green_icon(planet_pos):
+                damage = 2
+            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                secondary_player.assign_damage_to_pos(planet_pos, i, damage)
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+            self.delete_reaction()
+        elif current_reaction == "Death Korps Squad":
+            primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1, healing=True)
+            primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOB")
+            primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="EOB")
+            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Dripping Scythes":
             primary_player.discard_attachment_name_from_card(planet_pos, unit_pos, "Dripping Scythes")
@@ -2994,38 +2981,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.choice_context = "Shadowsun plays attachment from hand or discard?"
             self.name_player_making_choices = primary_player.name_player
             reaction.misc_target_planet = planet_pos
-        elif current_reaction == "Repurposed Pariah":
-            primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos)
-            enemy_pla, enemy_pos = extra_info
-            secondary_player.exhaust_given_pos(enemy_pla, enemy_pos)
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
-        elif current_reaction == "The Price of Success":
-            battle_planet = self.last_planet_checked_for_battle
-            for i in range(len(primary_player.cards_in_reserve[battle_planet])):
-                if primary_player.cards_in_reserve[battle_planet][i].get_ability() == "The Price of Success":
-                    if primary_player.spend_resources(primary_player.get_deepstrike_value_given_pos(battle_planet, i)):
-                        primary_player.deepstrike_event(battle_planet, i)
-                        interrupts = secondary_player.search_triggered_interrupts_enemy_discard()
-                        if interrupts:
-                            await self.send_update_message("Some sort of interrupt may be used.")
-                            self.choices_available = interrupts
-                            self.choices_available.insert(0, "No Interrupt")
-                            self.name_player_making_choices = secondary_player.name_player
-                            self.choice_context = "Interrupt Enemy Discard Effect?"
-                            self.resolving_search_box = True
-                            self.stored_discard_and_target.append((current_reaction, primary_player.number))
-                        else:
-                            secondary_player.discard_card_at_random()
-                            secondary_player.discard_card_at_random()
-                            for j in range(len(primary_player.cards_in_reserve[battle_planet])):
-                                if primary_player.cards_in_reserve[battle_planet][
-                                    j].get_ability() == "The Price of Success":
-                                    self.create_reaction("The Price of Success", primary_player.name_player,
-                                                         (int(primary_player.number), -1, -1))
-                            await primary_player.dark_eldar_event_played()
-                            self.delete_reaction()
-                        break
         elif current_reaction == "Liatha's Loyal Hound":
             if primary_player.cards_removed_from_game:
                 primary_player.cards_removed_from_game_hidden[-1] = "N"
@@ -3035,11 +2990,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.set_once_per_phase_used_given_pos(
                 planet_pos, unit_pos, primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos) + 1)
             primary_player.ready_given_pos(planet_pos, unit_pos)
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
-        elif current_reaction == "Chaos Maulerfiend":
-            target_pla, target_pos = extra_info
-            secondary_player.cards_in_play[target_pla + 1][target_pos].cannot_remove_damage_eor = True
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Decayed Gardens":

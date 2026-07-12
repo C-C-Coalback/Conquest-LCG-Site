@@ -415,10 +415,6 @@ async def start_resolving_interrupt(self, name, game_update_string):
                                                           discounts=self.discounts_applied)
             else:
                 pass
-        elif current_interrupt == "Unearthed Crypt":
-            primary_player.exhaust_given_pos(planet_pos, unit_pos)
-            primary_player.draw_card()
-            self.delete_interrupt()
         elif current_interrupt == "Icy Trygon":
             primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = False
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
@@ -430,3 +426,13 @@ async def start_resolving_interrupt(self, name, game_update_string):
             secondary_player.hit_by_gorgul = True
             self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
             self.delete_interrupt()
+        elif current_interrupt == "Temporal Snare":
+            primary_player.discard_card_name_from_hand("Temporal Snare")
+            try:
+                secondary_player.discard_card_from_hand(self.pos_shield_card)
+            except:
+                pass
+            self.delete_interrupt()
+            primary_player.resolve_played_any_event()
+            await self.better_shield_card_resolution(secondary_player.name_player, ["pass-P1"],
+                                                    alt_shields=False, can_no_mercy=False)

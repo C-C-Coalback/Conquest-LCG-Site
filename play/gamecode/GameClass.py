@@ -64,8 +64,7 @@ class Game:
         print("seed:", self.random_seed)
         self.rng = random.Random(str(self.random_seed))
         self.game_events_as_mono_string = ""
-        self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder", "Sanctified Aggressor",
-                                    "Incubus of the Severed", "Lurking Termagant"]
+        self.units_immune_to_aoe = ["Undying Saint", "Dodging Land Speeder", "Sanctified Aggressor", "Lurking Termagant"]
         self.attack_being_resolved = False
         self.attack_resolution_cleanup = False
         self.queued_mistarget_message = None
@@ -327,6 +326,8 @@ class Game:
         self.last_search_string = ""
         self.last_deck_string_1 = ""
         self.last_deck_string_2 = ""
+        self.last_orikan_string_1 = ""
+        self.last_orikan_string_2 = ""
         self.asking_which_reaction = True
         self.asking_which_interrupt = True
         self.stored_reaction_indexes = []
@@ -397,7 +398,7 @@ class Game:
                                  "Tras the Corrupter", "Unstoppable Tide", "Forge Master Dominus BLD",
                                  "Spray and Pray", "Grey Hunters", "Shambling Revenant", "Flayer Affliction",
                                  "Avatar of Khaine", "Aun'la Prince", "Carnifex", "Gleeful Plague Beast",
-                                 "Triarch Stalkers Procession", "Helvetis"]
+                                 "Triarch Stalkers Procession", "Helvetis", "Shoddy Swoopa"]
         if self.apoka:
             self.forced_reactions.append("Syren Zythlex")
         self.anrakyr_unit_position = -1
@@ -422,9 +423,8 @@ class Game:
                                  "Hydrae Stalker", "Dutiful Castellan", "Frenzied Wulfen", "Inspiring Sergeant",
                                  "Pinning Razorback", "Wrathful Dreadnought", "Junk Chucka Kommando",
                                  "Patient Infiltrator", "Slave-powered Wagons", "Lekor Blight-Tongue",
-                                 "Plagueburst Crawler", "Arrogant Haemonculus", "Luring Troupe", "Agnok's Shadows",
-                                 "Goff Shokboyz", "Inexperienced Weirdboy", "Thundering Wraith",
-                                 "Khornate Heldrake", "Incubus Cleavers", "Voidscarred Corsair",
+                                 "Plagueburst Crawler", "Arrogant Haemonculus", "Luring Troupe", "Agnok's Shadows", 
+                                 "Incubus Cleavers", "Voidscarred Corsair",
                                  "Peacekeeper Drone", "Broadside Shas'vre", "Psychic Zoanthrope"]
         self.nullifying_backlash = False
         self.nullifying_storm_of_silence = False
@@ -795,6 +795,7 @@ class Game:
         """
         Sends the top card of each players' deck.
         Usually, this is just the card back, however some cards interact with this.
+        Also sends additional info for Orikan the Diviner reasons.
 
         :param force: If False, only send the deck data if there has been a change since the last send.
         :return: None
@@ -809,16 +810,50 @@ class Game:
                 card_two = self.p2.deck[0]
         card_one = card_one + "/" + str(len(self.p1.deck))
         card_two = card_two + "/" + str(len(self.p2.deck))
-        if force or self.last_deck_string_1 != card_one:
+        p1_has_orikan = False
+        p2_has_orikan = False
+        war_pla, war_pos = self.p1.get_location_of_warlord()
+        if war_pla != -1:
+            if self.p1.get_ability_given_pos(war_pla, war_pos, bloodied_relevant=True) == "Orikan the Diviner":
+                p1_has_orikan = True
+        war_pla, war_pos = self.p2.get_location_of_warlord()
+        if war_pla != -1:
+            if self.p2.get_ability_given_pos(war_pla, war_pos, bloodied_relevant=True) == "Orikan the Diviner":
+                p2_has_orikan = True
+        orikan_1 = ""
+        if self.p1.deck and p1_has_orikan:
+            orikan_1 = self.p1.name_player + "/" + self.p1.deck[0]
+        else:
+            orikan_1 = self.p1.name_player + "/" + "Cardback"
+        orikan_1 += "|"
+        if self.p1.deck and p2_has_orikan:
+            orikan_1 += self.p2.name_player + "/" + self.p1.deck[0]
+        else:
+            orikan_1 += self.p2.name_player + "/" + "Cardback"
+        orikan_2 = ""
+        if self.p2.deck and p1_has_orikan:
+            orikan_2 = self.p1.name_player + "/" + self.p2.deck[0]
+        else:
+            orikan_2 = self.p1.name_player + "/" + "Cardback"
+        orikan_2 += "|"
+        if self.p2.deck and p2_has_orikan:
+            orikan_2 += self.p2.name_player + "/" + self.p2.deck[0]
+        else:
+            orikan_2 += self.p2.name_player + "/" + "Cardback"
+        print(orikan_1)
+        print(orikan_2)
+        if force or self.last_deck_string_1 != card_one or self.last_orikan_string_1 != orikan_1:
             self.last_deck_string_1 = card_one
+            self.last_orikan_string_1 = orikan_1
             if not force:
                 self.anything_changed_since_last_send = True
-            await self.send_update_message("GAME_INFO/DECK/1/" + card_one)
-        if force or self.last_deck_string_2 != card_two:
+            await self.send_update_message("GAME_INFO/DECK/1/" + card_one, additional_info=orikan_1)
+        if force or self.last_deck_string_2 != card_two or self.last_orikan_string_2 != orikan_2:
             self.last_deck_string_2 = card_two
+            self.last_orikan_string_2 = orikan_2
             if not force:
                 self.anything_changed_since_last_send = True
-            await self.send_update_message("GAME_INFO/DECK/2/" + card_two)
+            await self.send_update_message("GAME_INFO/DECK/2/" + card_two, additional_info=orikan_2)
 
     def create_choices(self, choices_array, general_imaging_format="No Images", custom_array=None):
         """
@@ -2580,6 +2615,11 @@ class Game:
                 await self.send_update_message("No Mercy window offered")
                 self.create_interrupt("No Mercy", self.first_player_nullified,
                                       (-1, -1, -1))
+            elif self.nullify_context == "Temporal Snare":
+                self.reset_choices_available()
+                await self.send_update_message("Temporal Snare window offered")
+                self.create_interrupt("Temporal Snare", self.first_player_nullified,
+                                      (-1, -1, -1))
             elif self.nullify_context == "Fall Back":
                 self.choices_available = []
                 self.name_player_making_choices = self.first_player_nullified
@@ -3631,11 +3671,6 @@ class Game:
             if not self.discard_fully_prevented:
                 secondary_player.discard_card_at_random()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
-        elif effect == "The Price of Success":
-            if not self.discard_fully_prevented:
-                secondary_player.discard_card_at_random()
-                secondary_player.discard_card_at_random()
             self.delete_reaction()
         elif effect == "Unconquerable Fear":
             if not self.discard_fully_prevented:
@@ -4982,6 +5017,7 @@ class Game:
                                             can_continue = False
                                 if can_continue:
                                     no_mercy_possible = False
+                                    temporal_snare_possible = False
                                     if can_no_mercy:
                                         for i in range(len(secondary_player.cards)):
                                             if secondary_player.cards[i] == "No Mercy":
@@ -4989,9 +5025,22 @@ class Game:
                                                 if secondary_player.urien_relevant:
                                                     if secondary_player.resources < 1:
                                                         no_mercy_possible = False
+                                            if secondary_player.cards[i] == "Temporal Snare":
+                                                temporal_snare_possible = True
                                     if no_mercy_possible:
                                         no_mercy_possible = secondary_player.search_ready_unique_unit()
-                                    if no_mercy_possible:
+                                    if temporal_snare_possible:
+                                        self.last_shield_string = game_update_string
+                                        self.choice_context = "Use Temporal Snare?"
+                                        self.choices_available = ["Yes", "No"]
+                                        self.name_player_making_choices = secondary_player.name_player
+                                        shield_string = "Temporal Snare can be played. A " + str(shields) + \
+                                                        "-shield card, " + card_name + ", is being played."
+                                        if self.liatha_active:
+                                            shield_string = "Temporal Snare can be played. A " + str(shields) + \
+                                                            "-shield card, from Liatha's ability, is being played."
+                                        await self.send_update_message(shield_string)
+                                    elif no_mercy_possible:
                                         self.last_shield_string = game_update_string
                                         self.choice_context = "Use No Mercy?"
                                         self.choices_available = ["Yes", "No"]
@@ -5257,12 +5306,6 @@ class Game:
                             if self.stored_damage[0].get_can_shield():
                                 primary_player.cards.append("Humanity's Shield")
                                 del primary_player.headquarters[hq_pos]
-                        elif ability == "The Phalanx":
-                            if self.stored_damage[0].get_can_shield():
-                                card_phalanx = primary_player.headquarters[hq_pos]
-                                primary_player.phalanx_shield_value = card_phalanx.damage + card_phalanx.counter + 2
-                                primary_player.cards.append("The Phalanx")
-                                del primary_player.headquarters[hq_pos]
                         elif ability == "Dal'yth Sept":
                             if primary_player.dalyth_sept_active and self.stored_damage[0].get_can_shield():
                                 primary_player.cards.append("Dal'yth Sept")
@@ -5332,6 +5375,15 @@ class Game:
                                 primary_player.headquarters[hurt_pos].misc_ability_used = True
                                 self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
                                 if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
+                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
+                            elif ability == "Tomb Blade Escort":
+                                primary_player.discard_top_card_deck()
+                                card_discarded = self.preloaded_find_card(primary_player.get_top_card_discard())
+                                if card_discarded.get_shields() > 0:
+                                    primary_player.return_discard_to_hand(len(primary_player.discard) - 1)
+                                    await self.update_game_event(name, ["HAND", primary_player.number, str(len(primary_player.cards) - 1)])
+                                else:
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif primary_player.get_faith_given_pos(hurt_planet, hurt_pos) > 0:
@@ -5559,6 +5611,15 @@ class Game:
                                 if self.stored_damage[0].get_amount_that_can_be_blocked() == 0:
                                     primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, hurt_planet)
+                            elif ability == "Tomb Blade Escort":
+                                primary_player.discard_top_card_deck()
+                                card_discarded = self.preloaded_find_card(primary_player.get_top_card_discard())
+                                if card_discarded.get_shields() > 0:
+                                    primary_player.return_discard_to_hand(len(primary_player.discard) - 1)
+                                    await self.update_game_event(name, ["HAND", primary_player.number, str(len(primary_player.cards) - 1)], same_thread=True)
+                                else:
+                                    primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
+                                    await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif ability == "Deff Dread" and not \
                                     primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
                                 if self.stored_damage[0].get_position_attacker():
@@ -6375,8 +6436,7 @@ class Game:
                         if self.interrupts_waiting_on_resolution[0].get_planet_pos() == planet_pos:
                             if game_update_string[1] == primary_player.number:
                                 card_in_reserve = primary_player.cards_in_reserve[planet_pos][unit_pos]
-                                if card_in_reserve.check_for_a_trait(
-                                        "Dark Angels") and card_in_reserve.get_card_type() == "Army":
+                                if card_in_reserve.get_card_type() == "Army":
                                     if primary_player.spend_resources(card_in_reserve.get_deepstrike_value()):
                                         primary_player.deepstrike_unit(planet_pos, unit_pos)
                                         self.delete_interrupt()
@@ -6642,11 +6702,6 @@ class Game:
                         if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                             self.create_delayed_reaction("Shedding Hive Crone", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, unit_pos))
-                    if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Bladeguard Veteran Squad":
-                        if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
-                            if not secondary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
-                                self.create_delayed_reaction("Bladeguard Veteran Squad", secondary_player.name_player,
-                                                             (int(secondary_player.number), planet_pos, unit_pos))
                     for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                         if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
                             self.create_delayed_reaction("Penitent Engine", secondary_player.name_player,
@@ -6658,10 +6713,6 @@ class Game:
                                     primary_player.get_ready_given_pos(def_pla, def_pos):
                                 self.create_reaction("Righteous Reprisal", primary_player.name_player,
                                                      (num, def_pla, def_pos))
-                        if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Chaos Maulerfiend":
-                            self.create_reaction("Chaos Maulerfiend", secondary_player.name_player,
-                                                 (int(secondary_player.number), planet_pos, unit_pos),
-                                                 (def_pla, def_pos))
                 else:
                     if primary_player.get_card_type_given_pos(def_pla, def_pos) != "Warlord":
                         if secondary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Orks"):
@@ -7436,6 +7487,7 @@ class Game:
                                     primary_player.aiming_reticle_coords_hand = None
                     elif self.debug_mode == "return":
                         primary_player.put_hand_pos_on_deck(hand_pos)
+                        self.debug_mode = None
                 elif game_update_string[0] == "IN_DISCARD":
                     discard_pos = int(game_update_string[2])
                     primary_player = self.p2
@@ -7868,6 +7920,12 @@ class Game:
                             if self.p1.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p1.get_ability_given_pos(planet, i) == "Shoddy Swoopa":
+                                if self.p1.discard_top_card_deck():
+                                    if self.preloaded_find_card(self.p1.get_top_card_discard()).get_cost() % 2 == 1:
+                                        self.p1.ready_given_pos(planet, i)
+                                        self.p1.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
+                                                                     by_enemy_unit=False)
                             if self.p1.get_ability_given_pos(planet, i) == "Shambling Revenant":
                                 self.create_reaction("Shambling Revenant", self.name_1, (1, planet, i))
                             if self.p1.get_ability_given_pos(planet, i) == "Explosive Scarabs":
@@ -7952,6 +8010,12 @@ class Game:
                             if self.p2.get_ability_given_pos(planet, i) == "Snakebite Thug":
                                 self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
                                                              by_enemy_unit=False)
+                            if self.p2.get_ability_given_pos(planet, i) == "Shoddy Swoopa":
+                                if self.p2.discard_top_card_deck():
+                                    if self.preloaded_find_card(self.p2.get_top_card_discard()).get_cost() % 2 == 1:
+                                        self.p2.ready_given_pos(planet, i)
+                                        self.p2.assign_damage_to_pos(planet, i, 1, shadow_field_possible=True,
+                                                                     by_enemy_unit=False)
                             if self.p2.get_ability_given_pos(planet, i) == "Shambling Revenant":
                                 self.create_reaction("Shambling Revenant", self.name_2, (2, planet, i))
                             if self.p2.get_ability_given_pos(planet, i) == "Explosive Scarabs":
@@ -8281,11 +8345,6 @@ class Game:
             for i in range(len(loser.attachments_at_planet[planet_id])):
                 if loser.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
                     reactions.append("Close Quarters Doctrine")
-            for i in range(len(loser.cards_in_reserve[planet_id])):
-                if loser.cards_in_reserve[planet_id][i].get_ability() == "The Price of Success":
-                    if loser.get_resources() >= loser.get_deepstrike_value_given_pos(planet_id, i):
-                        if "The Price of Success" not in reactions:
-                            reactions.append("The Price of Success")
             if loser.search_card_in_hq("Agra's Preachings", ready_relevant=True):
                 reactions.append("Agra's Preachings")
             if loser.search_card_in_hq("Order of the Crimson Oath"):
@@ -8341,10 +8400,6 @@ class Game:
                 if winner.get_ability_given_pos(planet_id, i) == "Kabalite Blackguard":
                     self.create_reaction("Kabalite Blackguard", winner.name_player, (int(winner.number), planet_id, i))
                     reactions_exist = True
-                if winner.get_ability_given_pos(planet_id, i) == "Khornate Heldrake":
-                    if self.get_blue_icon(planet_id):
-                        self.create_reaction("Khornate Heldrake", winner.name_player, (int(winner.number), planet_id, i))
-                        reactions_exist = True
                 if winner.get_ability_given_pos(planet_id, i) == "Sanguinary Guard":
                     self.create_reaction("Sanguinary Guard", winner.name_player, (int(winner.number), planet_id, i))
                     reactions_exist = True

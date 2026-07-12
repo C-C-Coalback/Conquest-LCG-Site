@@ -369,8 +369,6 @@ class Card:
                 extra_traits += "Nob."
             if self.attachments[i].get_ability() == "Raging Daemonhost":
                 extra_traits += "Khorne."
-            if self.attachments[i].get_ability() == "Speed Freakz Warpaint":
-                extra_traits += "Red."
         return trait_to_find in (self.traits + self.extra_traits_eop + self.extra_traits_eor + extra_traits)
 
     def get_image_name(self):
@@ -696,9 +694,6 @@ class UnitCard(Card):
             string += "Negative Health (EOP): " + str(self.negative_hp_until_eop) + "\n"
         if self.cannot_remove_damage_eor:
             string += "Cannont remove damage (EOR)\n"
-        for i in range(len(self.attachments)):
-            if self.attachments[i].get_ability() == "Necklace of Teef":
-                string += "Necklace of Teef: " + str(self.attachments[i].get_counter()) + " resources\n"
         if not string:
             return "None"
         return string
@@ -1152,8 +1147,6 @@ class UnitCard(Card):
             if self.attachments[i].get_card_type() == "Attachment":
                 if not self.attachments[i].from_magus_harid:
                     attack += self.attachments[i].get_extra_attack()
-            elif self.attachments[i].get_ability() == "Necklace of Teef":
-                attack += self.attachments[i].misc_counter
         if self.get_ability() == "Fire Warrior Strike Team":
             attack += len(self.attachments)
         return attack

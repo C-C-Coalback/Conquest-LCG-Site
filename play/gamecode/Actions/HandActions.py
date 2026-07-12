@@ -145,10 +145,15 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.misc_counter = 0
                         secondary_player.misc_counter = 0
                     elif ability == "Boast of Strength":
-                        self.action_object.chosen_first_card = False
-                        self.action_object.action_chosen = ability
-                        primary_player.discard_card_from_hand(int(game_update_string[2]))
-                        await self.send_update_message(self.action_object.player_with_action + " may sacrifice a unit.")
+                        if not primary_player.can_play_limited:
+                            await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card", 
+                                                              "Already played a Limited card this round.")
+                        else:
+                            primary_player.can_play_limited = False
+                            self.action_object.chosen_first_card = False
+                            self.action_object.action_chosen = ability
+                            primary_player.discard_card_from_hand(int(game_update_string[2]))
+                            await self.send_update_message(self.action_object.player_with_action + " may sacrifice a unit.")
                     elif ability == "Biomass Extraction":
                         if primary_player.can_play_limited:
                             primary_player.can_play_limited = True
@@ -798,9 +803,6 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         primary_player.discard_card_from_hand(hand_pos)
                         self.action_object.misc_counter = 0
                         self.action_object.chosen_first_card = False
-                    elif ability == "Lucky Shot":
-                        self.action_object.action_chosen = ability
-                        primary_player.discard_card_from_hand(hand_pos)
                     elif ability == "Hate":
                         self.action_object.action_chosen = ability
                         primary_player.aiming_reticle_color = "blue"
