@@ -862,6 +862,9 @@
                         orikan_card_name = data_orikan_two[1];
                     }
                     orikan_card_name = orikan_card_name.replaceAll(" ", "_")
+                    if (orikan_card_name === "") {
+                        orikan_card_name = "Cardback";
+                    }
                     if (orikan_card_name === "Cardback") {
                         orikan_card_name = replaceCardback(orikan_card_name, split_data[2])
                     }

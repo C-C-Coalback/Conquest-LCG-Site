@@ -4862,8 +4862,8 @@ class Game:
                     else:
                         self.stored_taken_damage.append(self.stored_damage[0])
                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Zogwort's Runtherders":
-                        self.create_reaction("Zogwort's Runtherders", primary_player.name_player,
-                                             (int(primary_player.number), planet_pos, unit_pos))
+                        self.create_interrupt("Zogwort's Runtherders", primary_player.name_player,
+                                              (int(primary_player.number), planet_pos, unit_pos))
                     if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                         if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Space Marines", own_event=True):
                             primary_player.set_vow_of_honor(planet_pos, unit_pos, True)
@@ -5215,9 +5215,9 @@ class Game:
                                                                                       -1, -1))
                                             if primary_player.get_ability_given_pos(
                                                     planet_pos, unit_pos) == "Zogwort's Runtherders":
-                                                self.create_reaction("Zogwort's Runtherders",
-                                                                     primary_player.name_player,
-                                                                     (int(primary_player.number), planet_pos, unit_pos))
+                                                self.create_interrupt("Zogwort's Runtherders",
+                                                                      primary_player.name_player,
+                                                                      (int(primary_player.number), planet_pos, unit_pos))
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             else:
                                 await self.send_update_message("This damage can not be shielded!")
@@ -5456,9 +5456,9 @@ class Game:
                                                                               -1, -1))
                                     if primary_player.get_ability_given_pos(
                                             planet_pos, unit_pos) == "Zogwort's Runtherders":
-                                        self.create_reaction("Zogwort's Runtherders",
-                                                             primary_player.name_player,
-                                                             (int(primary_player.number), planet_pos, unit_pos))
+                                        self.create_interrupt("Zogwort's Runtherders",
+                                                              primary_player.name_player,
+                                                              (int(primary_player.number), planet_pos, unit_pos))
                                 await self.send_update_message("Faith is being used as a shield.\n" +
                                                                str(amount_to_remove) + " damage is being removed.")
                                 primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)

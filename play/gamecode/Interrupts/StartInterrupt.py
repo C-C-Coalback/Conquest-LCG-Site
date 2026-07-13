@@ -387,6 +387,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
         elif current_interrupt == "Slumbering Gardens Special":
             primary_player.exhaust_card_in_hq_given_name("Slumbering Gardens")
             self.delete_interrupt()
+        elif current_interrupt == "Zogwort's Runtherders":
+            primary_player.summon_token_at_planet("Snotlings", planet_pos)
+            self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
+            self.delete_reaction()
         elif current_interrupt == "Magus Harid":
             self.misc_player_storage = "RESOLVING MAGUS HARID"
             card_name = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()

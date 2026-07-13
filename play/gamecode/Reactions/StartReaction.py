@@ -922,10 +922,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.exhaust_given_pos(planet_pos, unit_pos)
             primary_player.add_resources(1)
             self.delete_reaction()
-        elif current_reaction == "Zogwort's Runtherders":
-            primary_player.summon_token_at_planet("Snotlings", planet_pos)
-            self.mask_jain_zar_check_reactions(primary_player, secondary_player)
-            self.delete_reaction()
         elif current_reaction == "Zogwort's Hovel":
             primary_player.summon_token_at_planet("Snotlings", planet_pos)
             self.delete_reaction()
