@@ -42,6 +42,5 @@ for file in os.listdir(target_directory):
             content = f.read()
         for i in range(len(replacements)):
             content = content.replace(replacements[i][0], replacements[i][1])
-            print(content)
         with open(content_file, "w") as f:
             f.write(content)
