@@ -583,15 +583,23 @@ class GameConsumer(AsyncWebsocketConsumer):
                 print(position_card)
                 if command_used == "Ready":
                     await active_games[current_game_id].resolve_chat_message(self.name, ["", "ready-card"])
+                    game_relevant_string = self.name + "|||" + "/".join(position_card)
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, position_card)
                 elif command_used == "Exhaust":
                     await active_games[current_game_id].resolve_chat_message(self.name, ["", "exhaust-card"])
+                    game_relevant_string = self.name + "|||" + "/".join(position_card)
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, position_card)
                 elif command_used == "Discard":
                     await active_games[current_game_id].resolve_chat_message(self.name, ["", "discard"])
+                    game_relevant_string = self.name + "|||" + "/".join(position_card)
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, position_card)
                 elif command_used == "Return":
                     await active_games[current_game_id].resolve_chat_message(self.name, ["", "return"])
+                    game_relevant_string = self.name + "|||" + "/".join(position_card)
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, position_card)
                 elif command_used == "Remove":
                     if message[2] == "IN_DISCARD":
@@ -600,6 +608,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await active_games[current_game_id].resolve_chat_message(self.name, ["", "fully-remove", message[3], message[4]])
                 elif command_used == "Destroy":
                     await active_games[current_game_id].resolve_chat_message(self.name, ["", "destroy"])
+                    game_relevant_string = self.name + "|||" + "/".join(position_card)
+                    active_games[current_game_id].game_events_as_mono_string += game_relevant_string + "\n"
                     await active_games[current_game_id].update_game_event(self.name, position_card)
                 elif command_used == "Infest":
                     await active_games[current_game_id].resolve_chat_message(self.name, ["", "infest", message[3]])
