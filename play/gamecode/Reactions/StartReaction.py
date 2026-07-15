@@ -1043,7 +1043,8 @@ async def start_resolving_reaction(self, name, game_update_string):
                 damage += 1
             damage = int(damage / 2)
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, damage, healing=True)
-            primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
+            if self.phase != "DEPLOY":
+                primary_player.set_once_per_round_used_given_pos(planet_pos, unit_pos, True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Scything Hormagaunts":
