@@ -528,6 +528,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
                 self.mode = "ACTION"
+            elif card.get_name() == "Soul Seizure":
+                self.action_object.action_chosen = "Soul Seizure"
+                self.action_object.chosen_first_card = False
+                primary_player.soul_seizure_value = primary_player.count_tortures_in_discard()
             elif card.get_name() == "Power from Pain":
                 self.action_chosen = "Power from Pain"
                 self.player_with_action = secondary_player.name_player
