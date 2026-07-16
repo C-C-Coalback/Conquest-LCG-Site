@@ -868,8 +868,6 @@
                     if (orikan_card_name === "Cardback") {
                         orikan_card_name = replaceCardback(orikan_card_name, split_data[2])
                     }
-                    console.log(orikan_card_name)
-                    console.log("ORIKAN")
                     if (card_name === "Cardback") {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + replaceCardback(card_name, split_data[2]) + `.jpg"
@@ -877,7 +875,7 @@
                     } else {
                         document.getElementById(target_deck_id).innerHTML =
                         `<img src="/static/images/CardImages/` + card_name + `.jpg"
-                        alt="didnt work" data-orikan="` + orikan_card_name + `" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id, this.dataset.orikan)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
+                        alt="didnt work" data-orikan="` + card_name + `" id="deck-p` + split_data[2] + `" data-cardcount=` + card_count + ` class="Card" onmouseover="changeDefDeck(this.src, this.dataset.cardcount, this.id, this.dataset.orikan)" onmouseout="changeDefDeckOut(this.id)"><div id="count-deck-p` + split_data[2] + `"><p>10</p></div>`;
                     }
                 } else if (split_data[1] === "DISCARD") {
                     var target_discard_pile_id = "current-discard-player-" + split_data[2];
