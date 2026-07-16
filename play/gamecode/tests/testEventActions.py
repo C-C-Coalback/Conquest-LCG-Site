@@ -171,7 +171,7 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.add_to_hq(test_game.preloaded_find_card("Promethium Mine"))
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["HQ", "2", "1"])
+        await test_game.update_game_event("P1", ["HQ", "2", "0"])
         self.assertEqual(test_game.p1.resources, 5)
         self.assertEqual(len(test_game.p2.headquarters), 1)
 
@@ -328,7 +328,7 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 3)
         self.assertEqual(len(test_game.p2.headquarters), 1)
         self.assertEqual(len(test_game.p1.headquarters), 3)
-        self.assertEqual(test_game.p1.get_ability_given_pos(-2, 1), "Craftworld Gate")
+        self.assertEqual(test_game.p1.get_ability_given_pos(-2, 0), "Craftworld Gate")
         self.assertEqual(test_game.p1.get_ability_given_pos(-2, 2), "Spiritseer Erathal")
 
     async def test_gift_of_isha(self):
@@ -421,12 +421,12 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.deck = ["Fortress-Monastery" for _ in range(10)]
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["HQ", "2", "1"])
+        await test_game.update_game_event("P1", ["HQ", "2", "0"])
         await test_game.update_game_event("P1", ["SEARCH", "0"])
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 1)
         self.assertEqual(len(test_game.p1.discard), 1)
-        self.assertEqual(test_game.p2.get_ready_given_pos(-2, 1), False)
+        self.assertEqual(test_game.p2.get_ready_given_pos(-2, 0), False)
 
     async def test_the_bloodied_host(self):
         random.seed(42)
@@ -656,8 +656,8 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.exhaust_given_pos(-2, 1)
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["HQ", "1", "1"])
-        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 1), True)
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), True)
         self.assertEqual(test_game.p1.resources, 7)
         self.assertEqual(len(test_game.p1.cards), 0)
 
@@ -801,7 +801,7 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.add_to_hq(test_game.preloaded_find_card("Promethium Mine"))
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["HQ", "2", "1"])
+        await test_game.update_game_event("P1", ["HQ", "2", "0"])
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p2.headquarters), 1)
 

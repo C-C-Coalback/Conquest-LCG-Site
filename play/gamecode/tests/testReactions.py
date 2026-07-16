@@ -464,7 +464,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertEqual(test_game.p1.cards, ["Zarathur's Flamers"])
         self.assertEqual(test_game.p1.discard, ["Infernal Gateway", "Promise of Glory"])
-        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 1), False)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
 
     async def test_soul_grinder(self):
         random.seed(42)
@@ -706,7 +706,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Promethium Mine"))
-        self.assertEqual(test_game.p1.headquarters[1].get_counter(), 4)
+        self.assertEqual(test_game.p1.headquarters[0].get_counter(), 4)
         test_game.p1.cards = []
         test_game.p2.cards = []
         await test_game.update_game_event("P1", ["pass-P1"])
@@ -808,8 +808,8 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.cards = ["Ultramarines Dreadnought"]
         test_game.p2.cards = []
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Vamii Industrial Complex"))
-        test_game.p1.set_damage_given_pos(-2, 1, 2)
-        self.assertEqual(test_game.p1.get_damage_given_pos(-2, 1), 2)
+        test_game.p1.set_damage_given_pos(-2, 0, 2)
+        self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 2)
         await test_game.update_game_event("P1", ["pass-P1"])
         await test_game.update_game_event("P2", ["pass-P1"])
         await test_game.update_game_event("P1", ["PLANETS", "0"])

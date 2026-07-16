@@ -75,7 +75,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.cards = ["Bigtoof Banna"]
         test_game.p2.cards = []
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        self.assertEqual(test_game.p1.get_ability_given_pos(-2, 1), "Bigtoof Banna")
+        self.assertEqual(test_game.p1.get_ability_given_pos(-2, 0), "Bigtoof Banna")
 
     async def test_deploy_with_discounter(self):
         random.seed(42)
@@ -91,10 +91,10 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.cards = []
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
         await test_game.update_game_event("P1", ["PLANETS", "3"])
-        await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
         self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
         self.assertEqual(test_game.p1.resources, 7)
-        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 1), False)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(len(test_game.p1.cards), 0)
 
     async def test_deploy_attachment(self):

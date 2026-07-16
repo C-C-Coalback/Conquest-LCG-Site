@@ -2532,7 +2532,43 @@ class Player:
                                       (int(self.number), -2, last_element_index))
         self.headquarters[last_element_index].card_id = self.game.current_card_id
         self.game.current_card_id += 1
+        if card_object.get_card_type() == "Support":
+            self.sort_headquarters()
         return True
+
+    def sort_headquarters(self):
+        i = 0
+        next_index = 0
+        encountered_non_support = False
+        while i < len(self.headquarters):
+            if self.get_card_type_given_pos(-2, i) == "Support":
+                if encountered_non_support:
+                    self.adjust_own_reactions(-2, i, (-2, next_index))
+                    self.adjust_own_interrupts(-2, i)
+                    self.adjust_own_damage(-2, i)
+                    self.headquarters.insert(next_index, self.headquarters.pop(i))
+                next_index += 1
+            else:
+                encountered_non_support = True
+            i = i + 1
+        i = 0
+        already_sorted_supports = []
+        while i < len(self.headquarters):
+            if self.get_card_type_given_pos(-2, i) == "Support":
+                card_name = self.get_name_given_pos(-2, i)
+                if card_name not in already_sorted_supports:
+                    already_sorted_supports.append(card_name)
+                    positions_matching_card = []
+                    for j in range(len(self.headquarters)):
+                        if i != j:
+                            if self.get_name_given_pos(-2, j) == card_name:
+                                positions_matching_card.append(j)
+                    for k in positions_matching_card:
+                        self.adjust_own_reactions(-2, i, (-2, k))
+                        self.adjust_own_interrupts(-2, i)
+                        self.adjust_own_damage(-2, i)
+                        self.headquarters.insert(i, self.headquarters.pop(k))
+            i = i + 1
 
     def print_headquarters(self):
         for i in range(len(self.headquarters)):

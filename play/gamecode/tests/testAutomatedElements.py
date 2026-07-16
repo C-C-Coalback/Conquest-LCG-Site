@@ -371,15 +371,15 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.cards = []
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Khymera Den"))
         await test_game.update_game_event("P1", [])
-        self.assertNotIn("SPECIAL_ACTION_HQ/1/1", test_game.last_automated_data_string)
+        self.assertNotIn("SPECIAL_ACTION_HQ/1/0", test_game.last_automated_data_string)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Khymera"), 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Khymera"), 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Khymera"), 1)
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Khymera"))
         await test_game.update_game_event("P1", [])
-        self.assertIn("SPECIAL_ACTION_HQ/1/1", test_game.last_automated_data_string)
+        self.assertIn("SPECIAL_ACTION_HQ/1/0", test_game.last_automated_data_string)
         await test_game.update_game_event("P1", ["action-button"])
-        await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
         self.assertIn("IN_PLAY/1/0/1", test_game.last_automated_data_string)
         self.assertIn("HQ/1/2", test_game.last_automated_data_string)
         self.assertNotIn("PLANETS/0", test_game.last_automated_data_string)
@@ -748,12 +748,12 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p2.cards = []
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Craftworld Gate"))
         await test_game.update_game_event("P1", [])
-        self.assertNotIn("SPECIAL_ACTION_HQ/1/1", test_game.last_automated_data_string)
+        self.assertNotIn("SPECIAL_ACTION_HQ/1/0", test_game.last_automated_data_string)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Incubus Warrior"), 0)
         await test_game.update_game_event("P1", [])
-        self.assertIn("SPECIAL_ACTION_HQ/1/1", test_game.last_automated_data_string)
+        self.assertIn("SPECIAL_ACTION_HQ/1/0", test_game.last_automated_data_string)
         await test_game.update_game_event("P1", ["action-button"])
-        await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
         self.assertIn("IN_PLAY/1/0/0", test_game.last_automated_data_string)
 
     async def test_squadron_redeployment_offered_and_execution(self):
@@ -865,7 +865,7 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", [])
         self.assertIn("HAND/1/0", test_game.last_automated_data_string)
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        self.assertIn("HQ/2/1", test_game.last_automated_data_string)
+        self.assertIn("HQ/2/0", test_game.last_automated_data_string)
 
     async def test_deception_offered_and_execution(self):
         random.seed(42)
