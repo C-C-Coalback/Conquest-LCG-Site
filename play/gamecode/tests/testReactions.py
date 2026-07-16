@@ -726,6 +726,32 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p2.resources, 11)
         self.assertEqual(test_game.p1.headquarters[0].get_counter(), 3)
 
+    async def test_soul_seizure_with_ichor_gauntlet(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.cards = ["Soul Seizure"]
+        test_game.p1.discard = ["Soul Seizure" for _ in range(4)]
+        test_game.p2.cards = []
+        test_game.p2.discard = ["Shoota Mob" for _ in range(4)]
+        test_game.p1.attach_card(test_game.preloaded_find_card("Ichor Gauntlet"), -2, 0)
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_DISCARD", "2", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.action_object.action_chosen, "Soul Seizure")
+        self.assertEqual(test_game.action_object.player_with_action, "P1")
+        self.assertEqual(test_game.action_object.chosen_first_card, False)
+        self.assertEqual(test_game.player_with_deploy_turn, "P1")
+        self.assertEqual(test_game.number_with_deploy_turn, "1")
+        await test_game.update_game_event("P1", ["IN_DISCARD", "2", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+
     async def test_swordwind_farseer(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])

@@ -510,7 +510,10 @@ async def start_resolving_reaction(self, name, game_update_string):
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             if card.get_name() == "Rakarth's Experimentations":
                 self.action_chosen = "Rakarth's Experimentations"
-                self.player_with_action = primary_player.name_player
+                self.action_object.player_with_action = primary_player.name_player
+                if self.phase == "DEPLOY":
+                    self.player_with_deploy_turn = primary_player.name_player
+                    self.number_with_deploy_turn = primary_player.number
                 self.choices_available = ["Army", "Support", "Attachment", "Event"]
                 self.choice_context = "Rakarth's Experimentations card type"
                 self.name_player_making_choices = primary_player.name_player
@@ -518,33 +521,43 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.mode = "ACTION"
             elif card.get_name() == "Visions of Agony":
                 self.action_chosen = "Visions of Agony"
-                self.player_with_action = primary_player.name_player
+                self.action_object.player_with_action = primary_player.name_player
                 self.choices_available = secondary_player.cards
                 self.create_choices(
                     self.choices_available,
                     general_imaging_format="All"
                 )
+                if self.phase == "DEPLOY":
+                    self.player_with_deploy_turn = primary_player.name_player
+                    self.number_with_deploy_turn = primary_player.number
                 self.choice_context = "Visions of Agony Discard:"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
                 self.mode = "ACTION"
             elif card.get_name() == "Soul Seizure":
+                self.mode = "ACTION"
                 self.action_object.action_chosen = "Soul Seizure"
                 self.action_object.chosen_first_card = False
+                self.action_object.player_with_action = primary_player.name_player
+                if self.phase == "DEPLOY":
+                    self.player_with_deploy_turn = primary_player.name_player
+                    self.number_with_deploy_turn = primary_player.number
                 primary_player.soul_seizure_value = primary_player.count_tortures_in_discard()
             elif card.get_name() == "Power from Pain":
                 self.action_chosen = "Power from Pain"
-                self.player_with_action = secondary_player.name_player
+                self.action_object.player_with_action = secondary_player.name_player
                 self.mode = "ACTION"
             elif card.has_action_while_in_hand:
                 reaction.chosen_first_card = False
                 reaction.chosen_second_card = False
                 self.mode = "ACTION"
-                self.player_with_action = primary_player.name_player
+                if self.phase == "DEPLOY":
+                    self.player_with_deploy_turn = primary_player.name_player
+                    self.number_with_deploy_turn = primary_player.number
+                self.action_object.player_with_action = primary_player.name_player
                 self.action_chosen = card.get_name()
             else:
-                self.create_reaction(card.get_name(),
-                                     primary_player.name_player, (int(primary_player.number), -1, -1))
+                self.create_reaction(card.get_name(), primary_player.name_player, (int(primary_player.number), -1, -1))
             self.delete_reaction()
         elif current_reaction == "Deathmark Assassins":
             if primary_player.discard_top_card_deck():
