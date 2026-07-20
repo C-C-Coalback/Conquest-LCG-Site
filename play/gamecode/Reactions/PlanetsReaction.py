@@ -317,7 +317,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
                 planet_name = self.planet_array[chosen_planet]
                 await self.send_update_message("You may now move units to " + planet_name + ".")
     elif current_reaction == "Wildrider Vyper":
-        if og_pla != planet_pos:
+        if chosen_planet != planet_pos:
             valid_planet = False
             for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
                 if primary_player.cards_in_play[chosen_planet + 1][i].valid_target_ashen_banner:
