@@ -444,7 +444,9 @@ class Game:
         self.defender_is_flying_or_mobile = False
         self.defender_is_also_warlord = False
         self.valid_crushing_blow_triggers = ["Space Marines", "Sicarius's Chosen", "Veteran Barbrus",
-                                             "Ragnar Blackmane", "Morkai Rune Priest"]
+                                             "Ragnar Blackmane", "Morkai Rune Priest", "Vezuel's Hunters", 
+                                             "Castellan Crowe", "Salamander Flamer Squad", "Dutiful Castellan", 
+                                             "Fierce Purgator", "Interceptor Squad", "Storming Librarian"]
         self.forced_interrupts = ["Flayed Ones Revenants", "Chapter Champion Varn", "Zen Xi Aonia",
                                   "The Broken Sigil Sacrifice Unit", "Shok Troopa", "Incubus Cleavers",
                                   "Industrial Boom"]
@@ -5942,7 +5944,7 @@ class Game:
                     if reaction_name == "Castellan Crowe":
                         num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                         if self.reactions_needing_resolving[0].misc_counter > 0:
-                            secondary_player.assign_damage_to_pos(pla, pos, self.reactions_needing_resolving[0].misc_counter)
+                            secondary_player.assign_damage_to_pos(pla, pos, self.reactions_needing_resolving[0].misc_counter, context="Castellan Crowe")
                     if reaction_name == "Fire Warrior Elite" or \
                             reaction_name == "Deathwing Interceders" or \
                             reaction_name == "Runts to the Front":

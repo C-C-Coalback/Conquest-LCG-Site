@@ -386,7 +386,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
-                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
+                            secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True, context="Vezuel's Hunters")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
                     else:
