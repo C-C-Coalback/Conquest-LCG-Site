@@ -227,7 +227,6 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.cards_in_play[pos_planet + 1][unit_pos].set_sacrifice_end_of_phase(True)
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.aiming_reticle_coords_hand_2 = None
-                primary_player.discard_card_from_hand(pos_hand)
                 self.action_cleanup()
     elif self.action_object.action_chosen == "Khymera Den":
         primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
