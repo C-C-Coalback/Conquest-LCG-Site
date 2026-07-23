@@ -6621,16 +6621,16 @@ class Player:
                             self.increase_faith_given_pos(planet_id, unit_id, 1)
                         if self.get_ability_given_pos(planet_id, unit_id) == "Dutiful Castellan":
                             self.game.create_reaction("Dutiful Castellan", self.name_player,
-                                                      (int(self.number), planet_id, unit_id))
+                                                      (int(self.number), planet_id, -1))
                         if self.get_ability_given_pos(planet_id, unit_id) == "Sword Brethren Dreadnought":
                             self.game.create_reaction("Sword Brethren Dreadnought", self.name_player,
-                                                      (int(self.number), planet_id, unit_id))
+                                                      (int(self.number), planet_id, -1))
                         if self.get_ability_given_pos(planet_id, unit_id) == "Steadfast Sword Brethren":
                             self.game.create_reaction("Steadfast Sword Brethren", self.name_player,
-                                                      (int(self.number), planet_id, unit_id))
+                                                      (int(self.number), planet_id, -1))
                         if self.get_ability_given_pos(planet_id, unit_id) == "Wrathful Dreadnought":
                             self.game.create_reaction("Wrathful Dreadnought", self.name_player,
-                                                      (int(self.number), planet_id, unit_id))
+                                                      (int(self.number), planet_id, -1))
                         if self.get_ability_given_pos(planet_id, unit_id) == "Fighting Company Daras":
                             self.increase_retaliate_given_pos_eop(planet_id, unit_id, 2)
                         if self.get_ability_given_pos(planet_id, unit_id) == "Reclusiam Templars":
