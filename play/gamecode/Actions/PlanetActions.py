@@ -225,6 +225,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             unit_pos = primary_player.add_card_to_planet(card, pos_planet)
             if unit_pos != -1:
                 primary_player.cards_in_play[pos_planet + 1][unit_pos].set_sacrifice_end_of_phase(True)
+                primary_player.remove_card_from_hand(pos_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.aiming_reticle_coords_hand_2 = None
                 self.action_cleanup()

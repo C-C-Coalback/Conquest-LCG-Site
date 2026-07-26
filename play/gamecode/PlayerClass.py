@@ -520,6 +520,12 @@ class Player:
     def set_can_play_limited(self, new_val):
         self.can_play_limited = new_val
 
+    def get_cost_of_card_deployed_at_planet(self, card, i):
+        available_discounts = self.game.calculate_available_discounts_unit(i, card, self, False)
+        cost = card.get_cost()
+        cost = cost - available_discounts
+        return cost
+
     def determine_lowest_possible_cost_of_card(self, card, as_attachment=False):
         best_cost = card.get_cost()
         if card.get_card_type() == "Army":
@@ -531,9 +537,7 @@ class Player:
             best_cost = 999
             for i in range(7):
                 if self.game.planets_in_play_array[i]:
-                    available_discounts = self.game.calculate_available_discounts_unit(i, card, self, False)
-                    cost = card.get_cost()
-                    cost = cost - available_discounts
+                    cost = self.get_cost_of_card_deployed_at_planet(card, i)
                     if cost < best_cost:
                         best_cost = cost
         if card.get_card_type() == "Attachment":

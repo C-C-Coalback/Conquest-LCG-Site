@@ -586,7 +586,10 @@ def determine_valid_moves(self):
                     selected_card_still_playable = False
                 if selected_card_still_playable:
                     if selected_card.get_card_type() == "Army":
-                        valid_moves = add_active_planets_as_valid_moves(self, valid_moves)
+                        for i in range(7):
+                            cost = primary_player.get_cost_of_card_deployed_at_planet(selected_card, i)
+                            if cost <= primary_player.get_resources():
+                                valid_moves = add_valid_move(valid_moves, primary_player, "PLANET", planet_pos=i)
                         non_attachs_that_can_be_played_as_attach = ["Gun Drones", "Shadowsun's Stealth Cadre",
                                                                     "Escort Drone"]
                         army_unit_as_attachment = selected_card.get_name() in non_attachs_that_can_be_played_as_attach
