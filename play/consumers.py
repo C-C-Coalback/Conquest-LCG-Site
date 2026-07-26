@@ -654,8 +654,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                         await active_games[current_game_id].send_automated_info()
                     else:
                         await active_games[current_game_id].update_game_event(message[1], ["action-button"], same_thread=True)
-                        active_games[current_game_id].automated_1_has_passed_action = False
-                        active_games[current_game_id].automated_2_has_passed_action = False
+                        active_games[current_game_id].reset_automated_passed_actions()
                         await active_games[current_game_id].update_game_event(message[1], message[2:])
                 except:
                     try:

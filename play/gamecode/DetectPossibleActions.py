@@ -331,8 +331,16 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                         return True
     if special:
         if action_ability == "Exterminatus":
-            if game.round_number != 6:
-                return True
+            if game.round_number > 5:
+                return False
+            for i in range(7):
+                for j in range(len(primary_player.cards_in_play[i + 1])):
+                    if not primary_player.get_unique_given_pos(i, j):
+                        return True
+                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    if not secondary_player.get_unique_given_pos(i, j) and not secondary_player.get_immune_to_enemy_events(i, j):
+                        return True
+            return False
         if action_ability == "Captain Markis":
             if planet_pos == -2:
                 return False

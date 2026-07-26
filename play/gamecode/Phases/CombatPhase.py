@@ -55,8 +55,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                 print("Need to run action code")
                 if self.mode == "Normal" and self.check_if_battle_taking_place() and (
                         not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
-                    self.automated_1_has_passed_action = False
-                    self.automated_2_has_passed_action = False
+                    self.reset_automated_passed_actions()
                 self.stored_mode = self.mode
                 self.mode = "ACTION"
                 self.action_object.player_with_action = name
@@ -169,18 +168,6 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     self.reset_combat_positions()
                     self.number_with_combat_turn = secondary_player.get_number()
                     self.player_with_combat_turn = secondary_player.get_name_player()
-            elif self.mode == "Normal" and self.check_if_battle_taking_place() and (
-                    not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) and \
-                    self.bot_is_present and self.check_style_of_bot() != "ARG" and \
-                    name == self.get_action_window_between_combat_turns_player() and \
-                    name != self.player_with_combat_turn:
-                if name == self.name_1:
-                    self.automated_1_has_passed_action = True
-                else:
-                    self.automated_2_has_passed_action = True
-                await self.send_update_message(name + " passes the action window.")
-                if self.automated_1_has_passed_action and self.automated_2_has_passed_action:
-                    await self.send_update_message("Both players pass the action window.")
             elif name == self.player_with_combat_turn:
                 if self.number_with_combat_turn == "1":
                     can_continue = True

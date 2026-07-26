@@ -155,8 +155,15 @@ class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["CHOICE", "0"])
         test_game.p1.cards = ["Exterminatus"]
         test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Veteran Brother Maxos"), 2)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 3)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 4)
         await test_game.update_game_event("P1", [])
         self.assertIn("HAND/1/0", test_game.last_automated_data_string)
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        self.assertNotIn("PLANETS/2", test_game.last_automated_data_string)
+        self.assertIn("PLANETS/3", test_game.last_automated_data_string)
+        self.assertIn("PLANETS/4", test_game.last_automated_data_string)
 
     async def test_snotling_attack_offered(self):
         random.seed(42)

@@ -44,6 +44,17 @@ class Game:
         print("\n\nerrata text\n\n" + errata)
         self.battle_in_progress = False
         self.bot_is_present = bot_is_present
+        self.p1_is_bot = False
+        self.p2_is_bot = False
+        if bot_is_present:
+            self.p1_is_bot = True
+            self.p2_is_bot = True
+        if player_one_name == "Conqueror" or player_two_name == "Conqueror":
+            if player_one_name == "Conqueror":
+                self.p1_is_bot = True
+            else:
+                self.p2_is_bot = True
+            self.bot_is_present = True
         self.game_is_complete = False
         self.saved_moves = []
         self.saved_move_id = 0
@@ -51,9 +62,7 @@ class Game:
         self.game_id = game_id
         self.name_1 = player_one_name
         self.name_2 = player_two_name
-        self.current_game_event_p1 = ""
         self.damage_is_taken_one_at_a_time = True
-        self.current_game_event_p1 = ""
         self.stored_deck_1 = None
         self.stored_deck_2 = None
         self.random_seed = random.randrange(sys.maxsize)
@@ -550,6 +559,10 @@ class Game:
         self.automated_player_waited_on = ""
         self.automated_1_has_passed_action = False
         self.automated_2_has_passed_action = False
+        if not self.p1_is_bot:
+            self.automated_1_has_passed_action = True
+        if not self.p2_is_bot:
+            self.automated_2_has_passed_action = True
         self.clickable_items_automated = []
         if deck_1:
             deck_name = deck_1
@@ -578,6 +591,12 @@ class Game:
             else:
                 self.p2.setup_player_no_send(raw_deck_text_2, self.planet_array)
                 self.p1.setup_player_no_send(raw_deck_text_1, self.planet_array)
+
+    def reset_automated_passed_actions(self):
+        if self.p1_is_bot:
+            self.automated_1_has_passed_action = False
+        if self.p2_is_bot:
+            self.automated_2_has_passed_action = False
 
     async def send_queued_message(self):
         """Sends the queued message, if there is one."""
@@ -1211,11 +1230,7 @@ class Game:
                     info_string += "Combat Step: RANGED Skirmish/"
                 else:
                     info_string += "Combat Step: Normal Combat/"
-                if self.mode == "Normal" and (
-                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action) \
-                        and self.check_style_of_bot() != "ARG" and self.bot_is_present:
-                    info_string += "Action Window: " + self.get_action_window_between_combat_turns_player() + "/"
-                elif self.ranged_skirmish_active:
+                if self.ranged_skirmish_active:
                     info_string += "Active (RANGED): " + self.player_with_combat_turn + "/"
                 else:
                     info_string += "Active: " + self.player_with_combat_turn + "/"
@@ -1561,8 +1576,7 @@ class Game:
             await self.send_automated_info()
         else:
             await self.update_game_event(name, ["action-button"], same_thread=True)
-            self.automated_1_has_passed_action = False
-            self.automated_2_has_passed_action = False
+            self.reset_automated_passed_actions()
             await self.update_game_event(name, game_update_string)
 
     async def update_game_event_action(self, name, game_update_string):
@@ -8252,8 +8266,7 @@ class Game:
         return count_1, count_2
 
     def reset_combat_positions(self):
-        self.automated_1_has_passed_action = False
-        self.automated_2_has_passed_action = False
+        self.reset_automated_passed_actions()
         self.defender_position = -1
         self.defender_planet = -1
         self.attacker_position = -1
@@ -8629,8 +8642,7 @@ class Game:
                 ReactionsClass.Reaction(reaction_name, player_name, unit_tuple, additional_info))
 
     def begin_combat_round(self):
-        self.automated_1_has_passed_action = False
-        self.automated_2_has_passed_action = False
+        self.reset_automated_passed_actions()
         self.bloodthirst_active = [False, False, False, False, False, False, False]
         self.p1.resolve_combat_round_begins(self.last_planet_checked_for_battle)
         self.p2.resolve_combat_round_begins(self.last_planet_checked_for_battle)

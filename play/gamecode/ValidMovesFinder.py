@@ -191,6 +191,14 @@ def check_if_planet_is_valid_target(self, planet_pos, primary_player, secondary_
     if not_same_planet_unit:
         if planet_pos == unit_pla:
             return False
+    if ability == "Exterminatus":
+        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+            if not primary_player.get_unique_given_pos(planet_pos, i):
+                return True
+        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+            if not secondary_player.get_unique_given_pos(planet_pos, i) and not secondary_player.get_immune_to_enemy_events(planet_pos, i):
+                return True
+        return False
     return True
 
 
