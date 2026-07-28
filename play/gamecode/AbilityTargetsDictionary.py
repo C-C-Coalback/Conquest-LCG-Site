@@ -1326,7 +1326,7 @@ action_ability_starts = {
         "Exhaust Required": False,
     },
     "Doom": {
-        "Special": False,
+        "Special": True,
         "Requires Hand Card": False,
         "Requires In Play Card": False,
         "Once Per Phase": False,

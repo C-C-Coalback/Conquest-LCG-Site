@@ -184,6 +184,13 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Tzeentch's Firestorm":
             if primary_player.get_resources() == 0:
                 return False
+        if action_ability == "Doom":
+            valid_doom_target = False
+            for i in range(len(secondary_player.headquarters)):
+                if secondary_player.check_is_unit_at_pos(-2, i) and not secondary_player.get_unique_given_pos(-2, i):
+                    valid_doom_target = True
+            if not valid_doom_target:
+                return False
         if action_ability == "Veteran Brother Maxos":
             if planet_pos == -2:
                 return False
