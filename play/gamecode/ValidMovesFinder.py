@@ -286,7 +286,9 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                 if planet_pos == -2:
                     return False
             elif ability.get_reaction_name() == "Spiritseer Erathal":
-                if planet_pos == ability.get_planet_pos() and unit_pos == ability.get_unit_pos():
+                if planet_pos != ability.get_planet_pos():
+                    return False
+                if unit_pos == ability.get_unit_pos():
                     return False
                 if player.get_damage_given_pos(planet_pos, unit_pos) == 0:
                     return False
