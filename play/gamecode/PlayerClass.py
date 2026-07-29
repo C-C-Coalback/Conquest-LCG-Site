@@ -2182,7 +2182,6 @@ class Player:
                 if self.headquarters[i].get_attachments()[j].check_for_a_trait("Relic"):
                     if self.headquarters[i].get_attachments()[j].name_owner == name:
                         return True
-        print("not enemy hq")
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait("Relic"):
@@ -2194,7 +2193,6 @@ class Player:
                         if self.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]. \
                                 name_owner == name:
                             return True
-        print("not enemy in play")
         return False
 
     def start_agras_preachings_deployment(self):
