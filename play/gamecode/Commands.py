@@ -187,10 +187,13 @@ async def resolve_command(self, name, message):
         self.reset_damage_data()
         await self.send_info_box()
     elif message[1] == "force-quit-action":
-        await self.send_update_message("FORCEFULLY QUITTING ACTION")
-        self.reset_action_data()
-        self.action_cleanup()
-        await self.send_info_box()
+        if self.mode == "ACTION":
+            await self.send_update_message("FORCEFULLY QUITTING ACTION")
+            self.reset_action_data()
+            self.action_cleanup()
+            await self.send_info_box()
+        else:
+            await self.send_update_message("Not taking an action.")
     elif message[1] == "force-quit-moves":
         await self.send_update_message("FORCEFULLY QUITTING MOVES")
         self.queued_moves = []
