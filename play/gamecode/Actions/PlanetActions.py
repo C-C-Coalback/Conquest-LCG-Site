@@ -952,6 +952,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if self.action_object.chosen_first_card:
             planet_chosen = int(game_update_string[1])
             card = self.card_to_deploy
+            self.planet_pos_to_deploy = planet_chosen
             if card is None:
                 return None
             await self.discount_begin_routine(planet_chosen, card, primary_player)
