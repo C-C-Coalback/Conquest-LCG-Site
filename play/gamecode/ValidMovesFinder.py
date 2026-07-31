@@ -779,11 +779,13 @@ def determine_valid_moves(self):
                     if len(secondary_player.headquarters) > 0:
                         valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=0)
                     if self.atrox_origin != 0:
-                        if len(secondary_player.cards_in_play[self.atrox_origin]) > 0:
-                            valid_moves = add_valid_move(valid_moves, secondary_player, "PLANETS", planet_pos=self.atrox_origin - 1)
+                        if self.planets_in_play_array[self.atrox_origin - 1]:
+                            if len(secondary_player.cards_in_play[self.atrox_origin - 1]) > 0:
+                                valid_moves = add_valid_move(valid_moves, secondary_player, "PLANETS", planet_pos=self.atrox_origin - 1)
                     if self.atrox_origin != 6:
-                        if len(secondary_player.cards_in_play[self.atrox_origin + 1]) > 0:
-                            valid_moves = add_valid_move(valid_moves, secondary_player, "PLANETS", planet_pos=self.atrox_origin + 1)
+                        if self.planets_in_play_array[self.atrox_origin + 1]:
+                            if len(secondary_player.cards_in_play[self.atrox_origin + 1]) > 0:
+                                valid_moves = add_valid_move(valid_moves, secondary_player, "PLANETS", planet_pos=self.atrox_origin + 1)
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Alt Shield":
