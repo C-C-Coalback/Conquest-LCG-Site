@@ -385,6 +385,10 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
     if targets and enemy_ability:
         if player.get_immune_to_enemy_card_abilities(planet_pos, unit_pos, actual_check=False):
             return False
+        if ability_type == "Action":
+            if ability.action_chosen == "Tzeentch's Firestorm":
+                if player.get_immune_to_enemy_events(planet_pos, unit_pos):
+                    return False
     return True
 
 
