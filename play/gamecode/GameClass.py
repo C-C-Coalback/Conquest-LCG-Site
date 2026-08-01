@@ -843,22 +843,22 @@ class Game:
                 p2_has_orikan = True
         orikan_1 = ""
         if self.p1.deck and p1_has_orikan:
-            orikan_1 = self.p1.name_player + "/" + self.p1.deck[0]
+            orikan_1 = self.p1.name_player + "/" + card_one
         else:
             orikan_1 = self.p1.name_player + "/" + "Cardback"
         orikan_1 += "|"
         if self.p1.deck and p2_has_orikan:
-            orikan_1 += self.p2.name_player + "/" + self.p1.deck[0]
+            orikan_1 += self.p2.name_player + "/" + card_one
         else:
             orikan_1 += self.p2.name_player + "/" + "Cardback"
         orikan_2 = ""
         if self.p2.deck and p1_has_orikan:
-            orikan_2 = self.p1.name_player + "/" + self.p2.deck[0]
+            orikan_2 = self.p1.name_player + "/" + card_two
         else:
             orikan_2 = self.p1.name_player + "/" + "Cardback"
         orikan_2 += "|"
         if self.p2.deck and p2_has_orikan:
-            orikan_2 += self.p2.name_player + "/" + self.p2.deck[0]
+            orikan_2 += self.p2.name_player + "/" + card_two
         else:
             orikan_2 += self.p2.name_player + "/" + "Cardback"
         print(orikan_1)
