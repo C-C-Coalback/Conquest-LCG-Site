@@ -866,14 +866,10 @@ class Game:
         if force or self.last_deck_string_1 != card_one or self.last_orikan_string_1 != orikan_1:
             self.last_deck_string_1 = card_one
             self.last_orikan_string_1 = orikan_1
-            if not force:
-                self.anything_changed_since_last_send = True
             await self.send_update_message("GAME_INFO/DECK/1/" + card_one, additional_info=orikan_1)
         if force or self.last_deck_string_2 != card_two or self.last_orikan_string_2 != orikan_2:
             self.last_deck_string_2 = card_two
             self.last_orikan_string_2 = orikan_2
-            if not force:
-                self.anything_changed_since_last_send = True
             await self.send_update_message("GAME_INFO/DECK/2/" + card_two, additional_info=orikan_2)
 
     def create_choices(self, choices_array, general_imaging_format="No Images", custom_array=None):
@@ -1263,8 +1259,6 @@ class Game:
             info_string += "??????/"
         hint = self.determine_hint()
         if self.last_info_box_string != info_string or self.last_hint_string != hint or force:
-            if not force:
-                self.anything_changed_since_last_send = True
             await self.send_update_message(info_string, additional_info=hint)
             self.last_hint_string = hint
             self.last_info_box_string = info_string
