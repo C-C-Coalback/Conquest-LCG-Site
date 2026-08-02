@@ -1259,6 +1259,8 @@ class Game:
             info_string += "??????/"
         hint = self.determine_hint()
         if self.last_info_box_string != info_string or self.last_hint_string != hint or force:
+            if not force:
+                self.anything_changed_since_last_send = True
             await self.send_update_message(info_string, additional_info=hint)
             self.last_hint_string = hint
             self.last_info_box_string = info_string
