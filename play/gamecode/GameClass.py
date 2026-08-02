@@ -7642,6 +7642,7 @@ class Game:
         if message_to_send != self.last_automated_data_string or force or self.anything_changed_since_last_send:
             self.last_automated_data_string = message_to_send
             await self.send_update_message(message_to_send)
+        self.anything_changed_since_last_send = False
 
     def get_player_given_name(self, name_player):
         if name_player == self.name_1:
