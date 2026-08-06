@@ -5,10 +5,10 @@ To run the Conquest_LCG site locally in a rootless podman container;
 From within your downloaded Conquest_LCG-Site folder
 
 Run this the first time:
-user@machine ~/Conquest-LCG-Site> podman run --rm -it -p 6379:6379/tcp docker.io/redis:latest
+user@machine ~/Conquest-LCG-Site> podman run --rm -it --network=host -p 6379:6379/tcp docker.io/redis:latest
 
 This will create a temporary container and place you inside it;
-user@machine ~/Conquest-LCG-Site> podman run --rm -it -v ${PWD}:/app -w /app -p 8000:8000 docker.io/python:3.13-alpine ash
+user@machine ~/Conquest-LCG-Site> podman run --rm -it --network=host -v ${PWD}:/app -w /app -p 8000:8000 docker.io/python:3.13-alpine ash
 
 From within the container, run;
 
@@ -31,10 +31,10 @@ Or, just exit the container.
 
 After that to run the site again, you can just use:
 
-user@machine ~/Conquest-LCG-Site> podman run --rm -it -p 6379:6379/tcp docker.io/redis:latest
-user@machine ~/Conquest-LCG-Site> podman run --rm -it -v ${PWD}:/app -w /app -p 8000:8000 docker.io/python:3.13-alpine ash
+user@machine ~/Conquest-LCG-Site> podman run --rm -it --network=host -p 6379:6379/tcp docker.io/redis:latest
+user@machine ~/Conquest-LCG-Site> podman run --rm -it --network=host -v ${PWD}:/app -w /app -p 8000:8000 docker.io/python:3.13-alpine ash
 
 # source .venv/bin/activate
 
-# daphne -b 0.0.0.0 -p 8000 conquest_site.asgi:application  
+# daphne -b 0.0.0.0 -p 8000 conquest_site.asgi:application
 
