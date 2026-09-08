@@ -3083,8 +3083,11 @@ class Player:
                         return -1
         if self.game.banned_cards:
             if card.get_name() in self.game.banned_cards:
-                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", card.get_name() + " is banned in this ruleset.")
-                return -1
+                if deepstrike and card.get_name() == "Squiggoth Brute":
+                    pass
+                else:
+                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", card.get_name() + " is banned in this ruleset.")
+                    return -1
         if triggered_card_effect and not card.check_for_a_trait("Runt", etekh_trait=self.etekh_trait):
             resources_to_spend = self.game.imperial_blockades_active[position]
             if resources_to_spend:
