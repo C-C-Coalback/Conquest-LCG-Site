@@ -2,7 +2,7 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, swarmlord_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
 
 
 card_array = Initfunctions.init_player_cards()
@@ -144,6 +144,25 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["PLANETS", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+
+    async def test_the_swarmlord(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(swarmlord_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["PLANETS", "1"])
+        await test_game.update_game_event("P1", ["PLANETS", "2"])
+        await test_game.update_game_event("P2", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(len(test_game.p1.cards_in_play[1]), 1)
+        self.assertEqual(len(test_game.p1.cards_in_play[2]), 1)
+        self.assertEqual(len(test_game.p1.cards_in_play[3]), 2)
+        self.assertEqual(len(test_game.p1.cards_in_play[4]), 0)
+        self.assertEqual(len(test_game.p1.cards_in_play[5]), 0)
 
     async def test_eldorath_starbane(self):
         random.seed(42)

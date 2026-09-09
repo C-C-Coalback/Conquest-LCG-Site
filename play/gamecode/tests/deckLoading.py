@@ -28,3 +28,5 @@ with open(os.path.join(current_dir, 'decksForTests/ZarathurCore.txt')) as file:
     zarathur_deck_content = file.read()
 with open(os.path.join(current_dir, 'decksForTests/KithCore.txt')) as file:
     kith_deck_content = file.read()
+with open(os.path.join(current_dir, 'decksForTests/Swarmlord.txt')) as file:
+    swarmlord_deck_content = file.read()
