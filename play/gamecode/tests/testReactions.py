@@ -1,11 +1,10 @@
 import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
-import os
 import random
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
 
 
-current_dir = os.path.dirname(__file__)
 
 
 card_array = Initfunctions.init_player_cards()
@@ -14,20 +13,6 @@ for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
-
-
-first_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_1.txt')
-second_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_2.txt')
-
-with open(first_deck_location, 'r') as file:
-    deck_content_1 = file.read()
-with open(second_deck_location, 'r') as file:
-    deck_content_2 = file.read()
-
-with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-    cato_deck_content = file.read()
-with open(os.path.join(current_dir, 'decksForTests/OOE.txt')) as file:
-    ooe_deck_content = file.read()
 
 
 class StandardTest(unittest.IsolatedAsyncioTestCase):
@@ -151,9 +136,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_packmaster_kith(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/KithCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(kith_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -167,9 +150,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_eldorath_starbane(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/StarbaneCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(eldorath_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -185,9 +166,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_commander_shadowsun_hand(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/ShadowsunCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(shadowsun_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -212,9 +191,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_commander_shadowsun_discard(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/ShadowsunCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(shadowsun_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -234,9 +211,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_strakens_cunning(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/ShadowsunCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(shadowsun_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -252,9 +227,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_blood_angels_veterans(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/ShadowsunCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(shadowsun_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -279,9 +252,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_holy_sepulchre(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/ShadowsunCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(shadowsun_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -299,9 +270,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_veteran_barbrus(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/ShadowsunCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(shadowsun_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -320,9 +289,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_drifting_spore_mines(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -354,9 +321,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_strakens_command_squad(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -371,9 +336,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_omega_zero_command(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -393,9 +356,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_cadian_mortar_squad(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -411,9 +372,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_elysian_assault_team(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -428,9 +387,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_weirdboy_maniak(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -450,9 +407,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_shrine_of_warpflame(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -471,9 +426,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_soul_grinder(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -494,9 +447,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_xavaes_split_tongue(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -512,9 +463,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_murder_cogitator(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -548,9 +497,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_kiths_khymeramasters(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -564,9 +511,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_beasthunter_wyches(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -589,9 +534,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_murder_of_razorwings(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -605,9 +548,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_coliseum_fighters(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -623,9 +564,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_syren_zythlex(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
@@ -640,9 +579,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
     async def test_fall_back(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            new_warlord_deck_content = file.read()
-        await test_game.p1.setup_player(new_warlord_deck_content, test_game.planet_array)
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])

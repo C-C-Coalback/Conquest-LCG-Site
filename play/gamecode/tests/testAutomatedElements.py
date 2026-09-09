@@ -1,11 +1,8 @@
 import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
-import os
 import random
-
-
-current_dir = os.path.dirname(__file__)
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
 
 
 card_array = Initfunctions.init_player_cards()
@@ -14,21 +11,6 @@ for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
-
-
-first_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_1.txt')
-second_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_2.txt')
-eldorath_deck_location = os.path.join(current_dir, "decksForTests/StarbaneCore.txt")
-shadowsun_deck_location = os.path.join(current_dir, "decksForTests/ShadowsunCore.txt")
-
-with open(first_deck_location, 'r') as file:
-    deck_content_1 = file.read()
-with open(second_deck_location, 'r') as file:
-    deck_content_2 = file.read()
-with open(eldorath_deck_location, 'r') as file:
-    eldorath_deck_content = file.read()
-with open(shadowsun_deck_location, 'r') as file:
-    shadowsun_deck_content = file.read()
 
 
 # IMPORTANT: How automated combat turn actions work

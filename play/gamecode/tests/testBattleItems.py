@@ -1,11 +1,8 @@
 import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
-import os
 import random
-
-
-current_dir = os.path.dirname(__file__)
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content
 
 
 card_array = Initfunctions.init_player_cards()
@@ -14,15 +11,6 @@ for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
-
-
-first_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_1.txt')
-second_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_2.txt')
-
-with open(first_deck_location, 'r') as file:
-    deck_content_1 = file.read()
-with open(second_deck_location, 'r') as file:
-    deck_content_2 = file.read()
 
 
 async def skip_to_battle_first_planet(test_game):
@@ -98,6 +86,21 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
         self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
         self.assertEqual(len(test_game.p1.headquarters), 1)
+
+    async def test_lurking_hormagaunt(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(ooe_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Lurking Hormagaunt"), 0)
+        test_game.p1.assign_damage_to_pos(0, 0, 2)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "2"])
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 0)
+        self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 2)
 
     async def test_armorbane(self):
         random.seed(42)
@@ -231,8 +234,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_fury_sicarius(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
@@ -251,8 +252,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_indomitable(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
@@ -283,8 +282,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_glorious_intervention(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
@@ -314,8 +311,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_iron_halo(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
@@ -336,10 +331,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_vengeance(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -364,10 +355,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_junk_chucka_kommando(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -393,10 +380,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_honored_librarian(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -415,10 +398,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_blood_angels_veterans(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -441,10 +420,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_bodyguard_one_bodyguard(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -462,10 +437,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_bodyguard_two_bodyguard_same_unit(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -484,10 +455,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_bodyguard_two_bodyguard_different_unit_enough_damage(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -508,10 +475,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_bodyguard_two_bodyguard_different_unit_not_enough_damage(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], bot_is_present=True)
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -537,10 +500,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_rockcrete(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -558,10 +517,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_tankbusta_bommaz(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -583,10 +538,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_burna_boyz(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -607,10 +558,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_umbral_preacher(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -632,10 +579,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_black_heart_ravager(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -670,10 +613,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_starbanes_council(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -698,10 +637,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_wailing_wraithfighter(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -720,10 +655,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_banshee_power_sword(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -746,10 +677,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_fire_warrior_elite(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -766,10 +693,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_repulsor_impact_field(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -787,10 +710,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_spiritseer_erathal(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -808,10 +727,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_silvered_blade_avengers(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
@@ -827,10 +742,6 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_biel_tan_warp_spiders(self):
         random.seed(42)
-        with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
-            cato_deck_content = file.read()
-        with open(os.path.join(current_dir, 'decksForTests/NazdregCore.txt')) as file:
-            nazdreg_deck_content = file.read()
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
         await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
