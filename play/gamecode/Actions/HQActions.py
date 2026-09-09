@@ -2338,13 +2338,8 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                               "Card is not a Support or Attachment.")
     elif self.action_object.action_chosen == "Awakening Cavern":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = -2
-            unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].get_is_unit():
                 primary_player.ready_given_pos(planet_pos, unit_pos)
-                if self.phase == "DEPLOY":
-                    self.player_with_deploy_turn = secondary_player.name_player
-                    self.number_with_deploy_turn = secondary_player.get_number()
                 primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
                                                             self.action_object.position_of_actioned_card[1])
                 self.action_cleanup()
