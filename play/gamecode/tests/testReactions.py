@@ -746,6 +746,21 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 1)
         self.assertTrue(test_game.p1.get_once_per_round_used_given_pos(-2, 0))
 
+    async def test_old_one_eye_deploy_phase(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(ooe_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        test_game.p1.set_damage_given_pos(-2, 0, 3)
+        test_game.p1.exhaust_given_pos(-2, 0)
+        test_game.p1.ready_given_pos(-2, 0)
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 1)
+        self.assertFalse(test_game.p1.get_once_per_round_used_given_pos(-2, 0))
+
     async def test_soul_seizure_with_ichor_gauntlet(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
