@@ -26,6 +26,8 @@ with open(second_deck_location, 'r') as file:
 
 with open(os.path.join(current_dir, 'decksForTests/CatoCore.txt')) as file:
     cato_deck_content = file.read()
+with open(os.path.join(current_dir, 'decksForTests/OOE.txt')) as file:
+    ooe_deck_content = file.read()
 
 
 class StandardTest(unittest.IsolatedAsyncioTestCase):
@@ -725,6 +727,24 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 12)
         self.assertEqual(test_game.p2.resources, 11)
         self.assertEqual(test_game.p1.headquarters[0].get_counter(), 3)
+
+    async def test_old_one_eye(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(ooe_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        # NOTE: Skipping deploy phase as OOE has extra code to prevent readying in HQ phase preventing healing in next round.
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        test_game.p1.set_damage_given_pos(-2, 0, 3)
+        test_game.p1.exhaust_given_pos(-2, 0)
+        test_game.p1.ready_given_pos(-2, 0)
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 1)
+        self.assertTrue(test_game.p1.get_once_per_round_used_given_pos(-2, 0))
 
     async def test_soul_seizure_with_ichor_gauntlet(self):
         random.seed(42)
