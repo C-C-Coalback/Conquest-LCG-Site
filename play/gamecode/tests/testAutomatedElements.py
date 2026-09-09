@@ -3,6 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup
 
 
 card_array = Initfunctions.init_player_cards()
@@ -26,23 +27,6 @@ apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 #
 # The main advantage of this approach is processing speed, as we avoid the computationally heavy game update loop;
 # especially important as 99% of the time we don't want to take an action. This lets me train my models faster.
-
-
-async def skip_to_battle_first_planet(test_game):
-    await test_game.update_game_event("P1", ["CHOICE", "0"])
-    await test_game.update_game_event("P2", ["CHOICE", "0"])
-    test_game.p1.cards = []
-    test_game.p2.cards = []
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["PLANETS", "0"])
-    await test_game.update_game_event("P2", ["PLANETS", "0"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
 
 
 class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):

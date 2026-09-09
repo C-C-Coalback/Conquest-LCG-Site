@@ -5,8 +5,6 @@ import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
 
 
-
-
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
 for key in range(len(card_array)):

@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -503,8 +503,21 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", [])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Escort Drone")
-        test_game.p1.cards_in_play[1][0].print_info()
 
+    async def test_great_scything_talons(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(ooe_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, tyranid_1=True)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Great Scything Talons"), 0, 0)
+        test_game.p1.set_damage_given_pos(0, 0, 3)
+        test_game.p1.exhaust_given_pos(0, 0)
+        test_game.p1.ready_given_pos(0, 0)
+        await test_game.update_game_event("P1", [])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 4)
 
 if __name__ == "__main__":
     unittest.main()
