@@ -1400,7 +1400,7 @@ class Game:
                 player = self.p2
                 secondary_player = self.p1
         if self.reactions_needing_resolving:
-            if self.reactions_needing_resolving[0].get_reaction_name() in ["Vamii Industrial Complex", "The Dance Without End", "Dark Allegiance Rally", "Zadruk Prime"]:
+            if self.reactions_needing_resolving[0].get_reaction_name() in ["Vamii Industrial Complex", "The Dance Without End", "Dark Allegiance", "Zadruk Prime"]:
                 if self.reactions_needing_resolving[0].get_player_resolving_reaction() == self.name_1:
                     player = self.p1
                     secondary_player = self.p2

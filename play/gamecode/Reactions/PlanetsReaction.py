@@ -170,7 +170,7 @@ async def resolve_planet_reaction(self, name, game_update_string, primary_player
             if self.card_to_deploy.get_card_type() == "Army":
                 self.misc_player_storage = "RESOLVING DARK ALLEGIANCE"
                 await DeployPhase.deploy_card_routine(self, name, chosen_planet, discounts=1)
-                reaction.misc_player_storage = ""
+                self.misc_player_storage = ""
                 self.delete_reaction()
     elif current_reaction == "The Flayed Mask":
         if chosen_planet != 0:
