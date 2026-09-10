@@ -173,6 +173,9 @@ class Card:
             string += "Return to hand EOR\n"
         if self.cannot_remove_damage_eor:
             string += "Cannont remove damage (EOR)\n"
+        # if self.name == "Dark Allegiance":
+        #     if self.misc_string:
+        #         string += "Trait: " + self.misc_string + "\n"
         if not string:
             return "None"
         return string

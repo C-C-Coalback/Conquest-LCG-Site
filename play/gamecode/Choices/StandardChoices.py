@@ -599,8 +599,9 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.resolving_search_box = False
         self.delete_reaction()
     elif self.choice_context == "DA Choose Trait:":
-        num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-        primary_player.headquarters[pos].misc_string = chosen_choice
+        for i in range(len(primary_player.headquarters)):
+            if primary_player.headquarters[i].get_name() == "Dark Allegiance":
+                primary_player.headquarters[i].misc_string = chosen_choice
         await self.send_update_message("Dark Allegiance: Chose " + chosen_choice + " trait.")
         self.reset_choices_available()
         self.resolving_search_box = False
