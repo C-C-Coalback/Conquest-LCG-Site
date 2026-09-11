@@ -938,5 +938,17 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertTrue(test_game.p1.get_ready_given_pos(0, 0))
 
+    async def test_scything_hormagaunts(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["Scything Hormagaunts"]
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertTrue(test_game.infested_planets[0])
+
 if __name__ == "__main__":
     unittest.main()
