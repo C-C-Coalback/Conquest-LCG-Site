@@ -224,6 +224,17 @@ class PassiveEffectsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant Spikers"), 0)
         self.assertTrue(test_game.p1.get_ranged_given_pos(0, 0))
 
+    async def test_swarm_guard(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant"), 0)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 1)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Swarm Guard"), 0)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 3)
+
     async def test_savage_warrior_prime_not_same_planet(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
