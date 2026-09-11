@@ -950,5 +950,35 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertTrue(test_game.infested_planets[0])
 
+    async def test_toxic_venomthrope(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], forced_planet_array=["Barlus", "Osus IV", "Ferrin", "Plannum", "Iridial", "Atrox Prime", "Y'varn"])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.resources = 0
+        test_game.p2.resources = 0
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Toxic Venomthrope"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Toxic Venomthrope"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Toxic Venomthrope"), 0)
+        await test_game.update_game_event("P1", ["PLANETS", "1"])
+        await test_game.update_game_event("P2", ["PLANETS", "1"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        self.assertFalse(test_game.infested_planets[0])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertTrue(test_game.infested_planets[0])
+        pre_thrope_cards = len(test_game.p1.cards)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertEqual(len(test_game.p1.cards), pre_thrope_cards + 1)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await test_game.update_game_event("P1", ["CHOICE", "1"])
+        self.assertEqual(test_game.p1.resources, 1)
+
 if __name__ == "__main__":
     unittest.main()
