@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content
-
+from play.gamecode.tests.shortcuts import standard_setup, skip_to_battle_first_planet
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -11,23 +11,6 @@ for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
-
-
-async def skip_to_battle_first_planet(test_game):
-    await test_game.update_game_event("P1", ["CHOICE", "0"])
-    await test_game.update_game_event("P2", ["CHOICE", "0"])
-    test_game.p1.cards = []
-    test_game.p2.cards = []
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["PLANETS", "0"])
-    await test_game.update_game_event("P2", ["PLANETS", "0"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
 
 
 class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
@@ -776,6 +759,32 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.deck), 2)
         self.assertEqual(test_game.p1.deck, ["Void Pirate", "Promethium Mine"])
         self.assertEqual(test_game.p1.discard, ["Rogue Trader", "Gift of Isha"])
+
+    async def test_adamant_hive_guard(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Adamant Hive Guard"), 0)
+        test_game.p1.assign_damage_to_pos(0, 0, 1)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 1)
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "2"])
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 1)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        test_game.p1.assign_damage_to_pos(0, 1, 1)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 1), 1)
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "2"])
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 1), 0)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 2), 1)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Strangler Brood"), 0)
+        test_game.p1.assign_damage_to_pos(0, 3, 1)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 3), 1)
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "2"])
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 3), 0)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 2), 2)
 
 
 if __name__ == "__main__":
