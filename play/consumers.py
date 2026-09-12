@@ -213,15 +213,43 @@ class LobbyConsumer(AsyncWebsocketConsumer):
 
     async def send_lobbies(self, all=True):
         for i in range(len(active_lobbies)):
-            message = "Create lobby/" + active_lobbies[i][0] + "/" + active_lobbies[i][1] + "/" \
-                      + active_lobbies[i][2] + "/" + active_lobbies[i][3] + "/" + active_lobbies[i][4] +\
-                      "/" + active_lobbies[i][7] + "/" + active_lobbies[i][8] + "/false"
+            # Format: (p_one_name, p_two_name, private, errata, sector, deck_name_1, deck_name_2, time, first_player)
+            message = "Create lobby"
+            p_one_name = active_lobbies[i][0]
+            p_two_name = active_lobbies[i][1]
+            private = active_lobbies[i][2]
+            errata = active_lobbies[i][3]
+            sector = active_lobbies[i][4]
+            deck_name_1 = active_lobbies[i][5]
+            deck_name_2 = active_lobbies[i][6]
+            time = active_lobbies[i][7]
+            first_player = active_lobbies[i][8]
+            ai_opponent = "false"
             if all:
                 await self.channel_layer.group_send(
-                    self.room_group_name, {"type": "chat.message", "message": message}
+                    self.room_group_name, 
+                    {
+                        "type": "chat.message", "message": message, "p_one_name": p_one_name, "p_two_name": p_two_name, 
+                        "private": private, "errata": errata, "sector": sector, "deck_name_one": deck_name_1, "deck_name_two": deck_name_2, 
+                        "time": time, "first_player": first_player, "ai_opponent": ai_opponent
+                    }
                 )
             else:
-                await self.chat_message({"type": "chat.message", "message": message})
+                await self.chat_message(
+                    {
+                        "type": "chat.message", "message": message, "p_one_name": p_one_name, "p_two_name": p_two_name, 
+                        "private": private, "errata": errata, "sector": sector, "deck_name_one": deck_name_1, "deck_name_two": deck_name_2, 
+                        "time": time, "first_player": first_player, "ai_opponent": ai_opponent
+                    }
+                )
+
+    async def broadcast_selected_deck(self):
+        await self.channel_layer.group_send(
+            self.room_group_name, 
+            {
+                "type": "chat.message", "message": "Broadcasted Deck Selection", "name_player": self.name
+            }
+        )
 
     async def receive(self, text_data): # noqa
         global active_lobbies
@@ -239,8 +267,10 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             for i in range(len(active_lobbies)):
                 if active_lobbies[i][0] == self.name:
                     active_lobbies[i][5] = split_message[1]
+                    await self.broadcast_selected_deck()
                 if active_lobbies[i][1] == self.name:
                     active_lobbies[i][6] = split_message[1]
+                    await self.broadcast_selected_deck()
         if split_message[0] == "Load More":
             value = int(split_message[1])
             required_faction = split_message[2]
@@ -251,6 +281,13 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                 warlord_name = decks_user[i][1]
                 message = "Send Deck/" + self.user.username + "/" + deck_name + "/" + warlord_name + "/"
                 await self.chat_message({"type": "chat.message", "message": message})
+        if split_message[0] == "Chat Message":
+            await self.channel_layer.group_send(
+                self.room_group_name, 
+                {
+                    "type": "chat.message", "message": "Chat Message", "name_player": self.name, "chat_message": split_message[1]
+                }
+            )
         if split_message[0] == "Create lobby":
             print("code to create lobby for:", self.name)
             if self.name == "":
@@ -278,13 +315,14 @@ class LobbyConsumer(AsyncWebsocketConsumer):
             ai_opponent = split_message[6]
             print(ai_opponent)
             print(active_lobbies)
-            split_message[0] += "/" + lobby_data[0] + "/" + lobby_data[1] + \
-                                "/" + lobby_data[2] + "/" + lobby_data[3] + \
-                                "/" + lobby_data[4] + "/" + lobby_data[7] + \
-                                "/" + lobby_data[8] + "/" + ai_opponent
-            print(split_message[0])
+            print("test")
             await self.channel_layer.group_send(
-                self.room_group_name, {"type": "chat.message", "message": split_message[0]}
+                self.room_group_name, 
+                {
+                    "type": "chat.message", "message": "Create lobby", "p_one_name": lobby_data[0], "p_two_name": lobby_data[1], 
+                    "private": lobby_data[2], "errata": lobby_data[3], "sector": lobby_data[4], "deck_name_one": lobby_data[5], "deck_name_two": lobby_data[6], 
+                    "time": lobby_data[7], "first_player": lobby_data[8], "ai_opponent": ai_opponent
+                }
             )
         if message == "Remove lobby":
             i = 0
@@ -366,9 +404,8 @@ class LobbyConsumer(AsyncWebsocketConsumer):
                     spectator_games.append((first_player, second_player, game_id, end_time))
                     print("End game time:")
                     print(end_time)
-                message = "Move to game/" + game_id + "/" + first_player + "/" + second_player
                 await self.channel_layer.group_send(
-                    self.room_group_name, {"type": "chat.message", "message": message}
+                    self.room_group_name, {"type": "chat.message", "message": "Move to game", "game_id": game_id, "first_player": first_player, "second_player": second_player}
                 )
                 i = 0
                 while i < len(active_lobbies):
@@ -399,14 +436,13 @@ class LobbyConsumer(AsyncWebsocketConsumer):
         condition_games.release()
 
     async def chat_message(self, event):
-        message = event["message"]
-        print("send:", message)
+        print("send:", event)
         # Send message to WebSocket
         # FIXME: Disconnect() method of WebSocketConsumer not being called
         # FIXME: https://github.com/django/channels/issues/1466
         # FIXME: Needs Django Channels dev team to fix this issue
         try:
-            await self.send(text_data=json.dumps({"message": message}))
+            await self.send(text_data=json.dumps(event))
         except:
             try:
                 await self.close()

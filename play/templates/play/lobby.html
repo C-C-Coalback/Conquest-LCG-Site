@@ -39,6 +39,18 @@
             min-height:10vh;
             grid-area: settings;
         }
+        #game-status-container {
+            position:relative;
+            margin:auto;
+            border-style: double;
+            border-color: lightblue;
+            border-width: 5px;
+            background: rgba(47, 40, 153, 0.3);
+            width:200px;
+            max-width:200px;
+            min-height:10vh;
+            grid-area: settings;
+        }
         #add_to_me {
             position:relative;
             margin:auto;
@@ -48,6 +60,60 @@
             border: 2px solid blue;
             padding: 10px;
             margin: 10px;
+        }
+
+        #chat-message-submit {
+            position: absolute;
+            right: 0;
+            width: 40px;
+        }
+
+        #chat-message-input {
+            height: 15px;
+            width: calc(10vw - 40px);
+        }
+
+        .avatar-chat {
+            position:relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        #chat-log {
+            border-width: 6px;
+            border-style: double;
+            border-color: black;
+            overflow-y:auto;
+            background: rgba(210, 210, 210, 1.0);
+            height: 20vh;
+        }
+
+        #chat-container {
+            text-align: left;
+        }
+
+        #game_status_player_1 {
+            padding: 10px;
+            margin: 10px;
+        }
+        #game_status_player_2 {
+            padding: 10px;
+            margin: 10px;
+        }
+        .deck-chosen {
+            color: yellow;
+            background-color: green;
+            border: 2px solid lightgreen;
+        }
+        .deck-chosen > p {
+            color: yellow;
+        }
+        .deck-not-chosen {
+            background-color: red;
+            border: 2px solid orangered;
+        }
+        .deck-not-chosen > p {
+            color: black;
         }
         #create-lobby-submit {
             position:relative;
@@ -128,16 +194,16 @@
             <div id="players-in-lobby">
                 <h2 style="background-color:aliceblue">Players in Lobby</h2>
                 <div id="add_players_to_me">
-                    <p></p>
+
                 </div>
             </div>
             <h2 id="available" style="background-color:aliceblue">Available Lobbies</h2>
             <div id="add_to_me">
-                <p></p>
+
             </div>
             <h2 id="active" style="background-color:aliceblue">Active Games</h2>
             <div id="add_spec_to_me">
-                <p></p>
+
             </div>
         </div>
         <div id="game-settings-container-container">
@@ -190,6 +256,22 @@
                 </div>
                 <br>
             </div>
+            <div id="game-status-container" style="display:none">
+                <h2>Game Status</h2>
+                <div id="game_status_player_1" class="deck-not-chosen">
+                    <p>Player 1 - Deck Not Chosen</p>
+                </div>
+                <div id="game_status_player_2" class="deck-not-chosen">
+                    <p>Player 2 - Deck Not Chosen</p>
+                </div>
+                <div id="chat-container">
+                <div id="chat-log"></div>
+                    <div>
+                        <input id="chat-message-input" type="text">
+                        <input id="chat-message-submit" type="button" value="Send">
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="decks-container-container">
             <div>Faction Filter</div>
@@ -236,6 +318,58 @@
         var current_deck_amount = 0;
         var preferred_faction = "";
         var preferred_legality = "";
+        var game_status_active = false;
+        var own_lobby_p_one = "";
+        var own_lobby_p_two = "";
+
+        function checkIfPlayerInAnyLobbies() {
+            var e = document.getElementById("add_to_me");
+            var children = e.children;
+            var found_self = false;
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].nodeName == "DIV")
+                {
+                    var child = children[i];
+                    var text_child = child.innerHTML;
+                    var split_child = text_child.split("<br>");
+                    console.log(split_child);
+                    if (split_child[0] == "{{ user.username }}" || split_child[2].trimEnd() == "{{ user.username }}")
+                    {
+                        found_self = true;
+                    }
+                }
+            }
+            console.log(found_self);
+            return (found_self);
+        }
+
+        function clearChatLogs() {
+            document.getElementById("chat-log").innerHTML = ``;
+        }
+
+        function addChatMessage(name_player, message) {
+            var new_img = `<div class="chat-message">
+            <img class="avatar-chat" src="/media/` + name_player + `.jpg" onerror="this.onerror=null; this.src='/static/images/defaultprofile.jpg'">
+            `;
+            message = name_player + ": " + message
+            document.querySelector('#chat-log').innerHTML += (new_img + message + '</div>');
+            var textarea = document.getElementById('chat-log');
+            textarea.scrollTop = textarea.scrollHeight;
+        }
+
+        function updateLobbySettingsAppearance(in_lobby) {
+            var game_settings = document.getElementById("game-settings-container");
+            var game_status = document.getElementById("game-status-container");
+            if (in_lobby == true) {
+                game_status_active = true;
+                game_settings.style.display = "none";
+                game_status.style.display = "block";
+            } else {
+                game_status_active = false;
+                game_settings.style.display = "block";
+                game_status.style.display = "none";
+            }
+        }
 
         function clearUpdateLoad() {
             clearDecks();
@@ -258,19 +392,44 @@
         lobbySocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const split_string = data.message.split("/");
+            console.log(data)
             if (data.message === "Logged out")
             {
                 addAnonymousError()
+            } else if (data.message === "Chat Message") {
+                if (data.name_player == own_lobby_p_one || data.name_player == own_lobby_p_two) {
+                    addChatMessage(data.name_player, data.chat_message);
+                }
             } else if (data.message === "Already in lobby") {
                 addAlreadyLobbiedError()
             } else if (data.message === "Delete lobby") {
-                deleteLobby()
+                deleteLobby();
+                clearChatLogs();
+                var in_lobby = checkIfPlayerInAnyLobbies();
+                updateLobbySettingsAppearance(in_lobby);
             } else if (split_string[0] === "Move to game") {
-                moveToGame(split_string[1], split_string[2], split_string[3])
+                moveToGame(data.game_id, data.first_player, data.second_player)
             } else if (split_string[0] === "Delete spec") {
                 deleteSpec()
             } else if (split_string[0] === "Create spec") {
                 addSpec(split_string[1], split_string[2], split_string[3]);
+            } else if (split_string[0] === "Broadcasted Deck Selection") {
+                if (game_status_active == true) {
+                    el_1 = document.getElementById("game_status_player_1");
+                    console.log(el_1.innerHTML)
+                    console.log(data.name_player)
+                    if (el_1.innerHTML.includes(data.name_player)) {
+                        el_1.classList.remove("deck-not-chosen");
+                        el_1.classList.add("deck-chosen");
+                        el_1.innerHTML = el_1.innerHTML.replace("Deck Not Chosen", "Deck Chosen");
+                    }
+                    el_2 = document.getElementById("game_status_player_2");
+                    if (el_2.innerHTML.includes(data.name_player)) {
+                        el_2.classList.remove("deck-not-chosen");
+                        el_2.classList.add("deck-chosen");
+                        el_2.innerHTML = el_2.innerHTML.replace("Deck Not Chosen", "Deck Chosen");
+                    }
+                }
             } else if (split_string[0] === "Send Deck") {
                 addDeck(split_string[1], split_string[2], split_string[3]);
             } else if (split_string[0] === "players_in_lobby") {
@@ -280,7 +439,40 @@
                     document.getElementById("add_players_to_me").innerHTML += `<p>` + usernames[i] + `</p>`;
                 }
             } else {
-                addLobby(split_string[1], split_string[2], split_string[3], split_string[4], split_string[5], split_string[6])
+                addLobby(data.p_one_name, data.p_two_name, data.private, data.errata, data.sector, data.time);
+                if (data.p_one_name == "{{ user.username }}" || data.p_two_name == "{{ user.username }}") {
+                    own_lobby_p_one = data.p_one_name;
+                    own_lobby_p_two = data.p_two_name;
+                    addChatMessage(data.p_one_name, " joined the lobby.");
+                    if (data.p_two_name != "") {
+                        addChatMessage(data.p_two_name, " joined the lobby.");
+                    }
+                }
+                var in_lobby = checkIfPlayerInAnyLobbies();
+                updateLobbySettingsAppearance(in_lobby);
+                el_1 = document.getElementById("game_status_player_1");
+                el_2 = document.getElementById("game_status_player_2");
+                el_1.innerHTML = `<p>` + data.p_one_name + ` - Deck Not Chosen</p>`;
+                var text_store = "";
+                if (data.deck_name_one != '') {
+                    el_1.classList.remove("deck-not-chosen");
+                    el_1.classList.add("deck-chosen");
+                    el_1.innerHTML = el_1.innerHTML.replace("Deck Not Chosen", "Deck Chosen");
+                } else {
+                    el_1.classList.remove("deck-chosen");
+                    el_1.classList.add("deck-not-chosen");
+                    el_1.innerHTML = el_1.innerHTML.replace("Deck Chosen", "Deck Not Chosen");
+                }
+                el_2.innerHTML = `<p>` + data.p_two_name + ` - Deck Not Chosen</p>`;
+                if (data.deck_name_two != '') {
+                    el_2.classList.remove("deck-not-chosen");
+                    el_2.classList.add("deck-chosen");
+                    el_2.innerHTML = el_2.innerHTML.replace("Deck Not Chosen", "Deck Chosen");
+                } else {
+                    el_2.classList.remove("deck-chosen");
+                    el_2.classList.add("deck-not-chosen");
+                    el_2.innerHTML = el_2.innerHTML.replace("Deck Chosen", "Deck Not Chosen");
+                }
             }
         };
 
@@ -332,6 +524,21 @@
             lobbySocket.send(JSON.stringify({
                 'message': "Create lobby" + "/" + private.toString() + "/" + errata_string + "/" + sector + "/" + deck_name + "/" + first_player + "/" + aiopponent
             }));
+        };
+
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.key === 'Enter') {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            lobbySocket.send(JSON.stringify({
+                'message': "Chat Message/" + message
+            }));
+            messageInputDom.value = '';
         };
 
         function joinLobby(clicked_id) {
