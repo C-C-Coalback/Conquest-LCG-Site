@@ -371,8 +371,8 @@ def blackstone_project_cards_init():
                                                   "Attached unit gains Sweep (2).", "Wargear. Weapon.",
                                    1, "Eldar", "Common", 1, False, type_of_units_allowed_for_attachment="Army",
                                    required_traits="Spirit"),
-        CardClasses.ArmyCard("Ulthwé Night Spinner", "No Wargear Attachments.\n"
-                                                     "Area Effect (2).", "Vehicle. Ulthwé.",
+        CardClasses.ArmyCard("Ulthwe Night Spinner", "No Wargear Attachments.\n"
+                                                     "Area Effect (2).", "Vehicle. Ulthwe.",
                              4, "Eldar", "Loyal", 3, 5, 0, False, area_effect=2, wargear_attachments_permitted=False),
         CardClasses.ArmyCard("Howling Exarch", "Reaction: After you cancel a card effect, deal 1 damage to up to "
                                                "two units at this planet.", "Warrior.",
@@ -599,6 +599,9 @@ def blackstone_project_cards_init():
                                                        "this planet gets -1 ATK.", "Wargear.",
                                    2, "Necrons", "Common", 2, True, unit_must_match_faction=True,
                                    limit_one_per_unit=True, required_traits="Scholar"),
+        CardClasses.AttachmentCard("Disruption Field", 
+                                   "Attach to a Necrons Vehicle unit you control.\nTreat the printed text box of each damaged enemy army unit at this planet as if it were blank (except for Traits).", 
+                                   "Hardpoint.", 1, "Necrons", "Common", 2, False, required_traits="Vehicle", unit_must_match_faction=True, must_be_own_unit=True),
         CardClasses.ArmyCard("Explosive Scarabs", "Reaction: After this unit resolves its attack, sacrifice it to deal "
                                                   "damage equal to it's remaining HP to a target unit at this planet. "
                                                   "(max 4)",

@@ -25,8 +25,7 @@ replacements = [("Call the Storm", "Call The Storm"),
                 ("Unearthed Crypt", "Promethium Mine"), 
                 ("Harbinger of the Storm", "Promethium Mine"), 
                 ("Fabricator Claw Array", "Promethium Mine"), 
-                ("Repurposed Pariah", "Promethium Mine"), 
-                ("Disruption Field", "Promethium Mine")]
+                ("Repurposed Pariah", "Promethium Mine")]
 
 
 cwd = os.getcwd()
