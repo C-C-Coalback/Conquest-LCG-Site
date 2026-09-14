@@ -167,7 +167,6 @@ class Player:
         self.castellan_crowe_2_relevant = False
         self.tempting_ceasefire_used = False
         self.valid_aunlen_planets = [True, True, True, True, True, True, True]
-        self.ichor_gauntlet_target = ""
         self.permitted_commit_locs_warlord = [True, True, True, True, True, True, True]
         self.illegal_commits_warlord = 0
         self.illegal_commits_synapse = 0
@@ -3439,8 +3438,7 @@ class Player:
         warlord_planet, warlord_pos = self.get_location_of_warlord()
         if self.search_attachments_at_pos(warlord_planet, warlord_pos, "Ichor Gauntlet") and name:
             if self.get_ready_given_pos(warlord_planet, warlord_pos):
-                self.game.create_reaction("Ichor Gauntlet", self.name_player, (int(self.number), -1, -1))
-                self.ichor_gauntlet_target = name
+                self.game.create_reaction("Ichor Gauntlet", self.name_player, (int(self.number), -1, -1), additional_info=name)
         for i in range(len(self.headquarters)):
             if self.headquarters[i].get_ability() == "Uber Grotesque":
                 if not self.headquarters[i].once_per_phase_used:

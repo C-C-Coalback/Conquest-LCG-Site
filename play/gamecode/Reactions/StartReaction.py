@@ -1,4 +1,3 @@
-from .. import FindCard
 from ..Phases import CombatPhase
 import copy
 
@@ -505,9 +504,8 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Ichor Gauntlet":
             warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
-            card_target = primary_player.ichor_gauntlet_target
-            card = FindCard.find_card(card_target, self.card_array, self.cards_dict,
-                                      self.apoka_errata_cards, self.cards_that_have_errata)
+            card_target = extra_info
+            card = self.preloaded_find_card(card_target)
             if card.get_name() == "Rakarth's Experimentations":
                 self.action_chosen = "Rakarth's Experimentations"
                 self.action_object.player_with_action = primary_player.name_player
@@ -544,26 +542,25 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.number_with_deploy_turn = primary_player.number
                 primary_player.soul_seizure_value = primary_player.count_tortures_in_discard()
             elif card.get_name() == "Power from Pain":
-                self.action_chosen = "Power from Pain"
+                self.action_object.action_chosen = "Power from Pain"
                 self.action_object.player_with_action = secondary_player.name_player
                 self.mode = "ACTION"
             elif card.has_action_while_in_hand:
-                reaction.chosen_first_card = False
-                reaction.chosen_second_card = False
+                self.action_object.chosen_first_card = False
+                self.action_object.chosen_second_card = False
                 self.mode = "ACTION"
                 if self.phase == "DEPLOY":
                     self.player_with_deploy_turn = primary_player.name_player
                     self.number_with_deploy_turn = primary_player.number
                 self.action_object.player_with_action = primary_player.name_player
-                self.action_chosen = card.get_name()
+                self.action_object.action_chosen = card.get_name()
             else:
                 self.create_reaction(card.get_name(), primary_player.name_player, (int(primary_player.number), -1, -1))
             self.delete_reaction()
         elif current_reaction == "Deathmark Assassins":
             if primary_player.discard_top_card_deck():
                 last_card_discard = len(primary_player.discard) - 1
-                card = FindCard.find_card(primary_player.discard[last_card_discard], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(primary_player.discard[last_card_discard])
                 cost = card.get_cost()
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, cost, expiration="EOP")
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -790,8 +787,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Resurrection Orb":
             if primary_player.discard:
-                card = FindCard.find_card(primary_player.discard[-1], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(primary_player.discard[-1])
                 if card.get_card_type() == "Army" and card.get_faction() == "Necrons" and \
                         not card.check_for_a_trait("Elite"):
                     if primary_player.add_card_to_planet(card, planet_pos) != -1:
@@ -1025,8 +1021,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Doom Scythe Invader":
             self.choices_available = []
             for i in range(len(primary_player.discard)):
-                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(primary_player.discard[i])
                 if card.get_is_unit():
                     if card.check_for_a_trait("Vehicle", primary_player.etekh_trait):
                         if not card.check_for_a_trait("Elite"):
@@ -1514,8 +1509,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                         name_card = extra_info
                         planet = self.last_planet_checked_for_battle
                         if name_card in secondary_player.discard:
-                            card = FindCard.find_card(name_card, self.card_array, self.cards_dict,
-                                                      self.apoka_errata_cards, self.cards_that_have_errata)
+                            card = self.preloaded_find_card(name_card)
                             if primary_player.add_card_to_planet(card, planet, is_owner_of_card=False) != -1:
                                 last_index = len(secondary_player.discard) - 1
                                 found = False
@@ -2347,8 +2341,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             i = len(primary_player.discard) - 1
             found_card = False
             while i > -1 and not found_card:
-                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(primary_player.discard[i])
                 if card.get_card_type() == "Event":
                     primary_player.cards.append(card.get_name())
                     del primary_player.discard[i]
@@ -2421,8 +2414,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 if primary_player.headquarters[i].get_ability() == "Holding Cell":
                     if not primary_player.headquarters[i].get_attachments() and not found:
                         found = True
-                        card = FindCard.find_card(name_card, self.card_array, self.cards_dict,
-                                                  self.apoka_errata_cards, self.cards_that_have_errata)
+                        card = self.preloaded_find_card(name_card)
                         primary_player.headquarters[i].add_attachment(card, name_owner=secondary_player.name_player)
             if found:
                 last_index = len(secondary_player.discard) - 1
@@ -2654,8 +2646,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             last_card_position = -1
             primary_player.exhaust_card_in_hq_given_name("Shrine of Warpflame")
             for i in range(len(primary_player.discard)):
-                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(primary_player.discard[i])
                 if card.check_for_a_trait("Tzeentch", primary_player.etekh_trait):
                     last_card_position = i
             if last_card_position == -1:
@@ -2801,8 +2792,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             seen_a_canoptek = False
             allowed_cards = []
             for i in range(len(primary_player.discard)):
-                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                          self.apoka_errata_cards, self.cards_that_have_errata)
+                card = self.preloaded_find_card(primary_player.discard[i])
                 if card.get_faction() == "Necrons" and card.get_card_type() == "Army":
                     if card.get_name() != "Canoptek Scarab Swarm":
                         allowed_cards.append(card.get_name())
@@ -2861,9 +2851,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                     self.name_player_making_choices = primary_player.name_player
                     self.choice_context = "Target Fall Back:"
                     for i in range(len(primary_player.cards_recently_destroyed)):
-                        card = FindCard.find_card(primary_player.cards_recently_destroyed[i],
-                                                  self.card_array, self.cards_dict,
-                                                  self.apoka_errata_cards, self.cards_that_have_errata)
+                        card = self.preloaded_find_card(primary_player.cards_recently_destroyed[i])
                         if card.check_for_a_trait("Elite") and card.get_is_unit():
                             self.choices_available.append(card.get_name())
                             self.create_choices(

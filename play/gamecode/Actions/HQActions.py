@@ -1628,9 +1628,9 @@ async def update_game_event_action_hq(self, name, game_update_string):
             if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if primary_player.sacrifice_card_in_hq(unit_pos):
                     primary_player.resolve_played_any_event()
-                    self.action_cleanup()
                     await secondary_player.dark_eldar_event_played()
-                    secondary_player.torture_event_played("Power from Pain")
+                    secondary_player.torture_event_played(self.action_object.action_chosen)
+                    self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card is not an army unit.")
