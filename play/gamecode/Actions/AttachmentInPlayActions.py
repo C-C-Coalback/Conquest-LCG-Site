@@ -144,6 +144,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                               "Card is not ready.")
                     elif ability == "Soot-Blackened Axe":
+                        self.queue_special_damage_begins_sound()
                         card_chosen.aiming_reticle_color = None
                         primary_player.cards_in_reserve[planet_pos].append(card_chosen)
                         self.action_object.action_chosen = ability
@@ -235,6 +236,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                         enemy_warlord_pla = planet_pos
                                         enemy_warlord_pos = i
                             if hale_warlord:
+                                self.queue_special_damage_begins_sound()
                                 primary_player.sacrifice_attachment_from_pos(planet_pos, unit_pos,
                                                                              attachment_pos)
                                 own_damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
@@ -249,6 +251,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                 for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                                     if not secondary_player.get_ready_given_pos(planet_pos, i):
+                                        self.queue_special_damage_begins_sound()
                                         secondary_player.assign_damage_to_pos(planet_pos, i, 2, by_enemy_unit=False)
                                 self.action_cleanup()
                     elif ability == "Terminator Armour":
@@ -452,6 +455,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                 same_planet_dis, same_planet_auto_dis = \
                     primary_player.search_same_planet_for_discounts(card.get_faction(), self.planet_pos_to_deploy)
                 self.available_discounts = hq_dis + in_play_dis + same_planet_dis + hand_dis
+                self.queue_special_damage_begins_sound()
                 if self.available_discounts > self.discounts_applied:
                     self.stored_mode = self.mode
                     self.mode = "DISCOUNT"

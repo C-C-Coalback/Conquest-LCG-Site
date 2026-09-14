@@ -81,6 +81,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             else:
                 self.delete_reaction()
         elif current_reaction == "Dark Lance Raider":
+            self.queue_special_damage_begins_sound()
             self.choices_available = ["1 dmg to 2", "3 dmg to 1"]
             self.choice_context = "Dark Lance Raider Damage"
             self.name_player_making_choices = primary_player.name_player
@@ -423,8 +424,10 @@ async def start_resolving_reaction(self, name, game_update_string):
             elif num == 2:
                 self.p2.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                 self.advance_damage_aiming_reticle()
+            self.queue_special_damage_begins_sound()
             self.delete_reaction()
         elif current_reaction == "Volatile Pyrovore":
+            self.queue_special_damage_begins_sound()
             if num == 1:
                 self.p1.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
             elif num == 2:
@@ -506,6 +509,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
             card_target = extra_info
             card = self.preloaded_find_card(card_target)
+            self.queue_special_damage_begins_sound()
             if card.get_name() == "Rakarth's Experimentations":
                 self.action_chosen = "Rakarth's Experimentations"
                 self.action_object.player_with_action = primary_player.name_player
@@ -679,6 +683,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Parasitic Infection":
+            self.queue_special_damage_begins_sound()
             if num == 1:
                 self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
@@ -689,6 +694,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 primary_player.summon_token_at_planet("Termagant", planet_pos)
             self.delete_reaction()
         elif current_reaction == "Savage Parasite":
+            self.queue_special_damage_begins_sound()
             if num == 1:
                 self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.advance_damage_aiming_reticle()
@@ -858,9 +864,11 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             self.delete_reaction()
         elif current_reaction == "Ku'gath Plaguefather":
+            self.queue_special_damage_begins_sound()
             if primary_player.get_damage_given_pos(planet_pos, unit_pos) < 1:
                 self.delete_reaction()
         elif current_reaction == "The Plaguefather's Banner":
+            self.queue_special_damage_begins_sound()
             if primary_player.get_damage_given_pos(planet_pos, unit_pos) < 1:
                 self.delete_reaction()
         elif current_reaction == "Aun'ui Prelate":
@@ -950,6 +958,8 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Blitza-Bommer":
+            self.queue_special_damage_begins_sound()
+            await self.send_update_message(secondary_player.name_player + " must deal 3 indirect damage among their units due to Blitza-Bommer.")
             secondary_player.total_indirect_damage = 3
             secondary_player.indirect_damage_applied = 0
             self.location_of_indirect = "PLANET"
@@ -1084,6 +1094,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                     if storm_lib_value in secondary_player.cards_in_play[planet_pos + 1][i].\
                             hit_by_which_storming_librarians:
+                        self.queue_special_damage_begins_sound()
                         secondary_player.assign_damage_to_pos(planet_pos, i, 4, context="Storming Librarian",
                                                               rickety_warbuggy=True)
                         while storm_lib_value in secondary_player.cards_in_play[planet_pos + 1][i].\
@@ -1547,6 +1558,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.cards_in_play[planet_pos + 1][unit_pos].attack_set_next = 5
             self.delete_reaction()
         elif current_reaction == "Gleeful Plague Beast":
+            self.queue_special_damage_begins_sound()
             for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
                 primary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
@@ -1627,6 +1639,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.delete_reaction()
         elif current_reaction == "Death Guard Preachers":
             reaction.chosen_first_card = False
+            self.queue_special_damage_begins_sound()
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
         elif current_reaction == "Support Fleet Transfer":
             self.choices_available = []
@@ -2017,10 +2030,12 @@ async def start_resolving_reaction(self, name, game_update_string):
                 secondary_player.misc_counter = 2
         elif current_reaction == "Firedrake Terminators":
             self.damage_abilities_defender_active = True
+            self.queue_special_damage_begins_sound()
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
         elif current_reaction == "The Black Sword":
             self.damage_abilities_defender_active = True
+            self.queue_special_damage_begins_sound()
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
             self.delete_reaction()
         elif current_reaction == "Calibration Error":
@@ -2043,6 +2058,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                         self.nullify_context = "Reaction Event"
                         can_continue = False
                 if can_continue:
+                    self.queue_special_damage_begins_sound()
                     primary_player.spend_resources(cost)
                     primary_player.discard_card_name_from_hand("Calibration Error")
                     secondary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -2106,6 +2122,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(7):
                 for j in range(len(secondary_player.cards_in_play[i + 1])):
                     if secondary_player.cards_in_play[i + 1][j].resolving_attack:
+                        self.queue_special_damage_begins_sound()
                         secondary_player.assign_damage_to_pos(i, j, 4, rickety_warbuggy=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
@@ -2158,6 +2175,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Sanctified Bolter":
             reaction.misc_counter = 0
         elif current_reaction == "Sororitas Command Squad":
+            self.queue_special_damage_begins_sound()
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             _, att_pla, att_pos = extra_info
             secondary_player.assign_damage_to_pos(att_pla, att_pos, self.sororitas_command_squad_value)
@@ -2201,6 +2219,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             primary_player.summon_token_at_planet("Termagant", planet_pos)
             self.delete_reaction()
         elif current_reaction == "Turbulent Rift":
+            self.queue_special_damage_begins_sound()
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             secondary_player.suffer_area_effect(planet_pos, 1)
             self.delete_reaction()
@@ -2219,11 +2238,13 @@ async def start_resolving_reaction(self, name, game_update_string):
             for i in range(len(secondary_player.headquarters)):
                 if salamander_id in secondary_player.headquarters[i].hit_by_which_salamanders:
                     secondary_player.assign_damage_to_pos(-2, i, 1, context="Salamander Flamer Squad")
+                    self.queue_special_damage_begins_sound()
             for i in range(7):
                 for j in range(len(secondary_player.cards_in_play[i + 1])):
                     if salamander_id in secondary_player.cards_in_play[i + 1][j].hit_by_which_salamanders:
                         secondary_player.assign_damage_to_pos(
                             i, j, 1, context="Salamander Flamer Squad", rickety_warbuggy=True)
+                        self.queue_special_damage_begins_sound()
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Kith's Khymeramasters":
@@ -2304,6 +2325,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             reaction.misc_target_planet = planet_pos
             reaction.misc_counter = 0
         elif current_reaction == "Tomb Blade Diversionist":
+            self.queue_special_damage_begins_sound()
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
             self.delete_reaction()
         elif current_reaction == "Shedding Hive Crone":
@@ -2405,6 +2427,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
             self.delete_reaction()
         elif current_reaction == "Ravening Psychopath":
+            self.queue_special_damage_begins_sound()
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
                                                 by_enemy_unit=False)
         elif current_reaction == "Holding Cell":
@@ -2440,6 +2463,7 @@ async def start_resolving_reaction(self, name, game_update_string):
         elif current_reaction == "Burst Forth":
             reaction.misc_target_planet = planet_pos
         elif current_reaction == "The Mask of Jain Zar":
+            self.queue_special_damage_begins_sound()
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             self.delete_reaction()
         elif current_reaction == "Blood Axe Strategist":
@@ -2930,6 +2954,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             reaction.misc_target_planet = warlord_pla
             self.name_player_making_choices = primary_player.name_player
         elif current_reaction == "Doom Siren":
+            self.queue_special_damage_begins_sound()
             if planet_pos != 0:
                 if self.planets_in_play_array[planet_pos + 1]:
                     secondary_player.suffer_area_effect(planet_pos + 1, self.value_doom_siren)
@@ -3086,6 +3111,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.name_player_making_choices = primary_player.name_player
             self.resolving_search_box = True
         elif current_reaction == "Cloud of Flies":
+            self.queue_special_damage_begins_sound()
             self.location_of_indirect = "PLANET"
             self.planet_of_indirect = planet_pos
             self.valid_targets_for_indirect = ["Army", "Warlord", "Synapse", "Token"]
@@ -3165,6 +3191,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             for planet in range(7):
                 for i in range(len(secondary_player.cards_in_play[planet + 1])):
                     if secondary_player.cards_in_play[planet + 1][i].resolving_attack:
+                        self.queue_special_damage_begins_sound()
                         secondary_player.assign_damage_to_pos(planet, i, 2,
                                                               rickety_warbuggy=True, shadow_field_possible=True)
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -3450,6 +3477,7 @@ async def start_resolving_reaction(self, name, game_update_string):
             secondary_player.total_indirect_damage = 2
             self.delete_reaction()
         elif current_reaction == "Mark of Chaos":
+            self.queue_special_damage_begins_sound()
             for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1)
             self.delete_reaction()

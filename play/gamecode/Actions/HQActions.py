@@ -420,6 +420,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                     await self.send_update_message(
                                         "Ork Landa hit an odd Orks card!"
                                     )
+                                    self.queue_special_damage_begins_sound()
                                     self.location_of_indirect = "ALL"
                                     self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
                                     secondary_player.indirect_damage_applied = 0
@@ -1466,6 +1467,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                                 self.action_object.position_of_actioned_card[1])
                     self.action_object.misc_counter = 0
                     self.action_cleanup()
+                    self.queue_special_damage_begins_sound()
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Card is an Elite unit.")
@@ -1492,6 +1494,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
         if not player_owning_card.get_unique_given_pos(planet_pos, unit_pos):
             if player_owning_card.check_is_unit_at_pos(planet_pos, unit_pos):
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
+                self.queue_special_damage_begins_sound()
                 self.action_cleanup()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1601,6 +1604,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     primary_player.resolve_played_any_event()
+                    self.queue_special_damage_begins_sound()
                     self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1704,6 +1708,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Event Action"
                 if can_continue:
+                    self.queue_special_damage_begins_sound()
                     secondary_player.assign_damage_to_pos(-2, unit_pos, 3, by_enemy_unit=False)
                     self.action_cleanup()
         if not resolved_something:
@@ -1738,6 +1743,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
                                            " gained an infection token!")
             if player_owning_card.headquarters[unit_pos].infection_lekor > 1:
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 3)
                 player_owning_card.headquarters[unit_pos].infection_lekor = 0
             self.action_cleanup()
@@ -1794,6 +1800,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                       by_enemy_unit=False)
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
+                self.queue_special_damage_begins_sound()
                 self.amount_spend_for_tzeentch_firestorm = -1
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
@@ -2015,6 +2022,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if attachments[i].from_magus_harid:
                     magus_card = True
             if magus_card:
+                self.queue_special_damage_begins_sound()
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.action_cleanup()
     elif self.action_object.action_chosen == "Memories of Fallen Comrades":
@@ -2150,6 +2158,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 if not player_owning_card.headquarters[i].get_attachments():
                     if not player_owning_card.get_immune_to_enemy_events(planet_pos, i, power=True):
                         player_owning_card.assign_damage_to_pos(planet_pos, i, 2, by_enemy_unit=False)
+        self.queue_special_damage_begins_sound()
         primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_object.action_chosen == "Calculated Strike":

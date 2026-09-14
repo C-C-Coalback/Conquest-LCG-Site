@@ -121,6 +121,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.summon_token_at_planet("Guardsman", planet_pos)
             self.delete_interrupt()
         elif current_interrupt == "Seal of the Ebon Chalice":
+            self.queue_special_damage_begins_sound()
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.ebon_chalice_value,
                                                   by_enemy_unit=False)
             self.delete_interrupt()
@@ -140,6 +141,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             primary_player.add_resources(1)
             self.delete_interrupt()
         elif current_interrupt == "Trap Laying Hunter":
+            self.queue_special_damage_begins_sound()
             primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
             self.choices_available = ["3 Damage", "Exhaust"]
             if not secondary_player.search_ready_unit_at_planet(planet_pos):
@@ -158,6 +160,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             if primary_player.urien_relevant:
                 primary_player.spend_resources(1)
             primary_player.counterblow_used = True
+            self.queue_special_damage_begins_sound()
             primary_player.discard_card_name_from_hand("Counterblow")
             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False, preventable=False)
             warlord_pla, warlord_pos = primary_player.get_location_of_warlord()

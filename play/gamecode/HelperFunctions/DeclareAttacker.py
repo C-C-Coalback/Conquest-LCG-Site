@@ -41,11 +41,13 @@ async def declare_attacker(self, name, game_update_string):
             for i in range(len(other_player.attachments_at_planet[self.attacker_planet])):
                 if other_player.attachments_at_planet[self.attacker_planet][i] \
                         .get_ability() == "Repulsor Minefield":
+                    self.queue_special_damage_begins_sound()
                     player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
                                                 by_enemy_unit=False)
             for i in range(len(player.attachments_at_planet[self.attacker_planet])):
                 if player.attachments_at_planet[self.attacker_planet][i] \
                         .get_ability() == "Repulsor Minefield":
+                    self.queue_special_damage_begins_sound()
                     player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 1,
                                                 by_enemy_unit=False)
         if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
@@ -68,6 +70,7 @@ async def declare_attacker(self, name, game_update_string):
                         .get_ability() == "Improvised Minefield":
                     player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 3,
                                                 by_enemy_unit=False)
+                    self.queue_special_damage_begins_sound()
                     player.add_card_to_discard("Improvised Minefield")
                     del player.attachments_at_planet[self.attacker_planet][i]
                     i = i - 1
@@ -76,6 +79,7 @@ async def declare_attacker(self, name, game_update_string):
             while i < len(other_player.attachments_at_planet[self.attacker_planet]):
                 if other_player.attachments_at_planet[self.attacker_planet][i] \
                         .get_ability() == "Improvised Minefield":
+                    self.queue_special_damage_begins_sound()
                     player.assign_damage_to_pos(self.attacker_planet, self.attacker_position, 3,
                                                 by_enemy_unit=False)
                     other_player.add_card_to_discard("Improvised Minefield")

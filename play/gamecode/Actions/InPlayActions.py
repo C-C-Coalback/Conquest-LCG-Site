@@ -48,6 +48,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
                                                               "Insufficient resources.")
                     elif ability == "Virulent Spore Sacs":
+                        self.queue_special_damage_begins_sound()
                         player_owning_card.sacrifice_card_in_play(planet_pos, unit_pos)
                         self.infest_planet(planet_pos, player_owning_card)
                         for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
@@ -981,6 +982,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.resolve_played_any_event()
+                self.queue_special_damage_begins_sound()
                 self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -993,6 +995,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 else:
                     player_being_hit = self.p2
                 if player_being_hit.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                    self.queue_special_damage_begins_sound()
                     player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     self.action_cleanup()
                 else:
@@ -1418,6 +1421,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                                             by_enemy_unit=False)
                     self.action_object.misc_counter = 0
                     self.action_cleanup()
+                    self.queue_special_damage_begins_sound()
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Card is an Elite unit.")
@@ -1458,6 +1462,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
                     primary_player.aiming_reticle_coords_hand = None
                     primary_player.resolve_played_any_event()
+                    self.queue_special_damage_begins_sound()
                     self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1556,6 +1561,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_context = "Event Action"
                     if can_continue:
                         if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() != "Warlord":
+                            self.queue_special_damage_begins_sound()
                             primary_player.discard_card_name_from_hand("Searing Brand")
                             primary_player.aiming_reticle_coords_hand = None
                             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 3, preventable=False,
@@ -1614,6 +1620,8 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 if can_continue:
                     player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                     primary_player.shuffle_deck()
+                    self.queue_special_damage_begins_sound()
+                    await self.send_update_message("A Thousand Cuts was shuffled back into the deck.")
                     await primary_player.dark_eldar_event_played()
                     primary_player.torture_event_played("A Thousand Cuts")
                     primary_player.resolve_played_any_event()
@@ -1780,6 +1788,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.amount_spend_for_tzeentch_firestorm = -1
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
+                self.queue_special_damage_begins_sound()
         else:
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Tzeentch's Firestorm cannot target warlords.")
@@ -1831,6 +1840,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                     del self.action_object.misc_misc[i]
                                     i = i - 1
                                 i = i + 1
+                            self.queue_special_damage_begins_sound()
                             secondary_player.assign_damage_to_pos(current_pla, current_pos, num_times_shown_up,
                                                                   rickety_warbuggy=True)
                         self.action_object.misc_misc = None
@@ -2331,6 +2341,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "In Play Action"
             if can_continue:
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
                                                         rickety_warbuggy=True)
                 if self.action_object.position_of_actioned_card != (-1, -1):
@@ -2459,6 +2470,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
             if attachments[i].from_magus_harid:
                 magus_card = True
         if magus_card:
+            self.queue_special_damage_begins_sound()
             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
             self.action_cleanup()
         else:
@@ -2547,6 +2559,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
     elif self.action_object.action_chosen == "Ireful Vanguard":
         if self.action_object.position_of_actioned_card[0] == planet_pos:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
@@ -2715,6 +2728,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "In Play Action"
             if can_continue:
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2)
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
                 self.action_cleanup()
@@ -2750,6 +2764,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 await self.send_update_message(player_owning_card.get_name_given_pos(planet_pos, unit_pos) +
                                                " gained an infection token!")
                 if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor > 1:
+                    self.queue_special_damage_begins_sound()
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 3)
                     player_owning_card.cards_in_play[planet_pos + 1][unit_pos].infection_lekor = 0
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
@@ -3448,6 +3463,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                         self.nullify_context = "Event Action"
                     if can_continue:
                         damage = player_being_hit.get_damage_given_pos(planet_pos, unit_pos)
+                        self.queue_special_damage_begins_sound()
                         player_being_hit.set_damage_given_pos(planet_pos, unit_pos, damage + self.action_object.misc_counter)
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
@@ -4186,6 +4202,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Event Action"
             if can_continue:
+                self.queue_special_damage_begins_sound()
                 player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, self.action_object.misc_counter, by_enemy_unit=False)
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
@@ -4409,6 +4426,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                 self.nullify_context = "In Play Action"
             if can_continue:
                 if planet_pos == self.action_object.position_of_actioned_card[0]:
+                    self.queue_special_damage_begins_sound()
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, shadow_field_possible=True,
                                                             rickety_warbuggy=True)
                     self.action_cleanup()
@@ -4584,6 +4602,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Event Action"
                         if can_continue:
+                            self.queue_special_damage_begins_sound()
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, self.action_object.misc_counter,
                                                                   by_enemy_unit=False)
                             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
@@ -4600,6 +4619,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                     primary_player.ready_given_pos(planet_pos, unit_pos)
                     self.action_object.misc_counter -= 1
                     await self.send_update_message(str(self.action_object.misc_counter) + " uses of Smash 'n Bash left")
+                    self.queue_special_damage_begins_sound()
                     if self.action_object.misc_counter < 1:
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
@@ -4772,6 +4792,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "In Play Action"
                         if can_continue:
+                            self.queue_special_damage_begins_sound()
                             secondary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
                             atk = secondary_player.cards_in_play[planet_pos + 1][unit_pos].attack
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
@@ -4806,6 +4827,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Event Action"
                         if can_continue:
+                            self.queue_special_damage_begins_sound()
                             self.action_object.misc_counter[planet_pos] = False
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                     else:

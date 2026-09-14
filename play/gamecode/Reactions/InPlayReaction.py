@@ -129,6 +129,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Charging Juggernaut":
             if game_update_string[1] == secondary_player.number:
                 if self.round_number == planet_pos:
+                    self.queue_special_damage_begins_sound()
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                     self.delete_reaction()
         elif current_reaction == "Inspirational Fervor":
@@ -255,6 +256,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           relic_check_allowed=False):
                             del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
                             primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
+                            self.queue_special_damage_begins_sound()
                             player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
@@ -272,6 +274,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if abs(planet_pos - og_pla) == 1:
                 if game_update_string[1] == secondary_player.number:
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
+                        self.queue_special_damage_begins_sound()
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3)
                         self.delete_reaction()
         elif current_reaction == "Klaivex Warleader":
@@ -355,6 +358,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                   rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                            self.queue_special_damage_begins_sound()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target army units.")
@@ -386,6 +390,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
+                            self.queue_special_damage_begins_sound()
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True, context="Vezuel's Hunters")
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
@@ -438,6 +443,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
+                        self.queue_special_damage_begins_sound()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target army units.")
@@ -470,6 +476,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 self.first_player_nullified = primary_player.name_player
                                 self.nullify_context = "Reaction"
                             if can_continue:
+                                self.queue_special_damage_begins_sound()
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1,
                                                                       rickety_warbuggy=True, shadow_field_possible=True)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -514,6 +521,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         att_value = primary_player.get_attack_given_pos(att_pla, att_pos)
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, att_value, by_enemy_unit=False)
                         self.advance_damage_aiming_reticle()
+                        self.queue_special_damage_begins_sound()
                         self.delete_reaction()
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -572,6 +580,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                               rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                        self.queue_special_damage_begins_sound()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target army units.")
@@ -616,6 +625,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             damage = secondary_player.get_damage_given_pos(og_pla, og_pos)
                             secondary_player.set_damage_given_pos(og_pla, og_pos, damage + 1)
                             reaction.misc_counter = reaction.misc_counter - 1
+                            self.queue_special_damage_begins_sound()
                             if reaction.misc_counter < 1:
                                 primary_player.drammask_nane_check()
                                 self.delete_reaction()
@@ -699,6 +709,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
+                        self.queue_special_damage_begins_sound()
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                         self.delete_reaction()
         elif current_reaction == "Shadowed Thorns Venom":
@@ -756,6 +767,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
+                        self.queue_special_damage_begins_sound()
                         player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
@@ -797,6 +809,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                               rickety_warbuggy=True)
                         self.advance_damage_aiming_reticle()
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.queue_special_damage_begins_sound()
                         self.delete_reaction()
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -923,6 +936,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
+                            self.queue_special_damage_begins_sound()
                             if self.infested_planets[planet_pos]:
                                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             else:
@@ -1177,6 +1191,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         primary_player.name_player in\
                         player_owning_card.cards_in_play[planet_pos + 1][unit_pos].hit_by_frenzied_wulfen_names:
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
+                    self.queue_special_damage_begins_sound()
                     self.delete_reaction()
         elif current_reaction == "Thunderwolf Cavalry":
             if abs(og_pla - planet_pos) == 1:
@@ -1411,6 +1426,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if og_pla == planet_pos:
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1,
                                                         preventable=False, rickety_warbuggy=True)
+                self.queue_special_damage_begins_sound()
                 if player_owning_card.check_if_card_is_destroyed(planet_pos, unit_pos):
                     primary_player.number_cards_to_search = 6
                     if primary_player.number_cards_to_search > len(primary_player.deck):
@@ -1499,6 +1515,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, context="Ragnar Blackmane",
                                                               rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.queue_special_damage_begins_sound()
                         self.delete_reaction()
         elif current_reaction == "Scorpion Striker":
             if planet_pos == og_pla:
@@ -1560,6 +1577,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.delete_reaction()
         elif current_reaction == "Fusion Cascade Defiance":
             if planet_pos == og_pla:
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1)
                 self.delete_reaction()
         elif current_reaction == "Erupting Aberrants":
@@ -1640,6 +1658,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           current_reaction + " can only target army units.")
         elif current_reaction == "Rail Rifle":
             if planet_pos == reaction.misc_target_planet:
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                 self.delete_reaction()
         elif current_reaction == "Kroot Hounds":
@@ -1648,6 +1667,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                         if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Kroot Hounds":
                             primary_player.exhaust_given_pos(planet_pos, unit_pos)
+                            self.queue_special_damage_begins_sound()
                             secondary_player.assign_damage_to_pos(og_pla, og_pos, 2, shadow_field_possible=True,
                                                                   rickety_warbuggy=True)
                             self.delete_reaction()
@@ -1783,6 +1803,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
+                            self.queue_special_damage_begins_sound()
                             player_being_hit.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
@@ -1918,6 +1939,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
+                        self.queue_special_damage_begins_sound()
                         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                                 shadow_field_possible=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -1991,6 +2013,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                         if len(reaction.misc_misc) >= reaction.misc_counter:
                             for i in range(len(reaction.misc_misc)):
+                                self.queue_special_damage_begins_sound()
                                 current_pla, current_pos = reaction.misc_misc[i]
                                 secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
                                                                       rickety_warbuggy=True)
@@ -2072,6 +2095,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     damage = 2
                 elif player_owning_card.get_mobile_given_pos(planet_pos, unit_pos):
                     damage = 2
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, damage, rickety_warbuggy=True)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
@@ -2208,6 +2232,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 3, rickety_warbuggy=True)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
+                        self.queue_special_damage_begins_sound()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target exhausted units.")
@@ -2241,6 +2266,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Sautekh Royal Crypt Damage":
             if game_update_string[1] == secondary_player.number:
                 if reaction.misc_misc[planet_pos]:
+                    self.queue_special_damage_begins_sound()
                     reaction.misc_misc_2.append((planet_pos, unit_pos))
                     reaction.misc_misc[planet_pos] = False
                     secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
@@ -2378,6 +2404,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
+                        self.queue_special_damage_begins_sound()
                         player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         self.delete_reaction()
                 else:
@@ -2498,6 +2525,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if primary_player.search_hand_for_card("Crushing Blow"):
                             self.create_reaction("Crushing Blow", primary_player.name_player,
                                                  (int(primary_player.number), -1, -1))
+                        self.queue_special_damage_begins_sound()
                         self.delete_reaction()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -2586,6 +2614,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         secondary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                         if len(reaction.misc_misc) > 1:
                             for i in range(len(reaction.misc_misc)):
+                                self.queue_special_damage_begins_sound()
                                 current_pla, current_pos = reaction.misc_misc[i]
                                 secondary_player.assign_damage_to_pos(current_pla, current_pos, 1,
                                                                       rickety_warbuggy=True)
@@ -2628,6 +2657,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
                 if can_continue:
+                    self.queue_special_damage_begins_sound()
                     secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                     primary_player.draw_card()
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -2687,6 +2717,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
+                        self.queue_special_damage_begins_sound()
                         attack = primary_player.get_attack_given_pos(origin_planet, origin_pos)
                         player_being_hit.assign_damage_to_pos(origin_planet, target_unit_pos, attack,
                                                               by_enemy_unit=False)
@@ -2700,6 +2731,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if target_unit_pos == prev_def_pos:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target", "Can't select last defender")
                     else:
+                        self.queue_special_damage_begins_sound()
                         secondary_player.assign_damage_to_pos(origin_planet, target_unit_pos, 1,
                                                               rickety_warbuggy=True)
                         secondary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos,
@@ -2804,6 +2836,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                                   rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
+                            self.queue_special_damage_begins_sound()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target army units.")
@@ -2822,6 +2855,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                 if game_update_string[1] == secondary_player.get_number():
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
+                            self.queue_special_damage_begins_sound()
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                             self.delete_reaction()
                         else:
@@ -2888,6 +2922,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction"
                 if can_continue:
+                    self.queue_special_damage_begins_sound()
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             context="Dutiful Castellan", by_enemy_unit=True)
                     self.delete_reaction()
@@ -2986,6 +3021,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Interceptor Squad":
             if planet_pos == reaction.misc_target_planet:
                 if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].just_entered_play:
+                    self.queue_special_damage_begins_sound()
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             context="Interceptor Squad")
                     self.delete_reaction()
@@ -3051,9 +3087,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     for i in range(len(reaction.misc_misc_2)):
                         current_num, current_pla, current_pos = reaction.misc_misc_2[i]
                         if current_num == 1:
+                            self.queue_special_damage_begins_sound()
                             self.p1.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
                                                          rickety_warbuggy=True)
                         else:
+                            self.queue_special_damage_begins_sound()
                             self.p2.assign_damage_to_pos(current_pla, current_pos, 1, context="Fierce Purgator",
                                                          rickety_warbuggy=True)
                     reaction.misc_misc = None
@@ -3131,6 +3169,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Drifting Spore Mines":
             if planet_pos == reaction.misc_target_unit[0]:
                 if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+                    self.queue_special_damage_begins_sound()
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             shadow_field_possible=True)
                     self.delete_reaction()
@@ -3149,6 +3188,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       current_reaction + " cannot target that unit.")
         elif current_reaction == "Galvax the Bloated":
             if planet_pos == og_pla:
+                self.queue_special_damage_begins_sound()
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                 self.delete_reaction()
@@ -3213,6 +3253,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.assign_damage_to_pos(
                                 origin_planet, new_unit_pos, 1, context="Sicarius's Chosen", rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                            self.queue_special_damage_begins_sound()
                             self.delete_reaction()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",

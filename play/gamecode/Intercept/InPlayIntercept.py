@@ -3,6 +3,7 @@ import copy
 
 
 async def update_intercept_in_play(self, primary_player, secondary_player, name, game_update_string, name_effect):
+    player_owning_card = primary_player
     planet_pos = int(game_update_string[2])
     unit_pos = int(game_update_string[3])
     if name_effect == "Catachan Outpost":
@@ -23,9 +24,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Sicarius's Chosen":
         origin_planet = self.reactions_needing_resolving[0].get_planet_pos()
-        primary_player.move_unit_to_planet(target_planet,
-                                           int(game_update_string[3]),
-                                           origin_planet)
+        primary_player.move_unit_to_planet(planet_pos, unit_pos, origin_planet)
         new_unit_pos = len(primary_player.cards_in_play[origin_planet + 1]) - 1
         primary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1,
                                             context="Sicarius's Chosen",
@@ -226,8 +225,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         origin_planet = self.reactions_needing_resolving[0].get_planet_pos()
         origin_pos = self.reactions_needing_resolving[0].get_unit_pos()
         attack = secondary_player.get_attack_given_pos(origin_planet, origin_pos)
-        primary_player.assign_damage_to_pos(origin_planet, target_unit_pos, attack, by_enemy_unit=False)
-        primary_player.set_aiming_reticle_in_play(origin_planet, target_unit_pos, "blue")
+        primary_player.assign_damage_to_pos(origin_planet, unit_pos, attack, by_enemy_unit=False)
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Hallow Librarium":

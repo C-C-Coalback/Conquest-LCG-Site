@@ -31,6 +31,7 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                         primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_ready():
                     primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].exhaust_card()
                     secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, rickety_warbuggy=True)
+                    self.queue_special_damage_begins_sound()
                     self.delete_reaction()
     elif current_reaction == "Acidic Venom Cannon":
         og_num, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()

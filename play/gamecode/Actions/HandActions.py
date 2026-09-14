@@ -130,6 +130,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         self.trium_tracker = ("name", -1)
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                     elif ability == "Rakarth's Experimentations":
+                        self.queue_special_damage_begins_sound()
                         self.action_object.action_chosen = ability
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         self.choices_available = ["Army", "Support", "Attachment", "Event"]
@@ -548,6 +549,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Dakka Dakka Dakka!":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                            self.queue_special_damage_begins_sound()
                             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             for i in range(len(primary_player.headquarters)):
@@ -655,6 +657,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Cacophonic Choir":
                         warlord_planet, warlord_pos = primary_player.get_location_of_warlord()
                         if primary_player.get_ready_given_pos(warlord_planet, warlord_pos):
+                            self.queue_special_damage_begins_sound()
                             primary_player.exhaust_given_pos(warlord_planet, warlord_pos)
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
                             primary_player.resolve_played_any_event()
@@ -663,6 +666,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
                             secondary_player.indirect_damage_applied = 0
                             secondary_player.total_indirect_damage = secondary_player.count_units_in_play_all()
+                            await self.send_update_message(secondary_player.name_player + " must suffer " + str(secondary_player.total_indirect_damage) + " damage due to Cacophonic Choir.")
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Play Card",
                                                               "Warlord is not ready.")

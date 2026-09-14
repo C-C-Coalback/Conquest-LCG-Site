@@ -5961,6 +5961,7 @@ class Player:
                                               (int(self.number), planet_id, unit_id))
                 for i in range(len(self.headquarters[unit_id].get_attachments())):
                     if self.headquarters[unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
+                        self.game.queue_special_damage_begins_sound()
                         self.assign_damage_to_pos(-2, unit_id, 1, by_enemy_unit=False)
             return None
         if self.check_for_trait_given_pos(planet_id, unit_id, "Elite"):
@@ -5975,6 +5976,7 @@ class Player:
                                           (int(self.number), planet_id, unit_id))
             for i in range(len(self.cards_in_play[planet_id + 1][unit_id].get_attachments())):
                 if self.cards_in_play[planet_id + 1][unit_id].get_attachments()[i].get_ability() == "Dire Mutation":
+                    self.game.queue_special_damage_begins_sound()
                     self.assign_damage_to_pos(planet_id, unit_id, 1, by_enemy_unit=False)
         return None
 
@@ -8902,6 +8904,7 @@ class Player:
         if self.headquarters[last_element_hq].check_for_a_trait("Space Wolves", self.etekh_trait):
             mork_count = 0
         for i in range(mork_count):
+            self.game.queue_special_damage_begins_sound()
             self.assign_damage_to_pos(-2, last_element_hq, 1, context="Morkai Rune Priest", rickety_warbuggy=True)
         if exhaust:
             self.exhaust_given_pos(-2, last_element_hq)

@@ -633,6 +633,10 @@ class Game:
             await self.send_update_message("GAME_INFO/SOUND/" + self.queued_sound)
             self.queued_sound = ""
 
+    def queue_special_damage_begins_sound(self):
+        """Queues the damage on spell SFX."""
+        self.queued_sound = "spelldamage"
+
     def get_planet_name(self, planet_pos):
         """
         Gets the name of a planet at the given position.
@@ -5526,6 +5530,7 @@ class Game:
                                                         self.stored_damage[0].get_position_attacker()
                                                     secondary_player.assign_damage_to_pos(att_pla, att_pos, printed_atk,
                                                                                           by_enemy_unit=False)
+                                                    self.queue_special_damage_begins_sound()
                                                     await self.shield_cleanup(primary_player, secondary_player,
                                                                               planet_pos)
                             elif self.alt_shield_name == "Data Analyzer":
@@ -5650,6 +5655,7 @@ class Game:
                                 if secondary_player.special_get_card_type_given_pos(
                                         self.stored_damage[0].get_position_attacker()
                                 ) == "Army":
+                                    self.queue_special_damage_begins_sound()
                                     damage_prevented = self.stored_damage[0].get_amount_that_can_be_blocked() - 2
                                     self.stored_damage[0].set_amount_that_can_be_blocked(2)
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, damage_prevented)
@@ -5943,6 +5949,7 @@ class Game:
                     if reaction_name == "The Blood Pits":
                         if self.reactions_needing_resolving[0].misc_misc:
                             for i in range(len(self.reactions_needing_resolving[0].misc_misc)):
+                                self.queue_special_damage_begins_sound()
                                 pla, pos = self.reactions_needing_resolving[0].misc_misc[i]
                                 secondary_player.assign_damage_to_pos(pla, pos, 2)
                         self.reactions_needing_resolving[0].misc_misc = None
@@ -5954,6 +5961,7 @@ class Game:
                     if reaction_name == "Castellan Crowe":
                         num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
                         if self.reactions_needing_resolving[0].misc_counter > 0:
+                            self.queue_special_damage_begins_sound()
                             secondary_player.assign_damage_to_pos(pla, pos, self.reactions_needing_resolving[0].misc_counter, context="Castellan Crowe")
                     if reaction_name == "Fire Warrior Elite" or \
                             reaction_name == "Deathwing Interceders" or \
@@ -7401,6 +7409,7 @@ class Game:
                                                                       rickety_warbuggy=True,
                                                                       context="Hjorvath Coldstorm")
                                 primary_player.draw_card()
+                                self.queue_special_damage_begins_sound()
                                 self.interrupting_discard_effect_active = False
                                 self.interrupts_discard_enemy_allowed = False
                                 await self.complete_enemy_discard(primary_player, secondary_player)

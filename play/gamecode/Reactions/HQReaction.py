@@ -59,6 +59,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Reaction"
             if can_continue:
+                self.queue_special_damage_begins_sound()
                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True)
                 primary_player.draw_card()
                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -99,6 +100,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, preventable=False,
                                                       by_enemy_unit=False)
                 self.delete_reaction()
+                self.queue_special_damage_begins_sound()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target", " Unit is immune to enemy events.")
     elif current_reaction == "Decayed Gardens":
@@ -242,6 +244,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 damage = 2
             elif player_owning_card.get_mobile_given_pos(planet_pos, unit_pos):
                 damage = 2
+            self.queue_special_damage_begins_sound()
             player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, damage, rickety_warbuggy=True)
             self.delete_reaction()
         else:
@@ -478,6 +481,7 @@ async def resolve_hq_reaction(self, name, game_update_string, primary_player, se
                 if secondary_player.get_card_type_given_pos(-2, unit_pos) == "Army":
                     if secondary_player.headquarters[unit_pos].valid_defense_battery_target:
                         secondary_player.assign_damage_to_pos(-2, unit_pos, 2, by_enemy_unit=False)
+                        self.queue_special_damage_begins_sound()
                         self.delete_reaction()
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",

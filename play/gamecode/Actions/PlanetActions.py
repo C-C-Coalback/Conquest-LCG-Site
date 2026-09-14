@@ -308,6 +308,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Planet is not infested.")
     elif self.action_object.action_chosen == "Vivisection":
+        self.queue_special_damage_begins_sound()
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True):
                 if primary_player.get_damage_given_pos(chosen_planet, i) > 0:
@@ -500,6 +501,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             primary_player.summon_token_at_planet("Guardsman", chosen_planet)
         self.action_cleanup()
     elif self.action_object.action_chosen == "Blood For The Blood God!":
+        self.queue_special_damage_begins_sound()
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
             if primary_player.get_damage_given_pos(chosen_planet, i) == 0:
                 primary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
@@ -723,6 +725,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                         if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
                             secondary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
             primary_player.resolve_played_any_event()
+            self.queue_special_damage_begins_sound()
             self.action_cleanup()
         else:
             await self.send_update_message("Cannot target planet; insufficient resources for tax effects.")
@@ -874,6 +877,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Planet is not infested.")
     elif self.action_object.action_chosen == "Ork Kannon":
+        self.queue_special_damage_begins_sound()
         self.location_of_indirect = "PLANET"
         self.valid_targets_for_indirect = ["Army", "Synapse", "Token", "Warlord"]
         self.planet_of_indirect = int(game_update_string[1])
@@ -912,6 +916,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Adjacent planet only.")
     elif self.action_object.action_chosen == "Nurgling Bomb":
+        self.queue_special_damage_begins_sound()
         self.action_object.chosen_first_card = True
         found_nurgling_bomb_target_p1 = False
         for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
