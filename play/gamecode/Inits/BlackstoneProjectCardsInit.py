@@ -599,9 +599,6 @@ def blackstone_project_cards_init():
                                                        "this planet gets -1 ATK.", "Wargear.",
                                    2, "Necrons", "Common", 2, True, unit_must_match_faction=True,
                                    limit_one_per_unit=True, required_traits="Scholar"),
-        CardClasses.AttachmentCard("Disruption Field", 
-                                   "Attach to a Necrons Vehicle unit you control.\nTreat the printed text box of each damaged enemy army unit at this planet as if it were blank (except for Traits).", 
-                                   "Hardpoint.", 1, "Necrons", "Common", 2, False, required_traits="Vehicle", unit_must_match_faction=True, must_be_own_unit=True),
         CardClasses.ArmyCard("Explosive Scarabs", "Reaction: After this unit resolves its attack, sacrifice it to deal "
                                                   "damage equal to it's remaining HP to a target unit at this planet. "
                                                   "(max 4)",
