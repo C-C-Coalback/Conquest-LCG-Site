@@ -56,7 +56,7 @@ class Card:
         self.valid_defense_battery_target = False
         self.ethereal_movement_active = False
         self.valid_kugath_nurgling_target = False
-        self.damage_from_kugath_nurgling = 0
+        self.kugath_nurgling_ids = []
         self.extra_traits_eop = ""
         self.extra_traits_eor = ""
         self.ambush = ambush

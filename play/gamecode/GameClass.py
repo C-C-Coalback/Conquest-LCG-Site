@@ -448,6 +448,9 @@ class Game:
         self.need_to_move_to_hq = False
         self.just_moved_units = False
         self.resolving_kugath_nurglings = False
+        self.double_checker_kugath_nurglings = False
+        self.chosen_which_nurgling = False
+        self.kugath_nurgling_id = -1
         self.kugath_nurglings_present_at_planets = [0, 0, 0, 0, 0, 0, 0]
         self.card_type_defender = ""
         self.defender_is_flying_or_mobile = False
@@ -7073,14 +7076,24 @@ class Game:
         for i in range(7):
             for j in range(len(self.p1.cards_in_play[i + 1])):
                 if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                    if self.p1.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
-                            self.calc_kugath_nurgling_triggers_at_planet(i):
-                        return False
+                    for k in range(len(self.p1.cards_in_play[i + 1])):
+                        if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                            if self.p1.get_id_given_pos(i, k) in self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                                return False
+                    for k in range(len(self.p2.cards_in_play[i + 1])):
+                        if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                            if self.p2.get_id_given_pos(i, k) in self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                                return False
             for j in range(len(self.p2.cards_in_play[i + 1])):
                 if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                    if self.p2.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
-                            self.calc_kugath_nurgling_triggers_at_planet(i):
-                        return False
+                    for k in range(len(self.p1.cards_in_play[i + 1])):
+                        if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                            if self.p1.get_id_given_pos(i, k) in self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                                return False
+                    for k in range(len(self.p2.cards_in_play[i + 1])):
+                        if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                            if self.p2.get_id_given_pos(i, k) in self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                                return False
         self.reset_all_valid_targets_kugath_nurglings()
         return True
 
@@ -7094,53 +7107,110 @@ class Game:
     async def resolution_of_kugath_nurglings(self, name, game_update_string):
         if self.player_with_initiative == self.name_1:
             primary_player = self.p1
-            secondary_player = self.p2
         else:
             primary_player = self.p2
-            secondary_player = self.p1
         if name == primary_player.name_player:
+            if len(game_update_string) == 1:
+                if game_update_string[0] == "pass-P1":
+                    if self.double_checker_kugath_nurglings:
+                        self.double_checker_kugath_nurglings = False
+                        await self.send_update_message("Ku'gath's Nurglings is forced. Clicking pass again will force-quit the reactions.")
             if len(game_update_string) == 4:
                 if game_update_string[0] == "IN_PLAY":
                     num = int(game_update_string[1])
                     planet_pos = int(game_update_string[2])
                     unit_pos = int(game_update_string[3])
-                    if num == 1:
-                        if self.p1.cards_in_play[planet_pos + 1][unit_pos].valid_kugath_nurgling_target:
-                            if self.p1.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling < \
-                                    self.calc_kugath_nurgling_triggers_at_planet(planet_pos):
-                                self.p1.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling += 1
-                                self.p1.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
-                                                             rickety_warbuggy=True)
+                    if self.kugath_nurgling_id == -1:
+                        if num == 1:
+                            valid_nurgling = False
+                            if self.p1.get_ability_given_pos(planet_pos, unit_pos) == "Ku'gath's Nurglings":
+                                for j in range(len(self.p1.cards_in_play[planet_pos + 1])):
+                                    if self.p1.get_id_given_pos(planet_pos, unit_pos) in self.p1.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                        valid_nurgling = True
+                                for j in range(len(self.p2.cards_in_play[planet_pos + 1])):
+                                    if self.p1.get_id_given_pos(planet_pos, unit_pos) in self.p2.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                        valid_nurgling = True
+                            if valid_nurgling:
+                                self.p1.reset_all_aiming_reticles_play_hq()
+                                self.p2.reset_all_aiming_reticles_play_hq()
+                                self.p1.set_aiming_reticle_in_play(planet_pos, unit_pos, color="green")
+                                self.kugath_nurgling_id = self.p1.get_id_given_pos(planet_pos, unit_pos)
+                                await self.send_update_message("Selected Ku'gath Nurgling to trigger the ability.")
+                        elif num == 2:
+                            valid_nurgling = False
+                            if self.p2.get_ability_given_pos(planet_pos, unit_pos) == "Ku'gath's Nurglings":
+                                for j in range(len(self.p1.cards_in_play[planet_pos + 1])):
+                                    if self.p2.get_id_given_pos(planet_pos, unit_pos) in self.p1.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                        valid_nurgling = True
+                                for j in range(len(self.p2.cards_in_play[planet_pos + 1])):
+                                    if self.p2.get_id_given_pos(planet_pos, unit_pos) in self.p2.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                        valid_nurgling = True
+                            if valid_nurgling:
+                                self.p1.reset_all_aiming_reticles_play_hq()
+                                self.p2.reset_all_aiming_reticles_play_hq()
+                                self.p2.set_aiming_reticle_in_play(planet_pos, unit_pos, color="green")
+                                self.kugath_nurgling_id = self.p2.get_id_given_pos(planet_pos, unit_pos)
+                                await self.send_update_message("Selected Ku'gath Nurgling to trigger the ability.")
                     else:
-                        if self.p2.cards_in_play[planet_pos + 1][unit_pos].valid_kugath_nurgling_target:
-                            if self.p2.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling < \
-                                    self.calc_kugath_nurgling_triggers_at_planet(planet_pos):
-                                self.p2.cards_in_play[planet_pos + 1][unit_pos].damage_from_kugath_nurgling += 1
-                                self.p2.assign_damage_to_pos(planet_pos, unit_pos, 1, shadow_field_possible=True,
-                                                             rickety_warbuggy=True)
+                        if num == 1:
+                            if self.kugath_nurgling_id in self.p1.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids:
+                                self.p1.reset_all_aiming_reticles_play_hq()
+                                self.p2.reset_all_aiming_reticles_play_hq()
+                                self.p1.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids.remove(self.kugath_nurgling_id)
+                                self.p1.assign_damage_to_pos(
+                                    planet_pos, unit_pos, 1, shadow_field_possible=True, rickety_warbuggy=True
+                                )
+                                self.kugath_nurgling_id = -1
+                        else:
+                            if self.kugath_nurgling_id in self.p2.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids:
+                                self.p1.reset_all_aiming_reticles_play_hq()
+                                self.p2.reset_all_aiming_reticles_play_hq()
+                                self.p2.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids.remove(self.kugath_nurgling_id)
+                                self.p2.assign_damage_to_pos(
+                                    planet_pos, unit_pos, 1, shadow_field_possible=True, rickety_warbuggy=True
+                                )
+                                self.kugath_nurgling_id = -1
 
     def set_targeting_icons_kugath_nurglings(self):
-        for i in range(7):
-            for j in range(len(self.p1.cards_in_play[i + 1])):
-                if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                    if self.p1.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
-                            self.calc_kugath_nurgling_triggers_at_planet(i):
-                        self.p1.set_aiming_reticle_in_play(i, j, "blue")
-            for j in range(len(self.p2.cards_in_play[i + 1])):
-                if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                    if self.p2.cards_in_play[i + 1][j].damage_from_kugath_nurgling < \
-                            self.calc_kugath_nurgling_triggers_at_planet(i):
-                        self.p2.set_aiming_reticle_in_play(i, j, "blue")
+        if self.kugath_nurgling_id == -1:
+            for i in range(7):
+                for j in range(len(self.p1.cards_in_play[i + 1])):
+                    if self.p1.get_ability_given_pos(i, j) == "Ku'gath's Nurglings":
+                        for k in range(len(self.p1.cards_in_play[i + 1])):
+                            if self.p1.get_id_given_pos(i, j) in self.p1.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                                self.p1.set_aiming_reticle_in_play(i, j)
+                        for k in range(len(self.p2.cards_in_play[i + 1])):
+                            if self.p1.get_id_given_pos(i, j) in self.p2.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                                self.p1.set_aiming_reticle_in_play(i, j)
+                for j in range(len(self.p2.cards_in_play[i + 1])):
+                    if self.p2.get_ability_given_pos(i, j) == "Ku'gath's Nurglings":
+                        for k in range(len(self.p1.cards_in_play[i + 1])):
+                            if self.p2.get_id_given_pos(i, j) in self.p1.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                                self.p2.set_aiming_reticle_in_play(i, j)
+                        for k in range(len(self.p2.cards_in_play[i + 1])):
+                            if self.p2.get_id_given_pos(i, j) in self.p2.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                                self.p2.set_aiming_reticle_in_play(i, j)
+        else:
+            for i in range(7):
+                for j in range(len(self.p1.cards_in_play[i + 1])):
+                    if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                        if self.kugath_nurgling_id in self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                            self.p1.set_aiming_reticle_in_play(i, j, "blue")
+                for j in range(len(self.p2.cards_in_play[i + 1])):
+                    if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                        if self.kugath_nurgling_id in self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                            self.p2.set_aiming_reticle_in_play(i, j, "blue")
 
     def reset_all_valid_targets_kugath_nurglings(self):
         self.resolving_kugath_nurglings = False
+        self.double_checker_kugath_nurglings = True
         for i in range(7):
             for j in range(len(self.p1.cards_in_play[i + 1])):
                 self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target = False
-                self.p1.cards_in_play[i + 1][j].damage_from_kugath_nurgling = 0
+                self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids = []
             for j in range(len(self.p2.cards_in_play[i + 1])):
                 self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target = False
-                self.p2.cards_in_play[i + 1][j].damage_from_kugath_nurgling = 0
+                self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids = []
 
     def complete_nurgling_bomb(self, planet_id, primary_player):
         i = 0
@@ -7771,6 +7841,23 @@ class Game:
                     await self.send_update_message(
                         "Ku'gath's Nurglings firing against a moved unit. Proceeding to Ku'gath's Nurglings mode."
                     )
+                    for i in range(7):
+                        for j in range(len(self.p1.cards_in_play[i + 1])):
+                            if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                                for k in range(len(self.p1.cards_in_play[i + 1])):
+                                    if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                                        self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p1.get_id_given_pos(i, k))
+                                for k in range(len(self.p2.cards_in_play[i + 1])):
+                                    if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                                        self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p2.get_id_given_pos(i, k))
+                        for j in range(len(self.p2.cards_in_play[i + 1])):
+                            if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
+                                for k in range(len(self.p1.cards_in_play[i + 1])):
+                                    if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                                        self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p1.get_id_given_pos(i, k))
+                                for k in range(len(self.p2.cards_in_play[i + 1])):
+                                    if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
+                                        self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p2.get_id_given_pos(i, k))
                     self.set_targeting_icons_kugath_nurglings()
                 else:
                     self.reset_all_valid_targets_kugath_nurglings()
