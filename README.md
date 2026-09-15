@@ -37,25 +37,30 @@ Run
 ~~~
 py -m pip install -r requirements.txt
 ~~~
-to install dependencies.
 
-Open up a second command terminal. Launch docker. In one terminal, run 
-~~~
-docker run --rm -p 6379:6379 redis:7
-~~~
+to install dependencies. Then run 
 
-Then, run 
 ~~~
 py manage.py makemigrations
 py manage.py migrate
 ~~~
-to create the user database.
+to create the user database. You are now setup.
 
-To run tests, navigate to the all_tests.py file and run 
+To set the website running, follow the steps below.
+
+Open up a second command terminal. Launch docker. In the second terminal, run 
+
+~~~
+docker run --rm -p 6379:6379 redis:7
+~~~
+
+Continuing from the first terminal, run 
+
 ~~~
 py all_tests.py
 ~~~
 
+to check that all the unit tests are working.
 
 If you are wanting to run this for development purposes,
 navigate to the manage.py file, and run
@@ -74,3 +79,7 @@ Warhammer 40,000: Conquest is a trademark of Fantasy Flight
 Publishing, Inc. and/or Games Workshop Group. This project is 
 not affiliated with either Fantasy Flight Games or Games 
 Workshop Group. 
+
+# Contributing
+
+Please see CONTRIBUTIONS.md.
