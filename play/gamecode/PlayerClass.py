@@ -5868,14 +5868,21 @@ class Player:
         for i in range(len(self.headquarters)):
             if self.game.phase == "DEPLOY":
                 self.headquarters[i].cannot_ready_hq_phase = False
+            if self.headquarters[i].get_name() != "Kairos Fateweaver" or self.game.phase == "DEPLOY":
+                self.headquarters[i].new_ability = ""
+                self.headquarters[i].new_ability_has_action_in_play = False
+                self.headquarters[i].new_ability_allowed_phases_action_in_play = ""
             if self.headquarters[i].get_is_unit():
                 self.headquarters[i].hit_by_which_salamanders = []
-                if self.headquarters[i].get_name() != "Kairos Fateweaver" or self.game.phase == "DEPLOY":
-                    self.headquarters[i].new_ability = ""
                 self.headquarters[i].reset_ranged()
                 self.headquarters[i].reset_all_eop()
                 if self.game.phase == "COMBAT":
                     self.headquarters[i].command_until_combat = 0
+            attachments = self.get_all_attachments_at_pos(-2, i)
+            for a in range(len(attachments)):
+                attachments[a].new_ability = ""
+                attachments[a].new_ability_has_action_in_play = False
+                attachments[a].new_ability_allowed_phases_action_in_play = ""
         for planet_pos in range(7):
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.game.phase == "DEPLOY":
@@ -5884,9 +5891,16 @@ class Player:
                 self.cards_in_play[planet_pos + 1][unit_pos].reset_all_eop()
                 if self.cards_in_play[planet_pos + 1][unit_pos].get_name() != "Kairos Fateweaver" or self.game.phase == "DEPLOY":
                     self.cards_in_play[planet_pos + 1][unit_pos].new_ability = ""
+                    self.cards_in_play[planet_pos + 1][unit_pos].new_ability_has_action_in_play = False
+                    self.cards_in_play[planet_pos + 1][unit_pos].new_ability_allowed_phases_action_in_play = ""
                 self.cards_in_play[planet_pos + 1][unit_pos].hit_by_which_salamanders = []
                 if self.game.phase == "COMBAT":
                     self.cards_in_play[planet_pos + 1][unit_pos].command_until_combat = 0
+                attachments = self.get_all_attachments_at_pos(planet_pos, unit_pos)
+                for i in range(len(attachments)):
+                    attachments[i].new_ability = ""
+                    attachments[i].new_ability_has_action_in_play = False
+                    attachments[i].new_ability_allowed_phases_action_in_play = ""
 
     def reset_extra_attack_eop(self):
         for i in range(len(self.headquarters)):

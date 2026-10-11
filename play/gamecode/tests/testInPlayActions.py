@@ -2,7 +2,7 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
 from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup
 
 
@@ -185,6 +185,52 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         self.assertEqual(len(test_game.stored_damage), 2)
         self.assertTrue(test_game.infested_planets[0])
+
+    async def test_imotekh_army(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(imotekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Flayed Ones Pack"), 0)
+        test_game.p1.discard = ["White Scars Bikers"]
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await test_game.update_game_event("P1", ["IN_DISCARD", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 1), "White Scars Bikers")
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 1), 5)
+
+    async def test_imotekh_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(imotekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Flayed Ones Pack"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Dynastic Weaponry"), 0, 1)
+        test_game.p1.discard = ["Gauss Flayer"]
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await test_game.update_game_event("P1", ["IN_DISCARD", "1", "0"])
+        await test_game.update_game_event("P1", ["ATTACHMENT", "IN_PLAY", "1", "0", "1", "0"])
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["ATTACHMENT", "IN_PLAY", "1", "0", "1", "0"])
+        self.assertFalse(test_game.p1.get_ready_given_pos(0, 1))
+
+    async def test_imotekh_support(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(imotekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Promethium Mine"))
+        test_game.p1.discard = ["Eternity Gate"]
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await test_game.update_game_event("P1", ["IN_DISCARD", "1", "0"])
+        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(-2, 0), "Eternity Gate")
 
 if __name__ == "__main__":
     unittest.main()

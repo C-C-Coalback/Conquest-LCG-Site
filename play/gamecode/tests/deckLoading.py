@@ -6,6 +6,7 @@ first_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_1.txt
 second_deck_location = os.path.join(current_dir, 'decksForTests/sample_deck_2.txt')
 eldorath_deck_location = os.path.join(current_dir, "decksForTests/StarbaneCore.txt")
 shadowsun_deck_location = os.path.join(current_dir, "decksForTests/ShadowsunCore.txt")
+imotekh_deck_location = os.path.join(current_dir, 'decksForTests/Imotekh.txt')
 
 with open(first_deck_location, 'r') as file:
     deck_content_1 = file.read()
@@ -30,3 +31,5 @@ with open(os.path.join(current_dir, 'decksForTests/KithCore.txt')) as file:
     kith_deck_content = file.read()
 with open(os.path.join(current_dir, 'decksForTests/Swarmlord.txt')) as file:
     swarmlord_deck_content = file.read()
+with open(imotekh_deck_location) as file:
+    imotekh_deck_content = file.read()

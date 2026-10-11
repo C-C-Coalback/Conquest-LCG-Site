@@ -291,10 +291,11 @@ async def update_game_event_action_discard(self, name, game_update_string):
         if not self.action_object.chosen_first_card:
             if chosen_discard == int(primary_player.number):
                 card = self.preloaded_find_card(primary_player.discard[pos_discard])
-                if card.get_card_type() == "Army":
+                if card.get_card_type() != "Event":
                     if not card.get_unique():
                         if not card.check_for_a_trait("Elite"):
                             self.action_object.misc_target_player = card.get_ability()
+                            self.action_object.misc_misc = card.get_card_type()
                             self.action_object.chosen_first_card = True
                             primary_player.remove_card_from_game(card.get_name())
                             del primary_player.discard[pos_discard]
@@ -307,7 +308,7 @@ async def update_game_event_action_discard(self, name, game_update_string):
                                                           "Imotekh the Stormlord cannot swap Unique cards.")
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
-                                                      "Card is not a unit (Imotekh the Stormlord only supports units at this time).")
+                                                      "Imotekh the Stormlord cannot swap the textboxes of Event cards.")
     elif self.action_object.action_chosen == "Particle Whip":
         if chosen_discard == int(primary_player.number):
             card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array, self.cards_dict,

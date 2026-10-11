@@ -228,6 +228,29 @@ async def update_game_event_action_attachment_hq(self, name, game_update_string)
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Card has the Drone trait.")
+    elif self.action_object.action_chosen == "Imotekh the Stormlord":
+        if card_chosen.name_owner == primary_player.get_name_player():
+            if self.action_object.chosen_first_card:
+                if "Attachment" == self.action_object.misc_misc:
+                    if not card_chosen.get_unique() and not card_chosen.check_for_a_trait("Elite"):
+                        og_card = self.preloaded_find_card(self.action_object.misc_target_player)
+                        card_chosen.new_ability = self.action_object.misc_target_player
+                        card_chosen.new_ability_has_action_in_play = og_card.get_has_action_while_in_play()
+                        card_chosen.new_ability_allowed_phases_action_in_play = og_card.get_allowed_phases_while_in_play()
+
+                        card_name = card_chosen.get_name()
+                        await self.send_update_message(card_name + " in headquarters gained " +
+                                                    self.action_object.misc_target_player + "'s text box!")
+                        self.action_cleanup()
+                    else:
+                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                        "Imotkeh cannot target Elites and Uniques.")
+                else:
+                    await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                    "Type mismatch with the card removed from the game.")
+            else:
+                await self.send_mistarget_message(primary_player.name_player, "Invalid Target", 
+                                                  "A card in the discard must be removed first.")
     elif self.action_object.action_chosen == "Subdual":
         if card_chosen.name_owner == self.name_1:
             self.p1.deck.insert(0, card_chosen.get_name())

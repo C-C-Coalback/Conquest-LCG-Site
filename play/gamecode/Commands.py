@@ -241,6 +241,7 @@ async def resolve_command(self, name, message):
                     self.attacker_planet)
                 self.attacker_planet = -1
                 self.attacker_position = -1
+        
     elif message[1] == "cancel-mode" or message[1] == "cancel-debug":
         self.cancel_debug_mode()
         await self.send_update_message("Cancelled debug mode")
@@ -453,14 +454,37 @@ async def resolve_command(self, name, message):
             await self.send_update_message(
                 "Current discard of P2 is: " + new_message
             )
-    elif message[1] == "set-resources" and len(message) == 4:
-        player_num = message[2]
-        resources = int(message[3])
-        if player_num == "1":
-            self.p1.resources = resources
+    elif message[1] == "set-resources":
+        if len(message) == 4:
+            player_num = message[2]
+            resources = int(message[3])
+            if player_num == "1":
+                self.p1.resources = resources
+                await self.p1.send_resources()
+            elif player_num == "2":
+                self.p2.resources = resources
+                await self.p2.send_resources()
+        elif len(message) == 3:
+            resources = int(message[2])
+            if name == self.p1.name_player:
+                self.p1.resources = resources
+                await self.p1.send_resources()
+            elif name == self.p2.name_player:
+                self.p2.resources = resources
+                await self.p2.send_resources()
+    elif message[1] == "add" or message[1] == "add-r" or message[1] == "add-resource":
+        if name == self.p1.name_player:
+            self.p1.add_resources(1)
             await self.p1.send_resources()
-        elif player_num == "2":
-            self.p2.resources = resources
+        elif name == self.p2.name_player:
+            self.p2.add_resources(1)
+            await self.p2.send_resources()
+    elif message[1] == "lose" or message[1] == "lose-r" or message[1] == "lose-resource":
+        if name == self.p1.name_player:
+            self.p1.spend_resources(1)
+            await self.p1.send_resources()
+        elif name == self.p2.name_player:
+            self.p2.spend_resources(1)
             await self.p2.send_resources()
     elif message[1] == "add-to-hq" and len(message) > 3:
         card_name = message[3]
@@ -473,7 +497,7 @@ async def resolve_command(self, name, message):
                 elif message[2] == "2":
                     self.p2.add_to_hq(card)
                     await self.p2.send_hq()
-    elif message[1] == "add-to-play" and len(message) > 4:
+    elif (message[1] == "add-to-play" or message[1] == "add-to-planet") and len(message) > 4:
         planet_pos = int(message[3])
         if -1 < planet_pos < 7:
             if self.planets_in_play_array[planet_pos]:

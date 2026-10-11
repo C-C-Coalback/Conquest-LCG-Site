@@ -76,6 +76,8 @@ class Card:
         self.world_engine_enemy = False
         self.world_engine_owner = False
         self.new_ability = ""
+        self.new_ability_has_action_in_play = False
+        self.new_ability_allowed_phases_action_in_play = ""
         self.new_limited = False
         self.new_ranged = False
         self.new_armorbane = False
@@ -137,6 +139,8 @@ class Card:
             string += "Blanked (EOG)\n"
         if self.blanked_traits_eog:
             string += "Blanked Traits (EOG)\n"
+        if self.new_ability:
+            string += "New Textbox: " + self.new_ability + "\n"
         if self.extra_traits_eop:
             string += "Extra Traits (EOP): " + self.extra_traits_eop + "\n"
         if self.extra_traits_eor:
@@ -322,9 +326,13 @@ class Card:
         self.once_per_phase_used = value
 
     def get_has_action_while_in_play(self):
+        if self.new_ability:
+            return self.new_ability_has_action_in_play
         return self.has_action_while_in_play
 
     def get_allowed_phases_while_in_play(self):
+        if self.new_ability:
+            return self.new_ability_allowed_phases_action_in_play
         return self.allowed_phases_while_in_play
 
     def get_has_action_while_in_hand(self):
