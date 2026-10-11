@@ -11,8 +11,7 @@ async def declare_defender(self, name, game_update_string):
         if not self.check_if_unit_can_be_declared_as_defender(primary_player, secondary_player, chosen_planet,
                                                               chosen_unit):
             if self.sweep_active:
-                if not secondary_player.cards_in_play[self.defender_planet + 1][
-                    self.defender_position].valid_sweep_target:
+                if not secondary_player.cards_in_play[chosen_planet + 1][chosen_unit].valid_sweep_target:
                     await self.send_update_message("That unit has already been attacked!")
         else:
             self.defender_planet = chosen_planet
