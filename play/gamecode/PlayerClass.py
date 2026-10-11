@@ -2757,6 +2757,8 @@ class Player:
             target_card = self.headquarters[position]
         else:
             target_card = self.cards_in_play[planet + 1][position]
+        if target_card.get_card_type() == "Support":
+            return False
         if card.get_ability() in ["Shadowsun's Stealth Cadre", "Gun Drones", "Escort Drone"]:
             if card.get_ability() == "Shadowsun's Stealth Cadre":
                 card = CardClasses.AttachmentCard(
