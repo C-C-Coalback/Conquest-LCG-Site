@@ -3124,7 +3124,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             if secondary_player.attach_card(card, planet_pos, unit_pos, not_own_attachment=True):
                                 primary_player.deck.remove(reaction.misc_player_storage)
                                 primary_player.shuffle_deck()
-                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                                primary_player.discard_card_name_from_hand("Sweep Attack")
                                 primary_player.aiming_reticle_coords_hand = None
                                 self.delete_reaction()
                         elif reaction.misc_counter == 1:
@@ -3134,7 +3134,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 primary_player.discard.remove(reaction.misc_player_storage)
                                 primary_player.shuffle_deck()
                                 primary_player.aiming_reticle_coords_discard = None
-                                primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
+                                primary_player.discard_card_name_from_hand("Sweep Attack")
                                 primary_player.aiming_reticle_coords_hand = None
                                 self.delete_reaction()
         elif current_reaction == "Magus Harid":
