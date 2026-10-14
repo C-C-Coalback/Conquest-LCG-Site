@@ -942,8 +942,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_object.action_chosen == "Behind Enemy Lines":
         if self.action_object.chosen_first_card:
             planet_chosen = int(game_update_string[1])
-            card = self.game.card_to_deploy
+            card = self.card_to_deploy
             await self.discount_begin_routine(planet_chosen, card, primary_player)
+            self.action_object.chosen_second_card = True
+            self.action_object.misc_target_planet = planet_chosen
             if card.check_for_a_trait("Elite"):
                 primary_player.master_warpsmith_count = 0
             if self.available_discounts > self.discounts_applied:
