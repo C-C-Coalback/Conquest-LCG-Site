@@ -538,7 +538,6 @@ async def update_game_event_action_in_play(self, name, game_update_string):
                                 self.action_object.action_chosen = ability
                                 self.action_object.chosen_first_card = False
                                 self.action_object.misc_target_player = ""
-                                await self.send_update_message("Imotekh activated; only army units supported.")
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot Trigger Ability",
                                                               "Once per phase ability used.")

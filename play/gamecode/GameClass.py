@@ -2035,6 +2035,34 @@ class Game:
                                     primary_player.summon_token_at_planet("Termagant", pos_planet)
                                     del player_with_attach.attachments_at_planet[pos_planet][pos_attachment]
                                     self.action_cleanup()
+                    elif self.action_object.action_chosen == "Imotekh the Stormlord":
+                        if self.action_object.chosen_first_card:
+                            if player_with_attach.name_player == self.action_object.player_with_action:
+                                if "Attachment" == self.action_object.misc_misc:
+                                    og_card = self.preloaded_find_card(self.action_object.misc_target_player)
+                                    if og_card.planet_attachment:
+                                        card_chosen = player_with_attach.attachments_at_planet[pos_planet][pos_attachment]
+                                        if not card_chosen.get_unique() and not card_chosen.check_for_a_trait("Elite"):
+                                            card_chosen.new_ability = self.action_object.misc_target_player
+                                            card_chosen.new_ability_has_action_in_play = og_card.get_has_action_while_in_play()
+                                            card_chosen.new_ability_allowed_phases_action_in_play = og_card.get_allowed_phases_while_in_play()
+                                            card_name = card_chosen.get_name()
+                                            await self.send_update_message(card_name + " at " +
+                                                                        self.planet_array[pos_planet] + " gained " +
+                                                                        self.action_object.misc_target_player + "'s text box!")
+                                            self.action_cleanup()
+                                        else:
+                                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                                                "Imotkeh cannot target Elites and Uniques.")
+                                    else:
+                                        await self.send_mistarget_message(primary_player.name_player, "Invalid Target", 
+                                                                            "Attachment removed from the game is not a planet attachment.")
+                            else:
+                                await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
+                                                                "Type mismatch with the card removed from the game.")
+                        else:
+                            await self.send_mistarget_message(primary_player.name_player, "Invalid Target", 
+                                                            "A card in the discard must be removed first.")
                     elif self.action_object.action_chosen == "Subdual":
                         player_with_attach.deck.insert(
                             0, player_with_attach.attachments_at_planet[pos_planet][pos_attachment].get_name())

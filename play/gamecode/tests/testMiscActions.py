@@ -2,8 +2,8 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -38,6 +38,21 @@ class MiscActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
         self.assertEqual(test_game.p1.get_resources(), 5)
 
+    async def test_imotekh_planet_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(imotekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        test_game.p1.add_attachment_to_planet(0, test_game.preloaded_find_card("Defense Battery"))
+        test_game.p1.discard = ["Supreme Strategist"]
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await test_game.update_game_event("P1", ["IN_DISCARD", "1", "0"])
+        self.assertEqual(len(test_game.p1.discard), 0)
+        await test_game.update_game_event("P1", ["ATTACHMENT", "PLANETS", "1", "0", "0"])
+        self.assertEqual(test_game.p1.attachments_at_planet[0][0].get_ability(), "Supreme Strategist")
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 3)
 
 if __name__ == "__main__":
     unittest.main()

@@ -5886,6 +5886,10 @@ class Player:
                 attachments[a].new_ability_has_action_in_play = False
                 attachments[a].new_ability_allowed_phases_action_in_play = ""
         for planet_pos in range(7):
+            for attachment_pos in range(len(self.attachments_at_planet[planet_pos])):
+                self.attachments_at_planet[planet_pos][attachment_pos].new_ability = ""
+                self.attachments_at_planet[planet_pos][attachment_pos].new_ability_has_action_in_play = False
+                self.attachments_at_planet[planet_pos][attachment_pos].new_ability_allowed_phases_action_in_play = ""
             for unit_pos in range(len(self.cards_in_play[planet_pos + 1])):
                 if self.game.phase == "DEPLOY":
                     self.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_hq_phase = False
