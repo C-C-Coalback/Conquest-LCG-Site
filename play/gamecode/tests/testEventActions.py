@@ -915,7 +915,6 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.resources = 7
         test_game.p1.cards = ["Spawn Termagants"]
         test_game.p2.cards = []
-        test_game.infested_planets[2] = True
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Termagant")
@@ -925,6 +924,26 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_ability_given_pos(4, 0), "Termagant")
         self.assertEqual(test_game.p1.count_units_in_play_all(), 6)
         self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 5)
+
+    async def test_spore_burst(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.cards = ["Spore Burst"]
+        test_game.p2.cards = []
+        test_game.p1.discard = ["Volatile Pyrovore"]
+        test_game.infested_planets[0] = True
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_DISCARD", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Volatile Pyrovore")
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.discard, ["Spore Burst"])
         self.assertEqual(test_game.p1.resources, 5)
 
 if __name__ == "__main__":
