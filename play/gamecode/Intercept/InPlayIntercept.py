@@ -25,7 +25,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
     elif name_effect == "Sicarius's Chosen":
         origin_planet = self.reactions_needing_resolving[0].get_planet_pos()
         primary_player.move_unit_to_planet(planet_pos, unit_pos, origin_planet)
-        new_unit_pos = len(primary_player.cards_in_play[origin_planet + 1]) - 1
+        new_unit_pos = primary_player.count_units_at_planet(origin_planet) - 1
         primary_player.assign_damage_to_pos(origin_planet, new_unit_pos, 1,
                                             context="Sicarius's Chosen",
                                             rickety_warbuggy=True)
@@ -76,8 +76,8 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Superiority":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].hit_by_superiority = True
-        card_name = primary_player.cards_in_play[planet_pos + 1][unit_pos].get_name()
+        primary_player.get_card_given_pos(planet_pos, unit_pos).hit_by_superiority = True
+        card_name = primary_player.get_card_given_pos(planet_pos, unit_pos).get_name()
         text = card_name + ", position " + str(planet_pos) + " " + str(unit_pos) + " hit by superiority."
         await self.send_update_message(text)
         secondary_player.discard_card_from_hand(secondary_player.aiming_reticle_coords_hand)
@@ -191,8 +191,8 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Ethereal Wisdom":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop += "Ethereal"
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_attack_until_end_of_phase += 1
+        primary_player.get_card_given_pos(planet_pos, unit_pos).extra_traits_eop += "Ethereal"
+        primary_player.get_card_given_pos(planet_pos, unit_pos).extra_attack_until_end_of_phase += 1
         secondary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         secondary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
@@ -237,9 +237,9 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Squiggify":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eop += "Squig"
+        primary_player.get_card_given_pos(planet_pos, unit_pos).extra_traits_eop += "Squig"
         primary_player.set_blanked_given_pos(planet_pos, unit_pos)
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].attack_set_eop = 1
+        primary_player.get_card_given_pos(planet_pos, unit_pos).attack_set_eop = 1
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         name_card = primary_player.get_name_given_pos(planet_pos, unit_pos)
         await self.send_update_message(
@@ -272,9 +272,9 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Invasive Genestealers":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop += 1
+        primary_player.get_card_given_pos(planet_pos, unit_pos).negative_hp_until_eop += 1
         _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-        secondary_player.cards_in_play[og_pla + 1][og_pos].positive_hp_until_eop += 1
+        secondary_player.get_card_given_pos(og_pla, og_pos).positive_hp_until_eop += 1
         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
         self.delete_reaction()
         self.complete_intercept()
@@ -290,7 +290,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "The Emperor's Champion":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].emperor_champion_active = True
+        primary_player.get_card_given_pos(planet_pos, unit_pos).emperor_champion_active = True
         secondary_player.reset_aiming_reticle_in_play(planet_pos, self.position_of_actioned_card[1])
         self.mask_jain_zar_check_actions(secondary_player, primary_player)
         self.action_cleanup()
@@ -305,7 +305,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Hallucinogen Grenade":
         primary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
-        atk = primary_player.cards_in_play[planet_pos + 1][unit_pos].attack
+        atk = primary_player.get_card_given_pos(planet_pos, unit_pos).attack
         primary_player.assign_damage_to_pos(planet_pos, unit_pos, atk, by_enemy_unit=False)
         self.action_cleanup()
         self.complete_intercept()
@@ -333,7 +333,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
     elif name_effect == "Dark Angels Cruiser":
         primary_player.set_damage_given_pos(planet_pos, unit_pos, 0)
         primary_player.discard_attachments_from_card(planet_pos, unit_pos)
-        card = primary_player.cards_in_play[planet_pos + 1][unit_pos]
+        card = primary_player.get_card_given_pos(planet_pos, unit_pos)
         primary_player.cards_in_reserve[planet_pos].append(card)
         primary_player.remove_card_from_play(planet_pos, unit_pos, proper_remove=False)
         self.action_cleanup()
@@ -363,7 +363,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Frenzied Wulfen":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
+        primary_player.get_card_given_pos(planet_pos, unit_pos). \
             hit_by_frenzied_wulfen_names.append(secondary_player.name_player)
         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
         self.delete_reaction()
@@ -375,7 +375,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.delete_reaction()
         self.complete_intercept()
     elif name_effect == "Pinning Razorback":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].cannot_be_declared_as_attacker = True
+        primary_player.get_card_given_pos(planet_pos, unit_pos).cannot_be_declared_as_attacker = True
         secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                       self.position_of_actioned_card[1])
         self.mask_jain_zar_check_actions(secondary_player, primary_player)
@@ -390,15 +390,15 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
         primary_player.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
         primary_player.increase_retaliate_given_pos_eop(planet_pos, unit_pos, 1)
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].sacrifice_end_of_phase = True
+        primary_player.get_card_given_pos(planet_pos, unit_pos).sacrifice_end_of_phase = True
         secondary_player.reset_aiming_reticle_in_play(self.position_of_actioned_card[0],
                                                       self.position_of_actioned_card[1])
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Embarked Squads":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].embarked_squads_active = True
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].extra_traits_eor += "Upgrade. Transport."
-        await self.send_update_message(primary_player.cards_in_play[planet_pos + 1][unit_pos].name +
+        primary_player.get_card_given_pos(planet_pos, unit_pos).embarked_squads_active = True
+        primary_player.get_card_given_pos(planet_pos, unit_pos).extra_traits_eor += "Upgrade. Transport."
+        await self.send_update_message(primary_player.get_card_given_pos(planet_pos, unit_pos).name +
                                        "gained the Embarked Squads effect!")
         primary_player.reset_all_aiming_reticles_play_hq()
         secondary_player.reset_all_aiming_reticles_play_hq()
@@ -409,19 +409,19 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         if self.reactions_needing_resolving[0].get_player_resolving_reaction() != og_player.name_player:
             og_player = secondary_player
         og_pla, og_pos, og_attachment = self.misc_target_attachment
-        attachment = og_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
+        attachment = og_player.get_card_given_pos(og_pla, og_pos).get_attachments()[og_attachment]
         owner_attachment = attachment.name_owner
         not_own_attachment = False
         if owner_attachment != primary_player.name_player:
             not_own_attachment = True
         if primary_player.attach_card(attachment, og_pla, og_pos, not_own_attachment=not_own_attachment):
-            del og_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
+            del og_player.get_card_given_pos(og_pla, og_pos).get_attachments()[og_attachment]
             primary_player.assign_damage_to_pos(og_pla, og_pos, 2, rickety_warbuggy=True)
             self.delete_reaction()
             self.mask_jain_zar_check_reactions(secondary_player, primary_player)
             self.complete_intercept()
     elif name_effect == "Wrathful Dreadnought":
-        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = 4
+        player_owning_card.get_card_given_pos(planet_pos, unit_pos).health_set_eop = 4
         self.mask_jain_zar_check_reactions(secondary_player, primary_player)
         self.delete_reaction()
         self.complete_intercept()
@@ -497,12 +497,12 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.action_cleanup()
         self.complete_intercept()
     elif name_effect == "Lekor Blight-Tongue":
-        primary_player.cards_in_play[planet_pos + 1][unit_pos].infection_lekor += 1
+        primary_player.get_card_given_pos(planet_pos, unit_pos).infection_lekor += 1
         await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
                                        " gained an infection token!")
-        if primary_player.cards_in_play[planet_pos + 1][unit_pos].infection_lekor > 1:
+        if primary_player.get_card_given_pos(planet_pos, unit_pos).infection_lekor > 1:
             primary_player.assign_damage_to_pos(planet_pos, unit_pos, 3)
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].infection_lekor = 0
+            primary_player.get_card_given_pos(planet_pos, unit_pos).infection_lekor = 0
         self.mask_jain_zar_check_actions(secondary_player, primary_player)
         self.action_cleanup()
         self.complete_intercept()
@@ -521,8 +521,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.misc_target_unit = (planet_pos, unit_pos)
         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
         self.chosen_first_card = True
-        primary_player.cards_in_play[planet_pos + 1][
-            unit_pos].move_to_planet_end_of_phase_planet = planet_pos
+        primary_player.get_card_given_pos(planet_pos, unit_pos).move_to_planet_end_of_phase_planet = planet_pos
         next_phase = ""
         self.misc_target_player = primary_player.name_player
         if self.phase == "DEPLOY":
@@ -533,8 +532,7 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
             next_phase = "HEADQUARTERS"
         if self.phase == "HEADQUARTERS":
             next_phase = "DEPLOY"
-        primary_player.cards_in_play[planet_pos + 1][
-            unit_pos].move_to_planet_end_of_phase_phase = next_phase
+        primary_player.get_card_given_pos(planet_pos, unit_pos).move_to_planet_end_of_phase_phase = next_phase
         self.complete_intercept()
     elif name_effect == "Wraithbone Armour":
         self.misc_target_unit = (planet_pos, unit_pos)
@@ -553,17 +551,17 @@ async def update_intercept_in_play(self, primary_player, secondary_player, name,
         self.complete_intercept()
     elif name_effect == "Evolutionary Adaptation":
         if self.misc_target_choice == "Brutal":
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].brutal_eor = True
+            primary_player.get_card_given_pos(planet_pos, unit_pos).brutal_eor = True
         if self.misc_target_choice == "Armorbane":
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_eor = True
+            primary_player.get_card_given_pos(planet_pos, unit_pos).armorbane_eor = True
         if self.misc_target_choice == "Flying":
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eor = True
+            primary_player.get_card_given_pos(planet_pos, unit_pos).flying_eor = True
         if self.misc_target_choice == "Mobile":
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].mobile_eor = True
+            primary_player.get_card_given_pos(planet_pos, unit_pos).mobile_eor = True
         if self.misc_target_choice == "Ranged":
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].ranged_eor = True
+            primary_player.get_card_given_pos(planet_pos, unit_pos).ranged_eor = True
         if self.misc_target_choice == "Area Effect":
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eor = \
+            primary_player.get_card_given_pos(planet_pos, unit_pos).area_effect_eor = \
                 self.stored_area_effect_value
         name = primary_player.get_name_given_pos(planet_pos, unit_pos)
         if self.misc_target_choice == "Area Effect":

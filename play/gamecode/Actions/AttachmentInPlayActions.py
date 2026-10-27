@@ -14,11 +14,11 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
     unit_pos = int(game_update_string[4])
     attachment_pos = int(game_update_string[5])
     if game_update_string[2] == "1":
-        card_chosen = self.p1.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+        card_chosen = self.p1.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos]
         player_owning_card = self.p1
         other_player = self.p2
     else:
-        card_chosen = self.p2.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+        card_chosen = self.p2.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos]
         player_owning_card = self.p2
         other_player = self.p1
     if not self.action_object.action_chosen:
@@ -104,7 +104,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                                                   "Card is not ready.")
                     elif ability == "Blight Grenades":
                         player_owning_card.sacrifice_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].area_effect_eocr += 2
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).area_effect_eocr += 2
                         self.action_cleanup()
                     elif ability == "The Glovodan Eagle":
                         player_owning_card.remove_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
@@ -151,7 +151,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         self.misc_target_choice = primary_player.get_number()
                         self.action_object.misc_target_unit = (planet_pos, unit_pos)
                         primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                        del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+                        del player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos]
                         if player_owning_card.check_if_card_is_destroyed(planet_pos, unit_pos):
                             self.action_cleanup()
                         else:
@@ -229,9 +229,9 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                             hale_warlord = False
                             enemy_warlord_pla = -1
                             enemy_warlord_pos = -1
-                            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                            for i in range(secondary_player.count_units_at_planet(planet_pos)):
                                 if secondary_player.get_card_type_given_pos(planet_pos, i) == "Warlord":
-                                    if not secondary_player.cards_in_play[planet_pos + 1][i].get_bloodied():
+                                    if not secondary_player.get_card_given_pos(planet_pos, i).get_bloodied():
                                         hale_warlord = True
                                         enemy_warlord_pla = planet_pos
                                         enemy_warlord_pos = i
@@ -249,7 +249,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         if player_owning_card.name_player == primary_player.get_name_player():
                             if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
-                                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                                for i in range(secondary_player.count_units_at_planet(planet_pos)):
                                     if not secondary_player.get_ready_given_pos(planet_pos, i):
                                         self.queue_special_damage_begins_sound()
                                         secondary_player.assign_damage_to_pos(planet_pos, i, 2, by_enemy_unit=False)
@@ -354,8 +354,8 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                                         == primary_player.enslaved_faction:
                                     card_chosen.exhaust_card()
                                     self.take_control_of_card(primary_player, secondary_player, planet_pos, unit_pos)
-                                    last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
-                                    primary_player.cards_in_play[planet_pos + 1][last_el].mind_shackle_scarab_effect = True
+                                    last_el = primary_player.count_units_at_planet(planet_pos) - 1
+                                    primary_player.get_card_given_pos(planet_pos, last_el).mind_shackle_scarab_effect = True
                                 else:
                                     await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                                       "Enslaved faction does not match faction of attached unit.")
@@ -427,10 +427,10 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             self.action_object.action_chosen = "Breach and Clear 2"
     elif self.action_object.action_chosen == "Smuggler's Den":
         if card_chosen.name_owner == primary_player.get_name_player():
-            if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].check_for_a_trait("Drone"):
-                primary_player.add_resources(player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_cost())
-                primary_player.cards.append(player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos].get_name())
-                del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attachments[attachment_pos]
+            if not player_owning_card.get_card_given_pos(planet_pos, unit_pos).attachments[attachment_pos].check_for_a_trait("Drone"):
+                primary_player.add_resources(player_owning_card.get_card_given_pos(planet_pos, unit_pos).attachments[attachment_pos].get_cost())
+                primary_player.cards.append(player_owning_card.get_card_given_pos(planet_pos, unit_pos).attachments[attachment_pos].get_name())
+                del player_owning_card.get_card_given_pos(planet_pos, unit_pos).attachments[attachment_pos]
                 self.action_cleanup()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -472,7 +472,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             self.p1.deck.insert(0, card_chosen.get_name())
         else:
             self.p2.deck.insert(0, card_chosen.get_name())
-        del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+        del player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos]
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
         self.action_cleanup()
@@ -515,7 +515,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
             if planet_pos == self.action_object.position_of_actioned_card[0]:
                 if unit_pos == self.action_object.position_of_actioned_card[1]:
                     player_owning_card.add_card_to_discard(card_chosen.get_name())
-                    del player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos]
+                    del player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos]
                     player_owning_card.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                     player_owning_card.ready_given_pos(planet_pos, unit_pos)
                     self.action_object.position_of_actioned_card = (-1, -1)
@@ -526,7 +526,7 @@ async def update_game_event_action_attachment_in_play(self, name, game_update_st
                         self.player_with_deploy_turn = secondary_player.name_player
                         self.number_with_deploy_turn = secondary_player.number
     elif self.action_object.action_chosen == "Calculated Strike":
-        if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[attachment_pos].get_limited():
+        if player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos].get_limited():
             player_owning_card.destroy_attachment_from_pos(planet_pos, unit_pos, attachment_pos)
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None

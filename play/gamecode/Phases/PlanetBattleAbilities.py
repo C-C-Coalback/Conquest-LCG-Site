@@ -105,7 +105,7 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
     if len(game_update_string) == 2:
         planet_pos = int(game_update_string[1])
         if abs(self.atrox_origin - planet_pos) == 1:
-            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+            for i in range(secondary_player.count_units_at_planet(planet_pos)):
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
             self.damage_from_atrox = True
             if not self.stored_damage:
@@ -128,7 +128,7 @@ async def manual_atrox_prime_ability(self, name, game_update_string, primary_pla
         if game_update_string[0] == "IN_PLAY":
             planet_pos = int(game_update_string[2])
             if abs(self.atrox_origin - planet_pos) == 1:
-                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                for i in range(secondary_player.count_units_at_planet(planet_pos)):
                     secondary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
                 self.damage_from_atrox = True
                 if not self.stored_damage:
@@ -302,10 +302,7 @@ async def manual_excellor_ability(self, name, game_update_string, primary_player
                         player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
                     elif self.misc_target_player == player_owning_card.name_player:
                         og_pla, og_pos = self.misc_target_unit
-                        player_owning_card.cards_in_play[og_pla + 1].append(player_owning_card.cards_in_play[planet_pos + 1][unit_pos])
-                        player_owning_card.cards_in_play[planet_pos + 1].append(player_owning_card.cards_in_play[og_pla + 1][og_pos])
-                        del player_owning_card.cards_in_play[og_pla + 1][og_pos]
-                        del player_owning_card.cards_in_play[planet_pos + 1][unit_pos]
+                        player_owning_card.switch_locations_of_units(og_pla, og_pos, planet_pos, unit_pos)
                         player_owning_card.reset_all_aiming_reticles_play_hq()
                         await self.resolve_battle_conclusion(name, game_update_string)
 
@@ -917,7 +914,7 @@ async def manual_daprians_gate_ability(self, name, game_update_string, primary_p
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if player_owning_card.get_ready_given_pos(planet_pos, unit_pos):
                     player_owning_card.exhaust_given_pos(planet_pos, unit_pos)
-                    player_owning_card.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_hq_phase = True
+                    player_owning_card.get_card_given_pos(planet_pos, unit_pos).cannot_ready_hq_phase = True
                     await self.resolve_battle_conclusion(planet_pos, unit_pos)
 
 

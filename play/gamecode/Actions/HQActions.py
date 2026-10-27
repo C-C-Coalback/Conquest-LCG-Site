@@ -398,10 +398,10 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                         if secondary_player.get_card_type_given_pos(-2, i) != "Warlord":
                                             secondary_player.exhaust_given_pos(-2, i)
                                 for i in range(7):
-                                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    for j in range(primary_player.count_units_at_planet(i)):
                                         if primary_player.get_card_type_given_pos(i, j) != "Warlord":
                                             primary_player.exhaust_given_pos(i, j)
-                                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                                    for j in range(secondary_player.count_units_at_planet(i)):
                                         if secondary_player.get_card_type_given_pos(i, j) != "Warlord":
                                             secondary_player.exhaust_given_pos(i, j, card_effect=True)
                                 self.action_cleanup()
@@ -716,7 +716,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         if card.get_ready():
                             target_planet = secondary_player.get_planet_of_warlord()
                             if target_planet != -2 and target_planet != -1:
-                                if not primary_player.cards_in_play[target_planet + 1]:
+                                if not primary_player.check_if_units_present(target_planet):
                                     primary_player.exhaust_given_pos(planet_pos, unit_pos)
                                     primary_player.move_unit_to_planet(planet_pos, unit_pos, target_planet)
                                     self.action_cleanup()
@@ -1155,25 +1155,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     else:
                         other_pla, other_pos = self.action_object.misc_target_unit
                         primary_player.reset_aiming_reticle_in_play(other_pla, other_pos)
-                        if other_pla != planet_pos:
-                            card1 = primary_player.get_card_given_pos(planet_pos, unit_pos)
-                            card2 = primary_player.get_card_given_pos(other_pla, other_pos)
-                            if other_pla == -2:
-                                primary_player.headquarters.append(copy.deepcopy(card1))
-                            else:
-                                primary_player.cards_in_play[other_pla + 1].append(copy.deepcopy(card1))
-                            if planet_pos == -2:
-                                primary_player.headquarters.append(copy.deepcopy(card2))
-                            else:
-                                primary_player.cards_in_play[planet_pos + 1].append(copy.deepcopy(card2))
-                            if planet_pos == -2:
-                                del primary_player.headquarters[unit_pos]
-                            else:
-                                del primary_player.cards_in_play[planet_pos + 1][unit_pos]
-                            if other_pla == -2:
-                                del primary_player.headquarters[other_pos]
-                            else:
-                                del primary_player.cards_in_play[other_pla + 1][other_pos]
+                        primary_player.switch_locations_of_units(planet_pos, unit_pos, other_pla, other_pos)
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
                 else:
@@ -1189,25 +1171,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                 else:
                     other_pla, other_pos = self.action_object.misc_target_unit
                     primary_player.reset_aiming_reticle_in_play(other_pla, other_pos)
-                    if other_pla != planet_pos:
-                        card1 = primary_player.get_card_given_pos(planet_pos, unit_pos)
-                        card2 = primary_player.get_card_given_pos(other_pla, other_pos)
-                        if other_pla == -2:
-                            primary_player.headquarters.append(copy.deepcopy(card1))
-                        else:
-                            primary_player.cards_in_play[other_pla + 1].append(copy.deepcopy(card1))
-                        if planet_pos == -2:
-                            primary_player.headquarters.append(copy.deepcopy(card2))
-                        else:
-                            primary_player.cards_in_play[planet_pos + 1].append(copy.deepcopy(card2))
-                        if planet_pos == -2:
-                            del primary_player.headquarters[unit_pos]
-                        else:
-                            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
-                        if other_pla == -2:
-                            del primary_player.headquarters[other_pos]
-                        else:
-                            del primary_player.cards_in_play[other_pla + 1][other_pos]
+                    primary_player.switch_locations_of_units(planet_pos, unit_pos, other_pla, other_pos)
                     secondary_player.resolve_played_any_event()
                     self.action_cleanup()
             else:
@@ -1870,7 +1834,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
             player_being_hit = self.p1
         else:
             player_being_hit = self.p2
-        if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+        if player_being_hit.get_card_given_pos(planet_pos, unit_pos).get_card_type() == "Army":
             can_continue = True
             possible_interrupts = []
             if player_owning_card.name_player == primary_player.name_player:
@@ -2573,7 +2537,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     target_planet = self.action_object.position_of_actioned_card[0]
                     final_pos = primary_player.add_card_to_planet(card, target_planet)
                     if final_pos != -1:
-                        primary_player.cards_in_play[target_planet + 1][final_pos].saint_celestine_active = True
+                        primary_player.get_card_given_pos(target_planet, final_pos).saint_celestine_active = True
                     primary_player.aiming_reticle_coords_hand = None
                     primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
                                                                 self.action_object.position_of_actioned_card[1])

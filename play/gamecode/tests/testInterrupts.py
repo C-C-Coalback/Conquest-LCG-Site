@@ -55,7 +55,7 @@ class InterruptsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
-        self.assertEqual(test_game.p2.cards_in_play[1][1].hit_by_superiority, True)
+        self.assertEqual(test_game.p2.get_card_given_pos(0, 1).hit_by_superiority, True)
         await test_game.update_game_event("P1", ["pass-P1"])
         await test_game.update_game_event("P2", ["pass-P1"])
         self.assertEqual(test_game.after_command_struggle, True)
@@ -214,11 +214,11 @@ class InterruptsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["action-button"])
         await test_game.update_game_event("P2", ["HQ", "2", "0"])
         await test_game.update_game_event("P2", ["IN_PLAY", "1", "0", "0"])
-        print(len(test_game.p1.cards_in_play[1]))
+        print(test_game.p1.count_units_at_planet(0))
         print(test_game.choices_available)
         await test_game.update_game_event("P1", ["CHOICE", "1"])
         self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
         self.assertEqual(test_game.mode, "Normal")
 
     async def test_carnivore_pack(self):

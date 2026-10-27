@@ -2172,10 +2172,10 @@ class Game:
         if len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
                 if game_update_string[1] == "1":
-                    if len(self.p1.cards_in_play[int(game_update_string[2]) + 1]) > int(game_update_string[3]):
+                    if self.p1.count_units_at_planet(int(game_update_string[2])) > int(game_update_string[3]):
                         return True
                 elif game_update_string[1] == "2":
-                    if len(self.p2.cards_in_play[int(game_update_string[2]) + 1]) > int(game_update_string[3]):
+                    if self.p2.count_units_at_planet(int(game_update_string[2])) > int(game_update_string[3]):
                         return True
             elif game_update_string[0] == "RESERVE":
                 if game_update_string[1] == "1":
@@ -2218,13 +2218,13 @@ class Game:
                     pos_unit = int(game_update_string[4])
                     pos_attachment = int(game_update_string[5])
                     if game_update_string[2] == "1":
-                        if len(self.p1.cards_in_play[pos_planet + 1]) > pos_unit:
-                            card = self.p1.cards_in_play[pos_planet + 1][pos_unit]
+                        if self.p1.count_units_at_planet(pos_planet) > pos_unit:
+                            card = self.p1.get_card_given_pos(pos_planet, pos_unit)
                             if len(card.get_attachments()) > pos_attachment:
                                 return True
                     elif game_update_string[2] == "2":
-                        if len(self.p2.cards_in_play[pos_planet + 1]) > pos_unit:
-                            card = self.p2.cards_in_play[pos_planet + 1][pos_unit]
+                        if self.p2.count_units_at_planet(pos_planet) > pos_unit:
+                            card = self.p2.get_card_given_pos(pos_planet, pos_unit)
                             if len(card.get_attachments()) > pos_attachment:
                                 return True
         print("Bad string")
@@ -2484,7 +2484,7 @@ class Game:
             loser = self.p2
         for i in range(7):
             if self.planet_array[i] == self.battle_ability_to_resolve:
-                for j in range(len(winner.cards_in_play[i + 1])):
+                for j in range(winner.count_units_at_planet(i)):
                     if winner.get_ability_given_pos(i, j) == "Pathfinder Team":
                         if winner.get_ready_given_pos(i, j):
                             self.create_reaction("Pathfinder Team", winner.name_player,
@@ -2515,7 +2515,7 @@ class Game:
                         j = j - 1
                         self.p2.add_card_to_discard("Slaanesh's Temptation")
                     j = j + 1
-                while i < len(winner.cards_in_play[self.last_planet_checked_for_battle + 1]):
+                while i < winner.count_units_at_planet(self.last_planet_checked_for_battle):
                     if winner.get_ability_given_pos(self.last_planet_checked_for_battle, i) == "Mystic Warden":
                         if winner.sacrifice_card_in_play(self.last_planet_checked_for_battle, i):
                             i = i - 1
@@ -3122,7 +3122,7 @@ class Game:
         warlord_pla, warlord_pos = primary_player.get_location_of_warlord()
         primary_player.resolve_reactions_on_cancelling_enemy_effect()
         if warlord_pla != -2:
-            primary_player.cards_in_play[warlord_pla + 1][warlord_pos].once_per_round_used = True
+            primary_player.get_card_given_pos(warlord_pla, warlord_pos).once_per_round_used = True
         if self.nullify_context == "Event Action":
             secondary_player.aiming_reticle_coords_hand = None
             secondary_player.aiming_reticle_coords_hand_2 = None
@@ -3384,7 +3384,7 @@ class Game:
             last_planet = self.determine_last_planet()
             if warlord_pla != last_planet:
                 winner.move_unit_to_planet(warlord_pla, warlord_pos, last_planet)
-            last_el_index = len(winner.cards_in_play[last_planet + 1]) - 1
+            last_el_index = winner.count_units_at_planet(last_planet) - 1
             if last_el_index != -1:
                 winner.exhaust_given_pos(last_planet, last_el_index)
             await self.resolve_battle_conclusion(name, game_update_string)
@@ -4106,7 +4106,7 @@ class Game:
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
         destroyed_something = False
-        while i < len(player.cards_in_play[planet_num + 1]):
+        while i < player.count_units_at_planet(planet_num):
             if self.attacker_planet == planet_num and self.attacker_position == i:
                 if self.player_with_combat_turn == player.name_player:
                     player.set_aiming_reticle_in_play(planet_num, i, "blue")
@@ -4259,16 +4259,16 @@ class Game:
             i += 1
         for planet_pos in range(7):
             i = 0
-            while i < len(self.p1.cards_in_play[planet_pos + 1]):
-                if self.p1.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect:
-                    self.p1.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect = False
+            while i < self.p1.count_units_at_planet(planet_pos):
+                if self.p1.get_card_given_pos(planet_pos, i).mind_shackle_scarab_effect:
+                    self.p1.get_card_given_pos(planet_pos, i).mind_shackle_scarab_effect = False
                     self.take_control_of_card(self.p2, self.p1, planet_pos, i)
                     i -= 1
                 i += 1
             i = 0
-            while i < len(self.p2.cards_in_play[planet_pos + 1]):
-                if self.p2.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect:
-                    self.p2.cards_in_play[planet_pos + 1][i].mind_shackle_scarab_effect = False
+            while i < self.p2.count_units_at_planet(planet_pos):
+                if self.p2.get_card_given_pos(planet_pos, i).mind_shackle_scarab_effect:
+                    self.p2.get_card_given_pos(planet_pos, i).mind_shackle_scarab_effect = False
                     self.take_control_of_card(self.p1, self.p2, planet_pos, i)
                     i -= 1
                 i += 1
@@ -4283,9 +4283,9 @@ class Game:
                     can_continue = True
             if can_continue:
                 if primary_player.get_number() == self.number_with_combat_turn:
-                    if primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+                    if primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position). \
                             emperor_champion_active:
-                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                        for i in range(secondary_player.count_units_at_planet(planet_pos)):
                             if i != unit_pos:
                                 if secondary_player.get_name_given_pos(planet_pos, i) == "The Emperor's Champion":
                                     return False
@@ -4298,14 +4298,13 @@ class Game:
                         planet_pos, unit_pos, "Warrior"))
                     is_gene_hybrid = ability != "Genestealer Hybrids"
                     if ability == "Honored Librarian":
-                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                        for i in range(secondary_player.count_units_at_planet(planet_pos)):
                             if secondary_player.get_ability_given_pos(planet_pos, i) != "Honored Librarian":
                                 return False
                     if is_ready_lych and is_fl and is_exa_can and is_gene_hybrid:
-                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                        for i in range(secondary_player.count_units_at_planet(planet_pos)):
                             ability = secondary_player.get_ability_given_pos(planet_pos, i)
-                            if not self.sweep_active or secondary_player.cards_in_play[
-                                planet_pos + 1][i].valid_sweep_target:
+                            if not self.sweep_active or secondary_player.get_card_given_pos(planet_pos, i).valid_sweep_target:
                                 if (ability == "Lychguard Sentinel" and
                                     secondary_player.get_ready_given_pos(planet_pos, i)) or \
                                         ability == "Front Line 'Ard Boyz" or \
@@ -4314,7 +4313,7 @@ class Game:
                                             planet_pos, i, "Warrior")):
                                     return False
                 if self.sweep_active:
-                    if not secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_sweep_target:
+                    if not secondary_player.get_card_given_pos(planet_pos, unit_pos).valid_sweep_target:
                         return False
                     else:
                         return True
@@ -4330,12 +4329,12 @@ class Game:
                 grav_inhib_rel = secondary_player.search_card_at_planet(planet_pos, "Grav Inhibitor Drone")
             if grav_inhib_rel:
                 grav_inhib_rel = False
-                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                for i in range(primary_player.count_units_at_planet(planet_pos)):
                     if primary_player.get_card_type_given_pos(planet_pos, i) == "Army":
                         if primary_player.get_cost_given_pos(planet_pos, i) > 2:
                             if primary_player.get_ready_given_pos(planet_pos, i):
                                 grav_inhib_rel = True
-                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                for i in range(secondary_player.count_units_at_planet(planet_pos)):
                     if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
                         if secondary_player.get_cost_given_pos(planet_pos, i) > 2:
                             if secondary_player.get_ready_given_pos(planet_pos, i):
@@ -4357,7 +4356,7 @@ class Game:
                     if primary_player.get_cost_given_pos(planet_pos, unit_pos) < 3:
                         iron_hands_cent_rel = True
             pinning_razorback = False
-            if primary_player.cards_in_play[planet_pos + 1][unit_pos].cannot_be_declared_as_attacker:
+            if primary_player.get_card_given_pos(planet_pos, unit_pos).cannot_be_declared_as_attacker:
                 pinning_razorback = True
             if grav_inhib_rel:
                 return False
@@ -4365,21 +4364,21 @@ class Game:
                 return False
             elif pinning_razorback:
                 return False
-            elif not secondary_player.cards_in_play[planet_pos + 1]:
+            elif secondary_player.count_units_at_planet(planet_pos) == 0:
                 return True
             elif self.ranged_skirmish_active:
-                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                for i in range(primary_player.count_units_at_planet(planet_pos)):
                     if i != unit_pos:
-                        if primary_player.cards_in_play[planet_pos + 1][i].emperor_champion_active:
+                        if primary_player.get_card_given_pos(planet_pos, i).emperor_champion_active:
                             if primary_player.get_ready_given_pos(planet_pos, i):
                                 if primary_player.get_ranged_given_pos(planet_pos, i):
                                     return False
                 is_ranged = primary_player.get_ranged_given_pos(planet_pos, unit_pos)
                 return is_ranged
             else:
-                for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                for i in range(primary_player.count_units_at_planet(planet_pos)):
                     if i != unit_pos:
-                        if primary_player.cards_in_play[planet_pos + 1][i].emperor_champion_active:
+                        if primary_player.get_card_given_pos(planet_pos, i).emperor_champion_active:
                             if primary_player.get_ready_given_pos(planet_pos, i):
                                 return False
                 return True
@@ -4470,13 +4469,13 @@ class Game:
             i = i + 1
         for i in range(7):
             j = 0
-            while j < len(self.p1.cards_in_play[i + 1]):
-                if self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet != -1:
-                    if self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_phase == last_phase:
+            while j < self.p1.count_units_at_planet(i):
+                if self.p1.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet != -1:
+                    if self.p1.get_card_given_pos(i, j).move_to_planet_end_of_phase_phase == last_phase:
                         if self.planets_in_play_array[
-                            self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet]:
-                            stored_val_dest = self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet
-                            self.p1.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet = -1
+                            self.p1.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet]:
+                            stored_val_dest = self.p1.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet
+                            self.p1.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet = -1
                             if self.p1.move_unit_to_planet(
                                 i, j, stored_val_dest, force=True
                             ):
@@ -4498,13 +4497,13 @@ class Game:
             i = i + 1
         for i in range(7):
             j = 0
-            while j < len(self.p2.cards_in_play[i + 1]):
-                if self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet != -1:
-                    if self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_phase == last_phase:
+            while j < self.p2.count_units_at_planet(i):
+                if self.p2.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet != -1:
+                    if self.p2.get_card_given_pos(i, j).move_to_planet_end_of_phase_phase == last_phase:
                         if self.planets_in_play_array[
-                            self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet]:
-                            stored_val_dest = self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet
-                            self.p2.cards_in_play[i + 1][j].move_to_planet_end_of_phase_planet = -1
+                            self.p2.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet]:
+                            stored_val_dest = self.p2.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet
+                            self.p2.get_card_given_pos(i, j).move_to_planet_end_of_phase_planet = -1
                             if self.p2.move_unit_to_planet(
                                 i, j, stored_val_dest, force=True
                             ):
@@ -4594,10 +4593,10 @@ class Game:
         if player.name_player == self.name_1:
             other_player = self.p2
         if card.check_for_a_trait("Haemonculus", etekh_trait=player.etekh_trait):
-            for i in range(len(player.cards_in_play[planet_chosen + 1])):
+            for i in range(player.count_units_at_planet(planet_chosen)):
                 if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
                     discounts_applied = discounts_applied - 1
-            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+            for i in range(other_player.count_units_at_planet(planet_chosen)):
                 if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
                     discounts_applied = discounts_applied - 1
         if card.get_faction() == "Astra Militarum":
@@ -4619,11 +4618,11 @@ class Game:
             if self.planet_array[planet_chosen] == "Essio":
                 discounts_applied = discounts_applied - 2
         else:
-            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+            for i in range(other_player.count_units_at_planet(planet_chosen)):
                 if other_player.get_ability_given_pos(planet_chosen, i) == "Purveyor of Hubris":
                     discounts_applied = discounts_applied - 2
         for i in range(7):
-            for j in range(len(player.cards_in_play[i + 1])):
+            for j in range(player.count_units_at_planet(i)):
                 if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
                     discounts_applied = discounts_applied - 1
         for i in range(len(player.headquarters)):
@@ -4661,10 +4660,10 @@ class Game:
         )
         if card.check_for_a_trait("Haemonculus", etekh_trait=player.etekh_trait):
             if planet_chosen is not None:
-                for i in range(len(player.cards_in_play[planet_chosen + 1])):
+                for i in range(player.count_units_at_planet(planet_chosen)):
                     if player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
                         available_discounts = available_discounts - 1
-                for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+                for i in range(other_player.count_units_at_planet(planet_chosen)):
                     if other_player.get_ability_given_pos(planet_chosen, i) == "Arrogant Haemonculus":
                         available_discounts = available_discounts - 1
         if card.get_faction() == "Astra Militarum":
@@ -4699,7 +4698,7 @@ class Game:
             if player.check_if_control_trait("Ecclesiarchy"):
                 available_discounts += 1
         for i in range(7):
-            for j in range(len(player.cards_in_play[i + 1])):
+            for j in range(player.count_units_at_planet(i)):
                 if player.get_ability_given_pos(i, j) == "Uncontrollable Rioters":
                     available_discounts = available_discounts - 1
         for i in range(len(player.headquarters)):
@@ -4710,7 +4709,7 @@ class Game:
             if self.planet_array[planet_chosen] == "Essio":
                 available_discounts = available_discounts - 2
         else:
-            for i in range(len(other_player.cards_in_play[planet_chosen + 1])):
+            for i in range(other_player.count_units_at_planet(planet_chosen)):
                 if other_player.get_ability_given_pos(planet_chosen, i) == "Purveyor of Hubris":
                     available_discounts = available_discounts - 2
         slaanesh_temptation = False
@@ -4781,7 +4780,7 @@ class Game:
                 self.create_reaction("Mandrake Fearmonger", secondary_player.name_player,
                                      (int(secondary_player.number), -1, -1))
         if secondary_player.check_for_trait_given_pos(att_pla, att_pos, "Kroot"):
-            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+            for i in range(secondary_player.count_units_at_planet(planet_pos)):
                 if secondary_player.get_ability_given_pos(planet_pos, i) == "Kroot Hounds":
                     if secondary_player.get_ready_given_pos(planet_pos, i):
                         self.create_reaction("Kroot Hounds", secondary_player.name_player,
@@ -4793,8 +4792,8 @@ class Game:
         cost_diff = secondary_player.get_cost_given_pos(att_pla, att_pos) - \
                     primary_player.get_cost_given_pos(planet_pos, unit_pos)
         if cost_diff > 0:
-            for k in range(len(primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments)):
-                if primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments[k].get_ability() == \
+            for k in range(len(primary_player.get_card_given_pos(planet_pos, unit_pos).attachments)):
+                if primary_player.get_card_given_pos(planet_pos, unit_pos).attachments[k].get_ability() == \
                         "Seal of the Ebon Chalice":
                     self.ebon_chalice_value = cost_diff
                     self.create_interrupt("Seal of the Ebon Chalice", primary_player.name_player,
@@ -4814,17 +4813,13 @@ class Game:
                                              (int(secondary_player.number), att_pla, att_pos))
         if secondary_player.search_attachments_at_pos(att_pla, att_pos, "Searing Burst Cannon"):
             damage = self.stored_damage[0].get_amount_that_can_be_blocked()
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].damage += damage
+            primary_player.get_card_given_pos(planet_pos, unit_pos).damage += damage
         if secondary_player.get_ability_given_pos(att_pla, att_pos) == "Shrieking Basilisk":
             self.create_reaction("Shrieking Basilisk", secondary_player.name_player,
                                  (int(secondary_player.number), planet_pos, unit_pos))
-        for i in range(len(secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments())):
-            if secondary_player.cards_in_play[att_pla + 1][att_pos].get_attachments()[i].get_ability() \
-                    == "Nocturne-Ultima Storm Bolter" and secondary_player. \
-                    cards_in_play[att_pla + 1][att_pos].get_attachments()[i].name_owner \
-                    == secondary_player.name_player:
-                self.create_reaction("Nocturne-Ultima Storm Bolter", secondary_player.name_player,
-                                     (int(secondary_player.number), att_pla, att_pos))
+        for i in range(len(secondary_player.get_card_given_pos(att_pla, att_pos).get_attachments())):
+            if secondary_player.get_card_given_pos(att_pla, att_pos).get_attachments()[i].get_ability() == "Nocturne-Ultima Storm Bolter" and secondary_player.get_card_given_pos(att_pla, att_pos).get_attachments()[i].name_owner == secondary_player.name_player:
+                self.create_reaction("Nocturne-Ultima Storm Bolter", secondary_player.name_player, (int(secondary_player.number), att_pla, att_pos))
         if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Vehicle"):
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -4881,7 +4876,7 @@ class Game:
                     if planet_pos != -2:
                         if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
-                                    and not primary_player.cards_in_play[planet_pos + 1][unit_pos].once_per_phase_used:
+                                    and not primary_player.get_card_given_pos(planet_pos, unit_pos).once_per_phase_used:
                                 self.create_interrupt("Reanimating Warriors", primary_player.name_player,
                                                       (int(primary_player.number), planet_pos, unit_pos))
                             if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Treacherous Lhamaean":
@@ -4896,7 +4891,7 @@ class Game:
                                 self.create_interrupt("Prudent Fire Warriors", primary_player.name_player,
                                                       (int(primary_player.number), planet_pos, unit_pos))
                     if self.flamers_damage_active:
-                        primary_player.cards_in_play[planet_pos + 1][unit_pos].hit_by_which_salamanders.append(
+                        primary_player.get_card_given_pos(planet_pos, unit_pos).hit_by_which_salamanders.append(
                             self.id_of_the_active_flamer)
                     self.checks_on_damage(primary_player, secondary_player, planet_pos, unit_pos)
                     if self.stored_damage[0].get_position_attacker() is not None:
@@ -5136,10 +5131,8 @@ class Game:
                                             took_damage = False
                                         if self.stored_damage[0].get_position_attacker():
                                             num_atk, pla_atk, pos_atk = self.stored_damage[0].get_position_attacker()
-                                            for attach_pos in range(len(secondary_player.cards_in_play[pla_atk + 1
-                                                                        ][pos_atk].get_attachments())):
-                                                if secondary_player.cards_in_play[pla_atk + 1][
-                                                    pos_atk].get_attachments()[attach_pos
+                                            for attach_pos in range(len(secondary_player.get_card_given_pos(pla_atk, pos_atk).get_attachments())):
+                                                if secondary_player.get_card_given_pos(pla_atk, pos_atk).get_attachments()[attach_pos
                                                 ].get_ability() == "Spray and Pray":
                                                     self.create_reaction(
                                                         "Spray and Pray", secondary_player.name_player,
@@ -5157,10 +5150,9 @@ class Game:
                                                                 (int(primary_player.number), planet_pos, unit_pos),
                                                                 additional_info=self.stored_damage[0].get_position_attacker()
                                                             )
-                                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
-                                            for j in range(len(secondary_player.cards_in_play[
-                                                                   planet_pos + 1][i].attachments)):
-                                                if secondary_player.cards_in_play[planet_pos + 1][i].attachments[j]. \
+                                        for i in range(secondary_player.count_units_at_planet(planet_pos)):
+                                            for j in range(len(secondary_player.get_card_given_pos(planet_pos, i).attachments)):
+                                                if secondary_player.get_card_given_pos(planet_pos, i).attachments[j]. \
                                                         get_ability() == "Revered Heavy Flamer":
                                                     self.create_reaction("Revered Heavy Flamer",
                                                                          secondary_player.name_player,
@@ -5205,19 +5197,13 @@ class Game:
                                                                       planet_pos, unit_pos))
                                         if took_damage:
                                             if self.flamers_damage_active:
-                                                primary_player.cards_in_play[planet_pos + 1][
-                                                    unit_pos].hit_by_which_salamanders.append(
-                                                    self.id_of_the_active_flamer)
+                                                primary_player.get_card_given_pos(planet_pos, unit_pos).hit_by_which_salamanders.append(self.id_of_the_active_flamer)
                                             self.queued_sound = "damage"
                                             if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
                                                 if primary_player.get_ability_given_pos(
                                                         planet_pos, unit_pos) == "Reanimating Warriors" \
-                                                        and not primary_player.cards_in_play[planet_pos + 1][
-                                                    unit_pos].once_per_phase_used:
-                                                    self.create_interrupt("Reanimating Warriors",
-                                                                          primary_player.name_player,
-                                                                          (int(primary_player.number), planet_pos,
-                                                                           unit_pos))
+                                                        and not primary_player.get_card_given_pos(planet_pos, unit_pos).once_per_phase_used:
+                                                    self.create_interrupt("Reanimating Warriors", primary_player.name_player, (int(primary_player.number), planet_pos, unit_pos))
                                                 if primary_player.get_ability_given_pos(
                                                         planet_pos, unit_pos) == "Treacherous Lhamaean":
                                                     self.create_reaction(
@@ -5326,7 +5312,7 @@ class Game:
                                             self.choice_context = "Senatorum Directives Reassign"
                                             self.name_player_making_choices = primary_player.name_player
                                             self.resolving_search_box = True
-                                            last_el = len(primary_player.cards_in_play[planet_pos + 1]) - 1
+                                            last_el = primary_player.count_units_at_planet(planet_pos) - 1
                                             self.misc_target_unit = (planet_pos, last_el)
                         elif ability == "Extra Boomsticks":
                             if primary_player.headquarters[hq_pos].get_ready():
@@ -5445,15 +5431,11 @@ class Game:
                                 self.queued_sound = "shield"
                                 if self.stored_damage[0].get_amount_that_can_be_blocked() > 0:
                                     if self.flamers_damage_active:
-                                        primary_player.cards_in_play[planet_pos + 1][
-                                            unit_pos].hit_by_which_salamanders.append(
-                                            self.id_of_the_active_flamer)
+                                        primary_player.get_card_given_pos(planet_pos, unit_pos).hit_by_which_salamanders.append(self.id_of_the_active_flamer)
                                     self.queued_sound = "damage"
                                     if primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                                        if primary_player.get_ability_given_pos(
-                                                planet_pos, unit_pos) == "Reanimating Warriors" \
-                                                and not primary_player.cards_in_play[planet_pos + 1][
-                                            unit_pos].once_per_phase_used:
+                                        if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Reanimating Warriors" \
+                                                and not primary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos).once_per_phase_used:
                                             self.create_interrupt("Reanimating Warriors",
                                                                   primary_player.name_player,
                                                                   (int(primary_player.number), planet_pos,
@@ -5540,19 +5522,18 @@ class Game:
                                     print("Reached new GI code")
                                     if sac_planet_pos == planet_pos:
                                         if sac_unit_pos != unit_pos:
-                                            if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos]. \
+                                            if primary_player.get_card_given_pos(sac_planet_pos, sac_unit_pos). \
                                                     get_card_type() != "Warlord":
-                                                if primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
+                                                if primary_player.get_card_given_pos(sac_planet_pos, sac_unit_pos) \
                                                         .check_for_a_trait("Warrior", primary_player.etekh_trait) or \
-                                                        primary_player.cards_in_play[sac_planet_pos + 1][sac_unit_pos] \
+                                                        primary_player.get_card_given_pos(sac_planet_pos, sac_unit_pos) \
                                                                 .check_for_a_trait("Soldier",
                                                                                    primary_player.etekh_trait):
                                                     primary_player.aiming_reticle_coords_hand = None
                                                     primary_player.discard_card_from_hand(self.pos_shield_card)
                                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                                     self.pos_shield_card = -1
-                                                    printed_atk = primary_player.cards_in_play[
-                                                        sac_planet_pos + 1][sac_unit_pos].attack
+                                                    printed_atk = primary_player.get_card_given_pos(sac_planet_pos, sac_unit_pos).attack
                                                     primary_player.remove_damage_from_pos(
                                                         planet_pos, unit_pos,
                                                         self.stored_damage[0].get_amount_that_can_be_blocked())
@@ -5619,9 +5600,9 @@ class Game:
                                         primary_player.reset_aiming_reticle_in_play(hurt_planet, hurt_pos)
                                         await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                         elif ability == "Noble Shining Spears":
-                            if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                            if not primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used:
                                 if primary_player.get_mobile_given_pos(hurt_planet, hurt_pos):
-                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                    primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used = True
                                     primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
                                     damage = primary_player.get_damage_given_pos(planet_pos, unit_pos)
                                     primary_player.set_damage_given_pos(planet_pos, unit_pos, damage + 1)
@@ -5649,9 +5630,9 @@ class Game:
                                 self.may_block_with_ols = False
                             elif ability == "Blood Angels Veterans" and \
                                     primary_player.get_ready_given_pos(planet_pos, unit_pos) and not \
-                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                    primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used:
                                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
-                                primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used = True
                                 if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
                                     self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                                          (int(primary_player.number), planet_pos, unit_pos))
@@ -5669,11 +5650,11 @@ class Game:
                                     primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
                                     await self.shield_cleanup(primary_player, secondary_player, planet_pos)
                             elif ability == "Deff Dread" and not \
-                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                    primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used:
                                 if self.stored_damage[0].get_position_attacker():
                                     primary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, preventable=False,
                                                                         by_enemy_unit=False)
-                                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                                    primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used = True
                                     if secondary_player.search_card_at_planet(planet_pos, "The Mask of Jain Zar"):
                                         self.create_reaction("The Mask of Jain Zar", secondary_player.name_player,
                                                              (int(primary_player.number), planet_pos, unit_pos))
@@ -5721,14 +5702,10 @@ class Game:
                                                         (int(primary_player.number), planet_pos, unit_pos),
                                                         additional_info=self.stored_damage[0].get_position_attacker()
                                                     )
-                                    for attach_pos in range(len(secondary_player.cards_in_play[pla_atk + 1
-                                                                ][pos_atk].get_attachments())):
-                                        if secondary_player.cards_in_play[pla_atk + 1][
-                                            pos_atk].get_attachments()[attach_pos
-                                        ].get_ability() == "Spray and Pray":
+                                    for attach_pos in range(len(secondary_player.get_card_given_pos(pla_atk, pos_atk).get_attachments())):
+                                        if secondary_player.get_card_given_pos(pla_atk, pos_atk).get_attachments()[attach_pos].get_ability() == "Spray and Pray":
                                             self.create_reaction(
-                                                "Spray and Pray", secondary_player.name_player,
-                                                (num_atk, pla_atk, pos_atk)
+                                                "Spray and Pray", secondary_player.name_player, (num_atk, pla_atk, pos_atk)
                                             )
                                             self.spray_and_pray_amounts.append(amount_to_remove)
                                 primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, amount_to_remove)
@@ -5754,11 +5731,9 @@ class Game:
                         elif ability == "Follower of Gork":
                             hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                             if planet_pos == hurt_planet:
-                                if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait("Elite"):
-                                    if primary_player.cards_in_play[hurt_planet + 1][
-                                        hurt_pos].follower_of_gork_available:
-                                        primary_player.cards_in_play[hurt_planet + 1][
-                                            hurt_pos].follower_of_gork_available = False
+                                if primary_player.get_card_given_pos(hurt_planet, hurt_pos).check_for_a_trait("Elite"):
+                                    if primary_player.get_card_given_pos(hurt_planet, hurt_pos).follower_of_gork_available:
+                                        primary_player.get_card_given_pos(hurt_planet, hurt_pos).follower_of_gork_available = False
                                         damage_to_remove = 2
                                         if self.stored_damage[0].get_amount_that_can_be_blocked() == 1:
                                             damage_to_remove = 1
@@ -5773,7 +5748,7 @@ class Game:
                         elif ability == "Enginseer Mechanic":
                             hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                             if planet_pos == hurt_planet:
-                                if primary_player.cards_in_play[hurt_planet + 1][hurt_pos].check_for_a_trait(
+                                if primary_player.get_card_given_pos(hurt_planet, hurt_pos).check_for_a_trait(
                                         "Vehicle", primary_player.etekh_trait):
                                     if primary_player.get_ready_given_pos(planet_pos, unit_pos):
                                         primary_player.exhaust_given_pos(planet_pos, unit_pos)
@@ -5802,11 +5777,11 @@ class Game:
                             if self.stored_damage[0].get_position_attacker():
                                 hurt_num, hurt_planet, hurt_pos = self.stored_damage[0].get_position_unit()
                                 if planet_pos == hurt_planet:
-                                    if not primary_player.cards_in_play[hurt_planet + 1][hurt_pos] \
+                                    if not primary_player.get_card_given_pos(hurt_planet, hurt_pos) \
                                             .check_for_a_trait("Vehicle", primary_player.etekh_trait):
-                                        if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
+                                        if not primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used:
                                             primary_player.remove_damage_from_pos(hurt_planet, hurt_pos, 1)
-                                            primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
+                                            primary_player.get_card_given_pos(planet_pos, unit_pos). \
                                                 misc_ability_used = True
                                             if secondary_player.search_card_at_planet(planet_pos,
                                                                                       "The Mask of Jain Zar"):
@@ -5890,7 +5865,7 @@ class Game:
                         if game_update_string[2] == self.number_who_is_shielding:
                             if int(game_update_string[3]) == planet_pos:
                                 attachment_pos = int(game_update_string[5])
-                                attachment = primary_player.cards_in_play[planet_pos + 1][int(game_update_string[4])] \
+                                attachment = primary_player.get_card_given_pos(planet_pos, int(game_update_string[4])) \
                                     .get_attachments()[attachment_pos]
                                 if self.alt_shield_mode_active:
                                     if self.alt_shield_name == "Talon Strike Force":
@@ -5911,14 +5886,14 @@ class Game:
                                         self.starmist_raiment = True
                                 elif attachment.get_ability() == "Data Analyzer" and not attachment.misc_ability_used:
                                     if self.stored_damage[0].get_position_attacker():
-                                        if len(primary_player.cards_in_play[planet_pos + 1]) > 1:
+                                        if primary_player.count_units_at_planet(planet_pos) > 1:
                                             self.alt_shield_mode_active = True
                                             attachment.misc_ability_used = True
                                             self.alt_shield_name = "Data Analyzer"
                                             await self.send_update_message("Data Analyzer activated!")
                                 elif int(game_update_string[4]) == unit_pos:
                                     attachment_pos = int(game_update_string[5])
-                                    attachment = primary_player.cards_in_play[planet_pos + 1][unit_pos] \
+                                    attachment = primary_player.get_card_given_pos(planet_pos, unit_pos) \
                                         .get_attachments()[attachment_pos]
                                     if attachment.get_ability() == "Iron Halo" and attachment.get_ready() and \
                                             attachment.name_owner == primary_player.name_player:
@@ -6191,22 +6166,18 @@ class Game:
                             self.delete_reaction()
                     elif current_reaction == "Snagbrat's Scouts":
                         if game_update_string[1] == primary_player.number:
-                            if primary_player.cards_in_reserve[
-                                int(game_update_string[2])][
-                                int(game_update_string[3])].get_ability() == "Snagbrat's Scouts":
-                                ds_value = primary_player.get_deepstrike_value_given_pos(int(game_update_string[2]),
-                                                                                         int(game_update_string[3]))
+                            planet_pos = int(game_update_string[2])
+                            unit_pos = int(game_update_string[3])
+                            if primary_player.cards_in_reserve[planet_pos][unit_pos].get_ability() == "Snagbrat's Scouts":
+                                ds_value = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
                                 if primary_player.spend_resources(ds_value):
-                                    last_el_index = primary_player.deepstrike_unit(int(game_update_string[2]),
-                                                                                   int(game_update_string[3]))
+                                    last_el_index = primary_player.deepstrike_unit(planet_pos, unit_pos)
                                     if last_el_index != -1:
-                                        primary_player.cards_in_play[int(game_update_string[2]) + 1][
-                                            last_el_index].increase_extra_command_until_end_of_phase(2)
+                                        primary_player.get_card_given_pos(planet_pos, last_el_index).increase_extra_command_until_end_of_phase(2)
                                     found_one = False
                                     for i in range(7):
                                         for j in range(len(primary_player.cards_in_reserve[i])):
-                                            if primary_player.cards_in_reserve[
-                                                i][j].get_ability() == "Snagbrat's Scouts":
+                                            if primary_player.cards_in_reserve[i][j].get_ability() == "Snagbrat's Scouts":
                                                 if primary_player.resources > 0:
                                                     if not found_one:
                                                         found_one = True
@@ -6227,7 +6198,7 @@ class Game:
                                 card.deepstrike_card_name = primary_player.cards_in_reserve[planet_pos][
                                     unit_pos].get_name()
                                 card.name_owner = primary_player.name_player
-                                primary_player.cards_in_play[planet_pos + 1].append(card)
+                                primary_player.add_card_to_planet(card, planet_pos)
                                 del primary_player.cards_in_reserve[planet_pos][unit_pos]
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
@@ -6547,14 +6518,14 @@ class Game:
                 if pla == -2:
                     id_storm_lib = player.headquarters[pos].card_id
                 else:
-                    id_storm_lib = player.cards_in_play[pla + 1][pos].card_id
+                    id_storm_lib = player.get_card_given_pos(pla, pos).card_id
                 for i in range(7):
-                    for j in range(len(self.p1.cards_in_play[i + 1])):
-                        while id_storm_lib in self.p1.cards_in_play[i + 1][j].hit_by_which_storming_librarians:
-                            self.p1.cards_in_play[i + 1][j].hit_by_which_storming_librarians.remove(id_storm_lib)
-                    for j in range(len(self.p2.cards_in_play[i + 1])):
-                        while id_storm_lib in self.p2.cards_in_play[i + 1][j].hit_by_which_storming_librarians:
-                            self.p2.cards_in_play[i + 1][j].hit_by_which_storming_librarians.remove(id_storm_lib)
+                    for j in range(self.p1.count_units_at_planet(i)):
+                        while id_storm_lib in self.p1.get_card_given_pos(i, j).hit_by_which_storming_librarians:
+                            self.p1.get_card_given_pos(i, j).hit_by_which_storming_librarians.remove(id_storm_lib)
+                    for j in range(self.p2.count_units_at_planet(i)):
+                        while id_storm_lib in self.p2.get_card_given_pos(i, j).hit_by_which_storming_librarians:
+                            self.p2.get_card_given_pos(i, j).hit_by_which_storming_librarians.remove(id_storm_lib)
                 for i in range(len(self.p1.headquarters)):
                     while id_storm_lib in self.p1.headquarters[i].hit_by_which_storming_librarians:
                         self.p1.headquarters[i].hit_by_which_storming_librarians.remove(id_storm_lib)
@@ -6574,13 +6545,13 @@ class Game:
                 if self.p2.check_is_unit_at_pos(-2, i):
                     self.p2.headquarters[i].valid_target_magus_harid = False
             for i in range(7):
-                for j in range(len(self.p1.cards_in_play[i + 1])):
-                    self.p1.cards_in_play[i + 1][j].valid_target_ashen_banner = False
-                    self.p1.cards_in_play[i + 1][j].valid_target_magus_harid = False
+                for j in range(self.p1.count_units_at_planet(i)):
+                    self.p1.get_card_given_pos(i, j).valid_target_ashen_banner = False
+                    self.p1.get_card_given_pos(i, j).valid_target_magus_harid = False
             for i in range(7):
-                for j in range(len(self.p2.cards_in_play[i + 1])):
-                    self.p2.cards_in_play[i + 1][j].valid_target_ashen_banner = False
-                    self.p2.cards_in_play[i + 1][j].valid_target_magus_harid = False
+                for j in range(self.p2.count_units_at_planet(i)):
+                    self.p2.get_card_given_pos(i, j).valid_target_ashen_banner = False
+                    self.p2.get_card_given_pos(i, j).valid_target_magus_harid = False
             self.p1.reset_movement_trackers()
             self.p2.reset_movement_trackers()
 
@@ -6611,13 +6582,13 @@ class Game:
 
     def start_ranged_skirmish(self, planet_pos):
         self.ranged_skirmish_active = True
-        for i in range(len(self.p1.cards_in_play[planet_pos + 1])):
-            for j in range(len(self.p1.cards_in_play[planet_pos + 1][i].attachments)):
-                if self.p1.cards_in_play[planet_pos + 1][i].attachments[j].get_ability() == "Sanctified Bolter":
+        for i in range(self.p1.count_units_at_planet(planet_pos)):
+            for j in range(len(self.p1.get_card_given_pos(planet_pos, i).attachments)):
+                if self.p1.get_card_given_pos(planet_pos, i).attachments[j].get_ability() == "Sanctified Bolter":
                     self.create_reaction("Sanctified Bolter", self.name_1, (1, planet_pos, i))
-        for i in range(len(self.p2.cards_in_play[planet_pos + 1])):
-            for j in range(len(self.p2.cards_in_play[planet_pos + 1][i].attachments)):
-                if self.p2.cards_in_play[planet_pos + 1][i].attachments[j].get_ability() == "Sanctified Bolter":
+        for i in range(self.p2.count_units_at_planet(planet_pos)):
+            for j in range(len(self.p2.get_card_given_pos(planet_pos, i).attachments)):
+                if self.p2.get_card_given_pos(planet_pos, i).attachments[j].get_ability() == "Sanctified Bolter":
                     self.create_reaction("Sanctified Bolter", self.name_2, (2, planet_pos, i))
 
     async def shield_cleanup(self, primary_player, secondary_player, planet_pos):
@@ -6703,7 +6674,7 @@ class Game:
                 if primary_player.check_for_trait_given_pos(def_pla, def_pos, "Slaanesh") and def_pla != -2:
                     for i in range(7):
                         if i != def_pla:
-                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                            for j in range(primary_player.count_units_at_planet(i)):
                                 if primary_player.get_ability_given_pos(i, j) == "Seekers of Pleasure":
                                     if not primary_player.check_if_already_have_reaction_of_position(
                                             "Seekers of Pleasure", i, j):
@@ -6753,7 +6724,7 @@ class Game:
                         if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
                             self.create_delayed_reaction("Shedding Hive Crone", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, unit_pos))
-                    for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    for i in range(secondary_player.count_units_at_planet(planet_pos)):
                         if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
                             self.create_delayed_reaction("Penitent Engine", secondary_player.name_player,
                                                          (int(secondary_player.number), planet_pos, i))
@@ -6784,19 +6755,18 @@ class Game:
                             if not secondary_player.get_once_per_phase_used_given_pos(planet_pos, unit_pos):
                                 self.create_delayed_reaction("Goliath Rockgrinder", secondary_player.name_player,
                                                              (int(secondary_player.number), planet_pos, unit_pos))
-                                self.goliath_rockgrinder_value = primary_player.cards_in_play[
-                                    def_pla + 1][def_pos].health
+                                self.goliath_rockgrinder_value = primary_player.get_card_given_pos(def_pla, def_pos).health
                         if secondary_player.search_card_in_hq("Restorative Tunnels", ready_relevant=True):
                             if secondary_player.get_damage_given_pos(planet_pos, unit_pos) > 0:
                                 self.create_delayed_reaction("Restorative Tunnels", secondary_player.name_player,
                                                              (int(secondary_player.number), planet_pos, unit_pos))
-                        for i in range(len(secondary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments())):
+                        for i in range(len(secondary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments())):
                             if primary_player.get_card_type_given_pos(def_pla, def_pos) == "Army":
-                                if secondary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[
+                                if secondary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments()[
                                     i].get_ability() == "Bone Sabres":
                                     self.create_delayed_reaction("Bone Sabres", secondary_player.name_player,
                                                                  (int(secondary_player.number), planet_pos, unit_pos))
-                                if secondary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments()[
+                                if secondary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments()[
                                     i].get_ability() == "Kroot Hunting Rifle":
                                     self.create_delayed_reaction("Kroot Hunting Rifle", secondary_player.name_player,
                                                                  (int(secondary_player.number), planet_pos, unit_pos))
@@ -6831,7 +6801,7 @@ class Game:
             if secondary_player.get_ability_given_pos(planet_pos, unit_pos) == "Shedding Hive Crone":
                 self.create_delayed_reaction("Shedding Hive Crone", secondary_player.name_player,
                                              (int(secondary_player.number), planet_pos, unit_pos))
-            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+            for i in range(secondary_player.count_units_at_planet(planet_pos)):
                 if secondary_player.get_ability_given_pos(planet_pos, i) == "Penitent Engine":
                     self.create_delayed_reaction("Penitent Engine", secondary_player.name_player,
                                                  (int(secondary_player.number), planet_pos, i))
@@ -7102,25 +7072,25 @@ class Game:
 
     def check_end_kugath_nurglings(self):
         for i in range(7):
-            for j in range(len(self.p1.cards_in_play[i + 1])):
-                if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                    for k in range(len(self.p1.cards_in_play[i + 1])):
+            for j in range(self.p1.count_units_at_planet(i)):
+                if self.p1.get_card_given_pos(i, j).valid_kugath_nurgling_target:
+                    for k in range(self.p1.count_units_at_planet(i)):
                         if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                            if self.p1.get_id_given_pos(i, k) in self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                            if self.p1.get_id_given_pos(i, k) in self.p1.get_card_given_pos(i, j).kugath_nurgling_ids:
                                 return False
-                    for k in range(len(self.p2.cards_in_play[i + 1])):
+                    for k in range(self.p2.count_units_at_planet(i)):
                         if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                            if self.p2.get_id_given_pos(i, k) in self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                            if self.p2.get_id_given_pos(i, k) in self.p1.get_card_given_pos(i, j).kugath_nurgling_ids:
                                 return False
-            for j in range(len(self.p2.cards_in_play[i + 1])):
-                if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                    for k in range(len(self.p1.cards_in_play[i + 1])):
+            for j in range(self.p2.count_units_at_planet(i)):
+                if self.p2.get_card_given_pos(i, j).valid_kugath_nurgling_target:
+                    for k in range(self.p1.count_units_at_planet(i)):
                         if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                            if self.p1.get_id_given_pos(i, k) in self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                            if self.p1.get_id_given_pos(i, k) in self.p2.get_card_given_pos(i, j).kugath_nurgling_ids:
                                 return False
-                    for k in range(len(self.p2.cards_in_play[i + 1])):
+                    for k in range(self.p2.count_units_at_planet(i)):
                         if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                            if self.p2.get_id_given_pos(i, k) in self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                            if self.p2.get_id_given_pos(i, k) in self.p2.get_card_given_pos(i, j).kugath_nurgling_ids:
                                 return False
         self.reset_all_valid_targets_kugath_nurglings()
         return True
@@ -7152,11 +7122,11 @@ class Game:
                         if num == 1:
                             valid_nurgling = False
                             if self.p1.get_ability_given_pos(planet_pos, unit_pos) == "Ku'gath's Nurglings":
-                                for j in range(len(self.p1.cards_in_play[planet_pos + 1])):
-                                    if self.p1.get_id_given_pos(planet_pos, unit_pos) in self.p1.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                for j in range(self.p1.count_units_at_planet(planet_pos)):
+                                    if self.p1.get_id_given_pos(planet_pos, unit_pos) in self.p1.get_card_given_pos(planet_pos, j).kugath_nurgling_ids:
                                         valid_nurgling = True
-                                for j in range(len(self.p2.cards_in_play[planet_pos + 1])):
-                                    if self.p1.get_id_given_pos(planet_pos, unit_pos) in self.p2.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                for j in range(self.p2.count_units_at_planet(planet_pos)):
+                                    if self.p1.get_id_given_pos(planet_pos, unit_pos) in self.p2.get_card_given_pos(planet_pos, j).kugath_nurgling_ids:
                                         valid_nurgling = True
                             if valid_nurgling:
                                 self.p1.reset_all_aiming_reticles_play_hq()
@@ -7167,11 +7137,11 @@ class Game:
                         elif num == 2:
                             valid_nurgling = False
                             if self.p2.get_ability_given_pos(planet_pos, unit_pos) == "Ku'gath's Nurglings":
-                                for j in range(len(self.p1.cards_in_play[planet_pos + 1])):
-                                    if self.p2.get_id_given_pos(planet_pos, unit_pos) in self.p1.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                for j in range(self.p1.count_units_at_planet(planet_pos)):
+                                    if self.p2.get_id_given_pos(planet_pos, unit_pos) in self.p1.get_card_given_pos(planet_pos, j).kugath_nurgling_ids:
                                         valid_nurgling = True
-                                for j in range(len(self.p2.cards_in_play[planet_pos + 1])):
-                                    if self.p2.get_id_given_pos(planet_pos, unit_pos) in self.p2.cards_in_play[planet_pos + 1][j].kugath_nurgling_ids:
+                                for j in range(self.p2.count_units_at_planet(planet_pos)):
+                                    if self.p2.get_id_given_pos(planet_pos, unit_pos) in self.p2.get_card_given_pos(planet_pos, j).kugath_nurgling_ids:
                                         valid_nurgling = True
                             if valid_nurgling:
                                 self.p1.reset_all_aiming_reticles_play_hq()
@@ -7181,19 +7151,19 @@ class Game:
                                 await self.send_update_message("Selected Ku'gath Nurgling to trigger the ability.")
                     else:
                         if num == 1:
-                            if self.kugath_nurgling_id in self.p1.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids:
+                            if self.kugath_nurgling_id in self.p1.get_card_given_pos(planet_pos, unit_pos).kugath_nurgling_ids:
                                 self.p1.reset_all_aiming_reticles_play_hq()
                                 self.p2.reset_all_aiming_reticles_play_hq()
-                                self.p1.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids.remove(self.kugath_nurgling_id)
+                                self.p1.get_card_given_pos(planet_pos, unit_pos).kugath_nurgling_ids.remove(self.kugath_nurgling_id)
                                 self.p1.assign_damage_to_pos(
                                     planet_pos, unit_pos, 1, shadow_field_possible=True, rickety_warbuggy=True
                                 )
                                 self.kugath_nurgling_id = -1
                         else:
-                            if self.kugath_nurgling_id in self.p2.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids:
+                            if self.kugath_nurgling_id in self.p2.get_card_given_pos(planet_pos, unit_pos).kugath_nurgling_ids:
                                 self.p1.reset_all_aiming_reticles_play_hq()
                                 self.p2.reset_all_aiming_reticles_play_hq()
-                                self.p2.cards_in_play[planet_pos + 1][unit_pos].kugath_nurgling_ids.remove(self.kugath_nurgling_id)
+                                self.p2.get_card_given_pos(planet_pos, unit_pos).kugath_nurgling_ids.remove(self.kugath_nurgling_id)
                                 self.p2.assign_damage_to_pos(
                                     planet_pos, unit_pos, 1, shadow_field_possible=True, rickety_warbuggy=True
                                 )
@@ -7202,70 +7172,70 @@ class Game:
     def set_targeting_icons_kugath_nurglings(self):
         if self.kugath_nurgling_id == -1:
             for i in range(7):
-                for j in range(len(self.p1.cards_in_play[i + 1])):
+                for j in range(self.p1.count_units_at_planet(i)):
                     if self.p1.get_ability_given_pos(i, j) == "Ku'gath's Nurglings":
-                        for k in range(len(self.p1.cards_in_play[i + 1])):
-                            if self.p1.get_id_given_pos(i, j) in self.p1.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                        for k in range(self.p1.count_units_at_planet(i)):
+                            if self.p1.get_id_given_pos(i, j) in self.p1.get_card_given_pos(i, k).kugath_nurgling_ids:
                                 self.p1.set_aiming_reticle_in_play(i, j)
-                        for k in range(len(self.p2.cards_in_play[i + 1])):
-                            if self.p1.get_id_given_pos(i, j) in self.p2.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                        for k in range(self.p2.count_units_at_planet(i)):
+                            if self.p1.get_id_given_pos(i, j) in self.p2.get_card_given_pos(i, k).kugath_nurgling_ids:
                                 self.p1.set_aiming_reticle_in_play(i, j)
-                for j in range(len(self.p2.cards_in_play[i + 1])):
+                for j in range(self.p2.count_units_at_planet(i)):
                     if self.p2.get_ability_given_pos(i, j) == "Ku'gath's Nurglings":
-                        for k in range(len(self.p1.cards_in_play[i + 1])):
-                            if self.p2.get_id_given_pos(i, j) in self.p1.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                        for k in range(self.p1.count_units_at_planet(i)):
+                            if self.p2.get_id_given_pos(i, j) in self.p1.get_card_given_pos(i, k).kugath_nurgling_ids:
                                 self.p2.set_aiming_reticle_in_play(i, j)
-                        for k in range(len(self.p2.cards_in_play[i + 1])):
-                            if self.p2.get_id_given_pos(i, j) in self.p2.cards_in_play[i + 1][k].kugath_nurgling_ids:
+                        for k in range(self.p2.count_units_at_planet(i)):
+                            if self.p2.get_id_given_pos(i, j) in self.p2.get_card_given_pos(i, k).kugath_nurgling_ids:
                                 self.p2.set_aiming_reticle_in_play(i, j)
         else:
             for i in range(7):
-                for j in range(len(self.p1.cards_in_play[i + 1])):
-                    if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                        if self.kugath_nurgling_id in self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                for j in range(self.p1.count_units_at_planet(i)):
+                    if self.p1.get_card_given_pos(i, j).valid_kugath_nurgling_target:
+                        if self.kugath_nurgling_id in self.p1.get_card_given_pos(i, j).kugath_nurgling_ids:
                             self.p1.set_aiming_reticle_in_play(i, j, "blue")
-                for j in range(len(self.p2.cards_in_play[i + 1])):
-                    if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                        if self.kugath_nurgling_id in self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids:
+                for j in range(self.p2.count_units_at_planet(i)):
+                    if self.p2.get_card_given_pos(i, j).valid_kugath_nurgling_target:
+                        if self.kugath_nurgling_id in self.p2.get_card_given_pos(i, j).kugath_nurgling_ids:
                             self.p2.set_aiming_reticle_in_play(i, j, "blue")
 
     def reset_all_valid_targets_kugath_nurglings(self):
         self.resolving_kugath_nurglings = False
         self.double_checker_kugath_nurglings = True
         for i in range(7):
-            for j in range(len(self.p1.cards_in_play[i + 1])):
-                self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target = False
-                self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids = []
-            for j in range(len(self.p2.cards_in_play[i + 1])):
-                self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target = False
-                self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids = []
+            for j in range(self.p1.count_units_at_planet(i)):
+                self.p1.get_card_given_pos(i, j).valid_kugath_nurgling_target = False
+                self.p1.get_card_given_pos(i, j).kugath_nurgling_ids = []
+            for j in range(self.p2.count_units_at_planet(i)):
+                self.p2.get_card_given_pos(i, j).valid_kugath_nurgling_target = False
+                self.p2.get_card_given_pos(i, j).kugath_nurgling_ids = []
 
     def complete_nurgling_bomb(self, planet_id, primary_player):
         i = 0
-        while i < len(self.p1.cards_in_play[planet_id + 1]):
-            if self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Damage":
-                self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
+        while i < self.p1.count_units_at_planet(planet_id):
+            if self.p1.get_card_given_pos(planet_id, i).choice_nurgling_bomb == "Damage":
+                self.p1.get_card_given_pos(planet_id, i).choice_nurgling_bomb = ""
                 self.p1.assign_damage_to_pos(planet_id, i, 1, by_enemy_unit=False)
                 i = i - 1
             i += 1
         i = 0
-        while i < len(self.p2.cards_in_play[planet_id + 1]):
-            if self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Damage":
-                self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
+        while i < self.p2.count_units_at_planet(planet_id):
+            if self.p2.get_card_given_pos(planet_id, i).choice_nurgling_bomb == "Damage":
+                self.p2.get_card_given_pos(planet_id, i).choice_nurgling_bomb = ""
                 self.p2.assign_damage_to_pos(planet_id, i, 1, by_enemy_unit=False)
                 i = i - 1
             i += 1
         i = 0
-        while i < len(self.p1.cards_in_play[planet_id + 1]):
-            if self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Rout":
-                self.p1.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
+        while i < self.p1.count_units_at_planet(planet_id):
+            if self.p1.get_card_given_pos(planet_id, i).choice_nurgling_bomb == "Rout":
+                self.p1.get_card_given_pos(planet_id, i).choice_nurgling_bomb = ""
                 self.p1.rout_unit(planet_id, i)
                 i = i - 1
             i += 1
         i = 0
-        while i < len(self.p2.cards_in_play[planet_id + 1]):
-            if self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb == "Rout":
-                self.p2.cards_in_play[planet_id + 1][i].choice_nurgling_bomb = ""
+        while i < self.p2.count_units_at_planet(planet_id):
+            if self.p2.get_card_given_pos(planet_id, i).choice_nurgling_bomb == "Rout":
+                self.p2.get_card_given_pos(planet_id, i).choice_nurgling_bomb = ""
                 self.p2.rout_unit(planet_id, i)
                 i = i - 1
             i += 1
@@ -7273,12 +7243,12 @@ class Game:
         self.action_cleanup()
 
     def scan_planet_for_nurgling_bomb(self, pri, sec, planet_id):
-        for i in range(len(pri.cards_in_play[planet_id + 1])):
-            if pri.cards_in_play[planet_id + 1][i].need_to_resolve_nurgling_bomb:
+        for i in range(pri.count_units_at_planet(planet_id)):
+            if pri.get_card_given_pos(planet_id, i).need_to_resolve_nurgling_bomb:
                 self.action_object.player_with_action = pri.name_player
                 return True
-        for i in range(len(sec.cards_in_play[planet_id + 1])):
-            if sec.cards_in_play[planet_id + 1][i].need_to_resolve_nurgling_bomb:
+        for i in range(sec.count_units_at_planet(planet_id)):
+            if sec.get_card_given_pos(planet_id, i).need_to_resolve_nurgling_bomb:
                 self.action_object.player_with_action = sec.name_player
                 return True
         return False
@@ -7313,20 +7283,19 @@ class Game:
     def change_to_reserve(self, game_update_string):
         if len(game_update_string) == 4:
             if game_update_string[0] == "IN_PLAY":
+                planet_pos = int(game_update_string[2])
+                unit_pos = int(game_update_string[3])
                 if game_update_string[1] == "1":
-                    if len(self.p1.cards_in_play[int(game_update_string[2]) + 1]) <= int(game_update_string[3]):
+                    if self.p1.count_units_at_planet(planet_pos) <= unit_pos:
                         if self.p1.cards_in_reserve[int(game_update_string[2])]:
                             game_update_string[0] = "RESERVE"
-                            print(game_update_string[3], len(self.p1.cards_in_play[int(game_update_string[2]) + 1]))
-                            game_update_string[3] = str(int(game_update_string[3]) -
-                                                        len(self.p1.cards_in_play[int(game_update_string[2]) + 1]))
+                            game_update_string[3] = str(int(game_update_string[3]) - self.p1.count_units_at_planet(planet_pos))
                             return game_update_string
                 elif game_update_string[1] == "2":
-                    if len(self.p2.cards_in_play[int(game_update_string[2]) + 1]) <= int(game_update_string[3]):
+                    if self.p2.count_units_at_planet(planet_pos) <= unit_pos:
                         if self.p2.cards_in_reserve[int(game_update_string[2])]:
                             game_update_string[0] = "RESERVE"
-                            game_update_string[3] = str(int(game_update_string[3]) -
-                                                        len(self.p2.cards_in_play[int(game_update_string[2]) + 1]))
+                            game_update_string[3] = str(int(game_update_string[3]) - self.p2.count_units_at_planet(planet_pos))
                             return game_update_string
         return game_update_string
 
@@ -7870,22 +7839,22 @@ class Game:
                         "Ku'gath's Nurglings firing against a moved unit. Proceeding to Ku'gath's Nurglings mode."
                     )
                     for i in range(7):
-                        for j in range(len(self.p1.cards_in_play[i + 1])):
-                            if self.p1.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                                for k in range(len(self.p1.cards_in_play[i + 1])):
+                        for j in range(self.p1.count_units_at_planet(i)):
+                            if self.p1.get_card_given_pos(i, j).valid_kugath_nurgling_target:
+                                for k in range(self.p1.count_units_at_planet(i)):
                                     if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                                        self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p1.get_id_given_pos(i, k))
-                                for k in range(len(self.p2.cards_in_play[i + 1])):
+                                        self.p1.get_card_given_pos(i, j).kugath_nurgling_ids.append(self.p1.get_id_given_pos(i, k))
+                                for k in range(self.p2.count_units_at_planet(i)):
                                     if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                                        self.p1.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p2.get_id_given_pos(i, k))
-                        for j in range(len(self.p2.cards_in_play[i + 1])):
-                            if self.p2.cards_in_play[i + 1][j].valid_kugath_nurgling_target:
-                                for k in range(len(self.p1.cards_in_play[i + 1])):
+                                        self.p1.get_card_given_pos(i, j).kugath_nurgling_ids.append(self.p2.get_id_given_pos(i, k))
+                        for j in range(self.p2.count_units_at_planet(i)):
+                            if self.p2.get_card_given_pos(i, j).valid_kugath_nurgling_target:
+                                for k in range(self.p1.count_units_at_planet(i)):
                                     if self.p1.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                                        self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p1.get_id_given_pos(i, k))
-                                for k in range(len(self.p2.cards_in_play[i + 1])):
+                                        self.p2.get_card_given_pos(i, j).kugath_nurgling_ids.append(self.p1.get_id_given_pos(i, k))
+                                for k in range(self.p2.count_units_at_planet(i)):
                                     if self.p2.get_ability_given_pos(i, k) == "Ku'gath's Nurglings":
-                                        self.p2.cards_in_play[i + 1][j].kugath_nurgling_ids.append(self.p2.get_id_given_pos(i, k))
+                                        self.p2.get_card_given_pos(i, j).kugath_nurgling_ids.append(self.p2.get_id_given_pos(i, k))
                     self.set_targeting_icons_kugath_nurglings()
                 else:
                     self.reset_all_valid_targets_kugath_nurglings()
@@ -7987,12 +7956,12 @@ class Game:
                     self.p2.headquarters[i].valid_target_dynastic_weaponry = False
                     self.p2.headquarters[i].just_entered_play = False
                 for i in range(7):
-                    for j in range(len(self.p1.cards_in_play[i + 1])):
-                        self.p1.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
-                        self.p1.cards_in_play[i + 1][j].just_entered_play = False
-                    for j in range(len(self.p2.cards_in_play[i + 1])):
-                        self.p2.cards_in_play[i + 1][j].valid_target_dynastic_weaponry = False
-                        self.p2.cards_in_play[i + 1][j].just_entered_play = False
+                    for j in range(self.p1.count_units_at_planet(i)):
+                        self.p1.get_card_given_pos(i, j).valid_target_dynastic_weaponry = False
+                        self.p1.get_card_given_pos(i, j).just_entered_play = False
+                    for j in range(self.p2.count_units_at_planet(i)):
+                        self.p2.get_card_given_pos(i, j).valid_target_dynastic_weaponry = False
+                        self.p2.get_card_given_pos(i, j).just_entered_play = False
             if self.attack_resolution_cleanup and not self.attack_being_resolved:
                 self.attack_resolution_cleanup = False
                 if self.damage_abilities_defender_active:
@@ -8030,23 +7999,23 @@ class Game:
                 planet = self.last_planet_checked_for_battle
                 name_player_who_resolved_attack = ""
                 if planet > -1:
-                    for i in range(len(self.p1.cards_in_play[planet + 1])):
-                        if self.p1.cards_in_play[planet + 1][i].resolving_attack:
+                    for i in range(self.p1.count_units_at_planet(planet)):
+                        if self.p1.get_card_given_pos(planet, i).resolving_attack:
                             name_player_who_resolved_attack = self.name_1
-                            for j in range(len(self.p1.cards_in_play[planet + 1])):
-                                self.p1.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                            for j in range(self.p1.count_units_at_planet(planet)):
+                                self.p1.get_card_given_pos(planet, j).cannot_be_declared_as_attacker = False
                             if self.p1.get_card_type_given_pos(planet, i) == "Army":
-                                for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                for j in range(self.p2.count_units_at_planet(planet)):
                                     if self.p2.get_ability_given_pos(planet, j) == "Tomb Blade Diversionist":
-                                        if not self.p2.cards_in_play[planet + 1][j].misc_ability_used:
+                                        if not self.p2.get_card_given_pos(planet, j).misc_ability_used:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_2,
                                                                  (1, planet, i))
                             if self.p1.get_card_type_given_pos(planet, i) == "Token":
-                                for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                for j in range(self.p1.count_units_at_planet(planet)):
                                     if self.p1.get_ability_given_pos(planet, j) == "Grey Hunters":
                                         if not self.p1.does_own_reaction_exist("Grey Hunters"):
                                             self.create_reaction("Grey Hunters", self.name_1, (1, planet, i))
-                                for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                for j in range(self.p2.count_units_at_planet(planet)):
                                     if self.p2.get_ability_given_pos(planet, j) == "Grey Hunters":
                                         if not self.p2.does_own_reaction_exist("Grey Hunters"):
                                             self.create_reaction("Grey Hunters", self.name_2, (1, planet, i))
@@ -8120,23 +8089,23 @@ class Game:
                                     self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
                                 elif not self.p1.get_immune_to_enemy_events(planet, i):
                                     self.p1.assign_damage_to_pos(planet, i, 1, by_enemy_unit=False)
-                    for i in range(len(self.p2.cards_in_play[planet + 1])):
-                        if self.p2.cards_in_play[planet + 1][i].resolving_attack:
+                    for i in range(self.p2.count_units_at_planet(planet)):
+                        if self.p2.get_card_given_pos(planet, i).resolving_attack:
                             name_player_who_resolved_attack = self.name_2
-                            for j in range(len(self.p2.cards_in_play[planet + 1])):
-                                self.p2.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                            for j in range(self.p2.count_units_at_planet(planet)):
+                                self.p2.get_card_given_pos(planet, j).cannot_be_declared_as_attacker = False
                             if self.p2.get_card_type_given_pos(planet, i) == "Army":
-                                for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                for j in range(self.p1.count_units_at_planet(planet)):
                                     if self.p1.get_ability_given_pos(planet, j) == "Tomb Blade Diversionist":
-                                        if not self.p1.cards_in_play[planet + 1][j].misc_ability_used:
+                                        if not self.p1.get_card_given_pos(planet, j).misc_ability_used:
                                             self.create_reaction("Tomb Blade Diversionist", self.name_1,
                                                                  (2, planet, i))
                             if self.p2.get_card_type_given_pos(planet, i) == "Token":
-                                for j in range(len(self.p1.cards_in_play[planet + 1])):
+                                for j in range(self.p1.count_units_at_planet(planet)):
                                     if self.p1.get_ability_given_pos(planet, j) == "Grey Hunters":
                                         if not self.p1.does_own_reaction_exist("Grey Hunters"):
                                             self.create_reaction("Grey Hunters", self.name_1, (2, planet, i))
-                                for j in range(len(self.p2.cards_in_play[planet + 1])):
+                                for j in range(self.p2.count_units_at_planet(planet)):
                                     if self.p2.get_ability_given_pos(planet, j) == "Grey Hunters":
                                         if not self.p2.does_own_reaction_exist("Grey Hunters"):
                                             self.create_reaction("Grey Hunters", self.name_2, (2, planet, i))
@@ -8241,16 +8210,16 @@ class Game:
                     self.p2.headquarters[i].valid_sweep_target = True
                     self.p2.headquarters[i].recently_assigned_damage = False
                 for i in range(7):
-                    for j in range(len(self.p1.cards_in_play[i + 1])):
-                        self.p1.cards_in_play[i + 1][j].can_be_crushing_blowed = False
-                        self.p1.cards_in_play[i + 1][j].valid_sweep_target = True
-                        self.p1.cards_in_play[i + 1][j].recently_assigned_damage = False
-                        self.p1.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
-                    for j in range(len(self.p2.cards_in_play[i + 1])):
-                        self.p2.cards_in_play[i + 1][j].can_be_crushing_blowed = False
-                        self.p2.cards_in_play[i + 1][j].valid_sweep_target = True
-                        self.p2.cards_in_play[i + 1][j].recently_assigned_damage = False
-                        self.p2.cards_in_play[i + 1][j].valid_target_vow_of_honor = False
+                    for j in range(self.p1.count_units_at_planet(i)):
+                        self.p1.get_card_given_pos(i, j).can_be_crushing_blowed = False
+                        self.p1.get_card_given_pos(i, j).valid_sweep_target = True
+                        self.p1.get_card_given_pos(i, j).recently_assigned_damage = False
+                        self.p1.get_card_given_pos(i, j).valid_target_vow_of_honor = False
+                    for j in range(self.p2.count_units_at_planet(i)):
+                        self.p2.get_card_given_pos(i, j).can_be_crushing_blowed = False
+                        self.p2.get_card_given_pos(i, j).valid_sweep_target = True
+                        self.p2.get_card_given_pos(i, j).recently_assigned_damage = False
+                        self.p2.get_card_given_pos(i, j).valid_target_vow_of_honor = False
         if self.reset_resolving_attack_on_units:
             self.reset_resolving_attack_on_units = False
         await self.update_interrupts(name, game_update_string)
@@ -8533,7 +8502,7 @@ class Game:
                 if winner.attachments_at_planet[planet_id][i].get_ability() == "Close Quarters Doctrine":
                     self.create_reaction("Close Quarters Doctrine", winner.name_player, (int(winner.number), -1, -1))
                     reactions_exist = True
-            for i in range(len(winner.cards_in_play[planet_id + 1])):
+            for i in range(winner.count_units_at_planet(planet_id)):
                 if winner.get_ability_given_pos(planet_id, i) == "Kabalite Blackguard":
                     self.create_reaction("Kabalite Blackguard", winner.name_player, (int(winner.number), planet_id, i))
                     reactions_exist = True
@@ -8774,7 +8743,7 @@ class Game:
             primary_player.headquarters.append(secondary_player.headquarters[unit_pos])
             secondary_player.remove_card_from_hq(unit_pos, proper_remove=False)
             return None
-        primary_player.cards_in_play[planet_pos + 1].append(secondary_player.cards_in_play[planet_pos + 1][unit_pos])
+        primary_player.add_card_to_planet_without_effects(secondary_player.get_card_given_pos(planet_pos, unit_pos), planet_pos)
         secondary_player.remove_card_from_play(planet_pos, unit_pos, proper_remove=False)
         return None
 
@@ -8909,7 +8878,7 @@ class Game:
                     self.create_reaction("War Cabal", self.p1.name_player,
                                          (int(self.p1.number), -2, i))
             for i in range(7):
-                for j in range(len(self.p1.cards_in_play[i + 1])):
+                for j in range(self.p1.count_units_at_planet(i)):
                     if self.p1.get_ability_given_pos(i, j) == "War Cabal":
                         self.create_reaction("War Cabal", self.p1.name_player,
                                              (int(self.p1.number), i, j))
@@ -8918,7 +8887,7 @@ class Game:
                     self.create_reaction("War Cabal", self.p2.name_player,
                                          (int(self.p2.number), -2, i))
             for i in range(7):
-                for j in range(len(self.p2.cards_in_play[i + 1])):
+                for j in range(self.p2.count_units_at_planet(i)):
                     if self.p2.get_ability_given_pos(i, j) == "War Cabal":
                         self.create_reaction("War Cabal", self.p2.name_player,
                                              (int(self.p2.number), i, j))
@@ -8930,7 +8899,7 @@ class Game:
                     self.create_reaction("War Cabal", self.p1.name_player,
                                          (int(self.p1.number), -2, i))
             for i in range(7):
-                for j in range(len(self.p1.cards_in_play[i + 1])):
+                for j in range(self.p1.count_units_at_planet(i)):
                     if self.p1.get_ability_given_pos(i, j) == "War Cabal":
                         self.create_reaction("War Cabal", self.p1.name_player,
                                              (int(self.p1.number), i, j))
@@ -8939,7 +8908,7 @@ class Game:
                     self.create_reaction("War Cabal", self.p2.name_player,
                                          (int(self.p2.number), -2, i))
             for i in range(7):
-                for j in range(len(self.p2.cards_in_play[i + 1])):
+                for j in range(self.p2.count_units_at_planet(i)):
                     if self.p2.get_ability_given_pos(i, j) == "War Cabal":
                         self.create_reaction("War Cabal", self.p2.name_player,
                                              (int(self.p2.number), i, j))

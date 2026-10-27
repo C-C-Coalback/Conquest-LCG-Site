@@ -52,14 +52,14 @@ async def start_resolving_interrupt(self, name, game_update_string):
             if planet_pos == -2:
                 primary_player.headquarters.append(card)
             else:
-                primary_player.cards_in_play[planet_pos + 1].append(card)
+                primary_player.add_card_to_planet_without_effects(card, 0)
             if "Escort Drone" in primary_player.discard:
                 primary_player.discard.remove("Escort Drone")
             self.delete_interrupt()
         elif current_interrupt == "Shok Troopa":
-            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+            for i in range(primary_player.count_units_at_planet(planet_pos)):
                 primary_player.assign_damage_to_pos(planet_pos, i, 1, by_enemy_unit=False)
-            for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+            for i in range(secondary_player.count_units_at_planet(planet_pos)):
                 secondary_player.assign_damage_to_pos(planet_pos, i, 1)
             self.delete_interrupt()
         elif current_interrupt == "Truck Wreck Launcha":
@@ -142,7 +142,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.delete_interrupt()
         elif current_interrupt == "Trap Laying Hunter":
             self.queue_special_damage_begins_sound()
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+            primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used = True
             self.choices_available = ["3 Damage", "Exhaust"]
             if not secondary_player.search_ready_unit_at_planet(planet_pos):
                 self.choices_available = ["3 Damage"]
@@ -186,7 +186,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
                     del primary_player.cards_in_reserve[planet_belial][pos_belial]
                     card = CardClasses.WarlordCard("Grand Master Belial", "", "", "Space Marines", 2, 6, 2, 6,
                                                    "", 7, 7, [])
-                    primary_player.cards_in_play[planet_belial + 1].append(card)
+                    primary_player.add_card_to_planet_without_effects(card, planet_belial)
                     primary_player.belial_deepstrike(planet_belial)
             else:
                 primary_player.warlord_just_got_destroyed = True
@@ -378,7 +378,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
                     card = FindCard.find_card("Growing Tide", self.card_array, self.cards_dict,
                                               self.apoka_errata_cards, self.cards_that_have_errata)
                     if primary_player.add_card_to_planet(card, self.round_number + 1) != -1:
-                        last_element_index = len(primary_player.cards_in_play[self.round_number + 1]) - 1
+                        last_element_index = primary_player.count_units_at_planet(self.round_number) - 1
                         primary_player.increase_attack_of_unit_at_pos(self.round_number + 1, last_element_index, 1, expiration="EOG")
                         primary_player.increase_health_of_unit_at_pos(self.round_number + 1, last_element_index, 1, expiration="EOG")
                         await self.send_update_message("The Growing Tide grows...")
@@ -423,10 +423,10 @@ async def start_resolving_interrupt(self, name, game_update_string):
             else:
                 pass
         elif current_interrupt == "Icy Trygon":
-            primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = False
+            primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used = False
             primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
             primary_player.discard_attachments_from_card(planet_pos, unit_pos)
-            primary_player.cards_in_reserve[planet_pos].append(primary_player.cards_in_play[planet_pos + 1][unit_pos])
+            primary_player.cards_in_reserve[planet_pos].append(primary_player.get_card_given_pos(planet_pos, unit_pos))
             primary_player.remove_card_from_play(planet_pos, unit_pos, proper_remove=False)
             self.delete_interrupt()
         elif current_interrupt == "Gorgul Da Slaya":

@@ -84,7 +84,7 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
         if chosen_planet != origin_planet:
             primary_player.remove_damage_from_pos(origin_planet, origin_pos, 999)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
-            last_element_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+            last_element_index = primary_player.count_units_at_planet(chosen_planet) - 1
             try:
                 if self.stored_taken_damage:
                     self.stored_taken_damage[0].set_unit_position((int(primary_player.number), chosen_planet, last_element_index))
