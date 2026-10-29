@@ -120,14 +120,14 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         planet, unit = self.action_object.misc_target_unit
         primary_player.reset_aiming_reticle_in_play(planet, unit)
         if game_update_string[1] == "0":
-            primary_player.cards_in_play[planet + 1][unit].need_to_resolve_nurgling_bomb = False
-            primary_player.cards_in_play[planet + 1][unit].choice_nurgling_bomb = "Rout"
+            primary_player.get_card_given_pos(planet, unit).need_to_resolve_nurgling_bomb = False
+            primary_player.get_card_given_pos(planet, unit).choice_nurgling_bomb = "Rout"
             await self.send_update_message(
                 "Will rout unit."
             )
         else:
-            primary_player.cards_in_play[planet + 1][unit].need_to_resolve_nurgling_bomb = False
-            primary_player.cards_in_play[planet + 1][unit].choice_nurgling_bomb = "Damage"
+            primary_player.get_card_given_pos(planet, unit).need_to_resolve_nurgling_bomb = False
+            primary_player.get_card_given_pos(planet, unit).choice_nurgling_bomb = "Damage"
             await self.send_update_message(
                 "Will damage unit."
             )
@@ -384,15 +384,15 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 primary_player.headquarters[unit_pos].retaliate_eog += 4
         else:
             if chosen_choice == "Armorbane":
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_eog = True
+                primary_player.get_card_given_pos(planet_pos, unit_pos).armorbane_eog = True
             elif chosen_choice == "Flying":
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].flying_eog = True
+                primary_player.get_card_given_pos(planet_pos, unit_pos).flying_eog = True
             elif chosen_choice == "Mobile":
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].mobile_eog = True
+                primary_player.get_card_given_pos(planet_pos, unit_pos).mobile_eog = True
             elif chosen_choice == "Sweep (3)":
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].sweep_eog += 3
+                primary_player.get_card_given_pos(planet_pos, unit_pos).sweep_eog += 3
             elif chosen_choice == "Retaliate (4)":
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].retaliate_eog += 4
+                primary_player.get_card_given_pos(planet_pos, unit_pos).retaliate_eog += 4
         self.reset_choices_available()
         self.resolving_search_box = False
         await self.resolve_battle_conclusion(name, game_update_string)
@@ -442,7 +442,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             relevant_player.move_unit_to_planet(og_pla, og_pos, dest, force=True, card_effect=False)
         elif chosen_choice == "Strangleweb Termagant":
             found_strangleweb = False
-            for i in range(len(primary_player.cards_in_play[og_pla + 1])):
+            for i in range(primary_player.count_units_at_planet(og_pla)):
                 if primary_player.get_ability_given_pos(og_pla, i) == "Strangleweb Termagant":
                     if not found_strangleweb:
                         found_strangleweb = True
@@ -513,7 +513,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         i = 0
         found_planet = False
         while i < 7 and not found_planet:
-            if primary_player.cards_in_play[0][i] == chosen_choice:
+            if self.get_planet_name(i) == chosen_choice:
                 found_planet = True
                 card = self.preloaded_find_card("Shas'el Lyst")
                 primary_player.add_card_to_planet(card, i)
@@ -565,7 +565,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                                      (int(primary_player.number), -2, i))
         for i in range(7):
             if i != self.reactions_needing_resolving[0].misc_target_planet:
-                for j in range(len(primary_player.cards_in_play[i + 1])):
+                for j in range(primary_player.count_units_at_planet(i)):
                     if primary_player.get_ability_given_pos(i, j) == "War Cabal":
                         self.create_reaction("War Cabal", primary_player.name_player,
                                              (int(primary_player.number), i, j))
@@ -627,17 +627,17 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 target_player.headquarters[unit_pos].retaliate_eor += 3
         else:
             if chosen_choice == "Area Effect (1)":
-                target_player.cards_in_play[planet_pos + 1][unit_pos].area_effect_eor += 1
+                target_player.get_card_given_pos(planet_pos, unit_pos).area_effect_eor += 1
             elif chosen_choice == "Armorbane":
-                target_player.cards_in_play[planet_pos + 1][unit_pos].armorbane_eor = True
+                target_player.get_card_given_pos(planet_pos, unit_pos).armorbane_eor = True
             elif chosen_choice == "Brutal":
-                target_player.cards_in_play[planet_pos + 1][unit_pos].brutal_eor = True
+                target_player.get_card_given_pos(planet_pos, unit_pos).brutal_eor = True
             elif chosen_choice == "Flying":
-                target_player.cards_in_play[planet_pos + 1][unit_pos].flying_eor = True
+                target_player.get_card_given_pos(planet_pos, unit_pos).flying_eor = True
             elif chosen_choice == "Sweep (2)":
-                target_player.cards_in_play[planet_pos + 1][unit_pos].sweep_eor += 2
+                target_player.get_card_given_pos(planet_pos, unit_pos).sweep_eor += 2
             elif chosen_choice == "Retaliate (3)":
-                target_player.cards_in_play[planet_pos + 1][unit_pos].retaliate_eor += 3
+                target_player.get_card_given_pos(planet_pos, unit_pos).retaliate_eor += 3
         self.reset_choices_available()
         self.resolving_search_box = False
         og_pla, og_pos = self.action_object.position_of_actioned_card
@@ -759,7 +759,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 if planet_pos == -2:
                     primary_player.headquarters[unit_pos].misc_ability_used = True
                 else:
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                    primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used = True
             elif interrupt_name == "Catachan Devils Patrol" or interrupt_name == "Dodging Land Speeder":
                 self.shadow_thorns_body_allowed = False
                 _, current_planet, current_unit = self.last_defender_position
@@ -878,7 +878,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     if warlord_pla == -2:
                         primary_player.headquarters[warlord_pos].armorbane_eog = True
                     else:
-                        primary_player.cards_in_play[warlord_pla + 1][warlord_pos].armorbane_eog = True
+                        primary_player.get_card_given_pos(warlord_pla, warlord_pos).armorbane_eog = True
                     self.reset_choices_available()
                     self.resolving_search_box = False
                     await self.resolve_battle_conclusion(name, game_update_string)
@@ -887,7 +887,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     if warlord_pla == -2:
                         primary_player.headquarters[warlord_pos].brutal_eog = True
                     else:
-                        primary_player.cards_in_play[warlord_pla + 1][warlord_pos].brutal_eog = True
+                        primary_player.get_card_given_pos(warlord_pla, warlord_pos).brutal_eog = True
                     self.reset_choices_available()
                     self.resolving_search_box = False
                     await self.resolve_battle_conclusion(name, game_update_string)
@@ -1081,8 +1081,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Trap Laying Hunter Trap":
         if chosen_choice == "3 Damage":
             for i in range(7):
-                for j in range(len(primary_player.cards_in_play[i + 1])):
-                    if primary_player.cards_in_play[i + 1][j].resolving_attack:
+                for j in range(primary_player.count_units_at_planet(i)):
+                    if primary_player.get_card_given_pos(i, j).resolving_attack:
                         primary_player.assign_damage_to_pos(i, j, 3, rickety_warbuggy=True)
             self.reset_choices_available()
             self.resolving_search_box = False
@@ -1123,10 +1123,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         if chosen_choice == "Rout":
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             primary_player.rout_unit(planet_pos, unit_pos)
-            if len(primary_player.cards_in_play[planet_pos + 1]) > unit_pos:
+            if primary_player.count_units_at_planet(planet_pos) > unit_pos:
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "red")
             elif not self.reactions_needing_resolving[0].chosen_first_card:
-                if secondary_player.cards_in_play[planet_pos + 1]:
+                if secondary_player.check_if_units_present(planet_pos):
                     secondary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
                     self.reactions_needing_resolving[0].chosen_first_card = True
                     self.reactions_needing_resolving[0].misc_target_unit = (planet_pos, 0)
@@ -1161,11 +1161,11 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         elif chosen_choice == "Exhaust":
             primary_player.reset_aiming_reticle_in_play(planet_pos, unit_pos)
             primary_player.exhaust_given_pos(planet_pos, unit_pos, card_effect=True)
-            if len(primary_player.cards_in_play[planet_pos + 1]) > unit_pos + 1:
+            if primary_player.count_units_at_planet(planet_pos) > unit_pos + 1:
                 primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos + 1, "red")
                 self.reactions_needing_resolving[0].misc_target_unit = (planet_pos, unit_pos + 1)
             elif not self.reactions_needing_resolving[0].chosen_first_card:
-                if secondary_player.cards_in_play[planet_pos + 1]:
+                if secondary_player.check_if_units_present(planet_pos):
                     secondary_player.set_aiming_reticle_in_play(planet_pos, 0, "red")
                     self.reactions_needing_resolving[0].chosen_first_card = True
                     self.reactions_needing_resolving[0].misc_target_unit = (planet_pos, 0)
@@ -1384,9 +1384,9 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 primary_player.headquarters[warlord_pos].brutal_eog = True
         else:
             if chosen_choice == "Armorbane":
-                primary_player.cards_in_play[warlord_pla + 1][warlord_pos].armorbane_eog = True
+                primary_player.get_card_given_pos(warlord_pla, warlord_pos).armorbane_eog = True
             else:
-                primary_player.cards_in_play[warlord_pla + 1][warlord_pos].brutal_eog = True
+                primary_player.get_card_given_pos(warlord_pla, warlord_pos).brutal_eog = True
         self.reset_choices_available()
         self.resolving_search_box = False
         another_trigger = False
@@ -1540,7 +1540,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             if planet_pos == -2:
                 current_attack = primary_player.headquarters[unit_pos].extra_attack_until_end_of_phase
             else:
-                current_attack = primary_player.cards_in_play[planet_pos + 1][unit_pos] \
+                current_attack = primary_player.get_card_given_pos(planet_pos, unit_pos) \
                     .extra_attack_until_end_of_phase
             await self.send_update_message("Gained +2 ATK! Now has +" + str(current_attack) + " ATK.")
         elif self.choices_available[int(game_update_string[1])] == "+2 HP":
@@ -1548,8 +1548,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 primary_player.headquarters[unit_pos].positive_hp_until_eop += 2
                 current_health = primary_player.headquarters[unit_pos].positive_hp_until_eop
             else:
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].positive_hp_until_eop += 2
-                current_health = primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
+                primary_player.get_card_given_pos(planet_pos, unit_pos).positive_hp_until_eop += 2
+                current_health = primary_player.get_card_given_pos(planet_pos, unit_pos). \
                     positive_hp_until_eop
             await self.send_update_message("Gained +2 HP! Now has +" + str(current_health) + " HP.")
         self.action_cleanup()
@@ -1960,7 +1960,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.reset_choices_available()
             self.resolving_search_box = False
             self.attack_being_resolved = False
-            primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+            primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position). \
                 resolving_attack = False
             primary_player.reset_aiming_reticle_in_play(self.attacker_planet, self.attacker_position)
             primary_player.exhaust_given_pos(self.attacker_planet, self.attacker_position)
@@ -2135,8 +2135,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         if primary_player.add_card_to_planet(card, pla) != -1:
-            position_of_unit = len(primary_player.cards_in_play[pla + 1]) - 1
-            primary_player.cards_in_play[pla + 1][position_of_unit]. \
+            position_of_unit = primary_player.count_units_at_planet(pla) - 1
+            primary_player.get_card_given_pos(pla, position_of_unit). \
                 valid_target_dynastic_weaponry = True
             if "Dynastic Weaponry" in primary_player.discard:
                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
@@ -2155,8 +2155,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
                                   self.apoka_errata_cards, self.cards_that_have_errata)
         if primary_player.add_card_to_planet(card, planet) != -1:
-            position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
-            primary_player.cards_in_play[planet + 1][position_of_unit]. \
+            position_of_unit = primary_player.count_units_at_planet(planet) - 1
+            primary_player.get_card_given_pos(planet, position_of_unit). \
                 valid_target_dynastic_weaponry = True
             if "Dynastic Weaponry" in primary_player.discard:
                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
@@ -2551,10 +2551,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     name + " gained armorbane from Heavy Venom Cannon!"
                 )
             else:
-                target_player.cards_in_play[planet + 1][unit].armorbane_eop = True
-                target_player.cards_in_play[planet + 1][unit].get_attachments()[
+                target_player.get_card_given_pos(planet, unit).armorbane_eop = True
+                target_player.get_card_given_pos(planet, unit).get_attachments()[
                     att].set_once_per_phase_used(True)
-                name = target_player.cards_in_play[planet + 1][unit].get_name()
+                name = target_player.get_card_given_pos(planet, unit).get_name()
                 await self.send_update_message(
                     name + " gained armorbane from Heavy Venom Cannon!"
                 )
@@ -2567,10 +2567,10 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     name + " gained area effect (2) from Heavy Venom Cannon!"
                 )
             else:
-                target_player.cards_in_play[planet + 1][unit].area_effect_eop += 2
-                target_player.cards_in_play[planet + 1][unit].get_attachments()[att]. \
+                target_player.get_card_given_pos(planet, unit).area_effect_eop += 2
+                target_player.get_card_given_pos(planet, unit).get_attachments()[att]. \
                     set_once_per_phase_used(True)
-                name = target_player.cards_in_play[planet + 1][unit].get_name()
+                name = target_player.get_card_given_pos(planet, unit).get_name()
                 await self.send_update_message(
                     name + " gained area effect (2) from Heavy Venom Cannon!"
                 )
@@ -2789,7 +2789,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                 primary_player.remove_damage_from_pos(planet_pos, unit_pos, 1)
                 self.stored_damage[0].decrease_amount_that_can_be_blocked(1)
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Righteous Initiate":
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
+                    primary_player.get_card_given_pos(planet_pos, unit_pos). \
                         extra_attack_until_end_of_phase += 2
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Dutiful Castellan":
                     if planet_pos != -2:

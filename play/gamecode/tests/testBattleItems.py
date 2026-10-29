@@ -37,7 +37,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["pass-P1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 0)
 
     async def test_retreat(self):
         random.seed(42)
@@ -50,7 +50,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["pass-P1"])
         await test_game.update_game_event("P2", ["pass-P1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 0)
         self.assertEqual(len(test_game.p1.headquarters), 1)
 
     async def test_retreat_worr_same_planet_non_green(self):
@@ -64,10 +64,10 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["pass-P1"])
         await test_game.update_game_event("P2", ["pass-P1"])
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Iron Guard Recruits"), 0)
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 0)
         self.assertEqual(len(test_game.p1.headquarters), 1)
 
     async def test_lurking_hormagaunt(self):
@@ -230,7 +230,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
         await test_game.update_game_event("P2", ["pass-P1"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p2.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 1)
         self.assertEqual(test_game.p1.get_resources(), 5)
 
     async def test_indomitable(self):
@@ -283,9 +283,9 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.choice_context, "Use alternative shield effect?")
         await test_game.update_game_event("P1", ["CHOICE", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 3)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 3)
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "2"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
         self.assertEqual(len(test_game.stored_damage), 1)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 1), 1)
         self.assertEqual(test_game.p1.get_resources(), 6)
@@ -356,7 +356,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["ATTACHMENT", "IN_PLAY", "1", "0", "1", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
         await test_game.update_game_event("P2", ["pass-P1"])
-        self.assertEqual(len(test_game.p2.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 1)
         self.assertEqual(len(test_game.p1.discard), 1)
         self.assertEqual(len(test_game.p2.discard), 1)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 1)), 0)
@@ -557,8 +557,8 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["pass-P1"])
         await test_game.update_game_event("P2", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P2", ["pass-P1"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 1)
-        self.assertEqual(len(test_game.p2.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 2)
 
     async def test_black_heart_ravager(self):
         random.seed(42)
@@ -591,7 +591,7 @@ class BattleItemsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["pass-P1"])
         self.assertEqual(len(test_game.reactions_needing_resolving), 1)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p2.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 1)
         self.assertEqual(len(test_game.p2.headquarters), 1)
 
     async def test_starbanes_council(self):

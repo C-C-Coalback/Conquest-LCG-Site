@@ -81,8 +81,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             other_player = self.p1
                         og_pla, og_pos = self.deepstruck_attachment_pos
                         if self.deepstruck_attachment_is_in_play:
-                            player.add_card_to_discard(player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name)
-                            del player.cards_in_play[og_pla + 1][og_pos]
+                            player.add_card_to_discard(player.get_card_given_pos(og_pla, og_pos).deepstrike_card_name)
+                            player.remove_card_from_play(og_pla, og_pos, proper_remove=False)
                         else:
                             player.add_card_to_discard(player.cards_in_reserve[og_pla][og_pos].get_name())
                             del player.cards_in_reserve[og_pla][og_pos]
@@ -173,7 +173,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     can_continue = True
                     if self.mode == "Normal":
                         if self.p1.search_ready_unit_at_planet(self.last_planet_checked_for_battle):
-                            if len(self.p2.cards_in_play[self.last_planet_checked_for_battle + 1]) == 0:
+                            if self.p2.count_units_at_planet(self.last_planet_checked_for_battle) == 0:
                                 can_continue = False
                     if not can_continue:
                         await self.send_update_message("You are forced to win the battle if you don't have a way to exhaust your units.")
@@ -184,8 +184,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         self.p1.has_passed = True
                         self.reset_combat_positions()
                         for planet in range(7):
-                            for j in range(len(self.p1.cards_in_play[planet + 1])):
-                                self.p1.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                            for j in range(self.p1.count_units_at_planet(planet)):
+                                self.p1.get_card_given_pos(planet, j).cannot_be_declared_as_attacker = False
                         if self.mode == "Normal":
                             await self.send_update_message(self.name_1 + " passes their combat turn.")
                         else:
@@ -194,7 +194,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                     can_continue = True
                     if self.mode == "Normal":
                         if self.p2.search_ready_unit_at_planet(self.last_planet_checked_for_battle):
-                            if len(self.p1.cards_in_play[self.last_planet_checked_for_battle + 1]) == 0:
+                            if self.p1.count_units_at_planet(self.last_planet_checked_for_battle) == 0:
                                 can_continue = False
                     if not can_continue:
                         await self.send_update_message("You are forced to win the battle if you don't have a way to exhaust your units.")
@@ -205,8 +205,8 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         self.p2.has_passed = True
                         self.reset_combat_positions()
                         for planet in range(7):
-                            for j in range(len(self.p2.cards_in_play[planet + 1])):
-                                self.p2.cards_in_play[planet + 1][j].cannot_be_declared_as_attacker = False
+                            for j in range(self.p2.count_units_at_planet(planet)):
+                                self.p2.get_card_given_pos(planet, j).cannot_be_declared_as_attacker = False
                         if self.mode == "Normal":
                             await self.send_update_message(self.name_2 + " passes their combat turn.")
                         else:
@@ -263,7 +263,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                                            self.attacker_position)
                             if amount_aoe > 0:
                                 self.unit_will_move_after_attack = False
-                                primary_player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+                                primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position). \
                                     ethereal_movement_active = False
                                 self.damage_from_attack = True
                                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
@@ -432,7 +432,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                         og_pla, og_pos = self.deepstruck_attachment_pos
                         if self.deepstruck_attachment_is_in_play:
                             card = self.preloaded_find_card(
-                                player.cards_in_play[og_pla + 1][og_pos].deepstrike_card_name)
+                                player.get_card_given_pos(og_pla, og_pos).deepstrike_card_name)
                         else:
                             card = player.cards_in_reserve[og_pla][og_pos]
                         if ((not self.deepstruck_attachment_is_in_play) or
@@ -445,7 +445,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                     del player.cards_in_reserve[og_pla][og_pos]
                                 else:
                                     player.discard_attachments_from_card(og_pla, og_pos)
-                                    del player.cards_in_play[og_pla + 1][og_pos]
+                                    player.remove_card_from_play(og_pla, og_pos, proper_remove=False)
                                 player.deepstrike_attachment_extras(chosen_planet)
                                 self.choosing_target_for_deepstruck_attachment = False
                                 self.deepstruck_attachment_pos = (-1, -1)
@@ -506,14 +506,13 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                     await self.send_update_message("Deepstrike is complete")
                                                     self.start_ranged_skirmish(self.last_planet_checked_for_battle)
                                         else:
-                                            card_name = player.cards_in_play[
-                                                chosen_planet + 1][chosen_unit].deepstrike_card_name
+                                            card_name = player.get_card_given_pos(chosen_planet, chosen_unit).deepstrike_card_name
                                             card = self.preloaded_find_card(card_name)
                                             if card.planet_attachment:
                                                 player.add_attachment_to_planet(
                                                     chosen_planet, card)
                                                 player.discard_attachments_from_card(chosen_planet, chosen_unit)
-                                                del player.cards_in_play[chosen_planet + 1][chosen_unit]
+                                                player.remove_card_from_play(chosen_planet, chosen_unit, proper_remove=False)
                                                 player.deepstrike_attachment_extras(chosen_planet)
                                                 if not player.check_for_cards_in_reserve(chosen_planet):
                                                     player.has_passed = True
@@ -534,7 +533,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                                                         self.start_ranged_skirmish(self.last_planet_checked_for_battle)
                                             else:
                                                 self.choosing_target_for_deepstruck_attachment = True
-                                                player.cards_in_play[chosen_planet + 1][chosen_unit]. \
+                                                player.get_card_given_pos(chosen_planet, chosen_unit). \
                                                     aiming_reticle_color = "blue"
                                                 self.deepstruck_attachment_pos = (chosen_planet, chosen_unit)
                                                 self.deepstruck_attachment_is_in_play = True
@@ -566,7 +565,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
                             if secondary_player.get_ability_given_pos(chosen_planet, chosen_unit) not in \
                                     self.units_immune_to_aoe:
                                 genestealer_hybrids_relevant = False
-                                for j in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                                for j in range(secondary_player.count_units_at_planet(chosen_planet)):
                                     if secondary_player.get_ability_given_pos(chosen_planet, j) == \
                                             "Genestealer Hybrids" and chosen_unit != j:
                                         genestealer_hybrids_relevant = True

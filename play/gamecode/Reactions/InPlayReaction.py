@@ -17,7 +17,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if int(primary_player.get_number()) == int(og_num):
                 planet_pos = int(game_update_string[2])
                 unit_pos = int(game_update_string[3])
-                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_card_type() == "Army":
+                if primary_player.get_card_given_pos(planet_pos, unit_pos).get_card_type() == "Army":
                     primary_player.sacrifice_card_in_play(planet_pos, unit_pos)
                     self.delete_reaction()
                     await secondary_player.dark_eldar_event_played()
@@ -206,7 +206,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 if player_owning_card.check_if_faction_given_pos(planet_pos, unit_pos, "Orks"):
                     if player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Warrior"):
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].flying_eocr = True
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).flying_eocr = True
                         await self.send_update_message(primary_player.get_name_given_pos(planet_pos, unit_pos) +
                                                        " gained the Flying keyword until the end of the combat round.")
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -246,7 +246,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        attachment = primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
+                        attachment = primary_player.get_card_given_pos(og_pla, og_pos).get_attachments()[og_attachment]
                         owner_attachment = attachment.name_owner
                         not_own_attachment = False
                         if owner_attachment != player_owning_card.name_player:
@@ -254,7 +254,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if player_owning_card.attach_card(attachment, planet_pos, unit_pos,
                                                           not_own_attachment=not_own_attachment,
                                                           relic_check_allowed=False):
-                            del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_attachment]
+                            del primary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments()[og_attachment]
                             primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                             self.queue_special_damage_begins_sound()
                             player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
@@ -604,12 +604,12 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if not reaction.chosen_first_card:
                 if game_update_string[1] == secondary_player.get_number():
                     unique_present = False
-                    for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    for i in range(primary_player.count_units_at_planet(planet_pos)):
                         if primary_player.get_unique_given_pos(planet_pos, i):
                             unique_present = True
                     if unique_present:
-                        if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_kugath_nurgling_target or \
-                                secondary_player.cards_in_play[planet_pos + 1][unit_pos].just_entered_play:
+                        if secondary_player.get_card_given_pos(planet_pos, unit_pos).valid_kugath_nurgling_target or \
+                                secondary_player.get_card_given_pos(planet_pos, unit_pos).just_entered_play:
                             secondary_player.exhaust_given_pos(planet_pos, unit_pos)
                             reaction.misc_target_planet = planet_pos
                             reaction.misc_target_unit = (planet_pos, unit_pos)
@@ -657,7 +657,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if game_update_string[1] == primary_player.get_number():
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                     enemy_army = False
-                    for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                    for i in range(secondary_player.count_units_at_planet(planet_pos)):
                         if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
                             enemy_army = True
                     if not enemy_army:
@@ -675,7 +675,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       current_reaction + " can only target army units.")
         elif current_reaction == "Wildrider Vyper":
             if og_pla != planet_pos:
-                if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                if player_owning_card.get_card_given_pos(planet_pos, unit_pos).valid_target_ashen_banner:
                     primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                     primary_player.move_unit_to_planet(og_pla, og_pos, planet_pos)
                     self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -715,9 +715,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Shadowed Thorns Venom":
             if not reaction.chosen_first_card:
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].shadowed_thorns_venom_valid:
+                    if primary_player.get_card_given_pos(planet_pos, unit_pos).shadowed_thorns_venom_valid:
                         reaction.chosen_first_card = True
-                        primary_player.cards_in_play[planet_pos + 1][unit_pos].shadowed_thorns_venom_valid = False
+                        primary_player.get_card_given_pos(planet_pos, unit_pos).shadowed_thorns_venom_valid = False
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos)
                         reaction.misc_target_unit = (planet_pos, unit_pos)
                     else:
@@ -727,7 +727,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       current_reaction + " can only target army units.")
         elif current_reaction == "Vow of Honor":
-            if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_vow_of_honor:
+            if primary_player.get_card_given_pos(planet_pos, unit_pos).valid_target_vow_of_honor:
                 primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 3, expiration="NEXT")
                 target_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                 await self.send_update_message(target_name + " got +3 ATK from Vow of Honor")
@@ -1018,7 +1018,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           current_reaction + " can only target army units.")
         elif current_reaction == "Obedience":
             if game_update_string[1] == primary_player.number:
-                if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit():
+                if primary_player.get_card_given_pos(planet_pos, unit_pos).get_is_unit():
                     if primary_player.get_faction_given_pos(planet_pos, unit_pos) != "Necrons":
                         reaction.chosen_first_card = True
                         reaction.misc_target_unit = (planet_pos, unit_pos)
@@ -1124,8 +1124,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             self.first_player_nullified = primary_player.name_player
                             self.nullify_context = "Reaction"
                         if can_continue:
-                            secondary_player.cards_in_play[planet_pos + 1][unit_pos].negative_hp_until_eop += 1
-                            primary_player.cards_in_play[og_pla + 1][og_pos].positive_hp_until_eop += 1
+                            secondary_player.get_card_given_pos(planet_pos, unit_pos).negative_hp_until_eop += 1
+                            primary_player.get_card_given_pos(og_pla, og_pos).positive_hp_until_eop += 1
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                             self.delete_reaction()
                     else:
@@ -1145,7 +1145,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                 can_continue = True
                 if can_continue:
-                    player_owning_card.cards_in_play[planet_pos + 1][unit_pos].health_set_eop = 4
+                    player_owning_card.get_card_given_pos(planet_pos, unit_pos).health_set_eop = 4
                     self.delete_reaction()
             else:
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target", current_reaction + " can only target army units.")
@@ -1189,7 +1189,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if planet_pos == og_pla:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or\
                         primary_player.name_player in\
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].hit_by_frenzied_wulfen_names:
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).hit_by_frenzied_wulfen_names:
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                     self.queue_special_damage_begins_sound()
                     self.delete_reaction()
@@ -1197,17 +1197,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if abs(og_pla - planet_pos) == 1:
                 if game_update_string[1] == primary_player.get_number():
                     if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Thunderwolf Cavalry":
-                        if primary_player.cards_in_play[og_pla + 1]:
-                            primary_player.cards_in_play[planet_pos + 1].append(
-                                primary_player.cards_in_play[og_pla + 1][0]
-                            )
-                            primary_player.cards_in_play[og_pla + 1].append(
-                                primary_player.cards_in_play[planet_pos + 1][unit_pos]
-                            )
-                            del primary_player.cards_in_play[og_pla + 1][0]
-                            del primary_player.cards_in_play[planet_pos + 1][unit_pos]
-                            primary_player.adjust_own_reactions(planet_pos, unit_pos)
-                            primary_player.adjust_own_reactions(og_pla, 0)
+                        if primary_player.check_if_units_present(planet_pos):
+                            primary_player.switch_locations_of_units(planet_pos, unit_pos, og_pla, 0)
                             self.delete_reaction()
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
@@ -1228,9 +1219,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Tomb Blade Squadron":
             if not reaction.chosen_first_card and not reaction.chosen_second_card:
                 if game_update_string[1] == primary_player.get_number():
-                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ability() == "Tomb Blade Squadron":
-                        if not primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used:
-                            primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_ability_used = True
+                    if primary_player.get_card_given_pos(planet_pos, unit_pos).get_ability() == "Tomb Blade Squadron":
+                        if not primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used:
+                            primary_player.get_card_given_pos(planet_pos, unit_pos).misc_ability_used = True
                             reaction.chosen_first_card = True
                             reaction.misc_target_unit = (planet_pos, unit_pos)
                             primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
@@ -1271,9 +1262,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             reaction.chosen_first_card = False
                             reaction.chosen_second_card = False
                             for i in range(7):
-                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                for j in range(primary_player.count_units_at_planet(i)):
                                     if primary_player.get_ability_given_pos(i, j) == "Tomb Blade Squadron":
-                                        if not primary_player.cards_in_play[i + 1][j].misc_ability_used:
+                                        if not primary_player.get_card_given_pos(i, j).misc_ability_used:
                                             if primary_player.count_reactions("Tomb Blade Squadron") < 2:
                                                 self.create_reaction("Tomb Blade Squadron", primary_player.name_player,
                                                                      (int(primary_player.number), -1, -1))
@@ -1386,10 +1377,10 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         temp_player = self.p1
                         if og_num == 2:
                             temp_player = self.p2
-                        attack_first = temp_player.cards_in_play[og_pla + 1][og_pos].attack
-                        attack_second = player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attack
-                        temp_player.cards_in_play[og_pla + 1][og_pos].attack = attack_second
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].attack = attack_first
+                        attack_first = temp_player.get_card_given_pos(og_pla, og_pos).attack
+                        attack_second = player_owning_card.get_card_given_pos(planet_pos, unit_pos).attack
+                        temp_player.get_card_given_pos(og_pla, og_pos).attack = attack_second
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).attack = attack_first
                         temp_player.reset_all_aiming_reticles_play_hq()
                         card_name_1 = temp_player.get_name_given_pos(og_pla, og_pos)
                         card_name_2 = player_owning_card.get_name_given_pos(planet_pos, unit_pos)
@@ -1413,7 +1404,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     if not player_owning_card.check_for_trait_given_pos(planet_pos, unit_pos, "Elite"):
                         player_owning_card.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
                         player_owning_card.increase_health_of_unit_at_pos(planet_pos, unit_pos, 1, expiration="EOG")
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].yvraine_active = True
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).yvraine_active = True
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
                     else:
@@ -1461,8 +1452,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Impulsive Loota In Play":
             if not reaction.chosen_first_card:
                 if game_update_string[1] == primary_player.number:
-                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].actually_a_deepstrike:
-                        if primary_player.cards_in_play[planet_pos + 1][unit_pos].deepstrike_card_name \
+                    if primary_player.get_card_given_pos(planet_pos, unit_pos).actually_a_deepstrike:
+                        if primary_player.get_card_given_pos(planet_pos, unit_pos).deepstrike_card_name \
                                 == "Impulsive Loota":
                             cost = primary_player.get_deepstrike_value_given_pos(planet_pos, unit_pos)
                             if primary_player.spend_resources(cost):
@@ -1606,7 +1597,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.nullify_context = "Reaction"
                 if can_continue:
                     has_attachments = False
-                    if player_owning_card.cards_in_play[planet_pos + 1][unit_pos]:
+                    if player_owning_card.get_card_given_pos(planet_pos, unit_pos):
                         has_attachments = True
                     if player_owning_card.name_player == secondary_player.name_player:
                         if secondary_player.get_ability_given_pos(
@@ -1616,8 +1607,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
                     card = self.preloaded_find_card("Erupting Aberrants")
                     if player_owning_card.add_card_to_planet(card, planet_pos) != -1:
-                        last_element_index = len(player_owning_card.cards_in_play[planet_pos + 1]) - 1
-                        player_owning_card.cards_in_play[planet_pos + 1][last_element_index].name_owner = \
+                        last_element_index = player_owning_card.count_units_at_planet(planet_pos) - 1
+                        player_owning_card.get_card_given_pos(planet_pos, last_element_index).name_owner = \
                             primary_player.name_player
                         if has_attachments:
                             primary_player.spend_resources(1)
@@ -1701,8 +1692,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             reaction.misc_target_unit = (planet_pos, unit_pos)
                             player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos)
                             reaction.chosen_first_card = True
-                            player_owning_card.cards_in_play[planet_pos + 1][
-                                unit_pos].move_to_planet_end_of_phase_planet = planet_pos
+                            player_owning_card.get_card_given_pos(planet_pos, unit_pos).move_to_planet_end_of_phase_planet = planet_pos
                             next_phase = ""
                             reaction.misc_target_player = player_owning_card.name_player
                             if self.phase == "DEPLOY":
@@ -1713,8 +1703,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                 next_phase = "HEADQUARTERS"
                             if self.phase == "HEADQUARTERS":
                                 next_phase = "DEPLOY"
-                            player_owning_card.cards_in_play[planet_pos + 1][
-                                unit_pos].move_to_planet_end_of_phase_phase = next_phase
+                            player_owning_card.get_card_given_pos(planet_pos, unit_pos).move_to_planet_end_of_phase_phase = next_phase
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target army units.")
@@ -1879,13 +1868,13 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].cannot_ready_phase = True
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).cannot_ready_phase = True
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
         elif current_reaction == "Dynastic Weaponry":
             if "Dynastic Weaponry" not in primary_player.discard:
                 self.delete_reaction()
-            elif player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_target_dynastic_weaponry:
+            elif player_owning_card.get_card_given_pos(planet_pos, unit_pos).valid_target_dynastic_weaponry:
                 card = self.preloaded_find_card("Dynastic Weaponry")
                 if player_owning_card.attach_card(card, planet_pos, unit_pos):
                     primary_player.discard.remove("Dynastic Weaponry")
@@ -2088,7 +2077,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     reaction.chosen_first_card = True
                     await self.send_update_message("Select card in discard to bring back.")
         elif current_reaction == "Hydra Flak Tank":
-            if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].card_moved_recently:
+            if player_owning_card.get_card_given_pos(planet_pos, unit_pos).card_moved_recently:
                 primary_player.set_once_per_phase_used_given_pos(og_pla, og_pos, True)
                 damage = 1
                 if player_owning_card.get_flying_given_pos(planet_pos, unit_pos):
@@ -2273,7 +2262,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Sweep":
             if game_update_string[1] == secondary_player.number:
                 if planet_pos == og_pla:
-                    if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_sweep_target:
+                    if secondary_player.get_card_given_pos(planet_pos, unit_pos).valid_sweep_target:
                         shadow = True
                         if primary_player.get_card_type_given_pos(og_pla, og_pos) != "Army":
                             shadow = False
@@ -2295,7 +2284,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             else:
                 player_being_hit = self.p2
             if og_pla == planet_pos:
-                if player_being_hit.cards_in_play[planet_pos + 1][unit_pos].check_for_a_trait(
+                if player_being_hit.get_card_given_pos(planet_pos, unit_pos).check_for_a_trait(
                         "Ally", player_being_hit.etekh_trait):
                     can_continue = True
                     if player_being_hit.name_player == secondary_player.name_player:
@@ -2349,8 +2338,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     self.first_player_nullified = primary_player.name_player
                     self.nullify_context = "Reaction Event"
                 if can_continue:
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].hit_by_superiority = True
-                        card_name = player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_name()
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).hit_by_superiority = True
+                        card_name = player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_name()
                         text = card_name + ", position " + str(planet_pos) \
                                + " " + str(unit_pos) + " hit by superiority."
                         await self.send_update_message(text)
@@ -2466,9 +2455,9 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Beasthunter Wyches":
             if int(primary_player.get_number()) == int(og_num):
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == "Beasthunter Wyches":
-                    if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_reaction_available():
+                    if primary_player.get_card_given_pos(planet_pos, unit_pos).get_reaction_available():
                         if primary_player.spend_resources(1):
-                            primary_player.cards_in_play[planet_pos + 1][unit_pos]. \
+                            primary_player.get_card_given_pos(planet_pos, unit_pos). \
                                 set_reaction_available(False)
                             primary_player.summon_token_at_hq("Khymera", 1)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)
@@ -2854,7 +2843,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             if reaction.chosen_first_card:
                 if game_update_string[1] == secondary_player.get_number():
                     if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                        if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_defense_battery_target:
+                        if secondary_player.get_card_given_pos(planet_pos, unit_pos).valid_defense_battery_target:
                             self.queue_special_damage_begins_sound()
                             secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 2, by_enemy_unit=False)
                             self.delete_reaction()
@@ -2952,7 +2941,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         self.first_player_nullified = primary_player.name_player
                         self.nullify_context = "Reaction"
                     if can_continue:
-                        player_owning_card.cards_in_play[planet_pos + 1][unit_pos].\
+                        player_owning_card.get_card_given_pos(planet_pos, unit_pos).\
                             hit_by_frenzied_wulfen_names.append(primary_player.name_player)
                         self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                         self.delete_reaction()
@@ -2961,8 +2950,8 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       current_reaction + " can only target army units.")
         elif current_reaction == "Prognosticator":
             valid_planet = False
-            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-                if primary_player.cards_in_play[planet_pos + 1][i].recently_assigned_damage:
+            for i in range(primary_player.count_units_at_planet(planet_pos)):
+                if primary_player.get_card_given_pos(planet_pos, i).recently_assigned_damage:
                     valid_planet = True
             if valid_planet:
                 if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -3020,7 +3009,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     await self.send_update_message("Total faith spent: " + str(reaction.misc_counter))
         elif current_reaction == "Interceptor Squad":
             if planet_pos == reaction.misc_target_planet:
-                if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].just_entered_play:
+                if player_owning_card.get_card_given_pos(planet_pos, unit_pos).just_entered_play:
                     self.queue_special_damage_begins_sound()
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             context="Interceptor Squad")
@@ -3140,11 +3129,11 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Magus Harid":
             if reaction.chosen_first_card:
                 if secondary_player.number == game_update_string[1]:
-                    if secondary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_magus_harid:
+                    if secondary_player.get_card_given_pos(planet_pos, unit_pos).valid_target_magus_harid:
                         card = primary_player.get_card_in_hand(reaction.misc_player_storage)
                         if card is None:
                             return None
-                        secondary_player.cards_in_play[planet_pos + 1][unit_pos].add_attachment(
+                        secondary_player.get_card_given_pos(planet_pos, unit_pos).add_attachment(
                             card, name_owner=primary_player.name_player, is_magus=True)
                         primary_player.remove_card_from_hand(reaction.misc_player_storage)
                         primary_player.draw_card()
@@ -3158,7 +3147,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           current_reaction + " cannot target that unit.")
         elif current_reaction == "Banner of the Ashen Sky":
             if game_update_string[1] == primary_player.number:
-                if primary_player.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                if primary_player.get_card_given_pos(planet_pos, unit_pos).valid_target_ashen_banner:
                     primary_player.increase_attack_of_unit_at_pos(planet_pos, unit_pos, 2, expiration="NEXT")
                     card_name = primary_player.get_name_given_pos(planet_pos, unit_pos)
                     await self.send_update_message(card_name + " gained +2 ATK from Banner!")
@@ -3168,7 +3157,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       current_reaction + " cannot target that unit.")
         elif current_reaction == "Drifting Spore Mines":
             if planet_pos == reaction.misc_target_unit[0]:
-                if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+                if not player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_unique():
                     self.queue_special_damage_begins_sound()
                     player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 1, rickety_warbuggy=True,
                                                             shadow_field_possible=True)
@@ -3178,7 +3167,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                       current_reaction + " cannot target unique units.")
         elif current_reaction == "Cry of the Wind":
             if not reaction.chosen_first_card:
-                if player_owning_card.cards_in_play[planet_pos + 1][unit_pos].valid_target_ashen_banner:
+                if player_owning_card.get_card_given_pos(planet_pos, unit_pos).valid_target_ashen_banner:
                     reaction.misc_target_unit = (planet_pos, unit_pos)
                     player_owning_card.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                     reaction.chosen_first_card = True
@@ -3195,7 +3184,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
         elif current_reaction == "Willing Submission":
             if not reaction.chosen_first_card or not reaction.chosen_second_card:
                 if primary_player.get_number() == game_update_string[1]:
-                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or primary_player.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color != "blue":
+                    if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Warlord" or primary_player.get_card_given_pos(planet_pos, unit_pos).aiming_reticle_color != "blue":
                         primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
                         if not reaction.chosen_first_card:
                             reaction.chosen_first_card = True
@@ -3211,7 +3200,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                                                           current_reaction + " cannot target that unit.")
             else:
                 if secondary_player.get_number() == game_update_string[1]:
-                    if secondary_player.cards_in_play[planet_pos + 1][unit_pos].aiming_reticle_color == "blue":
+                    if secondary_player.get_card_given_pos(planet_pos, unit_pos).aiming_reticle_color == "blue":
                         secondary_player.assign_damage_to_pos(planet_pos, unit_pos, 1, by_enemy_unit=False)
                         secondary_player.reset_all_aiming_reticles_play_hq()
                         self.delete_reaction()
@@ -3221,8 +3210,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
             target_pos = int(game_update_string[3])
             if int(game_update_string[1]) == int(secondary_player.get_number()):
                 if abs(origin_planet - target_planet) == 1:
-                    if secondary_player.cards_in_play[target_planet + 1][
-                            target_pos].get_card_type() == "Army":
+                    if secondary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
                         can_continue = True
                         possible_interrupts = []
                         if player_owning_card.name_player == primary_player.name_player:
@@ -3249,7 +3237,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                             secondary_player.move_unit_to_planet(target_planet,
                                                                  int(game_update_string[3]),
                                                                  origin_planet)
-                            new_unit_pos = len(secondary_player.cards_in_play[origin_planet + 1]) - 1
+                            new_unit_pos = secondary_player.count_units_at_planet(origin_planet) - 1
                             secondary_player.assign_damage_to_pos(
                                 origin_planet, new_unit_pos, 1, context="Sicarius's Chosen", rickety_warbuggy=True)
                             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

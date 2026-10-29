@@ -241,10 +241,10 @@ async def update_game_event_command_section(self, name, game_update_string):
                         if self.p2.get_ability_given_pos(-2, i) == "Heralding Cherubim":
                             self.create_reaction("Heralding Cherubim", self.name_2, (2, -2, i))
                     for i in range(7):
-                        for j in range(len(self.p1.cards_in_play[i + 1])):
+                        for j in range(self.p1.count_units_at_planet(i)):
                             if self.p1.get_ability_given_pos(i, j) == "Heralding Cherubim":
                                 self.create_reaction("Heralding Cherubim", self.name_1, (1, i, j))
-                        for j in range(len(self.p2.cards_in_play[i + 1])):
+                        for j in range(self.p2.count_units_at_planet(i)):
                             if self.p2.get_ability_given_pos(i, j) == "Heralding Cherubim":
                                 self.create_reaction("Heralding Cherubim", self.name_2, (2, i, j))
                     planets_committed_to = [self.p1.warlord_commit_location, self.p2.warlord_commit_location,
@@ -616,7 +616,7 @@ def try_entire_command(self, planet_pos):
             if self.p1.resources >= cost:
                 return "INTERRUPT PRE STRUGGLE"
         elif self.p1.search_hand_for_card("War of Ideas"):
-            for i in range(len(self.p1.cards_in_play[planet_pos + 1])):
+            for i in range(self.p1.count_units_at_planet(planet_pos)):
                 if not self.p1.get_ready_given_pos(planet_pos, i):
                     return "INTERRUPT PRE STRUGGLE"
         elif self.p2.search_hand_for_card("Superiority") and self.p1.count_command_at_planet(planet_pos) > 0:
@@ -626,7 +626,7 @@ def try_entire_command(self, planet_pos):
             if self.p2.resources >= cost:
                 return "INTERRUPT PRE STRUGGLE"
         elif self.p2.search_hand_for_card("War of Ideas"):
-            for i in range(len(self.p2.cards_in_play[planet_pos + 1])):
+            for i in range(self.p2.count_units_at_planet(planet_pos)):
                 if not self.p2.get_ready_given_pos(planet_pos, i):
                     return "INTERRUPT PRE STRUGGLE"
     name_winner = determine_winner_command_struggle(self, planet_pos)
@@ -661,7 +661,7 @@ def try_entire_command(self, planet_pos):
                     self.create_interrupt("Shaper Agnok", self.name_2, (2, -1, -1))
                     auto_interrupts = True
             tau_present = False
-            for i in range(len(self.p2.cards_in_play[planet_pos + 1])):
+            for i in range(self.p2.count_units_at_planet(planet_pos)):
                 if self.p2.check_if_faction_given_pos(planet_pos, i, "Tau"):
                     tau_present = True
             if tau_present:
@@ -695,7 +695,7 @@ def try_entire_command(self, planet_pos):
                     self.create_interrupt("Shaper Agnok", self.name_1, (1, -1, -1))
                     auto_interrupts = True
             tau_present = False
-            for i in range(len(self.p1.cards_in_play[planet_pos + 1])):
+            for i in range(self.p1.count_units_at_planet(planet_pos)):
                 if self.p1.check_if_faction_given_pos(planet_pos, i, "Tau"):
                     tau_present = True
             if tau_present:
@@ -756,11 +756,11 @@ def resolve_winnings(self, winner, loser, planet_id):
         self.create_reaction("Humanity's Shield", loser.name_player, (int(loser.get_number()), planet_id, -1))
     if self.infested_planets[planet_id]:
         for i in range(len(self.planet_array)):
-            for j in range(len(winner.cards_in_play[i + 1])):
+            for j in range(winner.count_units_at_planet(i)):
                 if winner.get_ability_given_pos(i, j) == "Devourer Venomthrope":
                     self.create_reaction("Devourer Venomthrope", winner.name_player,
                                          (int(winner.get_number()), i, j))
-    for i in range(len(winner.cards_in_play[planet_id + 1])):
+    for i in range(winner.count_units_at_planet(planet_id)):
         if winner.get_ability_given_pos(planet_id, i) == "Soul Grinder":
             self.create_reaction("Soul Grinder", winner.name_player, (int(winner.get_number()), planet_id, i))
         if winner.get_ability_given_pos(planet_id, i) == "Toxic Venomthrope":
@@ -773,7 +773,7 @@ def resolve_winnings(self, winner, loser, planet_id):
                     if winner.search_card_in_hq("Raiding Portal", ready_relevant=True):
                         self.create_reaction("Raiding Portal", winner.name_player,
                                              (int(winner.get_number()), planet_id, -1))
-        attachments = winner.cards_in_play[planet_id + 1][i].get_attachments()
+        attachments = winner.get_card_given_pos(planet_id, i).get_attachments()
         for j in range(len(attachments)):
             if attachments[j].get_ability() == "Noxious Fleshborer" and not attachments[j].from_magus_harid:
                 if not already_noxious and not self.infested_planets[planet_id]:

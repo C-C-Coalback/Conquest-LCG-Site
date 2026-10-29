@@ -119,7 +119,7 @@ async def resolve_hand_reaction(self, name, game_update_string, primary_player, 
             if planet_pos == -2:
                 primary_player.headquarters[unit_pos].misc_string = primary_player.cards[hand_pos]
             else:
-                primary_player.cards_in_play[planet_pos + 1][unit_pos].misc_string = primary_player.cards[hand_pos]
+                primary_player.get_card_given_pos(planet_pos, unit_pos).misc_string = primary_player.cards[hand_pos]
             primary_player.remove_card_from_game(primary_player.cards[hand_pos], hidden="H")
             del primary_player.cards[hand_pos]
             self.mask_jain_zar_check_reactions(primary_player, secondary_player)

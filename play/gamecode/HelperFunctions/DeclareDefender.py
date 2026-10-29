@@ -11,7 +11,7 @@ async def declare_defender(self, name, game_update_string):
         if not self.check_if_unit_can_be_declared_as_defender(primary_player, secondary_player, chosen_planet,
                                                               chosen_unit):
             if self.sweep_active:
-                if not secondary_player.cards_in_play[chosen_planet + 1][chosen_unit].valid_sweep_target:
+                if not secondary_player.get_card_given_pos(chosen_planet, chosen_unit).valid_sweep_target:
                     await self.send_update_message("That unit has already been attacked!")
         else:
             self.defender_planet = chosen_planet
@@ -19,7 +19,7 @@ async def declare_defender(self, name, game_update_string):
             can_continue = True
             if self.may_move_defender and can_continue:
                 if secondary_player.search_card_at_planet(self.defender_planet, "Zen Xi Aonia"):
-                    if len(secondary_player.cards_in_play[self.defender_planet + 1]) > 1:
+                    if secondary_player.count_units_at_planet(self.defender_planet) > 1:
                         can_continue = False
                         self.create_interrupt("Zen Xi Aonia", secondary_player.name_player,
                                               (int(secondary_player.number), self.defender_planet, -1))
@@ -30,7 +30,7 @@ async def declare_defender(self, name, game_update_string):
                                                                     self.defender_position,
                                                                     "red")
             if self.may_move_defender and can_continue:
-                for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                for i in range(secondary_player.count_units_at_planet(self.defender_planet)):
                     if i != self.defender_position:
                         if secondary_player.get_ability_given_pos(self.defender_planet,
                                                                   i) == "Fire Warrior Elite":
@@ -48,7 +48,7 @@ async def declare_defender(self, name, game_update_string):
                                                                                 "red")
             if can_continue and self.may_move_defender:
                 ready_runt = False
-                for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                for i in range(secondary_player.count_units_at_planet(self.defender_planet)):
                     if secondary_player.get_ready_given_pos(self.defender_planet, i) and \
                             secondary_player.check_for_trait_given_pos(self.defender_planet, i, "Runt"):
                         ready_runt = True
@@ -84,8 +84,7 @@ async def declare_defender(self, name, game_update_string):
                                                                             "red")
             if can_continue and self.additional_attack_effects_allowed:
                 if secondary_player.check_for_trait_given_pos(self.defender_planet, self.defender_position, "Elite"):
-                    if not primary_player.cards_in_play[self.attacker_planet + 1][
-                               self.attacker_position].attack_set_next is not None:
+                    if not primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position).attack_set_next is not None:
                         if primary_player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
                                                                     "Krak Grenade"):
                             can_continue = False
@@ -144,8 +143,7 @@ async def declare_defender(self, name, game_update_string):
                                                    self.defender_position)
                 elif secondary_player.get_ability_given_pos(
                         self.defender_planet, self.defender_position) == "War Walker Squadron":
-                    attachments = secondary_player.cards_in_play[
-                        self.defender_planet + 1][self.defender_position].get_attachments()
+                    attachments = secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).get_attachments()
                     found_hardpoint = False
                     for i in range(len(attachments)):
                         if attachments[i].check_for_a_trait("Hardpoint") and attachments[i].get_ready():
@@ -331,8 +329,7 @@ async def declare_defender(self, name, game_update_string):
             if can_continue and self.allow_damage_abilities_defender:
                 if secondary_player.get_ability_given_pos(
                         self.defender_planet, self.defender_position) == "Trap Laying Hunter":
-                    if not secondary_player.cards_in_play[self.defender_planet + 1][
-                        self.defender_position].misc_ability_used:
+                    if not secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).misc_ability_used:
                         can_continue = False
                         await self.send_update_message(
                             "Trap Laying Hunter must fire before the rest of the attack."
@@ -350,13 +347,9 @@ async def declare_defender(self, name, game_update_string):
                 if secondary_player.get_ability_given_pos(
                         self.defender_planet, self.defender_position) == "Neurotic Obliterator":
                     ready_weapon = False
-                    for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1][
-                                           self.defender_position].get_attachments())):
-                        if secondary_player.cards_in_play[self.defender_planet + 1][
-                            self.defender_position].get_attachments()[i].get_ready() and \
-                                secondary_player.cards_in_play[self.defender_planet + 1][
-                                    self.defender_position].get_attachments()[i].check_for_a_trait(
-                                    "Weapon"):
+                    for i in range(len(secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).get_attachments())):
+                        if secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).get_attachments()[i].get_ready() and \
+                                secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).get_attachments()[i].check_for_a_trait("Weapon"):
                             ready_weapon = True
                     if ready_weapon:
                         can_continue = False
@@ -388,9 +381,8 @@ async def declare_defender(self, name, game_update_string):
                     self.queued_sound = "gunfire_attack"
                 if secondary_player.get_ability_given_pos(
                         self.defender_planet, self.defender_position) == "Tomb Blade Diversionist":
-                    secondary_player.cards_in_play[
-                        self.defender_planet + 1][self.defender_position].misc_ability_used = True
-                for i in range(len(primary_player.cards_in_play[self.defender_planet + 1])):
+                    secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).misc_ability_used = True
+                for i in range(primary_player.count_units_at_planet(self.defender_planet)):
                     if primary_player.get_ability_given_pos(
                             self.defender_planet, i) == "Sickening Helbrute":
                         self.create_reaction("Sickening Helbrute", secondary_player.name_player,
@@ -398,11 +390,10 @@ async def declare_defender(self, name, game_update_string):
                                               self.defender_position))
                 if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                         == "Storming Librarian":
-                    value_storming_librarion = primary_player.cards_in_play[self.attacker_planet + 1][
-                        self.attacker_position].card_id
-                    secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position]. \
+                    value_storming_librarion = primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position).card_id
+                    secondary_player.get_card_given_pos(self.defender_planet, self.defender_position). \
                         hit_by_which_storming_librarians.append(value_storming_librarion)
-                for i in range(len(secondary_player.cards_in_play[self.defender_planet + 1])):
+                for i in range(secondary_player.count_units_at_planet(self.defender_planet)):
                     if secondary_player.get_ability_given_pos(
                             self.defender_planet, i) == "Sickening Helbrute":
                         self.create_reaction("Sickening Helbrute", secondary_player.name_player,
@@ -422,53 +413,35 @@ async def declare_defender(self, name, game_update_string):
                                 self.defender_planet, self.defender_position) == "Warlord":
                             command = command - 999
                         attack_value += 2 * max(command, 0)
-                    for i in range(len(primary_player.cards_in_play[self.attacker_planet + 1][
-                                           self.attacker_position].get_attachments())):
-                        if primary_player.cards_in_play[self.attacker_planet + 1][
-                            self.attacker_position].get_attachments()[
+                    for i in range(len(primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position).get_attachments())):
+                        if primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position).get_attachments()[
                             i].get_ability() == "Hidden Strike Chainsword":
-                            if secondary_player.get_card_type_given_pos(
-                                    self.defender_planet, self.defender_position) != "Warlord":
+                            if secondary_player.get_card_type_given_pos(self.defender_planet, self.defender_position) != "Warlord":
                                 attack_value += 2
-                    if secondary_player.cards_in_play[self.defender_planet + 1][self.defender_position] \
+                    if secondary_player.get_card_given_pos(self.defender_planet, self.defender_position) \
                             .get_card_type() != "Warlord":
                         attack_value += self.banshee_power_sword_extra_attack
                         self.banshee_power_sword_extra_attack = 0
-                att_flying = primary_player.get_flying_given_pos(self.attacker_planet,
-                                                                 self.attacker_position)
-                def_flying = secondary_player.get_flying_given_pos(self.defender_planet,
-                                                                   self.defender_position)
+                att_flying = primary_player.get_flying_given_pos(self.attacker_planet, self.attacker_position)
+                def_flying = secondary_player.get_flying_given_pos(self.defender_planet, self.defender_position)
                 att_ignores_flying = primary_player.get_ignores_flying_given_pos(
                     self.attacker_planet, self.attacker_position)
-                if primary_player.get_ability_given_pos(
-                        self.attacker_planet, self.attacker_position) == "Silvered Blade Avengers":
-                    if secondary_player.cards_in_play[
-                        self.defender_planet + 1][self.defender_position] \
-                            .get_card_type() != "Warlord":
-                        secondary_player.exhaust_given_pos(self.defender_planet,
-                                                           self.defender_position)
-                if secondary_player.get_ability_given_pos(
-                        self.defender_planet, self.defender_position) == "Farsight Vanguard":
-                    if not secondary_player.get_once_per_phase_used_given_pos(
-                            self.defender_planet, self.defender_position):
+                if primary_player.get_ability_given_pos(self.attacker_planet, self.attacker_position) == "Silvered Blade Avengers":
+                    if secondary_player.get_card_type_given_pos(self.defender_planet, self.defender_position) != "Warlord":
+                        secondary_player.exhaust_given_pos(self.defender_planet, self.defender_position)
+                if secondary_player.get_ability_given_pos(self.defender_planet, self.defender_position) == "Farsight Vanguard":
+                    if not secondary_player.get_once_per_phase_used_given_pos(self.defender_planet, self.defender_position):
                         self.create_reaction("Farsight Vanguard", secondary_player.name_player,
                                              (int(secondary_player.number), self.defender_planet,
                                               self.defender_position))
-                if secondary_player.cards_in_play[
-                    self.defender_planet + 1][self.defender_position] \
-                        .get_card_type() == "Warlord" or primary_player.name_player \
-                        in secondary_player.cards_in_play[self.defender_planet + 1][
-                    self.defender_position].hit_by_frenzied_wulfen_names:
-                    if primary_player.get_card_type_given_pos(self.attacker_planet,
-                                                              self.attacker_position) == "Warlord":
+                if secondary_player.get_card_type_given_pos(self.defender_planet, self.defender_position) == "Warlord" or primary_player.name_player in secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).hit_by_frenzied_wulfen_names:
+                    if primary_player.get_card_type_given_pos(self.attacker_planet, self.attacker_position) == "Warlord":
                         for i in range(len(primary_player.headquarters)):
                             if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
                                 self.create_reaction("Gladius Strike Force", primary_player.name_player,
                                                      (int(primary_player.number), -2, i))
                     if secondary_player.search_card_in_hq("Zogwort's Hovel"):
-                        self.create_reaction("Zogwort's Hovel", secondary_player.name_player,
-                                             (int(secondary_player.number), self.defender_planet,
-                                              -1))
+                        self.create_reaction("Zogwort's Hovel", secondary_player.name_player, (int(secondary_player.number), self.defender_planet, -1))
                 # Flying check
                 if def_flying and not att_flying and not att_ignores_flying:
                     attack_value = int(attack_value / 2 + (attack_value % 2))
@@ -484,9 +457,7 @@ async def declare_defender(self, name, game_update_string):
                                 if secondary_player.get_card_type_given_pos(
                                         self.defender_planet, self.defender_position) == "Warlord":
                                     attack_value = attack_value * 2
-                                elif primary_player.name_player in secondary_player.cards_in_play[
-                                    self.defender_planet + 1][
-                                    self.defender_position].hit_by_frenzied_wulfen_names:
+                                elif primary_player.name_player in secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).hit_by_frenzied_wulfen_names:
                                     attack_value = attack_value * 2
                     if secondary_player.check_for_trait_given_pos(self.defender_planet,
                                                                   self.defender_position, "Vehicle"):
@@ -553,8 +524,7 @@ async def declare_defender(self, name, game_update_string):
                                                             self.attacker_position) \
                             == "Havocs of Khorne":
                         attack_value = attack_value * 2
-                secondary_player.cards_in_play[self.defender_planet + 1][
-                    self.defender_position].valid_sweep_target = False
+                secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).valid_sweep_target = False
                 print("unit is no longer a valid sweep target")
                 self.card_type_defender = secondary_player.get_card_type_given_pos(
                     self.defender_planet, self.defender_position)
@@ -564,8 +534,7 @@ async def declare_defender(self, name, game_update_string):
                                                         self.defender_planet, self.defender_position)
                 self.defender_is_also_warlord = \
                     primary_player.name_player in \
-                    secondary_player.cards_in_play[self.defender_planet + 1
-                                                   ][self.defender_position].hit_by_frenzied_wulfen_names
+                    secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).hit_by_frenzied_wulfen_names
                 self.attacker_location = (int(primary_player.number), self.attacker_planet,
                                           self.attacker_position)
                 if primary_player.get_ability_given_pos(self.attacker_planet,

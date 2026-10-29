@@ -30,7 +30,7 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 3)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 3)
 
     async def test_nazdregs_flash_gitz(self):
         random.seed(42)
@@ -63,7 +63,7 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "2"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
         self.assertEqual(test_game.p2.get_ready_given_pos(0, 1), False)
         self.assertEqual(test_game.p1.get_once_per_phase_used_given_pos(0, 1), True)
 
@@ -81,7 +81,7 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 0)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 2)
 
     async def test_haemonculus_tormentor(self):
@@ -120,7 +120,7 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "1", "0"])
         await test_game.update_game_event("P1", ["PLANETS", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
         self.assertEqual(test_game.p1.get_once_per_phase_used_given_pos(0, 1), True)
 
     async def test_ravenous_flesh_hounds(self):
@@ -138,7 +138,7 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["action-button"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 0)
 
     async def test_awakening_cavern(self):

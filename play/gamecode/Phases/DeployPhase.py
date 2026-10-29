@@ -477,7 +477,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         elif self.action_object.action_chosen == "Decaying Warrior Squad":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
             primary_player.aiming_reticle_coords_discard = -1
-            primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
+            primary_player.get_card_given_pos(planet_pos, position_of_unit). \
                 valid_target_dynastic_weaponry = True
             if "Dynastic Weaponry" in primary_player.discard:
                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
@@ -499,7 +499,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
                 del secondary_player.discard[self.anrakyr_unit_position]
             primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
                                                         self.action_object.position_of_actioned_card[1])
-            primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
+            primary_player.get_card_given_pos(planet_pos, position_of_unit). \
                 valid_target_dynastic_weaponry = True
             if own_card:
                 if "Dynastic Weaponry" in primary_player.discard:
@@ -512,7 +512,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         elif self.action_object.action_chosen == "Merciless Reclamation":
             del primary_player.discard[self.anrakyr_unit_position]
             primary_player.aiming_reticle_coords_discard = None
-            primary_player.cards_in_play[planet_pos + 1][position_of_unit]. \
+            primary_player.get_card_given_pos(planet_pos, position_of_unit). \
                 valid_target_dynastic_weaponry = True
             if "Dynastic Weaponry" in primary_player.discard:
                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
@@ -525,12 +525,12 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
             og_pla, og_pos, og_att = self.action_object.misc_target_attachment
             num = self.action_object.misc_target_player
             if num == int(primary_player.get_number()):
-                del primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_att]
+                del primary_player.get_card_given_pos(og_pla, og_pos).get_attachments()[og_att]
                 if not primary_player.get_immune_to_enemy_events(og_pla, og_pos):
                     primary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False,
                                                         by_enemy_unit=False)
             else:
-                del secondary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()[og_att]
+                del secondary_player.get_card_given_pos(og_pla, og_pos).get_attachments()[og_att]
                 if not secondary_player.get_immune_to_enemy_events(og_pla, og_pos):
                     secondary_player.assign_damage_to_pos(og_pla, og_pos, 1, preventable=False,
                                                           by_enemy_unit=False)
@@ -693,7 +693,7 @@ async def deploy_card_routine_attachment(self, name, game_update_string, special
                     primary_player.can_play_limited = False
                 if card.check_for_a_trait("Torture"):
                     for i in range(7):
-                        for j in range(len(primary_player.cards_in_play[i + 1])):
+                        for j in range(primary_player.count_units_at_planet(i)):
                             if primary_player.get_ability_given_pos(i, j) == "Arrogant Haemonculus":
                                 primary_player.game.create_reaction("Arrogant Haemonculus", primary_player.name_player,
                                                                     (int(primary_player.number), i, j))

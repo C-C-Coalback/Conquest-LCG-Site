@@ -51,7 +51,7 @@ def detect_possible_actions(game, primary_player, secondary_player, combat_turn_
                         if check_if_action_can_start(game, ability, prereqs, primary_player, secondary_player, card=card, planet_pos=-2, attachment_pos=k):
                             possible_action_locations = add_action(possible_action_locations, "ATTACHMENT/HQ/" + str(primary_player.number) + "/" + str(i) + "/" + str(k), combat_turn_action=combat_turn_action)
     for i in range(7):
-        for j in range(len(primary_player.cards_in_play[i + 1])):
+        for j in range(primary_player.count_units_at_planet(i)):
             card = primary_player.get_card_given_pos(i, j)
             if card.get_has_action_while_in_play():
                 if card.get_allowed_phases_while_in_play() in [game.phase, "ALL"]:
@@ -140,7 +140,7 @@ def check_single_card_in_play(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Kraktoof Hall":
             if primary_player.get_damage_given_pos(planet_pos, unit_pos) == 0:
                 return False
-            if len(primary_player.cards_in_play[planet_pos + 1]) + len(secondary_player.cards_in_play[planet_pos + 1]) < 2:
+            if primary_player.count_units_at_planet(planet_pos) + secondary_player.count_units_at_planet(planet_pos) < 2:
                 return False
         if action_ability == "Archon's Terror":
             if primary_player.get_unique_given_pos(planet_pos, unit_pos):
@@ -219,18 +219,18 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                             if primary_player.check_if_can_attach_card(attachments[j], -2, k):
                                 return True
                     for k in range(7):
-                        for l in range(len(primary_player.cards_in_play[k + 1])):
+                        for l in range(primary_player.count_units_at_planet(k)):
                             if primary_player.check_if_can_attach_card(attachments[j], k, l):
                                 return True
             for i in range(7):
-                for j in range(len(primary_player.cards_in_play[i + 1])):
+                for j in range(primary_player.count_units_at_planet(i)):
                     attachments = primary_player.get_all_attachments_at_pos(i, j)
                     for k in range(len(attachments)):
                         for l in range(len(primary_player.headquarters)):
                             if primary_player.check_if_can_attach_card(attachments[k], -2, l):
                                 return True
                         for l in range(7):
-                            for m in range(len(primary_player.cards_in_play[l + 1])):
+                            for m in range(primary_player.count_units_at_planet(l)):
                                 if i != l or j != m:
                                     if primary_player.check_if_can_attach_card(attachments[k], l, m):
                                         return True
@@ -242,18 +242,18 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                             if secondary_player.check_if_can_attach_card(attachments[j], -2, k):
                                 return True
                     for k in range(7):
-                        for l in range(len(secondary_player.cards_in_play[k + 1])):
+                        for l in range(secondary_player.count_units_at_planet(k)):
                             if secondary_player.check_if_can_attach_card(attachments[j], k, l):
                                 return True
             for i in range(7):
-                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                for j in range(secondary_player.count_units_at_planet(i)):
                     attachments = secondary_player.get_all_attachments_at_pos(i, j)
                     for k in range(len(attachments)):
                         for l in range(len(secondary_player.headquarters)):
                             if secondary_player.check_if_can_attach_card(attachments[k], -2, l):
                                 return True
                         for l in range(7):
-                            for m in range(len(secondary_player.cards_in_play[l + 1])):
+                            for m in range(secondary_player.count_units_at_planet(l)):
                                 if i != l or j != m:
                                     if secondary_player.check_if_can_attach_card(attachments[k], l, m):
                                         return True
@@ -267,8 +267,8 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                     if attachments[k].get_limited():
                         return True
             for i in range(7):
-                for j in range(len(secondary_player.cards_in_play[i + 1])):
-                    if secondary_player.cards_in_play[i + 1][j].get_limited():
+                for j in range(secondary_player.count_units_at_planet(i)):
+                    if secondary_player.get_card_given_pos(i, j).get_limited():
                         return True
                     attachments = secondary_player.get_all_attachments_at_pos(i, j)
                     for k in range(len(attachments)):
@@ -289,7 +289,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                     ):
                         return True
                 for i in range(7):
-                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                    for j in range(primary_player.count_units_at_planet(i)):
                         if primary_player.check_if_can_attach_card(
                                 attachment_card, i, j, not_own_attachment=not_own_attach
                         ):
@@ -301,7 +301,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                     ):
                         return True
                 for i in range(7):
-                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    for j in range(secondary_player.count_units_at_planet(i)):
                         if secondary_player.check_if_can_attach_card(
                                 attachment_card, i, j,
                                 not_own_attachment=not_own_attach
@@ -319,7 +319,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if own_card:
             if in_play_card_reqs["At Planet"]:
                 for i in range(7):
-                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                    for j in range(primary_player.count_units_at_planet(i)):
                         if check_single_card_in_play(game, action_ability, prereqs, primary_player, secondary_player, i, j, src_planet=planet_pos):
                             return True
             if in_play_card_reqs["At HQ"]:
@@ -329,7 +329,7 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if enemy_card:
             if in_play_card_reqs["At Planet"]:
                 for i in range(7):
-                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    for j in range(secondary_player.count_units_at_planet(i)):
                         if check_single_card_in_play(game, action_ability, prereqs, secondary_player, primary_player, i, j, src_planet=planet_pos):
                             return True
             if in_play_card_reqs["At HQ"]:
@@ -342,10 +342,10 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
                 return False
             for i in range(7):
                 if game.round_number != i and game.planets_in_play_array[i]:
-                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                    for j in range(primary_player.count_units_at_planet(i)):
                         if not primary_player.get_unique_given_pos(i, j):
                             return True
-                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    for j in range(secondary_player.count_units_at_planet(i)):
                         if not secondary_player.get_unique_given_pos(i, j) and not secondary_player.get_immune_to_enemy_events(i, j):
                             return True
             return False
@@ -353,13 +353,13 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
             if planet_pos == -2:
                 return False
             sac_unit_check = False
-            for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+            for i in range(primary_player.count_units_at_planet(planet_pos)):
                 if primary_player.check_if_faction_given_pos(planet_pos, i, "Astra Militarum"):
                     if primary_player.get_card_type_given_pos(planet_pos, i) != "Warlord":
                         sac_unit_check = True
             if sac_unit_check:
                 exhaustible_unit_check = False
-                for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+                for i in range(secondary_player.count_units_at_planet(planet_pos)):
                     if secondary_player.get_ready_given_pos(planet_pos, i):
                         if secondary_player.get_card_type_given_pos(planet_pos, i) != "Warlord":
                             exhaustible_unit_check = True
@@ -368,11 +368,11 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
         if action_ability == "Suppressive Fire":
             for i in range(7):
                 has_own_ready_unit = False
-                for j in range(len(primary_player.cards_in_play[i + 1])):
+                for j in range(primary_player.count_units_at_planet(i)):
                     if primary_player.get_ready_given_pos(i, j):
                         has_own_ready_unit = True
                 if has_own_ready_unit:
-                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                    for j in range(secondary_player.count_units_at_planet(i)):
                         if secondary_player.get_ready_given_pos(i, j):
                             if secondary_player.get_card_type_given_pos(i, j) != "Warlord":
                                 if not secondary_player.get_immune_to_enemy_events(i, j):
@@ -381,12 +381,12 @@ def check_if_action_can_start(game, action_ability, prereqs, primary_player, sec
             if card.get_damage() == 0:
                 return False
             for i in range(7):
-                for j in range(len(primary_player.cards_in_play[i + 1])):
+                for j in range(primary_player.count_units_at_planet(i)):
                     if primary_player.check_for_trait_given_pos(i, j, "Cultist"):
                         return True
         if action_ability == "Khymera Den":
             for i in range(7):
-                for j in range(len(primary_player.cards_in_play[i + 1])):
+                for j in range(primary_player.count_units_at_planet(i)):
                     if primary_player.get_name_given_pos(i, j) == "Khymera":
                         return True
             for i in range(len(primary_player.headquarters)):

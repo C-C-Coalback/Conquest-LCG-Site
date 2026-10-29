@@ -82,8 +82,8 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     if card.get_cost() < self.ghost_ark_of_orikan:
                         num, planet, unit = self.reactions_needing_resolving[0].get_position_unit_triggering()
                         if primary_player.add_card_to_planet(card, planet, already_exhausted=True) != -1:
-                            position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
-                            primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                            position_of_unit = primary_player.count_units_at_planet(planet) - 1
+                            primary_player.get_card_given_pos(planet, position_of_unit). \
                                 valid_target_dynastic_weaponry = True
                             if "Dynastic Weaponry" in primary_player.discard:
                                 if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
@@ -176,8 +176,8 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     num, planet, unit = self.reactions_needing_resolving[0].get_position_unit_triggering()
                     if primary_player.add_card_to_planet(card, planet) != -1:
                         primary_player.used_optimized_protocol = True
-                        position_of_unit = len(primary_player.cards_in_play[planet + 1]) - 1
-                        primary_player.cards_in_play[planet + 1][position_of_unit]. \
+                        position_of_unit = primary_player.count_units_at_planet(planet) - 1
+                        primary_player.get_card_given_pos(planet, position_of_unit). \
                             valid_target_dynastic_weaponry = True
                         if "Dynastic Weaponry" in primary_player.discard:
                             if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):

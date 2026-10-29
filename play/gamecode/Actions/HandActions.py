@@ -227,9 +227,9 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                     elif ability == "Clash of Wings":
                         warlord_pla, _ = primary_player.get_location_of_warlord()
                         if warlord_pla != -2 and warlord_pla != -1:
-                            for i in range(len(primary_player.cards_in_play[warlord_pla + 1])):
+                            for i in range(primary_player.count_units_at_planet(warlord_pla)):
                                 if primary_player.get_mobile_given_pos(warlord_pla, i):
-                                    primary_player.cards_in_play[warlord_pla + 1][i].flying_eocr = True
+                                    primary_player.get_card_given_pos(warlord_pla, i).flying_eocr = True
                         primary_player.discard_card_from_hand(int(game_update_string[2]))
                         primary_player.resolve_played_any_event()
                         self.action_cleanup()
@@ -276,8 +276,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                 if primary_player.check_is_unit_at_pos(-2, i):
                                     primary_player.headquarters[i].health_eocr += 2
                             for i in range(7):
-                                for j in range(len(primary_player.cards_in_play[i + 1])):
-                                    primary_player.cards_in_play[i + 1][j].health_eocr += 2
+                                for j in range(primary_player.count_units_at_planet(i)):
+                                    primary_player.get_card_given_pos(i, j).health_eocr += 2
                             primary_player.resolve_played_any_event()
                             self.action_cleanup()
                         else:
@@ -346,7 +346,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         if not primary_player.our_last_stand_used:
                             primary_player.our_last_stand_used = True
                             primary_player.discard_card_from_hand(int(game_update_string[2]))
-                            for i in range(len(primary_player.cards_in_play[self.round_number + 1])):
+                            for i in range(primary_player.count_units_at_planet(self.round_number)):
                                 if primary_player.check_if_faction_given_pos(self.round_number, i, "Astra Militarum", own_event=True):
                                     primary_player.increase_faith_given_pos(self.round_number, i, 1)
                             icons = secondary_player.get_icons_on_captured()
@@ -560,11 +560,11 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     if secondary_player.headquarters[i].get_is_unit():
                                         secondary_player.assign_damage_to_pos(-2, i, 1, by_enemy_unit=False)
                             for i in range(7):
-                                for j in range(len(primary_player.cards_in_play[i + 1])):
-                                    if primary_player.cards_in_play[i + 1][j].get_is_unit():
+                                for j in range(primary_player.count_units_at_planet(i)):
+                                    if primary_player.get_card_given_pos(i, j).get_is_unit():
                                         primary_player.assign_damage_to_pos(i, j, 1, by_enemy_unit=False)
-                                for j in range(len(secondary_player.cards_in_play[i + 1])):
-                                    if secondary_player.cards_in_play[i + 1][j].get_is_unit():
+                                for j in range(secondary_player.count_units_at_planet(i)):
+                                    if secondary_player.get_card_given_pos(i, j).get_is_unit():
                                         if not secondary_player.get_immune_to_enemy_events(i, j):
                                             secondary_player.assign_damage_to_pos(i, j, 1, by_enemy_unit=False)
                             primary_player.resolve_played_any_event()
@@ -685,7 +685,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         highest_num = 0
                         for i in range(7):
                             current_count = 0
-                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                            for j in range(primary_player.count_units_at_planet(i)):
                                 if primary_player.get_card_type_given_pos(i, j) == "Army":
                                     current_count += 1
                             if highest_num < current_count:
@@ -796,7 +796,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     primary_player.exhaust_given_pos(-2, i, card_effect=True)
                                     snotlings_total += 1
                         for i in range(7):
-                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                            for j in range(primary_player.count_units_at_planet(i)):
                                 if primary_player.get_ability_given_pos(i, j) == "Snotlings":
                                     if primary_player.get_ready_given_pos(i, j):
                                         primary_player.exhaust_given_pos(i, j, card_effect=True)
@@ -838,14 +838,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                         for i in range(7):
                             if self.get_blue_icon(i):
                                 j = 0
-                                while j < len(primary_player.cards_in_play[i + 1]):
+                                while j < primary_player.count_units_at_planet(i):
                                     if primary_player.get_card_type_given_pos(i, j) == "Army":
                                         if primary_player.get_cost_given_pos(i, j) < 3:
                                             primary_player.destroy_card_in_play(i, j)
                                             j = j - 1
                                     j = j + 1
                                 j = 0
-                                while j < len(secondary_player.cards_in_play[i + 1]):
+                                while j < secondary_player.count_units_at_planet(i):
                                     if secondary_player.get_card_type_given_pos(i, j) == "Army":
                                         if secondary_player.get_cost_given_pos(i, j) < 3:
                                             if not secondary_player.get_immune_to_enemy_events(i, j):
@@ -890,8 +890,8 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                                     if primary_player.headquarters[i].get_attachments():
                                         primary_player.ready_given_pos(-2, i)
                                 for i in range(7):
-                                    for j in range(len(primary_player.cards_in_play[i + 1])):
-                                        if primary_player.cards_in_play[i + 1][j].get_attachments():
+                                    for j in range(primary_player.count_units_at_planet(i)):
+                                        if primary_player.get_card_given_pos(i, j).get_attachments():
                                             primary_player.ready_given_pos(i, j)
                                 primary_player.resolve_played_any_event()
                                 self.action_cleanup()
@@ -1013,7 +1013,7 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             if has_valid_target:
                                 break
                             for planet_pos in range(7):
-                                for unit_pos in range(len(player.cards_in_play[planet_pos + 1])):
+                                for unit_pos in range(player.count_units_at_planet(planet_pos)):
                                     if player.check_is_unit_at_pos(planet_pos, unit_pos):
                                         if player.get_card_type_given_pos(planet_pos, unit_pos) != "Warlord":
                                             has_valid_target = True
@@ -1066,14 +1066,14 @@ async def update_game_event_action_hand(self, name, game_update_string, may_null
                             i += 1
                         for planet_pos in range(7):
                             i = 0
-                            while i < len(primary_player.cards_in_play[planet_pos + 1]):
+                            while i < primary_player.count_units_at_planet(planet_pos):
                                 if primary_player.get_card_type_given_pos(planet_pos, i) == "Army":
                                     if primary_player.get_cost_given_pos(planet_pos, i) < 3:
                                         primary_player.return_card_to_hand(planet_pos, i)
                                         i = i - 1
                                 i += 1
                             i = 0
-                            while i < len(secondary_player.cards_in_play[planet_pos + 1]):
+                            while i < secondary_player.count_units_at_planet(planet_pos):
                                 if secondary_player.get_card_type_given_pos(planet_pos, i) == "Army":
                                     if not secondary_player.get_immune_to_enemy_events(planet_pos, i):
                                         if secondary_player.get_cost_given_pos(planet_pos, i) < 3:

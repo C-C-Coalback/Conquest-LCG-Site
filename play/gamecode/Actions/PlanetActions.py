@@ -13,7 +13,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
     if not self.action_object.action_chosen:
         pass
     elif self.action_object.action_chosen == "Ruined Passages":
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
             if primary_player.check_for_trait_given_pos(chosen_planet, i, "Genestealer"):
                 primary_player.ready_given_pos(chosen_planet, i)
         self.action_cleanup()
@@ -224,7 +224,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                       self.apoka_errata_cards, self.cards_that_have_errata)
             unit_pos = primary_player.add_card_to_planet(card, pos_planet)
             if unit_pos != -1:
-                primary_player.cards_in_play[pos_planet + 1][unit_pos].set_sacrifice_end_of_phase(True)
+                primary_player.get_card_given_pos(pos_planet, unit_pos).set_sacrifice_end_of_phase(True)
                 primary_player.remove_card_from_hand(pos_hand)
                 primary_player.aiming_reticle_coords_hand = None
                 primary_player.aiming_reticle_coords_hand_2 = None
@@ -242,7 +242,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         for i in range(7):
             if i != chosen_planet:
                 j = 0
-                while j < len(primary_player.cards_in_play[i + 1]):
+                while j < primary_player.count_units_at_planet(i):
                     if primary_player.get_aiming_reticle_in_play(i, j) == "blue":
                         if primary_player.get_name_given_pos(i, j) == "Khymera":
                             if primary_player.move_unit_to_planet(i, j, chosen_planet):
@@ -264,7 +264,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             for i in range(7):
                 if i != chosen_planet:
                     j = 0
-                    while j < len(primary_player.cards_in_play[i + 1]):
+                    while j < primary_player.count_units_at_planet(i):
                         if primary_player.get_aiming_reticle_in_play(i, j) == "blue":
                             if primary_player.check_for_trait_given_pos(i, j, "Ethereal"):
                                 if primary_player.move_unit_to_planet(i, j, chosen_planet):
@@ -277,7 +277,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if abs(chosen_planet - self.action_object.position_of_actioned_card[0]) == 1:
             origin_planet, origin_pos = self.action_object.position_of_actioned_card
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-            primary_player.cards_in_play[origin_planet + 1][origin_pos].set_once_per_phase_used(True)
+            primary_player.get_card_given_pos(origin_planet, origin_pos).set_once_per_phase_used(True)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             self.action_cleanup()
             self.action_object.position_of_actioned_card = (-1, -1)
@@ -309,13 +309,13 @@ async def update_game_event_action_planet(self, name, game_update_string):
                                               "Planet is not infested.")
     elif self.action_object.action_chosen == "Vivisection":
         self.queue_special_damage_begins_sound()
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
             if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True):
                 if primary_player.get_damage_given_pos(chosen_planet, i) > 0:
                     primary_player.remove_damage_from_pos(chosen_planet, i, 1, healing=True)
             else:
                 primary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(secondary_player.count_units_at_planet(chosen_planet)):
             if not secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons"):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
@@ -345,8 +345,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
             if card_names[i]:
                 card = self.preloaded_find_card(card_names[i])
                 if primary_player.add_card_to_planet(card, chosen_planet, triggered_card_effect=True) != -1:
-                    last_el = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
-                    primary_player.cards_in_play[chosen_planet + 1][last_el].return_to_hand_eor = True
+                    last_el = primary_player.count_units_at_planet(chosen_planet) - 1
+                    primary_player.get_card_given_pos(chosen_planet, last_el).return_to_hand_eor = True
                 else:
                     primary_player.add_card_to_discard(card_names[i])
         primary_player.drammask_nane_check()
@@ -412,17 +412,17 @@ async def update_game_event_action_planet(self, name, game_update_string):
             await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                               "Kaerux Erameas cannot target the first planet.")
     elif self.action_object.action_chosen == "Bond of Brotherhood":
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
             if primary_player.check_if_faction_given_pos(chosen_planet, i, "Tau", own_event=True):
-                primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eop += 2
+                primary_player.get_card_given_pos(chosen_planet, i).positive_hp_until_eop += 2
             if primary_player.check_if_faction_given_pos(chosen_planet, i, "Astra Militarum"):
-                primary_player.cards_in_play[chosen_planet + 1][i].extra_attack_until_end_of_phase += 2
+                primary_player.get_card_given_pos(chosen_planet, i).extra_attack_until_end_of_phase += 2
         primary_player.resolve_played_any_event()
         self.action_cleanup()
     elif self.action_object.action_chosen == "Mechanical Enhancement":
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
             if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True):
-                primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eop += 2
+                primary_player.get_card_given_pos(chosen_planet, i).positive_hp_until_eop += 2
         if not primary_player.harbinger_of_eternity_active:
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
@@ -474,21 +474,21 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_object.action_chosen == "Killing Field":
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            primary_player.cards_in_play[chosen_planet + 1][i].lost_ranged_eop = True
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            secondary_player.cards_in_play[chosen_planet + 1][i].lost_ranged_eop = True
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
+            primary_player.get_card_given_pos(chosen_planet, i).lost_ranged_eop = True
+        for i in range(secondary_player.count_units_at_planet(chosen_planet)):
+            secondary_player.get_card_given_pos(chosen_planet, i).lost_ranged_eop = True
         self.action_cleanup()
     elif self.action_object.action_chosen == "Extermination":
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
             if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True) and \
-                    not primary_player.cards_in_play[chosen_planet + 1][i].get_unique():
-                primary_player.cards_in_play[chosen_planet + 1][i].negative_hp_until_eop += 3
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+                    not primary_player.get_card_given_pos(chosen_planet, i).get_unique():
+                primary_player.get_card_given_pos(chosen_planet, i).negative_hp_until_eop += 3
+        for i in range(secondary_player.count_units_at_planet(chosen_planet)):
             if secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons") and \
-                    not secondary_player.cards_in_play[chosen_planet + 1][i].get_unique() and \
+                    not secondary_player.get_card_given_pos(chosen_planet, i).get_unique() and \
                     not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
-                secondary_player.cards_in_play[chosen_planet + 1][i].negative_hp_until_eop += 3
+                secondary_player.get_card_given_pos(chosen_planet, i).negative_hp_until_eop += 3
         if not primary_player.harbinger_of_eternity_active:
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
@@ -502,10 +502,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.action_cleanup()
     elif self.action_object.action_chosen == "Blood For The Blood God!":
         self.queue_special_damage_begins_sound()
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
             if primary_player.get_damage_given_pos(chosen_planet, i) == 0:
                 primary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(secondary_player.count_units_at_planet(chosen_planet)):
             if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
                 if secondary_player.get_damage_given_pos(chosen_planet, i) == 0:
                     secondary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
@@ -513,8 +513,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_object.action_chosen == "Vile Laboratory":
         if not self.action_object.chosen_first_card:
             valid = False
-            for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-                if not secondary_player.cards_in_play[chosen_planet + 1][i].check_for_a_trait(
+            for i in range(secondary_player.count_units_at_planet(chosen_planet)):
+                if not secondary_player.get_card_given_pos(chosen_planet, i).check_for_a_trait(
                         "Vehicle", secondary_player.etekh_trait):
                     valid = True
             if valid:
@@ -540,11 +540,11 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                   "Adjacent planet movement only.")
     elif self.action_object.action_chosen == "Empower":
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
+            if primary_player.get_card_given_pos(chosen_planet, i).get_is_unit():
                 if primary_player.check_if_faction_given_pos(chosen_planet, i, "Eldar", own_event=True):
-                    primary_player.cards_in_play[chosen_planet + 1][i].increase_extra_attack_until_end_of_battle(1)
-                    primary_player.cards_in_play[chosen_planet + 1][i].positive_hp_until_eob += 1
+                    primary_player.get_card_given_pos(chosen_planet, i).increase_extra_attack_until_end_of_battle(1)
+                    primary_player.get_card_given_pos(chosen_planet, i).positive_hp_until_eob += 1
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
         primary_player.aiming_reticle_coords_hand = None
         primary_player.resolve_played_any_event()
@@ -552,7 +552,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_object.action_chosen == "Nesting Chamber":
         if not self.infested_planets[chosen_planet]:
             num_genestealers = 0
-            for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+            for i in range(primary_player.count_units_at_planet(chosen_planet)):
                 if primary_player.check_for_trait_given_pos(chosen_planet, i, "Genestealer"):
                     num_genestealers += 1
             if num_genestealers > 1:
@@ -590,7 +590,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 del primary_player.cards_in_reserve[planet_pos][unit_pos]
                 self.action_object.chosen_first_card = False
     elif self.action_object.action_chosen == "Guerrilla Tactics":
-        if secondary_player.cards_in_play[chosen_planet + 1]:
+        if secondary_player.check_if_units_present(chosen_planet):
             target_planet = FindCard.find_planet_card(self.planet_array[chosen_planet], self.planet_cards_array)
             secondary_player.spend_resources(min(target_planet.get_resources(), secondary_player.resources))
             cards_to_discard = min(target_planet.get_cards(), len(secondary_player.cards))
@@ -672,7 +672,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                 primary_player.reset_aiming_reticle_in_play(siv_pla, siv_pos)
                 primary_player.move_unit_to_planet(og_pla, og_pos, chosen_planet)
-                last_element_index = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+                last_element_index = primary_player.count_units_at_planet(chosen_planet) - 1
                 if last_element_index != -1:
                     primary_player.ready_given_pos(chosen_planet, last_element_index)
                 self.mask_jain_zar_check_actions(primary_player, secondary_player)
@@ -714,14 +714,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_object.action_chosen == "Warpstorm":
         additional_tax = secondary_player.get_additional_costs_target_planet(chosen_planet)
         if primary_player.spend_resources(additional_tax):
-            for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-                if primary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
-                    if not primary_player.cards_in_play[chosen_planet + 1][i].get_attachments() and \
+            for i in range(primary_player.count_units_at_planet(chosen_planet)):
+                if primary_player.get_card_given_pos(chosen_planet, i).get_is_unit():
+                    if not primary_player.get_card_given_pos(chosen_planet, i).get_attachments() and \
                             primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
                         primary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
-            for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-                if secondary_player.cards_in_play[chosen_planet + 1][i].get_is_unit():
-                    if not secondary_player.cards_in_play[chosen_planet + 1][i].get_attachments():
+            for i in range(secondary_player.count_units_at_planet(chosen_planet)):
+                if secondary_player.get_card_given_pos(chosen_planet, i).get_is_unit():
+                    if not secondary_player.get_card_given_pos(chosen_planet, i).get_attachments():
                         if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
                             secondary_player.assign_damage_to_pos(chosen_planet, i, 2, by_enemy_unit=False)
             primary_player.resolve_played_any_event()
@@ -733,28 +733,28 @@ async def update_game_event_action_planet(self, name, game_update_string):
         if chosen_planet != self.round_number:
             additional_tax = secondary_player.get_additional_costs_target_planet(chosen_planet)
             if primary_player.spend_resources(additional_tax):
-                for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-                    if primary_player.cards_in_play[chosen_planet + 1][i].get_card_type() == "Army":
+                for i in range(primary_player.count_units_at_planet(chosen_planet)):
+                    if primary_player.get_card_given_pos(chosen_planet, i).get_card_type() == "Army":
                         if primary_player.get_cost_given_pos(chosen_planet, i) > 2:
                             if primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
                                 primary_player.assign_damage_to_pos(chosen_planet, i, 3, by_enemy_unit=False)
-                for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-                    if secondary_player.cards_in_play[chosen_planet + 1][i].get_card_type() == "Army":
+                for i in range(secondary_player.count_units_at_planet(chosen_planet)):
+                    if secondary_player.get_card_given_pos(chosen_planet, i).get_card_type() == "Army":
                         if secondary_player.get_cost_given_pos(chosen_planet, i) > 2:
                             if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
                                 secondary_player.assign_damage_to_pos(chosen_planet, i, 3, by_enemy_unit=False)
                 if chosen_planet != 0:
-                    for i in range(len(primary_player.cards_in_play[chosen_planet])):
+                    for i in range(primary_player.count_units_at_planet(chosen_planet - 1)):
                         if primary_player.get_ability_given_pos(chosen_planet - 1, i) != "Frenzied Bloodthirster":
                             primary_player.assign_damage_to_pos(chosen_planet - 1, i, 1, by_enemy_unit=False)
-                    for i in range(len(secondary_player.cards_in_play[chosen_planet])):
+                    for i in range(secondary_player.count_units_at_planet(chosen_planet - 1)):
                         if not secondary_player.get_immune_to_enemy_events(chosen_planet - 1, i, power=True):
                             secondary_player.assign_damage_to_pos(chosen_planet - 1, i, 1, by_enemy_unit=False)
                 if chosen_planet != 6:
-                    for i in range(len(primary_player.cards_in_play[chosen_planet + 2])):
+                    for i in range(primary_player.count_units_at_planet(chosen_planet + 1)):
                         if primary_player.get_ability_given_pos(chosen_planet + 1, i) != "Frenzied Bloodthirster":
                             primary_player.assign_damage_to_pos(chosen_planet + 1, i, 1, by_enemy_unit=False)
-                    for i in range(len(secondary_player.cards_in_play[chosen_planet + 2])):
+                    for i in range(secondary_player.count_units_at_planet(chosen_planet + 1)):
                         if not secondary_player.get_immune_to_enemy_events(chosen_planet + 1, i, power=True):
                             secondary_player.assign_damage_to_pos(chosen_planet + 1, i, 1, by_enemy_unit=False)
                 primary_player.resolve_played_any_event()
@@ -811,8 +811,8 @@ async def update_game_event_action_planet(self, name, game_update_string):
                     self.queued_sound = "onplay"
                     primary_player.reset_aiming_reticle_in_play(self.action_object.position_of_actioned_card[0],
                                                                 self.action_object.position_of_actioned_card[1])
-                    position_of_unit = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
-                    primary_player.cards_in_play[chosen_planet + 1][position_of_unit].\
+                    position_of_unit = primary_player.count_units_at_planet(chosen_planet) - 1
+                    primary_player.get_card_given_pos(chosen_planet, position_of_unit).\
                         valid_target_dynastic_weaponry = True
                     if "Dynastic Weaponry" in primary_player.discard:
                         if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
@@ -853,10 +853,10 @@ async def update_game_event_action_planet(self, name, game_update_string):
                 primary_player.resolve_played_any_event()
                 self.action_cleanup()
     elif self.action_object.action_chosen == "Ecstatic Seizures":
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
             if primary_player.get_ability_given_pos(chosen_planet, i) != "Frenzied Bloodthirster":
                 primary_player.discard_attachments_from_card(chosen_planet, i)
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
+        for i in range(secondary_player.count_units_at_planet(chosen_planet)):
             if not secondary_player.get_immune_to_enemy_events(chosen_planet, i, power=True):
                 secondary_player.discard_attachments_from_card(chosen_planet, i)
         primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
@@ -919,18 +919,18 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.queue_special_damage_begins_sound()
         self.action_object.chosen_first_card = True
         found_nurgling_bomb_target_p1 = False
-        for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
-            primary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
+        for i in range(primary_player.count_units_at_planet(chosen_planet)):
+            primary_player.get_card_given_pos(chosen_planet, i).choice_nurgling_bomb = ""
             if not primary_player.check_for_trait_given_pos(chosen_planet, i, "Nurgle"):
-                primary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
+                primary_player.get_card_given_pos(chosen_planet, i).need_to_resolve_nurgling_bomb = True
                 primary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
                 found_nurgling_bomb_target_p1 = True
         found_nurgling_bomb_target_p2 = False
-        for i in range(len(secondary_player.cards_in_play[chosen_planet + 1])):
-            secondary_player.cards_in_play[chosen_planet + 1][i].choice_nurgling_bomb = ""
+        for i in range(secondary_player.count_units_at_planet(chosen_planet)):
+            secondary_player.get_card_given_pos(chosen_planet, i).choice_nurgling_bomb = ""
             if not secondary_player.check_for_trait_given_pos(chosen_planet, i, "Nurgle"):
                 if not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
-                    secondary_player.cards_in_play[chosen_planet + 1][i].need_to_resolve_nurgling_bomb = True
+                    secondary_player.get_card_given_pos(chosen_planet, i).need_to_resolve_nurgling_bomb = True
                     secondary_player.set_aiming_reticle_in_play(chosen_planet, i, "blue")
                     found_nurgling_bomb_target_p2 = True
         if found_nurgling_bomb_target_p1:
@@ -1010,7 +1010,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
     elif self.action_object.action_chosen == "Smash 'n Bash":
         if not self.action_object.chosen_first_card:
             if not secondary_player.check_for_warlord(chosen_planet):
-                for i in range(len(primary_player.cards_in_play[chosen_planet + 1])):
+                for i in range(primary_player.count_units_at_planet(chosen_planet)):
                     primary_player.assign_damage_to_pos(chosen_planet, i, 1, by_enemy_unit=False)
                 self.action_object.misc_counter = 3
                 self.action_object.misc_target_planet = chosen_planet
@@ -1023,7 +1023,7 @@ async def update_game_event_action_planet(self, name, game_update_string):
             origin_planet, origin_pos = self.action_object.misc_target_unit
             primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
-            new_pos = len(primary_player.cards_in_play[chosen_planet + 1]) - 1
+            new_pos = primary_player.count_units_at_planet(chosen_planet) - 1
             primary_player.ready_given_pos(chosen_planet, new_pos)
             self.action_cleanup()
     elif self.action_object.action_chosen == "Fungal Turf":

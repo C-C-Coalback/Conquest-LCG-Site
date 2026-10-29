@@ -534,7 +534,7 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
         await test_game.update_game_event("P2", ["pass-P1"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
 
     async def test_regeneration(self):
         random.seed(42)

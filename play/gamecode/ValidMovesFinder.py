@@ -192,10 +192,10 @@ def check_if_planet_is_valid_target(self, planet_pos, primary_player, secondary_
         if planet_pos == unit_pla:
             return False
     if ability == "Exterminatus":
-        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
+        for i in range(primary_player.count_units_at_planet(planet_pos)):
             if not primary_player.get_unique_given_pos(planet_pos, i):
                 return True
-        for i in range(len(secondary_player.cards_in_play[planet_pos + 1])):
+        for i in range(secondary_player.count_units_at_planet(planet_pos)):
             if not secondary_player.get_unique_given_pos(planet_pos, i) and not secondary_player.get_immune_to_enemy_events(planet_pos, i):
                 return True
         return False
@@ -322,7 +322,7 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
                     return False
                 if not ability.chosen_first_card:
                     other_player = player.get_other_player()
-                    for i in range(len(other_player.cards_in_play[planet_pos + 1])):
+                    for i in range(other_player.count_units_at_planet(planet_pos)):
                         if other_player.get_ready_given_pos(planet_pos, i):
                             if other_player.get_card_type_given_pos(planet_pos, i) != "Warlord":
                                 if not other_player.get_immune_to_enemy_events(planet_pos, i):
@@ -336,7 +336,7 @@ def check_if_single_card_in_play_is_valid_target(self, ability, player, planet_p
             elif ability.action_chosen == "Kraktoof Hall":
                 if not ability.chosen_first_card:
                     other_player = player.get_other_player()
-                    if len(other_player.cards_in_play[planet_pos + 1]) + len(player.cards_in_play[planet_pos + 1]) < 2:
+                    if other_player.count_units_at_planet(planet_pos) + player.count_units_at_planet(planet_pos) < 2:
                         return False
                     if player.get_damage_given_pos(planet_pos, unit_pos) == 0:
                         return False
@@ -450,7 +450,7 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
                 ):
                     return True
             for i in range(7):
-                for j in range(len(primary_player.cards_in_play[i + 1])):
+                for j in range(primary_player.count_units_at_planet(i)):
                     if primary_player.check_if_can_attach_card(
                             attachment_card, i, j, not_own_attachment=not_own_attach
                     ):
@@ -462,7 +462,7 @@ def check_if_single_card_in_hand_is_valid_target(self, ability, player, hand_pos
                 ):
                     return True
             for i in range(7):
-                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                for j in range(secondary_player.count_units_at_planet(i)):
                     if secondary_player.check_if_can_attach_card(
                             attachment_card, i, j,
                             not_own_attachment=not_own_attach
@@ -530,7 +530,7 @@ def find_all_valid_unit_locations_given_restrictions(self, ability, primary_play
             if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, -2, i, target_restrictions, misc_pla=planet_pos):
                 valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
         for i in range(7):
-            for j in range(len(primary_player.cards_in_play[i + 1])):
+            for j in range(primary_player.count_units_at_planet(i)):
                 if check_if_single_card_in_play_is_valid_target(self, ability, primary_player, i, j, target_restrictions, misc_pla=planet_pos):
                     valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     if enemy_unit:
@@ -538,7 +538,7 @@ def find_all_valid_unit_locations_given_restrictions(self, ability, primary_play
             if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, -2, i, target_restrictions, enemy_ability=True, misc_pla=planet_pos):
                 valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
         for i in range(7):
-            for j in range(len(secondary_player.cards_in_play[i + 1])):
+            for j in range(secondary_player.count_units_at_planet(i)):
                 if check_if_single_card_in_play_is_valid_target(self, ability, secondary_player, i, j, target_restrictions, enemy_ability=True, misc_pla=planet_pos):
                     valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
     return valid_moves
@@ -553,7 +553,7 @@ def determine_valid_moves(self):
                 if primary_player.valid_nullify_unit(-2, i):
                     valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
             for planet_pos in range(7):
-                for unit_pos in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                for unit_pos in range(primary_player.count_units_at_planet(planet_pos)):
                     if primary_player.valid_nullify_unit(planet_pos, unit_pos):
                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=planet_pos, unit_pos=unit_pos)
             if not valid_moves:
@@ -614,7 +614,7 @@ def determine_valid_moves(self):
                                             selected_card, -2, i, not_own_attachment=False):
                                         valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
                                 for i in range(7):
-                                    for j in range(len(primary_player.cards_in_play[i + 1])):
+                                    for j in range(primary_player.count_units_at_planet(i)):
                                         if primary_player.check_if_can_attach_card(
                                                 selected_card, i, j, not_own_attachment=False):
                                             valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
@@ -623,7 +623,7 @@ def determine_valid_moves(self):
                                             selected_card, -2, i, not_own_attachment=True):
                                         valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
                                 for i in range(7):
-                                    for j in range(len(secondary_player.cards_in_play[i + 1])):
+                                    for j in range(secondary_player.count_units_at_planet(i)):
                                         if secondary_player.check_if_can_attach_card(
                                                 selected_card, i, j, not_own_attachment=True):
                                             valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
@@ -665,7 +665,7 @@ def determine_valid_moves(self):
                                         selected_card, -2, i, not_own_attachment=False):
                                     valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
                             for i in range(7):
-                                for j in range(len(primary_player.cards_in_play[i + 1])):
+                                for j in range(primary_player.count_units_at_planet(i)):
                                     if primary_player.check_if_can_attach_card(
                                             selected_card, i, j, not_own_attachment=False):
                                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i,
@@ -675,7 +675,7 @@ def determine_valid_moves(self):
                                         selected_card, -2, i, not_own_attachment=True):
                                     valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
                             for i in range(7):
-                                for j in range(len(secondary_player.cards_in_play[i + 1])):
+                                for j in range(secondary_player.count_units_at_planet(i)):
                                     if secondary_player.check_if_can_attach_card(
                                             selected_card, i, j, not_own_attachment=True):
                                         valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i,
@@ -713,7 +713,7 @@ def determine_valid_moves(self):
                         valid_moves = add_valid_move(valid_moves, primary_player, "PLANETS", planet_pos=planet_pos+1)
             else:
                 for planet_pos in range(7):
-                    for unit_pos in range(len(primary_player.cards_in_play[planet_pos + 1])):
+                    for unit_pos in range(primary_player.count_units_at_planet(planet_pos)):
                         if primary_player.get_mobile_given_pos(planet_pos, unit_pos) and primary_player.get_available_mobile_given_pos(planet_pos, unit_pos):
                             valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=planet_pos, unit_pos=unit_pos)
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
@@ -731,11 +731,11 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Combat Turn":
             battle_planet = self.last_planet_checked_for_battle
             if self.attacker_planet == -1 or self.attacker_position == -1:
-                for i in range(len(primary_player.cards_in_play[battle_planet + 1])):
+                for i in range(primary_player.count_units_at_planet(battle_planet)):
                     if self.check_if_unit_can_be_declared_as_attacker(primary_player, secondary_player, battle_planet, i):
                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", battle_planet, i)
             else:
-                for i in range(len(secondary_player.cards_in_play[battle_planet + 1])):
+                for i in range(secondary_player.count_units_at_planet(battle_planet)):
                     if self.check_if_unit_can_be_declared_as_defender(primary_player, secondary_player, battle_planet, i):
                         valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
                 if primary_player.get_area_effect_given_pos(self.attacker_planet, self.attacker_position) > 0:
@@ -744,7 +744,7 @@ def determine_valid_moves(self):
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
         elif self.what_is_required_automated == "Retreat Turn":
             battle_planet = self.last_planet_checked_for_battle
-            for i in range(len(primary_player.cards_in_play[battle_planet + 1])):
+            for i in range(primary_player.count_units_at_planet(battle_planet)):
                 if primary_player.check_if_unit_can_retreat(battle_planet, i):
                     valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", battle_planet, i)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
@@ -784,11 +784,11 @@ def determine_valid_moves(self):
                         valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=0)
                     if self.atrox_origin != 0:
                         if self.planets_in_play_array[self.atrox_origin - 1]:
-                            if len(secondary_player.cards_in_play[self.atrox_origin - 1]) > 0:
+                            if secondary_player.count_units_at_planet(self.atrox_origin - 2) > 0:
                                 valid_moves = add_valid_move(valid_moves, secondary_player, "PLANETS", planet_pos=self.atrox_origin - 1)
                     if self.atrox_origin != 6:
                         if self.planets_in_play_array[self.atrox_origin + 1]:
-                            if len(secondary_player.cards_in_play[self.atrox_origin + 1]) > 0:
+                            if secondary_player.count_units_at_planet(self.atrox_origin) > 0:
                                 valid_moves = add_valid_move(valid_moves, secondary_player, "PLANETS", planet_pos=self.atrox_origin + 1)
             if not valid_moves:
                 valid_moves = add_valid_move(valid_moves, primary_player, "pass")
@@ -830,7 +830,7 @@ def determine_valid_moves(self):
                                 selected_card, -2, i, not_own_attachment=False):
                             valid_moves = add_valid_move(valid_moves, primary_player, "HQ", unit_pos=i)
                     for i in range(7):
-                        for j in range(len(primary_player.cards_in_play[i + 1])):
+                        for j in range(primary_player.count_units_at_planet(i)):
                             if primary_player.check_if_can_attach_card(
                                     selected_card, i, j, not_own_attachment=False):
                                 valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i,
@@ -840,7 +840,7 @@ def determine_valid_moves(self):
                                 selected_card, -2, i, not_own_attachment=True):
                             valid_moves = add_valid_move(valid_moves, secondary_player, "HQ", unit_pos=i)
                     for i in range(7):
-                        for j in range(len(secondary_player.cards_in_play[i + 1])):
+                        for j in range(secondary_player.count_units_at_planet(i)):
                             if secondary_player.check_if_can_attach_card(
                                     selected_card, i, j, not_own_attachment=True):
                                 valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i,
@@ -860,7 +860,7 @@ def determine_valid_moves(self):
                 if type_target == "Special":
                     if self.action_object.action_chosen == "Khymera Den":
                         for i in range(7):
-                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                            for j in range(primary_player.count_units_at_planet(i)):
                                 if primary_player.get_name_given_pos(i, j) == "Khymera":
                                     if primary_player.get_aiming_reticle_in_play(i, j) != "blue":
                                         valid_moves = add_valid_move(valid_moves, primary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
@@ -881,13 +881,13 @@ def determine_valid_moves(self):
                                         if primary_player.check_if_can_attach_card(attachment, -2, k):
                                             valid_attachment = True
                                 for k in range(7):
-                                    for l in range(len(primary_player.cards_in_play[k + 1])):
+                                    for l in range(primary_player.count_units_at_planet(k)):
                                         if primary_player.check_if_can_attach_card(attachment, k, l):
                                             valid_attachment = True
                                 if valid_attachment:
                                     valid_moves = add_valid_move(valid_moves, primary_player, "ATTACHMENT", planet_pos=-2, unit_pos=i, attachment_pos=j)
                         for i in range(7):
-                            for j in range(len(primary_player.cards_in_play[i + 1])):
+                            for j in range(primary_player.count_units_at_planet(i)):
                                 attachments = primary_player.get_all_attachments_at_pos(i, j)
                                 for k in range(len(attachments)):
                                     valid_attachment = False
@@ -896,7 +896,7 @@ def determine_valid_moves(self):
                                         if primary_player.check_if_can_attach_card(attachment, -2, l):
                                             valid_attachment = True
                                     for l in range(7):
-                                        for m in range(len(primary_player.cards_in_play[l + 1])):
+                                        for m in range(primary_player.count_units_at_planet(l)):
                                             if i != l or j != m:
                                                 if primary_player.check_if_can_attach_card(attachment, l, m):
                                                     valid_attachment = True
@@ -915,13 +915,13 @@ def determine_valid_moves(self):
                                         if secondary_player.check_if_can_attach_card(attachment, -2, k):
                                             valid_attachment = True
                                 for k in range(7):
-                                    for l in range(len(secondary_player.cards_in_play[k + 1])):
+                                    for l in range(secondary_player.count_units_at_planet(k)):
                                         if secondary_player.check_if_can_attach_card(attachment, k, l):
                                             valid_attachment = True
                                 if valid_attachment:
                                     valid_moves = add_valid_move(valid_moves, secondary_player, "ATTACHMENT", planet_pos=-2, unit_pos=i, attachment_pos=j)
                         for i in range(7):
-                            for j in range(len(secondary_player.cards_in_play[i + 1])):
+                            for j in range(secondary_player.count_units_at_planet(i)):
                                 attachments = secondary_player.get_all_attachments_at_pos(i, j)
                                 for k in range(len(attachments)):
                                     valid_attachment = False
@@ -930,7 +930,7 @@ def determine_valid_moves(self):
                                         if secondary_player.check_if_can_attach_card(attachment, -2, l):
                                             valid_attachment = True
                                     for l in range(7):
-                                        for m in range(len(secondary_player.cards_in_play[l + 1])):
+                                        for m in range(secondary_player.count_units_at_planet(l)):
                                             if i != l or j != m:
                                                 if secondary_player.check_if_can_attach_card(attachment, l, m):
                                                     valid_attachment = True
@@ -948,8 +948,8 @@ def determine_valid_moves(self):
                                 if attachments[k].get_limited():
                                     valid_moves = add_valid_move(valid_moves, secondary_player, "ATTACHMENT", planet_pos=-2, unit_pos=i, attachment_pos=k)
                         for i in range(7):
-                            for j in range(len(secondary_player.cards_in_play[i + 1])):
-                                if secondary_player.cards_in_play[i + 1][j].get_limited():
+                            for j in range(secondary_player.count_units_at_planet(i)):
+                                if secondary_player.get_card_given_pos(i, j).get_limited():
                                     valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", planet_pos=i, unit_pos=j)
                                 attachments = secondary_player.get_all_attachments_at_pos(i, j)
                                 for k in range(len(attachments)):

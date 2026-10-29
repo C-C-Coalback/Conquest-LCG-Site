@@ -59,8 +59,8 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
         await test_game.update_game_event("P2", ["pass-P1"])
-        self.assertEqual(len(test_game.p2.cards_in_play[1]), 0)
-        self.assertEqual(len(test_game.p2.cards_in_play[2]), 1)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 0)
+        self.assertEqual(test_game.p2.count_units_at_planet(1), 1)
         self.assertEqual(test_game.p2.get_damage_given_pos(1, 0), 1)
 
     async def test_cato_stronghold(self):
@@ -144,7 +144,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["PLANETS", "0"])
         await test_game.update_game_event("P2", ["PLANETS", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
 
     async def test_the_swarmlord(self):
         random.seed(42)
@@ -159,11 +159,11 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["PLANETS", "2"])
         await test_game.update_game_event("P2", ["PLANETS", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 1)
-        self.assertEqual(len(test_game.p1.cards_in_play[2]), 1)
-        self.assertEqual(len(test_game.p1.cards_in_play[3]), 2)
-        self.assertEqual(len(test_game.p1.cards_in_play[4]), 0)
-        self.assertEqual(len(test_game.p1.cards_in_play[5]), 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(1), 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(2), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(3), 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(4), 0)
 
     async def test_eldorath_starbane(self):
         random.seed(42)
@@ -369,7 +369,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["pass-P1"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         self.assertEqual(test_game.after_command_struggle, True)
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
 
     async def test_cadian_mortar_squad(self):
         random.seed(42)
@@ -460,7 +460,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["pass-P1"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
-        self.assertEqual(len(test_game.p2.cards_in_play[1]), 1)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 1)
 
     async def test_xavaes_split_tongue(self):
         random.seed(42)
@@ -740,7 +740,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.number_with_deploy_turn, "1")
         await test_game.update_game_event("P1", ["IN_DISCARD", "2", "0"])
         await test_game.update_game_event("P1", ["PLANETS", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
 
     async def test_swordwind_farseer(self):
         random.seed(42)
@@ -905,8 +905,8 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["PLANETS", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P2", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p2.cards_in_play[1]), 4)
-        self.assertEqual(len(test_game.p1.cards_in_play[3]), 2)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 4)
+        self.assertEqual(test_game.p1.count_units_at_planet(2), 2)
 
     async def test_venomthrope_polluter(self):
         random.seed(42)
@@ -922,8 +922,8 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P2", ["PLANETS", "0"])
         await test_game.update_game_event("P1", ["CHOICE", "0"])
         await test_game.update_game_event("P1", ["IN_PLAY", "1", "1", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[2]), 1)
-        self.assertEqual(len(test_game.p1.cards_in_play[3]), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(1), 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(2), 2)
 
     async def test_termagant_sentry(self):
         random.seed(42)
@@ -988,7 +988,7 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant Horde"), 0)
         await skip_to_battle_first_planet(test_game)
         await test_game.update_game_event("P1", ["CHOICE", "0"])
-        self.assertEqual(len(test_game.p1.cards_in_play[1]), 3)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 3)
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 2), "Termagant")
 
     async def test_ravenous_haruspex(self):

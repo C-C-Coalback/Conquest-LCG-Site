@@ -18,9 +18,9 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         og_num, og_pla, og_pos = self.interrupts_waiting_on_resolution[0].get_position_unit_triggering()
         if og_pla == planet_pos and og_pos != unit_pos:
             if not primary_player.check_if_card_is_destroyed(planet_pos, unit_pos):
-                attachments = primary_player.cards_in_play[og_pla + 1][og_pos].get_attachments()
+                attachments = primary_player.get_card_given_pos(og_pla, og_pos).get_attachments()
                 copy_attachments = copy.deepcopy(
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_attachments())
+                    primary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments())
                 attached_all = True
                 for i in range(len(attachments)):
                     owner = attachments[i].name_owner
@@ -32,12 +32,12 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                                                       not_own_attachment=not_owner, relic_check_allowed=False):
                         attached_all = False
                 if not attached_all:
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos].attachments = copy_attachments
+                    primary_player.get_card_given_pos(planet_pos, unit_pos).attachments = copy_attachments
                 if attached_all:
-                    primary_player.cards_in_play[og_pla + 1][og_pos].attachments = []
+                    primary_player.get_card_given_pos(og_pla, og_pos).attachments = []
                 self.delete_interrupt()
     elif current_interrupt == "World Engine Beam":
-        if not player_owning_card.cards_in_play[planet_pos + 1][unit_pos].get_unique():
+        if not player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_unique():
             player_owning_card.destroy_card_in_play(planet_pos, unit_pos)
             self.delete_interrupt()
     elif current_interrupt == "Cardinal Agra Decree":
@@ -181,15 +181,14 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                 self.first_player_nullified = primary_player.name_player
                 self.nullify_context = "Interrupt"
             if can_continue:
-                dmg = primary_player.cards_in_play[self.interrupts_waiting_on_resolution[0].get_planet_pos() + 1][
-                    self.interrupts_waiting_on_resolution[0].get_unit_pos()].counter
+                dmg = primary_player.get_card_given_pos(planet_pos, unit_pos).counter
                 player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, dmg, rickety_warbuggy=True)
                 self.mask_jain_zar_check_interrupts(primary_player, secondary_player)
                 self.delete_interrupt()
     elif current_interrupt == "Prognosticator":
         valid_planet = False
-        for i in range(len(primary_player.cards_in_play[planet_pos + 1])):
-            if primary_player.cards_in_play[planet_pos + 1][i].recently_assigned_damage:
+        for i in range(primary_player.count_units_at_planet(planet_pos)):
+            if primary_player.get_card_given_pos(planet_pos, i).recently_assigned_damage:
                 valid_planet = True
         if valid_planet:
             if player_owning_card.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
@@ -296,7 +295,7 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
             if game_update_string[1] == primary_player.number:
                 if primary_player.get_ability_given_pos(planet_pos, unit_pos) == \
                         "Reanimating Warriors" \
-                        and not primary_player.cards_in_play[planet_pos + 1][unit_pos] \
+                        and not primary_player.get_card_given_pos(planet_pos, unit_pos) \
                         .once_per_phase_used:
                     if primary_player.check_damage_too_great_given_pos(planet_pos, unit_pos) == 0:
                         interrupt.chosen_first_card = True
@@ -372,9 +371,9 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
         if game_update_string[1] == primary_player.number:
             planet_pos = int(game_update_string[2])
             unit_pos = int(game_update_string[3])
-            if primary_player.cards_in_play[planet_pos + 1][unit_pos].get_is_unit() and \
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_unique() and \
-                    primary_player.cards_in_play[planet_pos + 1][unit_pos].get_ready():
+            if primary_player.get_card_given_pos(planet_pos, unit_pos).get_is_unit() and \
+                    primary_player.get_card_given_pos(planet_pos, unit_pos).get_unique() and \
+                    primary_player.get_card_given_pos(planet_pos, unit_pos).get_ready():
                 primary_player.exhaust_given_pos(planet_pos, unit_pos)
                 primary_player.discard_card_name_from_hand("No Mercy")
                 try:

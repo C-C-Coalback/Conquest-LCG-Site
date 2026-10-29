@@ -11,7 +11,7 @@ async def declare_attacker(self, name, game_update_string):
     valid_unit = False
     if self.check_if_unit_can_be_declared_as_attacker(player, secondary_player, chosen_planet, chosen_unit):
         valid_unit = True
-        if not secondary_player.cards_in_play[chosen_planet + 1]:
+        if not secondary_player.check_if_units_present(chosen_planet):
             valid_unit = False
             await self.send_update_message("No enemy units to declare as defender. Combat ends.")
             await self.check_combat_end(player.name_player)
@@ -26,7 +26,7 @@ async def declare_attacker(self, name, game_update_string):
             self.attacker_planet = chosen_planet
             self.attacker_position = chosen_unit
     if valid_unit:
-        player.cards_in_play[chosen_planet + 1][chosen_unit].resolving_attack = True
+        player.get_card_given_pos(chosen_planet, chosen_unit).resolving_attack = True
         player.set_aiming_reticle_in_play(chosen_planet, chosen_unit, "blue")
         self.attacker_planet = chosen_planet
         self.attacker_position = chosen_unit
@@ -53,13 +53,13 @@ async def declare_attacker(self, name, game_update_string):
         if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                 in self.units_move_hq_attack:
             self.unit_will_move_after_attack = True
-            player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+            player.get_card_given_pos(self.attacker_planet, self.attacker_position). \
                 ethereal_movement_active = True
             if player.get_card_type_given_pos(
                     self.attacker_planet, self.attacker_position
             ) == "Warlord":
                 if player.get_bloodied_given_pos(self.attacker_planet, self.attacker_position):
-                    player.cards_in_play[self.attacker_planet + 1][self.attacker_position]. \
+                    player.get_card_given_pos(self.attacker_planet, self.attacker_position). \
                         ethereal_movement_active = False
                     self.unit_will_move_after_attack = False
         if player.get_card_type_given_pos(self.attacker_planet,
@@ -95,7 +95,7 @@ async def declare_attacker(self, name, game_update_string):
         if self.attacker_planet != 6:
             valid_adjacent_and_self_planets.append(self.attacker_planet + 1)
         for overseer_planet in valid_adjacent_and_self_planets:
-            for i in range(len(player.cards_in_play[overseer_planet + 1])):
+            for i in range(player.count_units_at_planet(overseer_planet)):
                 if player.get_ability_given_pos(overseer_planet, i) == "Overseer Drone":
                     if player.get_ready_given_pos(overseer_planet, i):
                         self.create_reaction("Overseer Drone", player.name_player,
@@ -115,7 +115,7 @@ async def declare_attacker(self, name, game_update_string):
         if player.check_for_trait_given_pos(
                 self.attacker_planet, self.attacker_position, "Ecclesiarchy"):
             if player.check_if_faction_given_pos(self.attacker_planet, self.attacker_position, "Astra Militarum"):
-                for i in range(len(player.cards_in_play[self.attacker_planet + 1])):
+                for i in range(player.count_units_at_planet(self.attacker_planet)):
                     if i != self.attacker_position:
                         if player.get_ability_given_pos(
                                 self.attacker_planet, i
@@ -132,7 +132,7 @@ async def declare_attacker(self, name, game_update_string):
                 == "Salamander Flamer Squad":
             self.flamers_damage_active = True
             self.id_of_the_active_flamer = \
-                player.cards_in_play[self.attacker_planet + 1][self.attacker_position].card_id
+                player.get_card_given_pos(self.attacker_planet, self.attacker_position).card_id
         if player.get_ability_given_pos(self.attacker_planet, self.attacker_position) \
                 == "Farsight Vanguard":
             if not player.get_once_per_phase_used_given_pos(self.attacker_planet,
@@ -196,8 +196,8 @@ async def declare_attacker(self, name, game_update_string):
                 self.create_reaction(
                     "Shrieking Harpy", player.name_player,
                     (int(player.number), self.attacker_planet, self.attacker_position))
-        for i in range(len(other_player.cards_in_play[self.attacker_planet + 1])):
-            current_name = other_player.cards_in_play[self.attacker_planet + 1][i].get_ability()
+        for i in range(other_player.count_units_at_planet(self.attacker_planet)):
+            current_name = other_player.get_card_given_pos(self.attacker_planet, i).get_ability()
             if current_name == "Celestian Amelia":
                 if not other_player.get_once_per_phase_used_given_pos(self.attacker_planet, i):
                     self.create_reaction("Celestian Amelia", other_player.name_player,
@@ -232,7 +232,7 @@ async def declare_attacker(self, name, game_update_string):
         if player.check_for_trait_given_pos(self.attacker_planet, self.attacker_position, "Psyker"):
             for i in range(7):
                 if i != self.attacker_planet:
-                    for j in range(len(player.cards_in_play[i + 1])):
+                    for j in range(player.count_units_at_planet(i)):
                         if player.get_ability_given_pos(i, j) == "Talyesin's Spiders":
                             self.create_reaction("Talyesin's Spiders", player.name_player,
                                                  (int(player.number), i, j))
