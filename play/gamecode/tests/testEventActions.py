@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -11,33 +11,6 @@ for key in range(len(card_array)):
     cards_dict[card_array[key].name] = card_array[key]
 planet_array = Initfunctions.init_planet_cards()
 apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
-
-
-async def standard_setup(test_game):
-    await test_game.update_game_event("P1", ["CHOICE", "0"])
-    await test_game.update_game_event("P2", ["CHOICE", "0"])
-    test_game.p1.cards = []
-    test_game.p2.cards = []
-
-
-async def skip_to_battle_first_planet(test_game, tyranid_1=False, tyranid_2=False):
-    await standard_setup(test_game)
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["PLANETS", "0"])
-    if tyranid_1:
-        await test_game.update_game_event("P1", ["PLANETS", "1"])
-    await test_game.update_game_event("P2", ["PLANETS", "0"])
-    if tyranid_2:
-        await test_game.update_game_event("P2", ["PLANETS", "1"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
-    test_game.p1.cards = []
-    test_game.p2.cards = []
-    await test_game.update_game_event("P1", ["pass-P1"])
-    await test_game.update_game_event("P2", ["pass-P1"])
 
 
 class ActionsTest(unittest.IsolatedAsyncioTestCase):
@@ -888,6 +861,144 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.resources, 3)
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 1), "Kroot Guerrilla")
 
+    async def test_clogged_with_corpses(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.cards = ["Clogged with Corpses"]
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant Sentry"), 0)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Termagant"))
+        test_game.p2.add_to_hq(test_game.preloaded_find_card("Cato's Stronghold"))
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["HQ", "2", "0"])
+        self.assertEqual(len(test_game.p2.headquarters), 2)
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
+        await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        self.assertEqual(len(test_game.p1.headquarters), 1)
+        self.assertEqual(test_game.action_object.misc_counter, 2)
+        await test_game.update_game_event("P1", ["HQ", "2", "0"])
+        self.assertEqual(len(test_game.p2.headquarters), 1)
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 7)
+
+    async def test_predation(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.cards = ["Predation"]
+        test_game.p2.cards = []
+        test_game.infested_planets[2] = True
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        self.assertFalse(test_game.infested_planets[0])
+        await test_game.update_game_event("P1", ["PLANETS", "1"])
+        self.assertTrue(test_game.infested_planets[1])
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 7)
+
+    async def test_spawn_termagants(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.cards = ["Spawn Termagants"]
+        test_game.p2.cards = []
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Termagant")
+        self.assertEqual(test_game.p1.get_ability_given_pos(1, 0), "Termagant")
+        self.assertEqual(test_game.p1.get_ability_given_pos(2, 0), "Termagant")
+        self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "Termagant")
+        self.assertEqual(test_game.p1.get_ability_given_pos(4, 0), "Termagant")
+        self.assertEqual(test_game.p1.count_units_in_play_all(), 6)
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 5)
+
+    async def test_spore_burst(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.cards = ["Spore Burst"]
+        test_game.p2.cards = []
+        test_game.p1.discard = ["Volatile Pyrovore"]
+        test_game.infested_planets[0] = True
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_DISCARD", "1", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Volatile Pyrovore")
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.discard, ["Spore Burst"])
+        self.assertEqual(test_game.p1.resources, 5)
+
+    async def test_dark_cunning(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.cards = ["Dark Cunning"]
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Volatile Pyrovore"), 0)
+        test_game.p1.exhaust_given_pos(0, 1)
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertTrue(test_game.p1.get_ready_given_pos(0, 1), True)
+        test_game.infested_planets[0] = True
+        test_game.p1.cards = ["Dark Cunning"]
+        test_game.p1.exhaust_given_pos(0, 1)
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
+        self.assertEqual(test_game.p1.resources, 4)
+        self.assertTrue(test_game.p1.get_ready_given_pos(0, 1), True)
+
+    async def test_consumption(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.cards = ["Consumption"]
+        test_game.p2.cards = []
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant"), 1)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant"), 2)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Termagant"), 2)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Veteran Brother Maxos"), 0)
+        await test_game.update_game_event("P1", ["action-button"])
+        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "1", "0"])
+        await test_game.update_game_event("P1", ["IN_PLAY", "1", "2", "0"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["IN_PLAY", "2", "0", "0"])
+        self.assertEqual(test_game.mode, "ACTION")
+        await test_game.update_game_event("P2", ["pass-P1"])
+        self.assertEqual(test_game.mode, "Normal")
+        self.assertEqual(len(test_game.p1.cards_in_play[1]), 0)
+        self.assertEqual(len(test_game.p1.cards_in_play[2]), 0)
+        self.assertEqual(len(test_game.p1.cards_in_play[3]), 1)
+        self.assertEqual(len(test_game.p2.cards_in_play[1]), 0)
 
 if __name__ == "__main__":
     unittest.main()

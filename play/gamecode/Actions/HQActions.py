@@ -2383,8 +2383,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                                                       "Card is not a Creature army unit.")
     elif self.action_object.action_chosen == "Dark Cunning":
         if primary_player.get_number() == game_update_string[1]:
-            planet_pos = -2
-            unit_pos = int(game_update_string[2])
             if primary_player.headquarters[unit_pos].get_is_unit() and \
                     primary_player.headquarters[unit_pos].get_card_type() != "Warlord":
                 primary_player.ready_given_pos(planet_pos, unit_pos)
@@ -2408,8 +2406,6 @@ async def update_game_event_action_hq(self, name, game_update_string):
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           "Card is not an Ethereal unit.")
     elif self.action_object.action_chosen == "Clogged with Corpses":
-        planet_pos = -2
-        unit_pos = int(game_update_string[2])
         if primary_player.get_number() == game_update_string[1]:
             if primary_player.check_for_trait_given_pos(planet_pos, unit_pos, "Termagant"):
                 primary_player.sacrifice_card_in_hq(unit_pos)

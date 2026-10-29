@@ -54,6 +54,8 @@ Open up a second command terminal. Launch docker. In the second terminal, run
 docker run --rm -p 6379:6379 redis:7
 ~~~
 
+NOTE: On some Linux systems, you may need to run ```redis-server --port 6379``` instead.
+
 Continuing from the first terminal, run 
 
 ~~~
