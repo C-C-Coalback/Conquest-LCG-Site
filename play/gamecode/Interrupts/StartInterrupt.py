@@ -398,8 +398,7 @@ async def start_resolving_interrupt(self, name, game_update_string):
             self.misc_player_storage = "RESOLVING MAGUS HARID"
             card_name = self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info()
             await self.send_update_message("Magus is deploying a " + card_name)
-            card = FindCard.find_card(card_name, self.card_array, self.cards_dict,
-                                      self.apoka_errata_cards, self.cards_that_have_errata)
+            card = self.preloaded_find_card(card_name)
             self.card_to_deploy = card
             interrupt.misc_target_planet = planet_pos
             if card.get_card_type() == "Army":

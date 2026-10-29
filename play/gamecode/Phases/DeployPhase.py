@@ -558,7 +558,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         if self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Berzerker Warriors":
             self.delete_interrupt()
         elif self.interrupts_waiting_on_resolution[0].get_interrupt_name() == "Magus Harid":
-            primary_player.discard.remove(self.card_to_deploy.get_name())
+            primary_player.discard.remove(self.interrupts_waiting_on_resolution[0].get_additional_interrupt_info())
             self.misc_player_storage = ""
             self.delete_interrupt()
             self.action_cleanup()
