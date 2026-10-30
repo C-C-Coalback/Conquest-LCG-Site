@@ -31,3 +31,4 @@ __pycache__/
 /decks/DeckStorage/ozagent*/
 /play/gamecode/_trial_temp/
 .vscode
+/staticfiles/

@@ -4,6 +4,7 @@
 
 {% block content %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'play_style_shared.css' %}">
 {% if is_p2 %}
 <link rel="stylesheet" href="{% static 'play_style_p2.css' %}">
 {% else %}
@@ -101,19 +102,19 @@
                 <p>P2P6</p>
             </div>
         </div>
-        <fieldset id="current-hand-player-1">
+        <fieldset id="current-hand-player-1"{% if is_p2 %} class="card-stack"{% else %} class="hand-friendly"{% endif %}>
             <legend>CARDS P1: 0 CARDS</legend>
         </fieldset>
-        <fieldset id="current-hand-player-2">
+        <fieldset id="current-hand-player-2"{% if is_p2 is False %} class="card-stack"{% else %} class="hand-friendly"{% endif %}>
             <legend>CARDS P2: 0 CARDS</legend>
         </fieldset>
-        <div id="current-deck-player-1">
+        <div id="current-deck-player-1"{% if is_p2 is False%} class="friendly-deck"{% endif %}>
             <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p1" class="Card">
             <div id="count-deck-p1">
                 <p>10</p>
             </div>
         </div>
-        <div id="current-deck-player-2">
+        <div id="current-deck-player-2"{% if is_p2%} class="friendly-deck"{% endif %}>
             <img src="/static/images/CardImages/Cardback.jpg" alt="didnt work" id="deck-p2" class="Card">
             <div id="count-deck-p2">
                 <p>10</p>
@@ -143,16 +144,16 @@
         <div id="initiative-player-2">
             <img src="/static/images/Initiative.png" class="initiative">
         </div>
-        <div id="current-discard-player-1">
+        <div id="current-discard-player-1"{% if is_p2 is False%} class="friendly-discard"{% endif %}>
             <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p1" class="Card" onclick="showDiscard(this.id);">
         </div>
-        <div id="current-removed-player-1">
+        <div id="current-removed-player-1"{% if is_p2 is False%} class="friendly-removed"{% endif %}>
             <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p1" class="Card" onclick="showRemoved(this.id);">
         </div>
-        <div id="current-discard-player-2">
+        <div id="current-discard-player-2"{% if is_p2%} class="friendly-discard"{% endif %}>
             <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="discard-p2" class="Card" onclick="showDiscard(this.id);">
         </div>
-        <div id="current-removed-player-2">
+        <div id="current-removed-player-2"{% if is_p2%} class="friendly-removed"{% endif %}>
             <img src="/static/images/CardImages/Nazdreg.jpg" alt="didnt work" id="removed-p2" class="Card" onclick="showRemoved(this.id);">
         </div>
         <div id="expanded-DISCARD_PILE-1">
@@ -393,10 +394,10 @@
             element.style.minHeight = (9 * current_zoom).toString() + "vh";
 
             element = document.getElementById('in-play-box');
-            element.style.height = "calc(" + (48 * current_zoom).toString() + "vh + 10px)";
-            element.style.width = (75 * current_zoom).toString() + "vw";
-            var row_height_1 = (19 * current_zoom).toString() + "vh";
-            var row_height_2 = (10 * current_zoom).toString() + "vh";
+            element.style.height = (570 * current_zoom).toString() + "px";
+            element.style.width = (105 * current_zoom).toString() + "vw";
+            var row_height_1 = (110 * current_zoom).toString() + "px";
+            var row_height_2 = (230 * current_zoom).toString() + "px";
             var row_height_3 = "";
             element.style.gridTemplateRows = row_height_1 + " " + row_height_2 + " " + row_height_1;
 
@@ -414,7 +415,7 @@
 
         function increaseZoom() {
             current_zoom = current_zoom + 0.1;
-            applyZoom();
+            // applyZoom();
         }
 
         function decreaseZoom() {
@@ -422,7 +423,7 @@
             if (current_zoom < 0.1) {
                 current_zoom = 0.1;
             }
-            applyZoom();
+            // applyZoom();
         }
 
         document.querySelector('#chat-log').value += ('Use \"/loaddeck/{deck_name}\" to load a deck\n');
@@ -432,7 +433,8 @@
         cardHeight = 100;
         cardWidth = 63;
         var inPlayPlanets = ["true", "true", "true", "true", "true", "false", "false"];
-        var tokenNames = ["Cultist", "Guardsman", "Khymera", "Snotlings", "Termagant"]
+        var firstPlanetMessage = "true";
+        var tokenNames = ["Cultist", "Guardsman", "Khymera", "Snotlings", "Termagant"];
         var mouse_x = 0;
         var mouse_y = 0;
         var last_initial_hand_pos_x = 0;
@@ -531,7 +533,7 @@
                     }
                 }
                 new_grid_template_columns += ` `;
-                console.log(new_grid_template_columns)
+                console.log(new_grid_template_columns);
             }
             document.getElementById("in-play-box").style.gridTemplateColumns = new_grid_template_columns;
         }
@@ -755,6 +757,11 @@
                             planetsChanged = "true";
                         }
                     }
+                    if (firstPlanetMessage === "true")
+                    {
+                        firstPlanetMessage = "false";
+                        planetsChanged = "true";
+                    }
                     if (planetsChanged === "true") {
                         console.log("trying to change planets");
                         var new_grid_template_areas = `
@@ -765,8 +772,8 @@
                         var first_pos_in_play = -1;
                         for (var i = 0; i < newPlanetsArray.length; i++) {
                             if (newPlanetsArray[0] === "true") {
-                                document.getElementById("player-1-cards-planet-" + (i).toString()).style.display = "block";
-                                document.getElementById("player-2-cards-planet-" + (i).toString()).style.display = "block";
+                                document.getElementById("player-1-cards-planet-" + (i).toString()).style.display = "grid";
+                                document.getElementById("player-2-cards-planet-" + (i).toString()).style.display = "grid";
                                 document.getElementById("div-PLANETS-" + (i).toString()).style.display = "block";
                             }
                             if (newPlanetsArray[i] === "true") {
@@ -1370,9 +1377,14 @@
                             let string_id = (i-4).toString();
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
                             var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
-                            document.getElementById(target_id).innerHTML +=
-                            `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            if (i == 4)
+                            {
+                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card first-hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            } else {
+                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                            }
                         }
+                        document.getElementById(target_id).style.setProperty('--count', Math.max(split_data.length - 4, 2))
                     }
                 } else if (split_data[1] === "SET_BOX_LOCATIONS") {
                     console.log("setting box locations");
@@ -1397,7 +1409,6 @@
                         }
                     }
                 }
-                applyZoom();
             } else if (split_data[1] === "AUTOMATED_DATA" || split_data[1] === "MISC_AUTOMATED_DATA") {
 
             } else {
