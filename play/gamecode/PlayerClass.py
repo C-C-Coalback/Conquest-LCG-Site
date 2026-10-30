@@ -7821,7 +7821,7 @@ class Player:
                     self.game.create_reaction("Champion of Khorne", self.name_player,
                                               (int(self.number), planet_pos - 1, i))
         if planet_pos != 6:
-            for i in range(self.count_units_at_planet(planet_pos - 1)):
+            for i in range(self.count_units_at_planet(planet_pos + 1)):
                 if self.get_ability_given_pos(planet_pos + 1, i) == "Champion of Khorne":
                     self.game.create_reaction("Champion of Khorne", self.name_player,
                                               (int(self.number), planet_pos + 1, i))
