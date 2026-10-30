@@ -6566,7 +6566,8 @@ class Player:
                         i].get_ability() == "Flickering Holosuit":
                     if self.get_card_given_pos(planet_id, unit_id).get_attachments()[i].get_ready():
                         self.get_card_given_pos(planet_id, unit_id).get_attachments()[i].exhaust_card()
-                        damage = damage - 2
+                        if preventable:
+                            damage = damage - 2
                     else:
                         self.get_card_given_pos(planet_id, unit_id).get_attachments()[i].ready_card()
         og_damage = damage
