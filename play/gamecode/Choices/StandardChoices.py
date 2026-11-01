@@ -1760,7 +1760,8 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
                     self.reactions_needing_resolving[0].get_reaction_name() == "Fake Ooman Base" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Kaptin's Hook" or \
                     self.reactions_needing_resolving[0].get_reaction_name() == "Dripping Scythes" or \
-                    self.reactions_needing_resolving[0].get_reaction_name() == "Fire Warrior Elite":
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Fire Warrior Elite" or \
+                    self.reactions_needing_resolving[0].get_reaction_name() == "Farsight Vanguard DEFENDER":
                 self.shadow_thorns_body_allowed = False
                 self.may_move_defender = False
                 _, current_planet, current_unit = self.last_defender_position

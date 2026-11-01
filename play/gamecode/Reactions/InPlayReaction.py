@@ -1754,7 +1754,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                     else:
                         await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                           current_reaction + " can only target non-Tau units.")
-        elif current_reaction == "Farsight Vanguard":
+        elif current_reaction == "Farsight Vanguard" or current_reaction == "Farsight Vanguard DEFENDER":
             if not reaction.chosen_first_card:
                 if primary_player.get_number() == game_update_string[1]:
                     if og_pla != planet_pos or og_pos != unit_pos:

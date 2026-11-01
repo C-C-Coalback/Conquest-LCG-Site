@@ -1687,7 +1687,7 @@ async def start_resolving_reaction(self, name, game_update_string):
                 self.choice_context = "Support Fleet Rally"
                 self.name_player_making_choices = primary_player.name_player
                 self.resolving_search_box = True
-        elif current_reaction == "Farsight Vanguard":
+        elif current_reaction == "Farsight Vanguard" or current_reaction == "Farsight Vanguard DEFENDER":
             primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
             reaction.chosen_first_card = False
         elif current_reaction == "Farsight":

@@ -21,88 +21,49 @@ async def declare_defender(self, name, game_update_string):
                 if secondary_player.search_card_at_planet(self.defender_planet, "Zen Xi Aonia"):
                     if secondary_player.count_units_at_planet(self.defender_planet) > 1:
                         can_continue = False
-                        self.create_interrupt("Zen Xi Aonia", secondary_player.name_player,
-                                              (int(secondary_player.number), self.defender_planet, -1))
-                        self.last_defender_position = (secondary_player.number,
-                                                       self.defender_planet,
-                                                       self.defender_position)
-                        secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                    self.defender_position,
-                                                                    "red")
+                        self.create_interrupt("Zen Xi Aonia", secondary_player.name_player, (int(secondary_player.number), self.defender_planet, -1))
+                        self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
+                        secondary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
             if self.may_move_defender and can_continue:
                 for i in range(secondary_player.count_units_at_planet(self.defender_planet)):
                     if i != self.defender_position:
-                        if secondary_player.get_ability_given_pos(self.defender_planet,
-                                                                  i) == "Fire Warrior Elite":
+                        if secondary_player.get_ability_given_pos(self.defender_planet, i) == "Fire Warrior Elite":
                             if not secondary_player.hit_by_gorgul:
                                 if not secondary_player.check_if_already_have_reaction("Fire Warrior Elite"):
                                     can_continue = False
-                                    self.create_reaction("Fire Warrior Elite", secondary_player.name_player,
-                                                         (int(secondary_player.number),
-                                                          self.defender_planet, -1))
-                                    self.last_defender_position = (secondary_player.number,
-                                                                   self.defender_planet,
-                                                                   self.defender_position)
-                                    secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                                self.defender_position,
-                                                                                "red")
+                                    self.create_reaction("Fire Warrior Elite", secondary_player.name_player, (int(secondary_player.number), self.defender_planet, -1))
+                                    self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
+                                    secondary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
             if can_continue and self.may_move_defender:
                 ready_runt = False
                 for i in range(secondary_player.count_units_at_planet(self.defender_planet)):
-                    if secondary_player.get_ready_given_pos(self.defender_planet, i) and \
-                            secondary_player.check_for_trait_given_pos(self.defender_planet, i, "Runt"):
+                    if secondary_player.get_ready_given_pos(self.defender_planet, i) and secondary_player.check_for_trait_given_pos(self.defender_planet, i, "Runt"):
                         ready_runt = True
                 if ready_runt:
-                    if secondary_player.search_hand_for_card(
-                            "Runts to the Front") and secondary_player.resources > 0:
+                    if secondary_player.search_hand_for_card("Runts to the Front") and secondary_player.resources > 0:
                         can_continue = False
-                        self.create_reaction("Runts to the Front", secondary_player.name_player,
-                                             (int(secondary_player.number),
-                                              self.defender_planet, -1))
-                        self.last_defender_position = (secondary_player.number,
-                                                       self.defender_planet,
-                                                       self.defender_position)
-                        secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                    self.defender_position,
-                                                                    "red")
+                        self.create_reaction("Runts to the Front", secondary_player.name_player, (int(secondary_player.number), self.defender_planet, -1))
+                        self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
+                        secondary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
             if can_continue and self.may_move_defender:
                 for i in range(len(secondary_player.cards_in_reserve[self.defender_planet])):
-                    if secondary_player.cards_in_reserve[self.defender_planet][i].get_ability() \
-                            == "Deathwing Interceders":
+                    if secondary_player.cards_in_reserve[self.defender_planet][i].get_ability() == "Deathwing Interceders":
                         if secondary_player.resources > 1:
                             if not secondary_player.hit_by_gorgul:
                                 can_continue = False
-                                self.create_reaction("Deathwing Interceders",
-                                                     secondary_player.name_player,
-                                                     (int(secondary_player.number),
-                                                      self.defender_planet, -1))
-                                self.last_defender_position = (secondary_player.number,
-                                                               self.defender_planet,
-                                                               self.defender_position)
-                                secondary_player.set_aiming_reticle_in_play(self.defender_planet,
-                                                                            self.defender_position,
-                                                                            "red")
+                                self.create_reaction("Deathwing Interceders", secondary_player.name_player, (int(secondary_player.number), self.defender_planet, -1))
+                                self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
+                                secondary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "red")
             if can_continue and self.additional_attack_effects_allowed:
                 if secondary_player.check_for_trait_given_pos(self.defender_planet, self.defender_position, "Elite"):
                     if not primary_player.get_card_given_pos(self.attacker_planet, self.attacker_position).attack_set_next is not None:
-                        if primary_player.search_attachments_at_pos(self.attacker_planet, self.attacker_position,
-                                                                    "Krak Grenade"):
+                        if primary_player.search_attachments_at_pos(self.attacker_planet, self.attacker_position, "Krak Grenade"):
                             can_continue = False
                             self.additional_attack_effects_allowed = False
-                            await self.send_update_message(
-                                "Krak Grenade can be used."
-                            )
-                            secondary_player.set_aiming_reticle_in_play(
-                                self.defender_planet, self.defender_position, "blue"
-                            )
-                            self.create_reaction(
-                                "Krak Grenade", primary_player.name_player,
-                                (int(primary_player.number), self.attacker_planet,
-                                 self.attacker_position)
-                            )
-                            self.last_defender_position = (secondary_player.number,
-                                                           self.defender_planet,
-                                                           self.defender_position)
+                            await self.send_update_message("Krak Grenade can be used.")
+                            secondary_player.set_aiming_reticle_in_play(self.defender_planet, self.defender_position, "blue")
+                            self.create_reaction("Krak Grenade", primary_player.name_player, (int(primary_player.number), self.attacker_planet, self.attacker_position))
+                            self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
             self.last_defender_id = secondary_player.get_id_given_pos(self.defender_planet, self.defender_position)
             if can_continue and self.shadow_thorns_body_allowed:
                 if secondary_player.search_attachments_at_pos(
@@ -120,9 +81,7 @@ async def declare_defender(self, name, game_update_string):
                         "Shadowed Thorns Bodysuit", secondary_player.name_player,
                         (int(secondary_player.number), self.defender_planet, self.defender_position)
                     )
-                    self.last_defender_position = (secondary_player.number,
-                                                   self.defender_planet,
-                                                   self.defender_position)
+                    self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
                 elif secondary_player.search_attachments_at_pos(
                         self.defender_planet, self.defender_position,
                         "Dripping Scythes", must_match_name=True
@@ -138,11 +97,22 @@ async def declare_defender(self, name, game_update_string):
                         "Dripping Scythes", secondary_player.name_player,
                         (int(secondary_player.number), self.defender_planet, self.defender_position)
                     )
-                    self.last_defender_position = (secondary_player.number,
-                                                   self.defender_planet,
-                                                   self.defender_position)
-                elif secondary_player.get_ability_given_pos(
-                        self.defender_planet, self.defender_position) == "War Walker Squadron":
+                    self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
+                elif secondary_player.get_ability_given_pos(self.defender_planet, self.defender_position) == "Farsight Vanguard" and not \
+                        secondary_player.get_once_per_phase_used_given_pos(self.defender_planet, self.defender_position):
+                    can_continue = False
+                    await self.send_update_message(
+                        "Farsight Vanguard can be used prior to the resolution of the attack."
+                    )
+                    secondary_player.set_aiming_reticle_in_play(
+                        self.defender_planet, self.defender_position, "blue"
+                    )
+                    self.create_reaction(
+                        "Farsight Vanguard DEFENDER", secondary_player.name_player,
+                        (int(secondary_player.number), self.defender_planet, self.defender_position)
+                    )
+                    self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
+                elif secondary_player.get_ability_given_pos(self.defender_planet, self.defender_position) == "War Walker Squadron":
                     attachments = secondary_player.get_card_given_pos(self.defender_planet, self.defender_position).get_attachments()
                     found_hardpoint = False
                     for i in range(len(attachments)):
@@ -161,9 +131,7 @@ async def declare_defender(self, name, game_update_string):
                             (int(secondary_player.number), self.defender_planet,
                              self.defender_position)
                         )
-                        self.last_defender_position = (secondary_player.number,
-                                                       self.defender_planet,
-                                                       self.defender_position)
+                        self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
                 elif secondary_player.get_ability_given_pos(
                         self.defender_planet, self.defender_position
                 ) == "Dodging Land Speeder" and secondary_player.get_ready_given_pos(
@@ -180,9 +148,7 @@ async def declare_defender(self, name, game_update_string):
                         "Dodging Land Speeder", secondary_player.name_player,
                         (int(secondary_player.number), self.defender_planet, self.defender_position)
                     )
-                    self.last_defender_position = (secondary_player.number,
-                                                   self.defender_planet,
-                                                   self.defender_position)
+                    self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
                 elif "Catachan Devils Patrol" in secondary_player.cards:
                     card = self.preloaded_find_card("Catachan Devils Patrol")
                     self.discounts_applied = 0
@@ -208,12 +174,9 @@ async def declare_defender(self, name, game_update_string):
                             "Catachan Devils Patrol", secondary_player.name_player,
                             (int(secondary_player.number), self.defender_planet, self.defender_position)
                         )
-                        self.last_defender_position = (secondary_player.number,
-                                                       self.defender_planet,
-                                                       self.defender_position)
+                        self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
                 elif secondary_player.search_card_in_hq("Fake Ooman Base", ready_relevant=True):
-                    if secondary_player.check_if_faction_given_pos(self.defender_planet, self.defender_position,
-                                                                   "Orks") and \
+                    if secondary_player.check_if_faction_given_pos(self.defender_planet, self.defender_position, "Orks") and \
                             secondary_player.check_for_trait_given_pos(
                                 self.defender_planet, self.defender_position, "Soldier") and \
                             secondary_player.get_card_type_given_pos(
@@ -231,18 +194,12 @@ async def declare_defender(self, name, game_update_string):
                             (int(secondary_player.number), self.defender_planet,
                              self.defender_position)
                         )
-                        self.last_defender_position = (secondary_player.number,
-                                                       self.defender_planet,
-                                                       self.defender_position)
+                        self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
                 else:
                     warlord_pla, warlord_pos = secondary_player.get_location_of_warlord()
                     if abs(warlord_pla - self.defender_planet) == 1:
-                        if not secondary_player.check_for_trait_given_pos(self.defender_planet,
-                                                                          self.defender_position,
-                                                                          "Elite"):
-                            if secondary_player.search_attachments_at_pos(warlord_pla, warlord_pos,
-                                                                          "Kaptin's Hook",
-                                                                          ready_relevant=True):
+                        if not secondary_player.check_for_trait_given_pos(self.defender_planet, self.defender_position, "Elite"):
+                            if secondary_player.search_attachments_at_pos(warlord_pla, warlord_pos, "Kaptin's Hook", ready_relevant=True):
                                 can_continue = False
                                 await self.send_update_message(
                                     "Kaptin's Hook can be used to cancel the attack"
@@ -255,9 +212,7 @@ async def declare_defender(self, name, game_update_string):
                                     (int(secondary_player.number), self.defender_planet,
                                      self.defender_position)
                                 )
-                                self.last_defender_position = (secondary_player.number,
-                                                               self.defender_planet,
-                                                               self.defender_position)
+                                self.last_defender_position = (secondary_player.number, self.defender_planet, self.defender_position)
             if can_continue and self.allow_damage_abilities_defender:
                 if secondary_player.get_ability_given_pos(
                         self.defender_planet, self.defender_position) == "Firedrake Terminators":

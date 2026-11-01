@@ -1,3 +1,4 @@
+from play.gamecode.Phases import CombatPhase
 
 
 async def resolve_attachment_in_play_reaction(self, name, game_update_string, primary_player, secondary_player):
@@ -48,7 +49,7 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                     _, ext_pla, ext_pos = extra_info
                     secondary_player.assign_damage_to_pos(ext_pla, ext_pos, 2)
                     self.delete_reaction()
-    elif current_reaction == "Farsight Vanguard":
+    elif current_reaction == "Farsight Vanguard" or current_reaction == "Farsight Vanguard DEFENDER":
         if game_update_string[2] == primary_player.get_number():
             if reaction.chosen_first_card:
                 _, og_pla, og_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
@@ -56,17 +57,31 @@ async def resolve_attachment_in_play_reaction(self, name, game_update_string, pr
                 if primary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos].name_owner == primary_player.name_player:
                     if not primary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos].check_for_a_trait("Drone"):
                         if og_pla == planet_pos and og_pos == unit_pos:
-                            if primary_player.move_attachment_card(planet_pos, unit_pos, attachment_pos,
-                                                                   second_pla, second_pos):
+                            if primary_player.move_attachment_card(planet_pos, unit_pos, attachment_pos, second_pla, second_pos):
                                 primary_player.reset_aiming_reticle_in_play(second_pla, second_pos)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
+                                if self.last_defender_position != (-1, -1, -1) and current_reaction == "Farsight Vanguard DEFENDER":
+                                    await self.send_update_message("Farsight Vanguard has moved an attachment between itself and another unit.")
+                                    _, current_planet, current_unit = self.last_defender_position
+                                    last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet), str(current_unit)]
+                                    self.resolving_search_box = False
+                                    await CombatPhase.update_game_event_combat_section(
+                                        self, secondary_player.name_player, last_game_update_string)
+                                    self.last_defender_position = (-1, -1, -1)
                         elif second_pla == planet_pos and second_pos == unit_pos:
-                            if primary_player.move_attachment_card(planet_pos, unit_pos, attachment_pos,
-                                                                   og_pla, og_pos):
+                            if primary_player.move_attachment_card(planet_pos, unit_pos, attachment_pos, og_pla, og_pos):
                                 primary_player.reset_aiming_reticle_in_play(second_pla, second_pos)
                                 self.mask_jain_zar_check_reactions(primary_player, secondary_player)
                                 self.delete_reaction()
+                                if self.last_defender_position != (-1, -1, -1) and current_reaction == "Farsight Vanguard DEFENDER":
+                                    await self.send_update_message("Farsight Vanguard has moved an attachment between itself and another unit.")
+                                    _, current_planet, current_unit = self.last_defender_position
+                                    last_game_update_string = ["IN_PLAY", primary_player.get_number(), str(current_planet), str(current_unit)]
+                                    self.resolving_search_box = False
+                                    await CombatPhase.update_game_event_combat_section(
+                                        self, secondary_player.name_player, last_game_update_string)
+                                    self.last_defender_position = (-1, -1, -1)
     elif current_reaction == "Torturer's Masks":
         if player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos].get_ability() == "Torturer's Masks":
             if player_owning_card.get_card_given_pos(planet_pos, unit_pos).get_attachments()[attachment_pos].name_owner == primary_player.name_player:
