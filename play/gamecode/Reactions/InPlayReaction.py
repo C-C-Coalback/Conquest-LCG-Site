@@ -254,7 +254,7 @@ async def resolve_in_play_reaction(self, name, game_update_string, primary_playe
                         if player_owning_card.attach_card(attachment, planet_pos, unit_pos,
                                                           not_own_attachment=not_own_attachment,
                                                           relic_check_allowed=False):
-                            del primary_player.get_card_given_pos(planet_pos, unit_pos).get_attachments()[og_attachment]
+                            del primary_player.get_card_given_pos(og_pla, og_pos).get_attachments()[og_attachment]
                             primary_player.reset_aiming_reticle_in_play(og_pla, og_pos)
                             self.queue_special_damage_begins_sound()
                             player_owning_card.assign_damage_to_pos(planet_pos, unit_pos, 2, rickety_warbuggy=True)
