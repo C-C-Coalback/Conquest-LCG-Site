@@ -102,10 +102,10 @@
                 <p>P2P6</p>
             </div>
         </div>
-        <fieldset id="current-hand-player-1"{% if is_p2 %} class="card-stack"{% else %} class="hand-friendly"{% endif %}>
+        <fieldset id="current-hand-player-1"{% if is_p2 %} class="card-stack"{% else %} class="hand-friendly friendly-card-stack"{% endif %}>
             <legend>CARDS P1: 0 CARDS</legend>
         </fieldset>
-        <fieldset id="current-hand-player-2"{% if is_p2 is False %} class="card-stack"{% else %} class="hand-friendly"{% endif %}>
+        <fieldset id="current-hand-player-2"{% if is_p2 is False %} class="card-stack"{% else %} class="hand-friendly friendly-card-stack"{% endif %}>
             <legend>CARDS P2: 0 CARDS</legend>
         </fieldset>
         <div id="current-deck-player-1"{% if is_p2 is False%} class="friendly-deck"{% endif %}>
@@ -1338,7 +1338,11 @@
                         for (var i = 4; i < split_data.length; i++) {
                             var card_data_split = split_data[i].split("|");
                             var card_name = card_data_split[0];
-                            var card_class = "Card hand-card";
+                            var card_class = "Card";
+                            var div_class = "Card-div hand-card";
+                            if (i == 4) {
+                                div_class = div_class + " first-hand-card";
+                            }
                             if (card_data_split[2] !== "") {
                                 if (card_data_split[2] === "playable") {
                                     card_class = card_class + " playable-hand-card";
@@ -1350,7 +1354,7 @@
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
                             card_name = card_name.split(' ').join('_');
                             var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                            var full_string = `<div class="Card-div"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="` + card_class + `" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
+                            var full_string = `<div class="` + div_class + `"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="` + card_class + `" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`;
                             if (card_data_split[1] === "") {
                                 full_string += `</div>`
                             } else {
@@ -1370,6 +1374,7 @@
                             var second_card_left = parseInt(document.getElementById(second_id).getBoundingClientRect().left);
                             dist_between_two_hand_cards = second_card_left - first_card_left;
                         }
+                        document.getElementById(target_id).style.setProperty('--count', Math.max(split_data.length - 4, 2))
                         console.log("hand eventer")
                         updateDraggableHand();
                     } else {

@@ -1,12 +1,11 @@
 #full-game-box {
     display: grid;
     grid-template-columns: 77px 77px 77px 77px 122px 300px 580px 177px;
-    grid-template-rows: 150px auto 130px 140px;
+    grid-template-rows: 150px auto 140px;
     grid-template-areas:
     "removed1 discard1 deck1 resources1 initiative1 hand1 headquarters1 victory1"
     "inplay inplay inplay inplay inplay inplay inplay inplay"
-    "resources2 initiative2 headquarters2 headquarters2 headquarters2 headquarters2 headquarters2 victory2"
-    "removed2 discard2 deck2 hand2 hand2 hand2 hand2 victory2";
+    "removed2 discard2 deck2 resources2 initiative2 hand2 headquarters2 victory2";
     border-right: dashed 1px aliceblue;
     height: 900px;
     position: relative;

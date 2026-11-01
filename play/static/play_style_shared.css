@@ -836,9 +836,9 @@ legend {
 /* ENEMY HAND SHRINKING */
 
 .card-stack {
-    --card-width: 77px;
+    --card-width: 81px;
     --max-width: 250px;
-    --count: 1;               /* set per container, see below */
+    --count: 1;
 
     display: flex;
     width: 100%;
@@ -848,10 +848,30 @@ legend {
 .card-stack .hand-card {
     width: var(--card-width);
     flex-shrink: 0;
-    /* Overlap needed so that all cards fit in max-width, never below 0 */
     margin-left: min(0px, calc(
         (var(--max-width) - var(--card-width)) / max(1, var(--count) - 1) - var(--card-width)
     ));
+}
+
+.friendly-card-stack {
+    --card-width: 81px;
+    --count: 2;
+
+    display: flex;
+    width: 100%;
+    max-width: 250px;
+}
+
+.friendly-card-stack .hand-card {
+    width: calc(var(--card-width) - 4px);
+    flex-shrink: 0;
+    margin-left: min(0px, calc(
+        (100% - var(--card-width)) / max(1, var(--count) - 1) - var(--card-width)
+    ));
+}
+
+.hand-card:hover {
+    z-index: 10;
 }
 
 .first-hand-card {
