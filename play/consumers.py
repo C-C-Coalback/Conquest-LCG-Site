@@ -729,7 +729,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     else:
                         await active_games[self.game_position].resolve_chat_message(self.name, message)
                 elif len(message) == 3:
-                    if message[0] == "" and message[1] == "Load-Game" and active_games[self.game_position].phase == "SETUP":
+                    if message[0] == "" and message[1] == "Load-Game":
                         game_id = message[2]
                         cwd = os.getcwd()
                         stored_game_data_dir = os.path.join(cwd, "saved_games")
