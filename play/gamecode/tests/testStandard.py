@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
-
+from play.gamecode.tests.shortcuts import click_in_play, click_action, click_choice, click_attachment_in_hq, click_attachment_in_play, click_discard, click_hand, click_hq, click_pass, click_planet, click_reserve, click_search, dummy_click, standard_setup, skip_to_battle_first_planet
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -27,12 +27,12 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards), 8)
         test_game.p2.draw_card()
         self.assertEqual(len(test_game.p2.cards), 8)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["10th Company Scout"]
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "3"])
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
 
@@ -43,12 +43,12 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         test_game.p1.draw_card()
         test_game.p2.draw_card()
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["10th Company Scout"]
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "3"])
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
         self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
 
     async def test_deploy_support(self):
@@ -58,11 +58,11 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         test_game.p1.draw_card()
         test_game.p2.draw_card()
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Bigtoof Banna"]
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await click_hand(test_game, 1, 0)
         self.assertEqual(test_game.p1.get_ability_given_pos(-2, 0), "Bigtoof Banna")
 
     async def test_deploy_with_discounter(self):
@@ -73,13 +73,13 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.draw_card()
         test_game.p2.draw_card()
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Fortress-Monastery"))
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["10th Company Scout"]
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "3"])
-        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
+        await click_hq(test_game, 1, 1, 0)
         self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
         self.assertEqual(test_game.p1.resources, 7)
         self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
@@ -92,16 +92,16 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         test_game.p1.draw_card()
         test_game.p2.draw_card()
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["10th Company Scout", "Godwyn Pattern Bolter"]
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "3"])
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
         self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
-        await test_game.update_game_event("P2", ["pass-P1"])
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "3", "0"])
+        await click_pass(test_game, 2)
+        await click_hand(test_game, 1, 0)
+        await click_in_play(test_game, 1, 1, 3, 0)
         self.assertEqual(test_game.p1.search_attachments_at_pos(3, 0, "Godwyn Pattern Bolter"), True)
         self.assertEqual(test_game.p1.resources, 5)
         self.assertEqual(test_game.p1.cards, [])
@@ -113,29 +113,29 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         test_game.p1.draw_card()
         test_game.p2.draw_card()
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["10th Company Scout"]
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "3"])
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
         # Test destroy
         test_game.p1.assign_damage_to_pos(3, 0, 3)
-        await test_game.update_game_event("P2", [])
-        await test_game.update_game_event("P1", ["pass-P1"])
+        await dummy_click(test_game, 2)
+        await click_pass(test_game, 1)
         self.assertEqual(test_game.p1.count_units_at_planet(3), 0)
         self.assertEqual(len(test_game.stored_damage), 0)
         # Test damage but not destroy
         test_game.p1.assign_damage_to_pos(-2, 0, 3)
-        await test_game.update_game_event("P2", [])
-        await test_game.update_game_event("P1", ["pass-P1"])
+        await dummy_click(test_game, 2)
+        await click_pass(test_game, 1)
         self.assertEqual(test_game.p1.count_units_at_planet(3), 0)
         self.assertEqual(len(test_game.stored_damage), 0)
         self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 3)
         # Test Bloody
         test_game.p1.assign_damage_to_pos(-2, 0, 9)
-        await test_game.update_game_event("P2", [])
-        await test_game.update_game_event("P1", ["pass-P1"])
+        await dummy_click(test_game, 2)
+        await click_pass(test_game, 1)
         self.assertEqual(test_game.p1.count_units_at_planet(3), 0)
         self.assertEqual(len(test_game.stored_damage), 0)
         self.assertEqual(test_game.p1.get_damage_given_pos(-2, 0), 0)
@@ -148,13 +148,13 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
         self.assertEqual(test_game.phase, "DEPLOY")
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         self.assertEqual(test_game.phase, "DEPLOY")
         test_game.p1.cards = []
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["pass-P1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
         self.assertEqual(test_game.phase, "COMMAND")
 
     async def test_force_planets(self):
@@ -177,21 +177,21 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["pass-P1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
-        await test_game.update_game_event("P1", ["PLANETS", "0"])
-        await test_game.update_game_event("P2", ["PLANETS", "0"])
-        await test_game.update_game_event("P1", ["pass-P1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        await click_planet(test_game, 1, 0)
+        await click_planet(test_game, 2, 0)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Vash'ya Trailblazer"), 0)
-        await test_game.update_game_event("P1", ["pass-P1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "1"])
-        await test_game.update_game_event("P1", ["PLANETS", "1"])
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        await click_in_play(test_game, 1, 1, 0, 1)
+        await click_planet(test_game, 1, 1)
         self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
         self.assertEqual(test_game.p1.count_units_at_planet(1), 1)
 
@@ -200,14 +200,14 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Bigga Is Betta", "Enraged Ork"]
         test_game.p2.cards = []
         test_game.p1.resources = 7
-        await test_game.update_game_event("P1", ["HAND", "1", "1"])
-        await test_game.update_game_event("P1", ["PLANETS", "0"])
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
+        await click_hand(test_game, 1, 1)
+        await click_planet(test_game, 1, 0)
+        await click_hand(test_game, 1, 0)
         self.assertEqual(len(test_game.p1.cards), 0)
         self.assertEqual(test_game.p1.resources, 7)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 1)
@@ -217,15 +217,15 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Enraged Ork"]
         test_game.p2.cards = []
         test_game.p1.resources = 7
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Crushface"), 0)
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "0"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        await click_in_play(test_game, 1, 1, 0, 0)
         self.assertEqual(test_game.p1.resources, 6)
 
     async def test_splintered_path_acolyte(self):
@@ -233,14 +233,14 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Black Legion Heldrake"]
         test_game.p1.resources = 7
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Splintered Path Acolyte"), 0)
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "0"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        await click_in_play(test_game, 1, 1, 0, 0)
         self.assertEqual(test_game.p1.resources, 1)
 
 

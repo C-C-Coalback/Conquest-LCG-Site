@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup
+from play.gamecode.tests.shortcuts import click_attachment_in_play, skip_to_battle_first_planet, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -19,13 +19,13 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Godwyn Pattern Bolter"]
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await click_hand(test_game, 1, 0)
+        await click_in_play(test_game, 1, 1, 0, 0)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
@@ -35,13 +35,13 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Godwyn Pattern Bolter"]
         test_game.p2.cards = []
         test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "0"])
+        await click_hand(test_game, 1, 0)
+        await click_in_play(test_game, 1, 2, 0, 0)
         self.assertEqual(len(test_game.p2.get_all_attachments_at_pos(0, 0)), 1)
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
@@ -51,13 +51,13 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Godwyn Pattern Bolter"]
         test_game.p2.cards = []
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Eager Recruit"))
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["HQ", "1", "1"])
+        await click_hand(test_game, 1, 0)
+        await click_hq(test_game, 1, 1, 1)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(-2, 1)), 1)
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
@@ -67,13 +67,13 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Godwyn Pattern Bolter"]
         test_game.p2.cards = []
         test_game.p2.add_to_hq(test_game.preloaded_find_card("Eager Recruit"))
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["HQ", "2", "1"])
+        await click_hand(test_game, 1, 0)
+        await click_hq(test_game, 1, 2, 1)
         self.assertEqual(len(test_game.p2.get_all_attachments_at_pos(-2, 1)), 1)
         self.assertEqual(test_game.p1.resources, 6)
         self.assertEqual(len(test_game.p1.cards), 0)
@@ -83,8 +83,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -98,8 +98,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -113,8 +113,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -126,14 +126,14 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Tallassarian Tempest Blade"]
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
-        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        await click_hand(test_game, 1, 0)
+        await click_in_play(test_game, 1, 1, 0, 0)
+        await click_hq(test_game, 1, 1, 0)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 0)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(-2, 0)), 1)
 
@@ -142,12 +142,12 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Tallassarian Tempest Blade"]
         test_game.p2.cards = []
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        await click_hand(test_game, 1, 0)
+        await click_hq(test_game, 1, 1, 0)
         self.assertEqual(test_game.p1.get_armorbane_given_pos(-2, 0), True)
 
     async def test_ranged_granting_attachment(self):
@@ -155,8 +155,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -168,8 +168,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -181,8 +181,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -194,8 +194,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -207,8 +207,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shoota Mob"), 0)
@@ -220,8 +220,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shoota Mob"), 0)
@@ -233,8 +233,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Vicious Bloodletter"), 0)
@@ -246,8 +246,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.attach_card(test_game.preloaded_find_card("The Dawn Blade"), -2, 0)
@@ -258,8 +258,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Eager Recruit"), 0)
@@ -271,8 +271,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Experimental Devilfish"), 0)
@@ -287,8 +287,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Experimental Devilfish"), 0)
@@ -303,8 +303,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Ripper Swarm"), 0)
@@ -317,8 +317,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Void Pirate"), 0)
@@ -333,8 +333,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Ripper Swarm"), 0)
@@ -349,8 +349,8 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Slaanesh's Temptation"]
         test_game.p2.cards = []
         await test_game.update_game_event("P1", ["HAND", "1", "0"])
@@ -365,22 +365,22 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Ripper Swarm"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Straken's Cunning"), 0, 0)
         test_game.p1.destroy_card_in_play(0, 0)
-        await test_game.update_game_event("P1", [])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 1, 0)
         self.assertEqual(len(test_game.p1.cards), 3)
         test_game.p1.cards = []
         test_game.p1.add_to_hq(test_game.preloaded_find_card("Ripper Swarm"))
         test_game.p1.attach_card(test_game.preloaded_find_card("Straken's Cunning"), -2, 1)
         test_game.p1.destroy_card_in_play(-2, 1)
-        await test_game.update_game_event("P1", [])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 1, 0)
         self.assertEqual(len(test_game.p1.cards), 3)
 
     async def test_cybork_body(self):
@@ -388,8 +388,8 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Ripper Swarm"), 0)
@@ -404,15 +404,15 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Zarathur's Flamers"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Mark of Chaos"), 0, 0)
         test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Zarathur's Flamers"), 0)
         test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Zarathur's Flamers"), 0)
         test_game.p1.destroy_card_in_play(0, 0)
-        await test_game.update_game_event("P1", [])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await dummy_click(test_game, 1)
+        await click_choice(test_game, 1, 0)
         self.assertEqual(len(test_game.stored_damage), 2)
         self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 1)
 
@@ -421,12 +421,12 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Zarathur's Flamers"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Dire Mutation"), 0, 0)
         test_game.p1.exhaust_given_pos(0, 0)
-        await test_game.update_game_event("P1", [])
+        await click_choice(test_game, 1, 0)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 1)
 
     async def test_agonizer_of_bren(self):
@@ -434,8 +434,8 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Zarathur's Flamers"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Agonizer of Bren"), 0, 0)
         card = test_game.preloaded_find_card("Khymera")
@@ -452,8 +452,8 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = ["Raid"]
         test_game.p2.cards = []
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Baleful Mandrake"), 0)
@@ -461,9 +461,9 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.attach_card(test_game.preloaded_find_card("Hypex Injector"), 0, 0)
         test_game.p1.resources = 6
         test_game.p2.resources = 7
-        await test_game.update_game_event("P1", ["action-button"])
-        await test_game.update_game_event("P1", ["HAND", "1", "0"])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        await click_choice(test_game, 1, 0)
         self.assertEqual(test_game.p1.get_ready_given_pos(0, 0), True)
 
     async def test_shadowsuns_stealth_cadre(self):
@@ -471,8 +471,8 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0, 0)
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 4)
@@ -483,8 +483,8 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Gun Drones"), 0, 0)
         self.assertEqual(test_game.p1.get_area_effect_given_pos(0, 0), 2)
@@ -494,15 +494,15 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Escort Drone"), 0, 0)
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 4)
         self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 3)
         test_game.p1.destroy_card_in_play(0, 0)
-        await test_game.update_game_event("P1", [])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await dummy_click(test_game, 1)
+        await click_choice(test_game, 1, 0)
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Escort Drone")
 
     async def test_great_scything_talons(self):
@@ -515,9 +515,9 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.set_damage_given_pos(0, 0, 3)
         test_game.p1.exhaust_given_pos(0, 0)
         test_game.p1.ready_given_pos(0, 0)
-        await test_game.update_game_event("P1", [])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await dummy_click(test_game, 1)
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 1, 0)
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 4)
 
     async def test_bone_sabres(self):
@@ -528,13 +528,13 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         await skip_to_battle_first_planet(test_game, tyranid_1=True)
         test_game.p1.attach_card(test_game.preloaded_find_card("Bone Sabres"), 0, 0)
         test_game.p2.add_card_to_planet(test_game.preloaded_find_card("10th Company Scout"), 0)
-        await test_game.update_game_event("P1", ["pass-P1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
-        await test_game.update_game_event("P1", ["CHOICE", "1"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "2", "0", "1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        await click_in_play(test_game, 1, 1, 0, 0)
+        await click_choice(test_game, 1, 1)
+        await click_in_play(test_game, 1, 2, 0, 1)
+        await click_pass(test_game, 2)
+        await click_choice(test_game, 1, 0)
         self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
 
     async def test_regeneration(self):
@@ -547,8 +547,8 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.attach_card(test_game.preloaded_find_card("Regeneration"), 0, 0)
         test_game.p1.set_damage_given_pos(0, 0, 3)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 3)
-        await test_game.update_game_event("P1", ["action-button"])
-        await test_game.update_game_event("P1", ["ATTACHMENT", "IN_PLAY", "1", "0", "0", "0"])
+        await click_action(test_game, 1)
+        await click_attachment_in_play(test_game, 1, 1, 0, 0, 0)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 1)
         self.assertFalse(test_game.p1.get_attachment_at_pos(0, 0, 0).get_ready())
 
@@ -574,15 +574,15 @@ class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         await standard_setup(test_game)
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Volatile Pyrovore"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Noxious Fleshborer"), 0, 0)
-        await test_game.update_game_event("P1", ["pass-P1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
-        await test_game.update_game_event("P1", ["PLANETS", "0"])
-        await test_game.update_game_event("P1", ["PLANETS", "1"])
-        await test_game.update_game_event("P2", ["PLANETS", "0"])
-        await test_game.update_game_event("P1", ["pass-P1"])
-        await test_game.update_game_event("P2", ["pass-P1"])
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        await click_planet(test_game, 1, 0)
+        await click_planet(test_game, 1, 1)
+        await click_planet(test_game, 2, 0)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
         self.assertEqual(len(test_game.reactions_needing_resolving), 1)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
         self.assertTrue(test_game.infested_planets[0])
 
 if __name__ == "__main__":
