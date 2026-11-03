@@ -359,6 +359,7 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards), 0)
         self.assertEqual(len(test_game.p1.attachments_at_planet[4]), 1)
 
+class SpecificAttachmentsTest(unittest.IsolatedAsyncioTestCase):
     async def test_strakens_cunning(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
@@ -550,6 +551,39 @@ class GenericAttachmentsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["ATTACHMENT", "IN_PLAY", "1", "0", "0", "0"])
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 1)
         self.assertFalse(test_game.p1.get_attachment_at_pos(0, 0, 0).get_ready())
+
+    async def test_noxious_fleshborer(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(ooe_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Volatile Pyrovore"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Noxious Fleshborer"), 0, 0)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 3)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 3)
+        test_game.infest_planet(0, test_game.p1)
+        self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 4)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 4)
+
+    async def test_noxious_fleshborer_command_ability(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(ooe_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Volatile Pyrovore"), 0)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Noxious Fleshborer"), 0, 0)
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        await test_game.update_game_event("P1", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["PLANETS", "1"])
+        await test_game.update_game_event("P2", ["PLANETS", "0"])
+        await test_game.update_game_event("P1", ["pass-P1"])
+        await test_game.update_game_event("P2", ["pass-P1"])
+        self.assertEqual(len(test_game.reactions_needing_resolving), 1)
+        await test_game.update_game_event("P1", ["CHOICE", "0"])
+        self.assertTrue(test_game.infested_planets[0])
 
 if __name__ == "__main__":
     unittest.main()
