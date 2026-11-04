@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, swarmlord_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
-from play.gamecode.tests.shortcuts import standard_setup, skip_to_battle_first_planet, click_search, click_reserve, click_planet, click_pass, click_hq, click_hand, click_discard, click_attachment_in_play, click_attachment_in_hq, click_choice, click_action, click_in_play, dummy_click
+from play.gamecode.tests.shortcuts import standard_setup, skip_to_hq_phase, skip_to_battle_first_planet, click_search, click_reserve, click_planet, click_pass, click_hq, click_hand, click_discard, click_attachment_in_play, click_attachment_in_hq, click_choice, click_action, click_in_play, dummy_click
 
 
 card_array = Initfunctions.init_player_cards()
@@ -1030,6 +1030,18 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(test_game.p2.get_ready_given_pos(0, 1))
         self.assertFalse(test_game.p2.get_ready_given_pos(0, 2))
         self.assertTrue(test_game.p2.get_ready_given_pos(0, 3))
+
+    async def test_spore_chimney(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Spore Chimney"))
+        await skip_to_hq_phase(test_game)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 1)
+        await click_choice(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
+        self.assertTrue(test_game.infested_planets[3])
 
 if __name__ == "__main__":
     unittest.main()
