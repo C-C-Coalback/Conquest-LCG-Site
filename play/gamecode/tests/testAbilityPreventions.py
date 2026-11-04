@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -19,8 +19,8 @@ class AbilityPreventionsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.cards = []
         test_game.p2.cards = []
         card = test_game.preloaded_find_card("Land Raider")
@@ -31,12 +31,12 @@ class AbilityPreventionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.add_card_to_planet(card, 0)
         card = test_game.preloaded_find_card("Sicarius's Chosen")
         test_game.p2.add_card_to_planet(card, 1)
-        await test_game.update_game_event("P2", [])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await dummy_click(test_game, 2)
+        await click_choice(test_game, 2, 0)
         self.assertEqual(len(test_game.reactions_needing_resolving), 1)
         self.assertEqual(test_game.p1.count_units_at_planet(0), 3)
-        await test_game.update_game_event("P2", ["IN_PLAY", "1", "0", "1"])
+        await click_in_play(test_game, 2, 1, 0, 1)
         self.assertEqual(test_game.p1.count_units_at_planet(0), 3)
-        await test_game.update_game_event("P2", ["IN_PLAY", "1", "0", "2"])
+        await click_in_play(test_game, 2, 1, 0, 2)
         self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
         self.assertEqual(len(test_game.reactions_needing_resolving), 0)

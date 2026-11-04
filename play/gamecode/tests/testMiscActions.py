@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-from play.gamecode.tests.shortcuts import skip_to_battle_first_planet
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, click_search, click_reserve, click_planet, click_pass, click_hq, click_hand, click_discard, click_attachment_in_play, click_attachment_in_hq, click_choice, click_action, click_in_play, dummy_click
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -19,21 +19,21 @@ class MiscActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
         await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
         await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
-        await test_game.update_game_event("P1", ["CHOICE", "0"])
-        await test_game.update_game_event("P2", ["CHOICE", "0"])
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
         test_game.p1.resources = 7
         test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Shadowsun's Stealth Cadre"), 0)
         test_game.p1.attach_card(test_game.preloaded_find_card("Command-link Drone"), 0, 0)
-        await test_game.update_game_event("P1", ["action-button"])
-        await test_game.update_game_event("P1", ["ATTACHMENT", "IN_PLAY", "1", "0", "0", "0"])
-        await test_game.update_game_event("P1", ["HQ", "1", "0"])
+        await click_action(test_game, 1)
+        await click_attachment_in_play(test_game, 1, 1, 0, 0, 0)
+        await click_hq(test_game, 1, 1, 0)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(-2, 0)), 1)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 0)
         self.assertEqual(test_game.p1.get_resources(), 6)
-        await test_game.update_game_event("P2", ["pass-P1"])
-        await test_game.update_game_event("P1", ["action-button"])
-        await test_game.update_game_event("P1", ["ATTACHMENT", "HQ", "1", "0", "0"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
+        await click_pass(test_game, 2)
+        await click_action(test_game, 1)
+        await click_attachment_in_hq(test_game, 1, 1, 0, 0)
+        await click_in_play(test_game, 1, 1, 0, 0)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(-2, 0)), 0)
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
         self.assertEqual(test_game.p1.get_resources(), 5)
@@ -46,9 +46,9 @@ class MiscActionsTest(unittest.IsolatedAsyncioTestCase):
         await skip_to_battle_first_planet(test_game, necron_1=True)
         test_game.p1.add_attachment_to_planet(0, test_game.preloaded_find_card("Defense Battery"))
         test_game.p1.discard = ["Supreme Strategist"]
-        await test_game.update_game_event("P1", ["action-button"])
-        await test_game.update_game_event("P1", ["IN_PLAY", "1", "0", "0"])
-        await test_game.update_game_event("P1", ["IN_DISCARD", "1", "0"])
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 0, 0)
+        await click_discard(test_game, 1, 1, 0)
         self.assertEqual(len(test_game.p1.discard), 0)
         await test_game.update_game_event("P1", ["ATTACHMENT", "PLANETS", "1", "0", "0"])
         self.assertEqual(test_game.p1.attachments_at_planet[0][0].get_ability(), "Supreme Strategist")
