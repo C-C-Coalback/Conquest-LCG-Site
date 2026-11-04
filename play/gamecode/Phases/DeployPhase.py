@@ -489,7 +489,7 @@ async def deploy_card_routine(self, name, planet_pos, discounts=0):
         elif self.action_object.action_chosen == "Triumvirate of Ynnead":
             del primary_player.discard[primary_player.aiming_reticle_coords_discard]
             primary_player.aiming_reticle_coords_discard = -1
-            self.chosen_first_card = False
+            self.action_object.chosen_first_card = False
             self.trium_tracker = (self.card_to_deploy.get_name(), planet_pos)
             self.trium_count += 1
         elif self.action_object.action_chosen == "Anrakyr the Traveller":
