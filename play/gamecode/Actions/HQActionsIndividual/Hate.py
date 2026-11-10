@@ -1,0 +1,2 @@
+async def hate():
+    pass
