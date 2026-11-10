@@ -1043,5 +1043,21 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await click_planet(test_game, 1, 3)
         self.assertTrue(test_game.infested_planets[3])
 
+    async def test_synaptic_link(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(ooe_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Synaptic Link"))
+        await standard_setup(test_game)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        await click_planet(test_game, 1, 2)
+        await click_planet(test_game, 1, 3)
+        await click_planet(test_game, 2, 4)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 1)
+        await click_choice(test_game, 1, 0)
+        self.assertEqual(len(test_game.p1.cards), 1)
+
 if __name__ == "__main__":
     unittest.main()
