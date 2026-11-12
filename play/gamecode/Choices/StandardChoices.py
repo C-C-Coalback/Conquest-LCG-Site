@@ -2240,21 +2240,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             await self.better_shield_card_resolution(
                 secondary_player.name_player, self.last_shield_string, alt_shields=False,
                 can_no_mercy=False)
-    elif self.choice_context == "First Line Rhinos Rally":
-        _, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-        card_name = self.choices_available[int(game_update_string[1])]
-        card = self.preloaded_find_card(card_name)
-        if card.get_faction() == "Space Marines" and card.get_card_type() == "Army" and not \
-                card.check_for_a_trait("Vehicle") and card.get_cost() < 4:
-            attachment_card = CardClasses.AttachmentCard(
-                card_name, "", "", 0, "Space Marines", "Common", 0, False)
-            attachment_card.from_front_line_rhinos = True
-            primary_player.attach_card(attachment_card, pla, pos, relic_check_allowed=False)
-            del primary_player.deck[int(game_update_string[1])]
-            primary_player.bottom_remaining_cards()
-            self.reset_choices_available()
-            self.resolving_search_box = False
-            self.delete_reaction()
     elif self.choice_context == "Use Woken Machine Spirit?":
         self.woken_machine_spirit_enabled = False
         if game_update_string[1] == "0":

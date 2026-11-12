@@ -2237,6 +2237,9 @@ class Game:
         return self.check_if_card_searched_satisfies_conditions(card_chosen, player)
 
     def check_if_card_searched_satisfies_conditions(self, card, player):
+        if self.what_to_do_with_searched_card == "First Line Rhinos Rally":
+            if card.check_for_a_trait("Vehicle"):
+                return False
         if not self.all_conditions_searched_card_required:
             if self.faction_of_searched_card is not None:
                 if card.get_faction() == self.faction_of_searched_card:
@@ -2301,6 +2304,8 @@ class Game:
                             elif self.what_to_do_with_searched_card == "Zadruk Prime":
                                 self.start_next_activity(self.name_1, self.reactions_needing_resolving[0].get_planet_pos())
                                 self.delete_reaction()
+                            elif self.what_to_do_with_searched_card == "First Line Rhinos Rally":
+                                self.delete_reaction()
                     else:
                         self.p2.bottom_remaining_cards()
                         if self.action_object.action_chosen == "Drop Pod Assault":
@@ -2314,6 +2319,8 @@ class Game:
                                     self.delete_reaction()
                             elif self.what_to_do_with_searched_card == "Zadruk Prime":
                                 self.start_next_activity(self.name_2, self.reactions_needing_resolving[0].get_planet_pos())
+                                self.delete_reaction()
+                            elif self.what_to_do_with_searched_card == "First Line Rhinos Rally":
                                 self.delete_reaction()
                     self.cards_in_search_box = []
                     if self.resolving_search_box:
@@ -2399,6 +2406,14 @@ class Game:
                                 del primary_player.deck[int(game_update_string[1])]
                             else:
                                 primary_player.number_cards_to_search += 1
+                        elif self.what_to_do_with_searched_card == "First Line Rhinos Rally":
+                            pla, pos = self.misc_target_unit
+                            card_name = primary_player.deck[int(game_update_string[1])]
+                            card = self.preloaded_find_card(card_name)
+                            attachment_card = CardClasses.AttachmentCard(card_name, "", "", 0, "Space Marines", "Common", 0, False)
+                            attachment_card.from_front_line_rhinos = True
+                            primary_player.attach_card(attachment_card, pla, pos, relic_check_allowed=False)
+                            del primary_player.deck[int(game_update_string[1])]
                         elif self.what_to_do_with_searched_card == "Zadruk Prime":
                             card_name = primary_player.deck[int(game_update_string[1])]
                             card = self.preloaded_find_card(card_name)
@@ -2423,9 +2438,7 @@ class Game:
                             else:
                                 primary_player.discard_card_from_deck(int(game_update_string[1]))
                         primary_player.number_cards_to_search -= 1
-                        if self.choice_context == "Tower of Despair" and \
-                                self.what_to_do_with_searched_card == "DRAW" and \
-                                self.misc_counter > 0:
+                        if self.choice_context == "Tower of Despair" and self.what_to_do_with_searched_card == "DRAW" and self.misc_counter > 0:
                             del self.cards_in_search_box[int(game_update_string[1])]
                             self.misc_counter = self.misc_counter - 1
                         else:

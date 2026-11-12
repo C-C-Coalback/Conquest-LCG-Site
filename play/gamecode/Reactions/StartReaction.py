@@ -35,18 +35,24 @@ async def start_resolving_reaction(self, name, game_update_string):
             self.number_who_is_searching = primary_player.number
             self.delete_reaction()
         elif current_reaction == "First Line Rhinos":
+            self.resolving_search_box = True
+            self.what_to_do_with_searched_card = "First Line Rhinos Rally"
+            self.traits_of_searched_card = None
+            self.card_type_of_searched_card = "Army"
+            self.faction_of_searched_card = "Space Marines"
+            self.max_cost_of_searched_card = 3
+            self.all_conditions_searched_card_required = True
+            self.no_restrictions_on_chosen_card = False
             primary_player.number_cards_to_search = 6
             for i in range(len(primary_player.headquarters)):
                 if primary_player.get_ability_given_pos(-2, i) == "Gladius Strike Force":
                     if primary_player.headquarters[i].counter > 0:
                         primary_player.number_cards_to_search += 2
-            self.resolving_search_box = True
-            if primary_player.number_cards_to_search > len(primary_player.deck):
-                primary_player.number_cards_to_search = len(primary_player.deck)
-            self.choices_available = primary_player.deck[:primary_player.number_cards_to_search]
-            self.create_choices(self.choices_available, "All")
-            self.choice_context = "First Line Rhinos Rally"
-            self.name_player_making_choices = primary_player.name_player
+            self.cards_in_search_box = primary_player.deck[:min(primary_player.number_cards_to_search, len(primary_player.deck))]
+            self.name_player_who_is_searching = primary_player.name_player
+            self.number_who_is_searching = primary_player.number
+            self.misc_target_unit = (reaction.get_planet_pos(), reaction.get_unit_pos())
+            self.delete_reaction()
         elif current_reaction == "Beasthunter Wyches":
             if primary_player.spend_resources(1):
                 primary_player.summon_token_at_hq("Khymera")

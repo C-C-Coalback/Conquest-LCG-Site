@@ -1059,5 +1059,23 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await click_choice(test_game, 1, 0)
         self.assertEqual(len(test_game.p1.cards), 1)
 
+    async def test_first_line_rhinos(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["First Line Rhinos"]
+        test_game.p1.deck = ["First Line Rhinos", "Blood Angels Veterans", "Rogue Trader"]
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 1)
+        await click_choice(test_game, 1, 0)
+        await click_search(test_game, 1, 0)
+        await click_search(test_game, 1, 2)
+        await click_search(test_game, 1, 1)
+        self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
+        self.assertEqual(test_game.p1.get_attachment_at_pos(0, 0, 0).get_ability(), "Blood Angels Veterans")
+
 if __name__ == "__main__":
     unittest.main()
