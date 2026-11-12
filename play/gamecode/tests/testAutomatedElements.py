@@ -30,6 +30,37 @@ apoka_errata_cards_array = Initfunctions.init_apoka_errata_cards()
 
 
 class AutomatedElementsTest(unittest.IsolatedAsyncioTestCase):
+    async def test_apoka_ae(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "Apoka", [], bot_is_present=True)
+        test_game.bot_is_present = False
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Tactical Squad Cardinis"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Tactical Squad Cardinis"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Tactical Squad Cardinis"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Tactical Squad Cardinis"), 0)
+        test_game.automated_1_has_passed_action = True
+        test_game.automated_2_has_passed_action = True
+        await click_pass(test_game, 1)
+        test_game.automated_1_has_passed_action = True
+        test_game.automated_2_has_passed_action = True
+        await click_pass(test_game, 2)
+        self.assertIn("IN_PLAY/1/0/1", test_game.last_automated_data_string)
+        await click_in_play(test_game, 1, 1, 0, 1)
+        self.assertIn("PLANETS/0", test_game.last_automated_data_string)
+        await click_planet(test_game, 1, 0)
+        self.assertIn("IN_PLAY/2/0/0", test_game.last_automated_data_string)
+        self.assertIn("IN_PLAY/2/0/1", test_game.last_automated_data_string)
+        self.assertIn("IN_PLAY/2/0/2", test_game.last_automated_data_string)
+        self.assertIn("IN_PLAY/2/0/3", test_game.last_automated_data_string)
+        await click_in_play(test_game, 1, 2, 0, 1)
+        self.assertIn("IN_PLAY/2/0/0", test_game.last_automated_data_string)
+        self.assertNotIn("IN_PLAY/2/0/1", test_game.last_automated_data_string)
+        self.assertIn("IN_PLAY/2/0/2", test_game.last_automated_data_string)
+        self.assertIn("IN_PLAY/2/0/3", test_game.last_automated_data_string)
+
     async def test_ambush_army(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [], bot_is_present=True)

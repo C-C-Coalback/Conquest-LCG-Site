@@ -53,8 +53,7 @@ async def update_game_event_combat_section(self, name, game_update_string):
         if game_update_string[0] == "action-button":
             if self.get_actions_allowed():
                 print("Need to run action code")
-                if self.mode == "Normal" and self.check_if_battle_taking_place() and (
-                        not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
+                if self.mode == "Normal" and self.check_if_battle_taking_place() and (not self.automated_1_has_passed_action or not self.automated_2_has_passed_action):
                     self.reset_automated_passed_actions()
                 self.stored_mode = self.mode
                 self.mode = "ACTION"

@@ -132,6 +132,9 @@ def update_automated_attributes(self):
                 else:
                     self.what_is_required_automated = "Combat Turn"
                     self.automated_player_waited_on = self.player_with_combat_turn
+                    if self.area_effect_active:
+                        self.what_is_required_automated = "Apoka AOE"
+                    self.automated_player_waited_on = self.player_with_combat_turn
     elif self.phase == "HEADQUARTERS":
         self.what_is_required_automated = "Headquarters Action"
         if not self.p1.has_passed and not self.p2.has_passed:
@@ -728,6 +731,13 @@ def determine_valid_moves(self):
         elif self.what_is_required_automated == "Outside Combat":
             valid_moves = detect_possible_actions(self, primary_player, secondary_player, combat_turn_action=False)
             valid_moves = add_valid_move(valid_moves, primary_player, "pass")
+        elif self.what_is_required_automated == "Apoka AOE":
+            battle_planet = self.last_planet_checked_for_battle
+            for i in range(secondary_player.count_units_at_planet(battle_planet)):
+                if secondary_player.get_aiming_reticle_in_play(battle_planet, i) != "blue":
+                    valid_moves = add_valid_move(valid_moves, secondary_player, "IN_PLAY", battle_planet, i)
+            if not valid_moves:
+                valid_moves = ["pass-P1"]
         elif self.what_is_required_automated == "Combat Turn":
             battle_planet = self.last_planet_checked_for_battle
             if self.attacker_planet == -1 or self.attacker_position == -1:
