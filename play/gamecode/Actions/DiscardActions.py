@@ -309,10 +309,16 @@ async def update_game_event_action_discard(self, name, game_update_string):
                 else:
                     await self.send_mistarget_message(primary_player.name_player, "Invalid Target",
                                                       "Imotekh the Stormlord cannot swap the textboxes of Event cards.")
+    elif self.action_object.action_chosen == "Repair Bay":
+        if chosen_discard == int(primary_player.number):
+            card = self.preloaded_find_card(primary_player.discard[pos_discard])
+            if card.check_for_a_trait("Pilot") or card.check_for_a_trait("Drone"):
+                primary_player.deck.insert(0, card.get_name())
+                del primary_player.discard[pos_discard]
+                self.action_cleanup()
     elif self.action_object.action_chosen == "Particle Whip":
         if chosen_discard == int(primary_player.number):
-            card = FindCard.find_card(primary_player.discard[pos_discard], self.card_array, self.cards_dict,
-                                      self.apoka_errata_cards, self.cards_that_have_errata)
+            card = self.preloaded_find_card(primary_player.discard[pos_discard])
             if card.get_is_unit():
                 primary_player.shuffle_card_in_discard_into_deck(pos_discard)
                 self.action_object.misc_counter += 1

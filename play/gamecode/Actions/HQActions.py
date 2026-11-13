@@ -884,23 +884,7 @@ async def update_game_event_action_hq(self, name, game_update_string):
                     elif ability == "Repair Bay":
                         if card.get_ready():
                             card.exhaust_card()
-                            self.choices_available = []
-                            self.choice_context = "Repair Bay"
-                            self.name_player_making_choices = primary_player.name_player
-                            for i in range(len(primary_player.discard)):
-                                card = FindCard.find_card(primary_player.discard[i], self.card_array, self.cards_dict,
-                                                          self.apoka_errata_cards, self.cards_that_have_errata)
-                                if card.check_for_a_trait("Drone", primary_player.etekh_trait) or \
-                                        card.check_for_a_trait("Pilot", primary_player.etekh_trait):
-                                    if card.get_name() not in self.choices_available:
-                                        self.choices_available.append(card.get_name())
-                            if not self.choices_available:
-                                await self.send_update_message(
-                                    "No valid target for Repair Bay."
-                                )
-                                self.choice_context = ""
-                                self.name_player_making_choices = ""
-                            self.action_cleanup()
+                            self.action_object.action_chosen = ability
                         else:
                             await self.send_mistarget_message(primary_player.name_player, "Cannot use ability",
                                                               "Card is not ready.")

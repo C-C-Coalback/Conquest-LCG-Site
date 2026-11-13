@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, meph_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click, click_attachment_in_play
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click, click_attachment_in_play, click_discard
 
 
 card_array = Initfunctions.init_player_cards()
@@ -303,6 +303,21 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         await click_action(test_game, 1)
         await click_hq(test_game, 1, 1, 0)
         self.assertEqual(test_game.p2.total_indirect_damage, 3)
+
+    async def test_repair_bay(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Repair Bay"))
+        test_game.p1.discard = ["Heavy Marker Drone"]
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        await click_discard(test_game, 1, 1, 0)
+        self.assertEqual(len(test_game.p1.discard), 0)
+        self.assertEqual(test_game.p1.get_top_card_deck_name_only(), "Heavy Marker Drone")
+        self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
 
 if __name__ == "__main__":
     unittest.main()
