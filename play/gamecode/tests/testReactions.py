@@ -1077,5 +1077,24 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.get_all_attachments_at_pos(0, 0)), 1)
         self.assertEqual(test_game.p1.get_attachment_at_pos(0, 0, 0).get_ability(), "Blood Angels Veterans")
 
+    async def test_veteran_barbrus(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(cato_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Blood Angels Veterans"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Enraged Ork"), 0)
+        test_game.p1.cards = ["Veteran Barbrus"]
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 1)
+        await click_choice(test_game, 1, 0)
+        await click_in_play(test_game, 1, 2, 0, 0)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 1)
+        await click_in_play(test_game, 1, 2, 0, 1)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 0)
+        self.assertEqual(test_game.p2.get_damage_given_pos(0, 1), 2)
+
 if __name__ == "__main__":
     unittest.main()
