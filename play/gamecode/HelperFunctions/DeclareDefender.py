@@ -452,11 +452,6 @@ async def declare_defender(self, name, game_update_string):
                             if secondary_player.get_damage_given_pos(self.defender_planet,
                                                                      self.defender_position) == 0:
                                 attack_value = attack_value - 5
-                    if primary_player.get_ability_given_pos(self.attacker_planet,
-                                                            self.attacker_position) \
-                            == "Roghrax Bloodhand":
-                        if self.bloodthirst_active[self.attacker_planet]:
-                            attack_value = attack_value * 2
                 if secondary_player.get_all_attachments_at_pos(
                         self.defender_planet, self.defender_position):
                     for i in range(len(primary_player.get_all_attachments_at_pos(

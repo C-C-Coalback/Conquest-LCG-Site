@@ -6454,6 +6454,11 @@ class Player:
                         attack_value += 1
         if self.get_brutal_given_pos(planet_id, unit_id):
             attack_value = attack_value + card.get_damage()
+        if ability == "Roghrax Bloodhand":
+            print("is Roghrax")
+            print(self.game.bloodthirst_active)
+            if self.game.bloodthirst_active[planet_id]:
+                attack_value = attack_value * 2
         return attack_value
 
     def get_most_termagants_at_single_planet(self):
@@ -8288,6 +8293,7 @@ class Player:
                     if self.search_hand_for_card("Fall Back!"):
                         self.game.create_reaction("Fall Back!", self.name_player, (int(self.number), -1, -1))
             self.cards_recently_destroyed.append(self.get_card_given_pos(planet_num, card_pos).get_name())
+            self.game.bloodthirst_active[planet_num] = True
             self.add_card_in_play_to_discard(planet_num, card_pos)
             self.game.queued_sound = "destroy"
 

@@ -4118,7 +4118,6 @@ class Game:
 
     async def destroy_check_cards_at_planet(self, player, planet_num):
         i = 0
-        destroyed_something = False
         while i < player.count_units_at_planet(planet_num):
             if self.attacker_planet == planet_num and self.attacker_position == i:
                 if self.player_with_combat_turn == player.name_player:
@@ -4139,11 +4138,8 @@ class Game:
                         elif self.attacker_position > i:
                             self.attacker_position = self.attacker_position - 1
                 player.destroy_card_in_play(planet_num, i)
-                destroyed_something = True
                 i = i - 1
             i = i + 1
-        if destroyed_something:
-            self.bloodthirst_active[planet_num] = True
 
     def holy_sepulchre_check(self, player):
         if player.search_card_in_hq("Holy Sepulchre", ready_relevant=True):
