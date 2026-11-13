@@ -232,5 +232,27 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await click_hq(test_game, 1, 1, 0)
         self.assertEqual(test_game.p1.get_ability_given_pos(-2, 0), "Eternity Gate")
 
+    async def test_boss_zugnog(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Boss Zugnog"), 3)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Enraged Ork"), 3)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Enraged Ork"), 3)
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 3, 0)
+        await click_in_play(test_game, 1, 1, 3, 0)
+        await click_in_play(test_game, 1, 1, 3, 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(3), 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 3)
+        self.assertEqual(len(test_game.stored_damage), 2)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 1), 1)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 2), 1)
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 1), "Boss Zugnog")
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 2), "Enraged Ork")
+
+
 if __name__ == "__main__":
     unittest.main()
