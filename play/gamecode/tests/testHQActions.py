@@ -292,5 +292,17 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.count_units_at_planet(0), 3)
         self.assertEqual(test_game.p1.count_units_at_planet(3), 0)
 
+    async def test_ork_landa(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Ork Landa"))
+        test_game.p1.deck = ["Squiggify", "Rok Bombardment"]
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        self.assertEqual(test_game.p2.total_indirect_damage, 3)
+
 if __name__ == "__main__":
     unittest.main()
