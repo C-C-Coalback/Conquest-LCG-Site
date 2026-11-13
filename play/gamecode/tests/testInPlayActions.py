@@ -253,6 +253,47 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 1), "Boss Zugnog")
         self.assertEqual(test_game.p1.get_ability_given_pos(0, 2), "Enraged Ork")
 
+    async def test_autarch_celachia_area_effect(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Autarch Celachia"), 3)
+        test_game.p1.resources = 5
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 3, 0)
+        await click_choice(test_game, 1, 0)
+        self.assertEqual(test_game.p1.resources, 4)
+        self.assertEqual(test_game.p1.get_area_effect_given_pos(3, 0), 1)
+
+    async def test_autarch_celachia_armorbane(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Autarch Celachia"), 3)
+        test_game.p1.resources = 5
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 3, 0)
+        await click_choice(test_game, 1, 1)
+        self.assertEqual(test_game.p1.resources, 4)
+        self.assertTrue(test_game.p1.get_armorbane_given_pos(3, 0))
+
+    async def test_autarch_celachia_mobile(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Autarch Celachia"), 3)
+        test_game.p1.resources = 5
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 3, 0)
+        await click_choice(test_game, 1, 2)
+        self.assertEqual(test_game.p1.resources, 4)
+        self.assertTrue(test_game.p1.get_mobile_given_pos(3, 0))
 
 if __name__ == "__main__":
     unittest.main()
