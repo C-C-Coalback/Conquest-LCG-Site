@@ -3828,7 +3828,7 @@ async def update_game_event_action_in_play(self, name, game_update_string):
         if game_update_string[1] == primary_player.get_number():
             if not self.action_object.chosen_first_card:
                 if primary_player.get_card_type_given_pos(planet_pos, unit_pos) == "Army":
-                    if primary_player.get_faction_given_pos(planet_pos, unit_pos) == "Astra Militarum":
+                    if primary_player.check_if_faction_given_pos(planet_pos, unit_pos, "Astra Militarum"):
                         cost = primary_player.get_card_given_pos(planet_pos, unit_pos).get_cost()
                         primary_player.return_card_to_hand(planet_pos, unit_pos)
                         self.action_object.chosen_first_card = True
