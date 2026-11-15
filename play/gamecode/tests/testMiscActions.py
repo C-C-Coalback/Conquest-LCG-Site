@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, click_search, click_reserve, click_planet, click_pass, click_hq, click_hand, click_discard, click_attachment_in_play, click_attachment_in_hq, click_choice, click_action, click_in_play, dummy_click
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, click_search, click_reserve, click_planet, standard_setup, click_pass, click_hq, click_hand, click_discard, click_attachment_in_play, click_attachment_in_hq, click_choice, click_action, click_in_play, dummy_click
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -53,6 +53,18 @@ class MiscActionsTest(unittest.IsolatedAsyncioTestCase):
         await test_game.update_game_event("P1", ["ATTACHMENT", "PLANETS", "1", "0", "0"])
         self.assertEqual(test_game.p1.attachments_at_planet[0][0].get_ability(), "Supreme Strategist")
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 3)
+
+    async def test_the_staff_of_command(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(imotekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.attach_card(test_game.preloaded_find_card("The Staff of Command"), -2, 0)
+        await click_action(test_game, 1)
+        await click_attachment_in_hq(test_game, 1, 1, 0, 0)
+        await click_choice(test_game, 1, 6)
+        self.assertEqual(test_game.p1.enslaved_faction, "Astra Militarum")
 
 if __name__ == "__main__":
     unittest.main()
