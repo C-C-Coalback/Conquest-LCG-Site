@@ -2,7 +2,7 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, swarmlord_deck_content, cato_deck_content, nahumekh_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, swarmlord_deck_content, cato_deck_content, anrakyr_deck_content, nahumekh_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
 from play.gamecode.tests.shortcuts import standard_setup, skip_to_hq_phase, skip_to_battle_first_planet, skip_to_combat_phase, click_search, click_reserve, click_planet, click_pass, click_hq, click_hand, click_discard, click_attachment_in_play, click_attachment_in_hq, click_choice, click_action, click_in_play, dummy_click
 
 
@@ -1233,6 +1233,20 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
         self.assertEqual(test_game.p1.count_units_at_planet(0), 0)
         self.assertEqual(test_game.p1.count_units_at_planet(1), 2)
+
+    async def test_pyrrhian_warscythe(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        test_game.p1.attach_card(test_game.preloaded_find_card("Pyrrhian Warscythe"), 0, 0)
+        await click_in_play(test_game, 1, 1, 0, 0)
+        await click_choice(test_game, 1, 1)
+        await click_choice(test_game, 1, 0)
+        self.assertEqual(len(test_game.p1.discard), 2)
 
 if __name__ == "__main__":
     unittest.main()
