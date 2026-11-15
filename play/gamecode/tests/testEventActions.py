@@ -2,7 +2,7 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nahumekh_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
 from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click, click_reserve, click_attachment_in_play, click_discard
 
 card_array = Initfunctions.init_player_cards()
@@ -1054,6 +1054,24 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p2.get_top_card_deck_name_only(), "Khymera Den")
         self.assertEqual(test_game.p1.cards, [])
         self.assertEqual(test_game.p1.resources, 3)
+
+    async def test_hate(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nahumekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Obedience"))
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Blood Angels Veterans"), 0)
+        test_game.p1.cards = ["Hate"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        await click_in_play(test_game, 1, 2, 0, 0)
+        self.assertEqual(test_game.p2.count_units_at_planet(0), 0)
+        self.assertEqual(test_game.p1.discard, ["Hate"])
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 4)
 
 if __name__ == "__main__":
     unittest.main()
