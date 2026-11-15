@@ -357,5 +357,24 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         test_game.p1.destroy_card_in_play(0, 0)
         self.assertEqual(test_game.p2.discard, ["Void Pirate"])
 
+    async def test_slumbering_tomb(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.cards = ["Recycle"]
+        test_game.p1.deck = ["Void Pirate", "Rogue Trader", "Freebooter Kaptain"]
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Slumbering Tomb"))
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        self.assertEqual(len(test_game.p1.cards), 3)
+        await click_hand(test_game, 1, 0)
+        await click_hand(test_game, 1, 0)
+        self.assertEqual(test_game.p1.cards, ["Rogue Trader"])
+        self.assertEqual(len(test_game.p1.deck), 1)
+        self.assertEqual(len(test_game.p1.discard), 2)
+        self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
+
 if __name__ == "__main__":
     unittest.main()
