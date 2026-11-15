@@ -38,3 +38,5 @@ with open(imotekh_deck_location, 'r') as file:
     imotekh_deck_content = file.read()
 with open(os.path.join(current_dir, 'decksForTests/Nahumekh.txt'), 'r') as file:
     nahumekh_deck_content = file.read()
+with open(os.path.join(current_dir, 'decksForTests/Anrakyr.txt'), 'r') as file:
+    anrakyr_deck_content = file.read()

@@ -2,7 +2,7 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, meph_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, meph_deck_content, anrakyr_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
 from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click, click_attachment_in_play, click_discard
 
 
@@ -318,6 +318,44 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.discard), 0)
         self.assertEqual(test_game.p1.get_top_card_deck_name_only(), "Heavy Marker Drone")
         self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
+
+    async def test_anrakyr_the_traveller_self(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.discard = ["No Mercy", "Pyrrhian Eternals"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        await click_choice(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Pyrrhian Eternals")
+        self.assertEqual(test_game.p1.discard, ["No Mercy"])
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertTrue(test_game.p1.get_once_per_phase_used_given_pos(-2, 0))
+
+    async def test_anrakyr_the_traveller_enemy(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p2.discard = ["Void Pirate"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        await click_choice(test_game, 1, 1)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 0), "Void Pirate")
+        self.assertEqual(test_game.p2.discard, [])
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertTrue(test_game.p1.get_once_per_phase_used_given_pos(-2, 0))
+        test_game.p1.destroy_card_in_play(0, 0)
+        self.assertEqual(test_game.p2.discard, ["Void Pirate"])
 
 if __name__ == "__main__":
     unittest.main()
