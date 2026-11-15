@@ -4616,7 +4616,7 @@ class Game:
         if card.get_ability() == "Burrowing Trygon":
             num_termagants = player.get_most_termagants_at_single_planet()
             discounts_applied += num_termagants
-        if card.get_faction() == "Astra Militarum":
+        if card.get_faction() == "Astra Militarum" or card.get_ability() == "Gue'vesa Overseer" or (card.get_ability() == "Ardent Auxiliaries" and self.apoka):
             discounts_applied += player.muster_the_guard_count
         slaanesh_temptation = False
         if card.get_ability() == "Dutiful Castellan":
