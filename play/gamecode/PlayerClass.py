@@ -7296,15 +7296,17 @@ class Player:
     def count_non_necron_factions(self):
         faction_list = []
         for i in range(len(self.headquarters)):
-            if self.headquarters[i].get_faction() != "Necrons" and self.headquarters[i].get_faction() != "Neutral":
-                if self.headquarters[i].get_faction() not in faction_list:
-                    faction_list.append(self.headquarters[i].get_faction())
+            faction = self.get_faction_given_pos(-2, i)
+            if faction != "Necrons" and faction != "Neutral":
+                if faction not in faction_list:
+                    faction_list.append(faction)
         for i in range(7):
+            print(self.count_units_at_planet(i))
             for j in range(self.count_units_at_planet(i)):
-                if self.get_card_given_pos(i, j).get_faction() != "Necrons" and \
-                        self.get_card_given_pos(i, j).get_faction() != "Neutral":
-                    if self.get_card_given_pos(i, j).get_faction() not in faction_list:
-                        faction_list.append(self.get_card_given_pos(i, j).get_faction())
+                faction = self.get_faction_given_pos(i, j)
+                if faction != "Necrons" and faction != "Neutral":
+                    if faction not in faction_list:
+                        faction_list.append(faction)
         return len(faction_list)
 
     def apply_negative_health_eop(self, planet_pos, unit_pos, value):
@@ -7522,10 +7524,12 @@ class Player:
                                                   (int(self.number), i, j))
                 if self.get_ability_given_pos(i, j, bloodied_relevant=True) == "Nahumekh":
                     if phase == "COMBAT":
+
                         self.nahumekh_value = self.count_non_necron_factions()
+                        print("[[ NAHUMEKH FOUND ]]")
+                        print(self.nahumekh_value)
                         if self.nahumekh_value > 0:
-                            self.game.create_reaction("Nahumekh", self.name_player,
-                                                      (int(self.number), i, j))
+                            self.game.create_reaction("Nahumekh", self.name_player, (int(self.number), i, j))
                 if self.get_ability_given_pos(i, j) == "Gleeful Plague Beast":
                     if phase == "COMBAT":
                         self.game.create_reaction("Gleeful Plague Beast", self.name_player,
