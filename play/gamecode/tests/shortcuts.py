@@ -1,6 +1,6 @@
 async def standard_setup(test_game, necron_1=False, necron_2=False):
-    await test_game.update_game_event("P1", ["CHOICE", "0"])
-    await test_game.update_game_event("P2", ["CHOICE", "0"])
+    await test_game.update_game_event("P1", ["CHOICE", "1"])
+    await test_game.update_game_event("P2", ["CHOICE", "1"])
     if necron_1:
         await test_game.update_game_event("P1", ["CHOICE", "0"])
     if necron_2:
