@@ -44,6 +44,22 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                     if valid:
                         primary_player.return_discard_to_hand(pos_discard)
                         self.delete_reaction()
+        elif current_reaction == "Doom Scythe Invader":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_card_type() == "Army" and card.check_for_a_trait("Vehicle", primary_player.etekh_trait) and not card.check_for_a_trait("Elite", primary_player.etekh_trait):
+                    pla = reaction.get_planet_pos()
+                    if primary_player.add_card_to_planet(card, pla) != -1:
+                        position_of_unit = primary_player.count_units_at_planet(pla) - 1
+                        primary_player.get_card_given_pos(pla, position_of_unit).valid_target_dynastic_weaponry = True
+                        if "Dynastic Weaponry" in primary_player.discard:
+                            if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
+                                self.create_reaction("Dynastic Weaponry", primary_player.name_player, (int(primary_player.get_number()), pla, position_of_unit))
+                        if primary_player.optimized_protocol_check():
+                            self.create_reaction("Optimized Protocol", primary_player.name_player, (int(primary_player.get_number()), pla, position_of_unit))
+                        primary_player.remove_card_from_discard(pos_discard)
+                        self.mask_jain_zar_check_reactions(primary_player, secondary_player)
+                        self.delete_reaction()
         elif current_reaction == "Parasite of Mortrex":
             if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):

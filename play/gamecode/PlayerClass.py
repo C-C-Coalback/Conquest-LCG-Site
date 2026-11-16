@@ -3519,8 +3519,7 @@ class Player:
         del self.cards[hand_pos]
         return True
 
-    def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0,
-                  is_owner_of_card=True):
+    def play_card(self, position, card=None, position_hand=None, discounts=0, damage_to_take=0, is_owner_of_card=True):
         damage_on_play = damage_to_take
         if position_hand is not None:
             return "ERROR/play_card function called incorrectly", -1
@@ -3529,8 +3528,7 @@ class Player:
         if card is not None:
             if card.get_card_type() == "Support":
                 warlord_pla, warlord_pos = self.get_location_of_warlord()
-                if self.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn" or \
-                        self.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn BLOODIED":
+                if self.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn" or self.get_ability_given_pos(warlord_pla, warlord_pos) == "Chapter Champion Varn BLOODIED":
                     if not self.get_once_per_round_used_given_pos(warlord_pla, warlord_pos):
                         discounts += 1
                         self.set_once_per_round_used_given_pos(warlord_pla, warlord_pos, True)
@@ -3556,8 +3554,7 @@ class Player:
                                     if damage_to_take > 0:
                                         if self.game.bigga_is_betta_active:
                                             while damage_on_play > 0:
-                                                self.assign_damage_to_pos(position, location_of_unit, 1,
-                                                                          by_enemy_unit=False)
+                                                self.assign_damage_to_pos(position, location_of_unit, 1, by_enemy_unit=False)
                                                 damage_on_play -= 1
                                         else:
                                             self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
@@ -3565,41 +3562,31 @@ class Player:
                             self.add_resources(cost, refund=True)
                             return "FAIL/Unique already in play", -1
                     else:
-                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ",
-                                                               "Already played a Limited card this round.")
+                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "Already played a Limited card this round.")
                         return "FAIL/Limited already played", -1
                 else:
                     if card.get_ability() == "Devoted Hospitaller":
                         if self.check_if_control_trait("Commissar"):
-                            self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ",
-                                                                   "Devoted Hospitaller cannot be played due to the presence of a Commissar unit.")
+                            self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "Devoted Hospitaller cannot be played due to the presence of a Commissar unit.")
                             return "FAIL/Controls Commissar and is Devoted Hospitaller", -1
                     if self.spend_resources(cost):
                         if self.add_to_hq(card):
                             location_of_unit = len(self.headquarters) - 1
                             if self.check_for_trait_given_pos(position, location_of_unit, "Vehicle"):
                                 if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
-                                    self.game.create_reaction("Forge Master Dominus", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
-                                elif self.search_for_card_everywhere("Forge Master Dominus BLOODIED",
-                                                                     bloodied_relevant=True):
-                                    self.game.create_reaction("Forge Master Dominus BLD", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Forge Master Dominus", self.name_player, (int(self.number), position, location_of_unit))
+                                elif self.search_for_card_everywhere("Forge Master Dominus BLOODIED", bloodied_relevant=True):
+                                    self.game.create_reaction("Forge Master Dominus BLD", self.name_player, (int(self.number), position, location_of_unit))
                                 if self.search_card_in_hq("Dominus' Forge"):
-                                    self.game.create_reaction("Dominus' Forge", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Dominus' Forge", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Murder of Razorwings":
-                                self.game.create_reaction("Murder of Razorwings", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Murder of Razorwings", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Mobilize the Chapter":
-                                self.game.create_reaction("Mobilize the Chapter Initiation", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Mobilize the Chapter Initiation", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Shadowed Thorns Venom":
-                                self.game.create_reaction("Shadowed Thorns Venom", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Shadowed Thorns Venom", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Munitorum Support":
-                                self.game.create_reaction("Munitorum Support", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Munitorum Support", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Triarch Stalkers Procession" and not self.game.blackstone:
                                 other_player.draw_card()
                                 other_player.draw_card()
@@ -3607,111 +3594,87 @@ class Player:
                                 for i in range(7):
                                     for j in range(self.count_units_at_planet(i)):
                                         if self.get_ability_given_pos(i, j) == "Arrogant Haemonculus":
-                                            self.game.create_reaction("Arrogant Haemonculus", self.name_player,
-                                                                      (int(self.number), i, j))
+                                            self.game.create_reaction("Arrogant Haemonculus", self.name_player, (int(self.number), i, j))
                             if card.get_ability() == "Bork'an Sept":
-                                self.game.create_reaction("Bork'an Sept", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Bork'an Sept", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Novokh Dynasty":
-                                self.game.create_reaction("Novokh Dynasty Burying", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Novokh Dynasty Burying", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "WAAAGH! Ungskar":
-                                self.game.create_reaction("WAAAGH! Ungskar", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("WAAAGH! Ungskar", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "The Broken Sigil":
-                                self.game.create_reaction("The Broken Sigil", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("The Broken Sigil", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "The Flayed Mask":
-                                self.game.create_reaction("The Flayed Mask", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("The Flayed Mask", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Grand Schemes":
-                                self.game.create_reaction("The Broken Sigil", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
-                                self.game.create_reaction("The Flayed Mask", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("The Broken Sigil", self.name_player, (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("The Flayed Mask", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Hive Fleet Leviathan":
-                                self.game.create_reaction("Hive Fleet Leviathan", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Hive Fleet Leviathan", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Dark Allegiance":
-                                self.game.create_reaction("Dark Allegiance Trait", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Dark Allegiance Trait", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Patron Saint":
-                                self.game.create_reaction("Patron Saint", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Patron Saint", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "First Line Rhinos":
-                                self.game.create_reaction("First Line Rhinos", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("First Line Rhinos", self.name_player, (int(self.number), position, location_of_unit))
                             if not card.check_for_a_trait("Elite") and card.get_card_type() == "Army":
                                 if self.search_card_in_hq("Eldritch Council", ready_relevant=True):
-                                    self.game.create_reaction("Eldritch Council", self.name_player,
-                                                              (int(self.number), -1, -1))
+                                    self.game.create_reaction("Eldritch Council", self.name_player, (int(self.number), -1, -1))
                                     self.game.eldritch_council_value = card.get_cost()
                             if card.get_card_type() == "Army":
                                 self.bluddflagg_used = True
                                 if card.get_faction() != "Necrons":
                                     if self.search_card_in_hq("Sautekh Dynasty", ready_relevant=True):
-                                        self.game.create_reaction("Sautekh Dynasty", self.name_player,
-                                                                  (int(self.number), position, location_of_unit))
+                                        self.game.create_reaction("Sautekh Dynasty", self.name_player, (int(self.number), position, location_of_unit))
                                 if damage_to_take > 0:
                                     if self.game.bigga_is_betta_active:
                                         while damage_on_play > 0:
-                                            self.assign_damage_to_pos(position, location_of_unit, 1,
-                                                                      by_enemy_unit=False)
+                                            self.assign_damage_to_pos(position, location_of_unit, 1, by_enemy_unit=False)
                                             damage_on_play -= 1
                                     else:
                                         self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
                                 if card.get_has_hive_mind():
                                     for i in range(len(self.headquarters)):
                                         if self.headquarters[i].get_ability() == "Hive Fleet Kraken":
-                                            self.game.create_reaction("Hive Fleet Kraken", self.name_player,
-                                                                      (int(self.number), -2, i))
+                                            self.game.create_reaction("Hive Fleet Kraken", self.name_player, (int(self.number), -2, i))
                             return "SUCCESS", -1
                         self.add_resources(cost, refund=True)
                         return "Fail/Unique already in play", -1
-                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ",
-                                                       "Insufficient resources to play the card.")
+                self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to HQ", "Insufficient resources to play the card.")
                 return "FAIL/Insufficient resources", -1
             else:
                 if card.get_ability() == "Devoted Hospitaller":
                     if self.check_if_control_trait("Commissar"):
-                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
-                                                               "Devoted Hospitaller cannot be played due to the presence of a Commissar unit.")
+                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", "Devoted Hospitaller cannot be played due to the presence of a Commissar unit.")
                         return "FAIL/Controls Commissar and is Devoted Hospitaller", -1
                 cost = card.get_cost() - discounts
                 if card.get_limited():
                     if self.can_play_limited and not self.enemy_holding_cell_check(card.get_name()):
                         if self.spend_resources(cost):
-                            if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card,
-                                                       triggered_card_effect=False) != -1:
+                            if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card, triggered_card_effect=False) != -1:
                                 self.set_can_play_limited(False)
                                 print("Played card to planet", position)
                                 location_of_unit = self.count_units_at_planet(position) - 1
                                 if damage_to_take > 0:
                                     if self.game.bigga_is_betta_active:
                                         while damage_on_play > 0:
-                                            self.assign_damage_to_pos(position, location_of_unit, 1,
-                                                                      by_enemy_unit=False)
+                                            self.assign_damage_to_pos(position, location_of_unit, 1, by_enemy_unit=False)
                                             damage_on_play -= 1
                                     else:
-                                        self.assign_damage_to_pos(position, location_of_unit, damage_to_take,
-                                                                  by_enemy_unit=False)
+                                        self.assign_damage_to_pos(position, location_of_unit, damage_to_take, by_enemy_unit=False)
                                 return "SUCCESS", location_of_unit
                             self.add_resources(cost, refund=True)
                             return "FAIL/Unique already in play", -1
                     else:
-                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
-                                                               "Already played a Limited card this round.")
+                        self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", "Already played a Limited card this round.")
                         return "FAIL/Limited already played", -1
                 elif not self.enemy_holding_cell_check(card.get_name()):
                     if self.spend_resources(cost):
-                        if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card,
-                                                   triggered_card_effect=False) != -1:
+                        if self.add_card_to_planet(card, position, is_owner_of_card=is_owner_of_card, triggered_card_effect=False) != -1:
                             location_of_unit = self.count_units_at_planet(position) - 1
                             if damage_to_take > 0:
                                 if self.game.bigga_is_betta_active:
                                     while damage_on_play > 0:
-                                        self.assign_damage_to_pos(position, location_of_unit, 1,
-                                                                  by_enemy_unit=False)
+                                        self.assign_damage_to_pos(position, location_of_unit, 1, by_enemy_unit=False)
                                         damage_on_play -= 1
                                 else:
                                     self.assign_damage_to_pos(position, location_of_unit, damage_to_take)
@@ -3719,158 +3682,116 @@ class Player:
                             if other_player.name_player == self.name_player:
                                 other_player = self.game.p2
                             if card.get_ability() == "Murder of Razorwings":
-                                self.game.create_reaction("Murder of Razorwings", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Murder of Razorwings", self.name_player, (int(self.number), position, location_of_unit))
                             if self.check_for_trait_given_pos(position, location_of_unit, "Vehicle"):
                                 if self.search_for_card_everywhere("Forge Master Dominus", bloodied_relevant=True):
-                                    self.game.create_reaction("Forge Master Dominus", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
-                                elif self.search_for_card_everywhere("Forge Master Dominus BLOODIED",
-                                                                     bloodied_relevant=True):
-                                    self.game.create_reaction("Forge Master Dominus BLD", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Forge Master Dominus", self.name_player, (int(self.number), position, location_of_unit))
+                                elif self.search_for_card_everywhere("Forge Master Dominus BLOODIED", bloodied_relevant=True):
+                                    self.game.create_reaction("Forge Master Dominus BLD", self.name_player, (int(self.number), position, location_of_unit))
                                 if self.search_card_in_hq("Dominus' Forge"):
-                                    self.game.create_reaction("Dominus' Forge", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Dominus' Forge", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Patron Saint":
-                                self.game.create_reaction("Patron Saint", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Patron Saint", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Kariaq's Inner Circle":
                                 if self.game.determine_last_planet() == position:
-                                    self.game.create_reaction("Kariaq's Inner Circle", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Kariaq's Inner Circle", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Imperial Fists Siege Force":
-                                self.game.create_reaction("Imperial Fists Siege Force", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Imperial Fists Siege Force", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Hydrae Stalker":
-                                self.game.create_reaction("Hydrae Stalker", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Hydrae Stalker", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Imperial Fists Devastators":
                                 if self.game.get_blue_icon(position):
-                                    self.game.create_reaction("Imperial Fists Devastators", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Imperial Fists Devastators", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_faction() != "Necrons":
                                 if self.search_card_in_hq("Sautekh Dynasty", ready_relevant=True):
-                                    self.game.create_reaction("Sautekh Dynasty", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Sautekh Dynasty", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "First Line Rhinos":
-                                self.game.create_reaction("First Line Rhinos", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("First Line Rhinos", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Triarch Stalkers Procession" and not self.game.blackstone:
                                 other_player.draw_card()
                                 other_player.draw_card()
                             if card.get_ability() == "Scheming Warlock":
-                                self.game.create_reaction("Scheming Warlock", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Scheming Warlock", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Brotherhood Justicar":
-                                self.game.create_reaction("Brotherhood Justicar", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Brotherhood Justicar", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Luring Troupe":
-                                self.game.create_reaction("Luring Troupe", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Luring Troupe", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "The Webway Witch":
-                                self.game.create_reaction("The Webway Witch", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
-                            if card.get_ability() == "Scything Hormagaunts"\
-                                    and not self.game.infested_planets[position]:
-                                self.game.create_reaction("Scything Hormagaunts", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("The Webway Witch", self.name_player, (int(self.number), position, location_of_unit))
+                            if card.get_ability() == "Scything Hormagaunts" and not self.game.infested_planets[position]:
+                                self.game.create_reaction("Scything Hormagaunts", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Emergent Cultists":
-                                self.game.create_reaction("Emergent Cultists", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Emergent Cultists", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Klaivex Warleader":
                                 if self.game.phase == "COMBAT":
-                                    self.game.create_reaction("Klaivex Warleader", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Klaivex Warleader", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Aun'ui Prelate":
-                                self.game.create_reaction("Aun'ui Prelate", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Aun'ui Prelate", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Doom Scythe Invader":
-                                self.game.create_reaction("Doom Scythe Invader", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Doom Scythe Invader", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Genestealer Brood":
-                                self.game.create_reaction("Genestealer Brood", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Genestealer Brood", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Space Wolves Predator":
-                                self.game.create_reaction("Space Wolves Predator", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Space Wolves Predator", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Kommando Sneakaz":
-                                self.game.create_reaction("Kommando Sneakaz", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Kommando Sneakaz", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Prophetic Farseer":
-                                self.game.create_reaction("Prophetic Farseer", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Prophetic Farseer", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Prototype Crisis Suit":
-                                self.game.create_reaction("Prototype Crisis Suit", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Prototype Crisis Suit", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Invasive Genestealers":
-                                self.game.create_reaction("Invasive Genestealers", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Invasive Genestealers", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Shadowed Thorns Venom":
-                                self.game.create_reaction("Shadowed Thorns Venom", self.name_player,
-                                                          (int(self.number), position, location_of_unit))
+                                self.game.create_reaction("Shadowed Thorns Venom", self.name_player, (int(self.number), position, location_of_unit))
                             if card.get_ability() == "Kroot Hunter":
                                 if self.game.get_red_icon(position):
-                                    self.game.create_reaction("Kroot Hunter", self.name_player,
-                                                              (int(self.number), position, location_of_unit))
-                            if card.check_for_a_trait("Scout", self.etekh_trait) \
-                                    and card.get_faction() != "Necrons":
+                                    self.game.create_reaction("Kroot Hunter", self.name_player, (int(self.number), position, location_of_unit))
+                            if card.check_for_a_trait("Scout", self.etekh_trait) and card.get_faction() != "Necrons":
                                 for i in range(7):
                                     for j in range(self.count_units_at_planet(i)):
                                         if self.get_card_given_pos(i, j).get_ability() == "Tomb Blade Squadron":
                                             if not self.check_if_already_have_reaction("Tomb Blade Squadron"):
-                                                self.game.create_reaction("Tomb Blade Squadron", self.name_player,
-                                                                          (int(self.number), -1, -1))
+                                                self.game.create_reaction("Tomb Blade Squadron", self.name_player, (int(self.number), -1, -1))
                                 for i in range(len(self.headquarters)):
                                     if self.headquarters[i].get_ability() == "Tomb Blade Squadron":
                                         if not self.check_if_already_have_reaction("Tomb Blade Squadron"):
-                                            self.game.create_reaction("Tomb Blade Squadron", self.name_player,
-                                                                      (int(self.number), -1, -1))
+                                            self.game.create_reaction("Tomb Blade Squadron", self.name_player, (int(self.number), -1, -1))
                             if card.check_for_a_trait("Elite"):
                                 for i in range(len(self.headquarters)):
                                     if self.get_ability_given_pos(-2, i) == "Turbulent Rift":
-                                        self.game.create_reaction("Turbulent Rift", self.name_player,
-                                                                  (int(self.number), position, location_of_unit))
+                                        self.game.create_reaction("Turbulent Rift", self.name_player, (int(self.number), position, location_of_unit))
                                     if self.get_ability_given_pos(-2, i) == "Loamy Broodhive":
                                         if self.get_ready_given_pos(-2, i):
-                                            self.game.create_reaction("Loamy Broodhive", self.name_player,
-                                                                      (int(self.number), position, location_of_unit))
+                                            self.game.create_reaction("Loamy Broodhive", self.name_player, (int(self.number), position, location_of_unit))
                             if not card.check_for_a_trait("Elite") and card.get_card_type() == "Army":
                                 if self.search_card_in_hq("Eldritch Council", ready_relevant=True):
-                                    self.game.create_reaction("Eldritch Council", self.name_player,
-                                                              (int(self.number), -1, -1))
+                                    self.game.create_reaction("Eldritch Council", self.name_player, (int(self.number), -1, -1))
                                     self.game.eldritch_council_value = card.get_cost()
                             if card.check_for_a_trait("Daemon", self.etekh_trait):
                                 for i in range(len(self.headquarters)):
                                     if self.get_ability_given_pos(-2, i) == "Tower of Worship":
-                                        self.game.create_reaction("Tower of Worship", self.name_player,
-                                                                  (int(self.number), -2, i))
+                                        self.game.create_reaction("Tower of Worship", self.name_player, (int(self.number), -2, i))
                             if card.check_for_a_trait("Nurgle", self.etekh_trait):
                                 for i in range(self.count_units_at_planet(position)):
                                     if self.get_ability_given_pos(position, i) == "Death Guard Preachers":
                                         if not self.get_once_per_phase_used_given_pos(position, i):
-                                            if not self.check_if_already_have_reaction_of_position(
-                                                    "Death Guard Preachers", position, i):
-                                                self.game.create_reaction("Death Guard Preachers", self.name_player,
-                                                                          (int(self.number), position, i))
+                                            if not self.check_if_already_have_reaction_of_position("Death Guard Preachers", position, i):
+                                                self.game.create_reaction("Death Guard Preachers", self.name_player, (int(self.number), position, i))
                             if card.get_faction() != "Necrons" and card.get_faction() != "Neutral":
                                 if self.count_units_of_faction(card.get_faction()) == 1:
                                     for i in range(len(self.headquarters)):
                                         if self.headquarters[i].get_ability() == "Sautekh Complex":
-                                            self.game.create_reaction("Sautekh Complex", self.name_player,
-                                                                      (int(self.number), -2, i))
+                                            self.game.create_reaction("Sautekh Complex", self.name_player, (int(self.number), -2, i))
                             if card.get_faction() != "Tau":
                                 for i in range(self.count_units_at_planet(position)):
                                     if self.get_ability_given_pos(position, i) == "Exploratory Drone":
-                                        self.game.create_reaction("Exploratory Drone", self.name_player,
-                                                                  (int(self.number), position, i))
+                                        self.game.create_reaction("Exploratory Drone", self.name_player, (int(self.number), position, i))
                                 other_player = self.game.p1
                                 if other_player.name_player == self.name_player:
                                     other_player = self.game.p2
                                 for i in range(other_player.count_units_at_planet(position)):
                                     if other_player.get_ability_given_pos(position, i) == "Exploratory Drone":
-                                        self.game.create_reaction("Exploratory Drone", other_player.name_player,
-                                                                  (int(other_player.number), position, i))
+                                        self.game.create_reaction("Exploratory Drone", other_player.name_player, (int(other_player.number), position, i))
                             other_player = self.get_other_player()
                             syren_ok = False
                             for i in range(other_player.count_units_at_planet(position)):
@@ -3884,12 +3805,10 @@ class Player:
                             if card.get_has_hive_mind():
                                 for i in range(len(self.headquarters)):
                                     if self.headquarters[i].get_ability() == "Hive Fleet Kraken":
-                                        self.game.create_reaction("Hive Fleet Kraken", self.name_player,
-                                                                  (int(self.number), -2, i))
+                                        self.game.create_reaction("Hive Fleet Kraken", self.name_player, (int(self.number), -2, i))
                             for i in range(len(other_player.attachments_at_planet[position])):
                                 if other_player.attachments_at_planet[position][i].get_ability() == "Vanguard Pack":
-                                    self.game.create_reaction("Vanguard Pack", other_player.name_player,
-                                                              (int(self.number), position, location_of_unit))
+                                    self.game.create_reaction("Vanguard Pack", other_player.name_player, (int(self.number), position, location_of_unit))
                             if self.game.deploy_exhausted:
                                 self.exhaust_given_pos(position, location_of_unit)
                                 self.game.deploy_exhausted = False
@@ -3904,12 +3823,10 @@ class Player:
                             return "SUCCESS", location_of_unit
                         self.add_resources(cost, refund=True)
                         return "FAIL/Unique already in play", -1
-                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
-                                                           "Insufficient resources to play the card.")
+                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", "Insufficient resources to play the card.")
                     return "FAIL/Insufficient resources", -1
                 else:
-                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet",
-                                                           "Enemy Holding Cell prevents the card from being played.")
+                    self.game.set_queued_mistarget_message(self.name_player, "Cannot Add Card to Planet", "Enemy Holding Cell prevents the card from being played.")
         return "FAIL/Invalid card", -1
 
     def count_units_of_faction(self, faction):

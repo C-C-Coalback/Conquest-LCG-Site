@@ -2129,26 +2129,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
         self.misc_target_choice = chosen_choice
         self.resolving_search_box = False
         self.reset_choices_available()
-    elif self.choice_context == "Target Doom Scythe Invader:":
-        target_choice = self.choices_available[int(game_update_string[1])]
-        num, pla, pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
-        self.resolving_search_box = False
-        card = FindCard.find_card(target_choice, self.card_array, self.cards_dict,
-                                  self.apoka_errata_cards, self.cards_that_have_errata)
-        if primary_player.add_card_to_planet(card, pla) != -1:
-            position_of_unit = primary_player.count_units_at_planet(pla) - 1
-            primary_player.get_card_given_pos(pla, position_of_unit). \
-                valid_target_dynastic_weaponry = True
-            if "Dynastic Weaponry" in primary_player.discard:
-                if not primary_player.check_if_already_have_reaction("Dynastic Weaponry"):
-                    self.create_reaction("Dynastic Weaponry", primary_player.name_player,
-                                         (int(primary_player.get_number()), pla, position_of_unit))
-            if primary_player.optimized_protocol_check():
-                self.create_reaction("Optimized Protocol", primary_player.name_player,
-                                     (int(primary_player.get_number()), pla, position_of_unit))
-            primary_player.discard.remove(target_choice)
-        self.delete_reaction()
-        self.reset_choices_available()
     elif self.choice_context == "Target Dread Monolith:":
         target_choice = self.choices_available[int(game_update_string[1])]
         planet, pos = self.action_object.position_of_actioned_card
