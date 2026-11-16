@@ -1260,5 +1260,23 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await click_in_play(test_game, 1, 1, 0, 1)
         self.assertEqual(len(test_game.p1.discard), 3)
 
+    async def test_patrolling_wraith(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Patrolling Wraith"), 0)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Void Pirate"), 0)
+        test_game.p2.cards = ["Void Pirate", "Rogue Trader"]
+        await click_in_play(test_game, 1, 1, 0, 1)
+        await click_in_play(test_game, 1, 2, 0, 1)
+        await click_pass(test_game, 2)
+        await click_choice(test_game, 1, 0)
+        self.assertEqual(test_game.p2.cards, ["Rogue Trader"])
+        self.assertEqual(test_game.p2.discard, ["Void Pirate", "Void Pirate"])
+
 if __name__ == "__main__":
     unittest.main()
