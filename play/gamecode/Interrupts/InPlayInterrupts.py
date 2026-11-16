@@ -285,24 +285,6 @@ async def resolve_in_play_interrupt(self, name, game_update_string, primary_play
                         except:
                             pass
                         self.delete_interrupt()
-    elif current_interrupt == "Reanimating Warriors":
-        print("reanimating warriors")
-        if not self.asked_if_resolve_effect:
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Reanimating Warriors?"
-            self.name_player_making_choices = name
-        elif not interrupt.chosen_first_card:
-            if game_update_string[1] == primary_player.number:
-                if primary_player.get_ability_given_pos(planet_pos, unit_pos) == \
-                        "Reanimating Warriors" \
-                        and not primary_player.get_card_given_pos(planet_pos, unit_pos) \
-                        .once_per_phase_used:
-                    if primary_player.check_damage_too_great_given_pos(planet_pos, unit_pos) == 0:
-                        interrupt.chosen_first_card = True
-                        interrupt.misc_target_unit = (planet_pos, unit_pos)
-                        primary_player.set_aiming_reticle_in_play(planet_pos, unit_pos, "blue")
-                        primary_player.remove_damage_from_pos(planet_pos, unit_pos, 999, healing=True)
-                        primary_player.set_once_per_phase_used_given_pos(planet_pos, unit_pos, True)
     elif current_interrupt == "Transcendent Blessing":
         if not interrupt.chosen_first_card:
             if game_update_string[1] == primary_player.number:

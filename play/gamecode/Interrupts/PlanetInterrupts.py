@@ -102,18 +102,11 @@ async def resolve_planet_interrupt(self, name, game_update_string, primary_playe
             primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
             self.delete_interrupt()
     elif current_interrupt == "Reanimating Warriors":
-        print("reanimating warriors")
-        if not self.asked_if_resolve_effect:
-            self.choices_available = ["Yes", "No"]
-            self.choice_context = "Use Reanimating Warriors?"
-            self.name_player_making_choices = name
-        else:
-            if interrupt.chosen_first_card:
-                origin_planet, origin_pos = interrupt.misc_target_unit
-                target_planet = int(game_update_string[1])
-                if abs(origin_planet - target_planet) == 1:
-                    primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
-                    primary_player.move_unit_to_planet(origin_planet, origin_pos, target_planet)
-                    self.delete_interrupt()
-                    self.asked_if_resolve_effect = False
-                    interrupt.chosen_first_card = False
+        origin_planet = interrupt.get_planet_pos()
+        origin_pos = interrupt.get_unit_pos()
+        if abs(origin_planet - chosen_planet) == 1:
+            primary_player.set_once_per_phase_used_given_pos(origin_planet, origin_pos, True)
+            primary_player.remove_damage_from_pos(origin_planet, origin_pos, 999)
+            primary_player.reset_aiming_reticle_in_play(origin_planet, origin_pos)
+            primary_player.move_unit_to_planet(origin_planet, origin_pos, chosen_planet)
+            self.delete_interrupt()
