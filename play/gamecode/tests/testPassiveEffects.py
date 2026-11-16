@@ -470,5 +470,19 @@ class PassiveEffectsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_attack_given_pos(0, 0), 5)
         self.assertTrue(test_game.p1.get_armorbane_given_pos(0, 0))
 
+    async def test_harbinger_of_eternity(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Harbinger of Eternity"), 0)
+        test_game.p1.discard = ["Reanimation Protocol"]
+        await click_action(test_game, 1)
+        await click_discard(test_game, 1, 1, 0)
+        self.assertEqual(test_game.action_object.action_chosen, "Reanimation Protocol")
+        self.assertEqual(test_game.p1.cards_removed_from_game, ["Reanimation Protocol"])
+        self.assertEqual(test_game.p1.discard, [])
+
 if __name__ == "__main__":
     unittest.main()
