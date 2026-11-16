@@ -28,6 +28,22 @@ async def resolve_discard_reaction(self, name, game_update_string, primary_playe
                             primary_player.cards.append(card.get_name())
                             del primary_player.discard[pos_discard]
                             self.delete_reaction()
+        elif current_reaction == "Canoptek Scarab Swarm":
+            if chosen_discard == int(primary_player.number):
+                card = primary_player.get_card_in_discard(pos_discard)
+                if card.get_card_type() == "Army" and card.get_faction() == "Necrons":
+                    valid = True
+                    if card.get_name() == "Canoptek Scarab Swarm":
+                        current_pos = pos_discard + 1
+                        valid = False
+                        len_discard = len(primary_player.discard)
+                        while (current_pos < len_discard):
+                            if primary_player.discard[current_pos] == "Canoptek Scarab Swarm":
+                                valid = True
+                            current_pos = current_pos + 1
+                    if valid:
+                        primary_player.return_discard_to_hand(pos_discard)
+                        self.delete_reaction()
         elif current_reaction == "Parasite of Mortrex":
             if not reaction.chosen_first_card:
                 if chosen_discard == int(primary_player.number):

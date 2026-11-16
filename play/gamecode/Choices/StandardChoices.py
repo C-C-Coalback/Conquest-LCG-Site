@@ -2434,13 +2434,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             self.resolving_search_box = False
             self.reset_choices_available()
         self.delete_reaction()
-    elif self.choice_context == "Choose target for Canoptek Scarab Swarm:":
-        target = self.choices_available[int(game_update_string[1])]
-        primary_player.cards.append(target)
-        primary_player.discard.remove(target)
-        self.reset_choices_available()
-        self.delete_reaction()
-        self.resolving_search_box = False
     elif self.choice_context == "Autarch Celachia":
         self.reset_choices_available()
         self.action_object.action_chosen = ""

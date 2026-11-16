@@ -8255,25 +8255,19 @@ class Player:
                                 self.game.create_reaction("Vha'shaelhur", other_player.name_player,
                                                           (int(other_player.number), planet_num, i))
             if self.get_card_given_pos(planet_num, card_pos).get_ability() == "Carnivore Pack":
-                self.game.create_reaction("Carnivore Pack", self.name_player,
-                                          (int(self.number), -1, -1))
+                self.game.create_reaction("Carnivore Pack", self.name_player, (int(self.number), -1, -1))
             if self.get_ability_given_pos(planet_num, card_pos) == "Mucolid Spores":
                 self.game.create_interrupt("Mucolid Spores", self.name_player, (int(self.number), -1, -1))
             if self.get_card_given_pos(planet_num, card_pos).get_ability() == "Big Shoota Battlewagon":
-                self.game.create_reaction("Big Shoota Battlewagon", self.name_player,
-                                          (int(self.number), planet_num, -1))
+                self.game.create_reaction("Big Shoota Battlewagon", self.name_player, (int(self.number), planet_num, -1))
             if self.get_card_given_pos(planet_num, card_pos).get_ability() == "Dark Angels Purifier":
-                self.game.create_interrupt("Dark Angels Purifier", self.name_player,
-                                           (int(self.number), planet_num, -1))
+                self.game.create_interrupt("Dark Angels Purifier", self.name_player, (int(self.number), planet_num, -1))
             if self.get_card_given_pos(planet_num, card_pos).get_ability() == "Shrouded Harlequin":
-                self.game.create_reaction("Shrouded Harlequin", self.name_player,
-                                          (int(self.number), -1, -1))
+                self.game.create_reaction("Shrouded Harlequin", self.name_player, (int(self.number), -1, -1))
             if self.get_card_given_pos(planet_num, card_pos).get_ability() == "The Dawnsinger":
-                self.game.create_reaction("The Dawnsinger", self.name_player,
-                                          (int(self.number), -1, -1))
+                self.game.create_reaction("The Dawnsinger", self.name_player, (int(self.number), -1, -1))
             if self.get_card_given_pos(planet_num, card_pos).get_ability() == "Canoptek Scarab Swarm":
-                self.game.create_reaction("Canoptek Scarab Swarm", self.name_player,
-                                          (int(self.number), -1, -1))
+                self.game.create_reaction("Canoptek Scarab Swarm", self.name_player, (int(self.number), -1, -1))
             if self.get_card_given_pos(planet_num, card_pos).get_has_hive_mind():
                 if self.search_card_in_hq("Leviathan Hive Ship", ready_relevant=True):
                     if not self.check_if_already_have_reaction("Leviathan Hive Ship"):
@@ -8283,15 +8277,13 @@ class Player:
                 if warlord_pla != planet_num:
                     self.valid_surrogate_host[planet_num] = True
                     if not self.check_if_already_have_interrupt("Surrogate Host"):
-                        self.game.create_interrupt("Surrogate Host", self.name_player,
-                                                   (int(self.number), -1, -1))
+                        self.game.create_interrupt("Surrogate Host", self.name_player, (int(self.number), -1, -1))
             if self.get_faction_given_pos(planet_num, card_pos) == "Space Marines":
                 if not self.check_if_already_have_reaction("Secluded Apothecarion"):
                     for i in range(len(self.headquarters)):
                         if self.get_ability_given_pos(-2, i) == "Secluded Apothecarion":
                             if self.get_ready_given_pos(-2, i):
-                                self.game.create_reaction("Secluded Apothecarion", self.name_player,
-                                                          (int(self.number), -2, i))
+                                self.game.create_reaction("Secluded Apothecarion", self.name_player, (int(self.number), -2, i))
             if self.check_for_trait_given_pos(planet_num, card_pos, "Elite"):
                 if not self.check_if_already_have_reaction("Fall Back!"):
                     if self.search_hand_for_card("Fall Back!"):

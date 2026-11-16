@@ -2818,33 +2818,6 @@ async def start_resolving_reaction(self, name, game_update_string):
             reaction.misc_counter = 0
             reaction.misc_player_storage = ""
             reaction.misc_target_planet = planet_pos
-        elif current_reaction == "Canoptek Scarab Swarm":
-            seen_a_canoptek = False
-            allowed_cards = []
-            for i in range(len(primary_player.discard)):
-                card = self.preloaded_find_card(primary_player.discard[i])
-                if card.get_faction() == "Necrons" and card.get_card_type() == "Army":
-                    if card.get_name() != "Canoptek Scarab Swarm":
-                        allowed_cards.append(card.get_name())
-                    else:
-                        if not seen_a_canoptek:
-                            seen_a_canoptek = True
-                        else:
-                            allowed_cards.append(card.get_name())
-            if allowed_cards:
-                self.choices_available = allowed_cards
-                self.create_choices(
-                    self.choices_available,
-                    general_imaging_format="All"
-                )
-                self.name_player_making_choices = primary_player.name_player
-                self.choice_context = "Choose target for Canoptek Scarab Swarm:"
-                self.resolving_search_box = True
-            else:
-                await self.send_update_message(
-                    "No valid targets for Canoptek Scarab Swarm!"
-                )
-                self.delete_reaction()
         elif current_reaction == "Murder Cogitator":
             primary_player.exhaust_card_in_hq_given_name("Murder Cogitator")
             await primary_player.reveal_top_card_deck()
