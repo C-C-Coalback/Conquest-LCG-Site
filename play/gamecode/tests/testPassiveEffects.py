@@ -484,5 +484,34 @@ class PassiveEffectsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.cards_removed_from_game, ["Reanimation Protocol"])
         self.assertEqual(test_game.p1.discard, [])
 
+    async def test_lychguard_sentinel(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Lychguard Sentinel"), 0)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 1), 6)
+        for _ in range(3):
+            test_game.p1.discard.append("No Mercy")
+            test_game.p1.discard.append("Void Pirate")
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 1), 6)
+        for _ in range(3):
+            test_game.p1.discard.append("Void Pirate")
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 1), 10)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        await click_pass(test_game, 1)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Lychguard Sentinel"), 0)
+        await click_in_play(test_game, 2, 2, 0, 1)
+        await click_in_play(test_game, 2, 1, 0, 0)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 0)
+        await click_in_play(test_game, 2, 1, 0, 1)
+        self.assertEqual(test_game.p1.get_damage_given_pos(0, 1), 2)
+        await click_pass(test_game, 1)
+        await click_in_play(test_game, 1, 1, 0, 1)
+        await click_in_play(test_game, 1, 2, 0, 0)
+        self.assertEqual(test_game.p2.get_damage_given_pos(0, 0), 4)
+
 if __name__ == "__main__":
     unittest.main()
