@@ -2,7 +2,7 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, anrakyr_deck_content
 from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_action, click_planet, click_hand, click_hq, click_in_play, click_attachment_in_play, click_choice, click_pass, click_discard
 
 
@@ -349,6 +349,19 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await click_in_play(test_game, 1, 1, 0, 2)
         await click_in_play(test_game, 1, 1, 0, 1)
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 1), 0)
+
+    async def test_immortal_legion(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        test_game.p1.enslaved_faction = "Orks"
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Immortal Legion"), 1)
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 1, 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
+        self.assertEqual(test_game.p1.count_units_at_planet(1), 0)
 
 if __name__ == "__main__":
     unittest.main()
