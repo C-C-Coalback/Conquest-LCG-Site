@@ -1207,5 +1207,43 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards_removed_from_game), 1)
         self.assertEqual(test_game.p1.resources, 5)
 
+    async def test_drudgery(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nahumekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.cards = ["Drudgery"]
+        test_game.p1.discard = ["10th Company Scout"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        await click_discard(test_game, 1, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
+        self.assertEqual(len(test_game.p1.cards), 0)
+        self.assertEqual(len(test_game.p1.discard), 1)
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertFalse(test_game.p1.can_play_limited)
+
+    async def test_drudgery_with_harbinger_of_eternity(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nahumekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Harbinger of Eternity"), 4)
+        test_game.p1.discard = ["Drudgery", "10th Company Scout"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_discard(test_game, 1, 1, 0)
+        await click_discard(test_game, 1, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
+        self.assertEqual(len(test_game.p1.discard), 0)
+        self.assertEqual(len(test_game.p1.cards_removed_from_game), 1)
+        self.assertEqual(test_game.p1.resources, 5)
+        self.assertFalse(test_game.p1.can_play_limited)
+
 if __name__ == "__main__":
     unittest.main()
