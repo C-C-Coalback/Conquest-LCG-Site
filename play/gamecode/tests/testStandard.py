@@ -104,6 +104,46 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
         self.assertEqual(len(test_game.p1.cards), 0)
 
+    async def test_deploy_with_stc_fragment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.draw_card()
+        test_game.p2.draw_card()
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("STC Fragment"))
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
+        test_game.p1.cards = ["Ultramarines Dreadnought"]
+        test_game.p1.resources = 7
+        test_game.p2.cards = []
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
+        await click_hq(test_game, 1, 1, 0)
+        self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "Ultramarines Dreadnought")
+        self.assertEqual(test_game.p1.resources, 3)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), False)
+        self.assertEqual(len(test_game.p1.cards), 0)
+
+    async def test_deploy_stc_fragment_non_elite(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        test_game.p1.draw_card()
+        test_game.p2.draw_card()
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("STC Fragment"))
+        await click_choice(test_game, 1, 0)
+        await click_choice(test_game, 2, 0)
+        test_game.p1.cards = ["10th Company Scout"]
+        test_game.p2.cards = []
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 3)
+        self.assertEqual(test_game.p1.get_ability_given_pos(3, 0), "10th Company Scout")
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(test_game.p1.get_ready_given_pos(-2, 0), True)
+        self.assertEqual(len(test_game.p1.cards), 0)
+
     async def test_deploy_attachment(self):
         random.seed(42)
         test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
