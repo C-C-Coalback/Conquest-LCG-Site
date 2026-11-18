@@ -790,8 +790,9 @@ def resolve_winnings(self, winner, loser, planet_id):
 def determine_winner_command_struggle(self, planet_id):
     fbk_1 = self.p1.search_card_at_planet(planet_id, "Freebooter Kaptain")
     fbk_2 = self.p2.search_card_at_planet(planet_id, "Freebooter Kaptain")
-    command_p1 = self.p1.count_command_at_planet(planet_id, fbk=fbk_2, actual_cs=True)
-    command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk_1, actual_cs=True)
+    fbk = fbk_1 or fbk_2
+    command_p1 = self.p1.count_command_at_planet(planet_id, fbk=fbk, actual_cs=True)
+    command_p2 = self.p2.count_command_at_planet(planet_id, fbk=fbk, actual_cs=True)
     if command_p1 > command_p2:
         return self.name_1
     elif command_p2 > command_p1:
