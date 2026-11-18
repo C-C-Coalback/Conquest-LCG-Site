@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, straken_deck_content, zarathur_deck_content, kith_deck_content
-from play.gamecode.tests.shortcuts import click_in_play, click_action, click_choice, click_attachment_in_hq, click_attachment_in_play, click_discard, click_hand, click_hq, click_pass, click_planet, click_reserve, click_search, dummy_click, standard_setup, skip_to_battle_first_planet
+from play.gamecode.tests.shortcuts import click_in_play, click_action, click_choice, click_attachment_in_hq, click_attachment_in_play, click_discard, click_hand, click_hq, click_pass, click_planet, click_reserve, click_search, dummy_click, standard_setup, skip_to_battle_first_planet, skip_to_combat_phase
 
 card_array = Initfunctions.init_player_cards()
 cards_dict = {}
@@ -302,6 +302,55 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         await click_in_play(test_game, 1, 1, 0, 0)
         self.assertEqual(test_game.p1.resources, 1)
 
+    async def test_put_in_reserve(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["8th Company Assault Squad"]
+        test_game.p1.resources = 7
+        await click_hand(test_game, 1, 0)
+        await click_choice(test_game, 1, 1)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 0)
+        self.assertEqual(len(test_game.p1.cards_in_reserve[0]), 1)
+
+    async def test_deploy_deepstrike_unit_normally(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["8th Company Assault Squad"]
+        test_game.p1.resources = 7
+        await click_hand(test_game, 1, 0)
+        await click_choice(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.cards, [])
+        self.assertEqual(test_game.p1.resources, 4)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
+        self.assertEqual(len(test_game.p1.cards_in_reserve[0]), 0)
+
+    async def test_deepstrike_unit(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_combat_phase(test_game)
+        test_game.p1.resources = 7
+        test_game.p1.put_card_into_reserve(test_game.preloaded_find_card("8th Company Assault Squad"), 0, False)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        self.assertEqual(test_game.choice_context, "Deepstrike cards?")
+        await click_choice(test_game, 1, 0)
+        await click_reserve(test_game, 1, 1, 0, 0)
+        self.assertEqual(test_game.p1.get_resources(), 5)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), 2)
+        self.assertEqual(len(test_game.p1.cards_in_reserve[0]), 0)
+        self.assertEqual(test_game.p1.get_ability_given_pos(0, 1), "8th Company Assault Squad")
 
 if __name__ == "__main__":
     unittest.main()
