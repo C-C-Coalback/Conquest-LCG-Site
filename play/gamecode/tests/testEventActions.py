@@ -1166,5 +1166,46 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards_removed_from_game), 1)
         self.assertEqual(test_game.p1.resources, 6)
 
+    async def test_mechanical_enhancement(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nahumekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("10th Company Scout"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Destroyer Cultist"), 0)
+        test_game.p1.cards = ["Mechanical Enhancement"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 8)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 1), 1)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 2), 6)
+        self.assertEqual(len(test_game.p1.cards), 0)
+        self.assertEqual(len(test_game.p1.discard), 1)
+        self.assertEqual(test_game.p1.resources, 5)
+
+    async def test_mechanical_enhancement_with_harbinger_of_eternity(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nahumekh_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, necron_1=True)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Harbinger of Eternity"), 4)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("10th Company Scout"), 0)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Destroyer Cultist"), 0)
+        test_game.p1.discard = ["Mechanical Enhancement"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_discard(test_game, 1, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 0), 8)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 1), 1)
+        self.assertEqual(test_game.p1.get_health_given_pos(0, 2), 6)
+        self.assertEqual(len(test_game.p1.discard), 0)
+        self.assertEqual(len(test_game.p1.cards_removed_from_game), 1)
+        self.assertEqual(test_game.p1.resources, 5)
+
 if __name__ == "__main__":
     unittest.main()
