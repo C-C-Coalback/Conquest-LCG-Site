@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, ooe_deck_content, meph_deck_content, anrakyr_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content
-from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click, click_attachment_in_play, click_discard
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, skip_to_hq_phase, standard_setup, click_pass, click_action, click_planet, click_hand, click_hq, click_in_play, click_choice, click_search, dummy_click, click_attachment_in_play, click_discard
 
 
 card_array = Initfunctions.init_player_cards()
@@ -423,6 +423,30 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p1.count_units_at_planet(0), 1)
         self.assertTrue(test_game.p1.get_ready_given_pos(0, 0))
         self.assertEqual(test_game.p1.get_damage_given_pos(0, 0), 0)
+
+    async def test_particle_whip(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_hq_phase(test_game, necron_1=True)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Particle Whip"))
+        test_game.p1.discard = ["Rogue Trader", "Decaying Warrior Squad", "No Mercy"]
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Goff Nob"), 1)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Enraged Ork"), 1)
+        cards_in_deck = len(test_game.p1.deck)
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        await click_discard(test_game, 1, 1, 0)
+        await click_discard(test_game, 1, 1, 0)
+        await click_discard(test_game, 1, 1, 0)
+        self.assertEqual(len(test_game.p1.discard), 1)
+        self.assertEqual(len(test_game.p1.deck), cards_in_deck + 2)
+        await click_in_play(test_game, 1, 2, 1, 0)
+        self.assertEqual(test_game.p2.get_damage_given_pos(1, 0), 0)
+        await click_in_play(test_game, 1, 2, 1, 1)
+        self.assertEqual(test_game.p2.get_damage_given_pos(1, 1), 2)
+        self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
 
 if __name__ == "__main__":
     unittest.main()
