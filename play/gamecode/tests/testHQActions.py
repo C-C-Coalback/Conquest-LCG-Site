@@ -376,5 +376,33 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.discard), 2)
         self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
 
+    async def test_eternity_gate(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Eternity Gate"))
+        test_game.p1.discard = ["Recycle", "Rogue Trader"]
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        await click_discard(test_game, 1, 1, 0)
+        self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
+        self.assertEqual(test_game.p1.discard, ["Rogue Trader", "Recycle"])
+
+    async def test_eternity_gate_on_enemy_discard(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(anrakyr_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await standard_setup(test_game, necron_1=True)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Eternity Gate"))
+        test_game.p2.discard = ["Recycle", "Rogue Trader"]
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 0)
+        await click_discard(test_game, 1, 2, 0)
+        self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
+        self.assertEqual(test_game.p2.discard, ["Rogue Trader", "Recycle"])
+
 if __name__ == "__main__":
     unittest.main()
