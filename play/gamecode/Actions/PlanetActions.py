@@ -481,14 +481,14 @@ async def update_game_event_action_planet(self, name, game_update_string):
         self.action_cleanup()
     elif self.action_object.action_chosen == "Extermination":
         for i in range(primary_player.count_units_at_planet(chosen_planet)):
-            if primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True) and \
+            if not primary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons", own_event=True) and \
                     not primary_player.get_card_given_pos(chosen_planet, i).get_unique():
-                primary_player.get_card_given_pos(chosen_planet, i).negative_hp_until_eop += 3
+                primary_player.apply_negative_health_eop(chosen_planet, i, 3)
         for i in range(secondary_player.count_units_at_planet(chosen_planet)):
-            if secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons") and \
-                    not secondary_player.get_card_given_pos(chosen_planet, i).get_unique() and \
+            if not secondary_player.check_if_faction_given_pos(chosen_planet, i, "Necrons") and \
+                    not secondary_player.get_unique_given_pos(chosen_planet, i) and \
                     not secondary_player.get_immune_to_enemy_events(chosen_planet, i):
-                secondary_player.get_card_given_pos(chosen_planet, i).negative_hp_until_eop += 3
+                secondary_player.apply_negative_health_eop(chosen_planet, i, 3)
         if not primary_player.harbinger_of_eternity_active:
             primary_player.discard_card_from_hand(primary_player.aiming_reticle_coords_hand)
             primary_player.aiming_reticle_coords_hand = None
