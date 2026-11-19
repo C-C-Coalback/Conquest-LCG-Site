@@ -8,6 +8,7 @@ eldorath_deck_location = os.path.join(current_dir, "decksForTests/StarbaneCore.t
 shadowsun_deck_location = os.path.join(current_dir, "decksForTests/ShadowsunCore.txt")
 imotekh_deck_location = os.path.join(current_dir, 'decksForTests/Imotekh.txt')
 meph_deck_location = os.path.join(current_dir, 'decksForTests/meph.txt')
+omega_deck_location = os.path.join(current_dir, 'decksForTests/Omega.txt')
 
 with open(first_deck_location, 'r') as file:
     deck_content_1 = file.read()
@@ -40,3 +41,5 @@ with open(os.path.join(current_dir, 'decksForTests/Nahumekh.txt'), 'r') as file:
     nahumekh_deck_content = file.read()
 with open(os.path.join(current_dir, 'decksForTests/Anrakyr.txt'), 'r') as file:
     anrakyr_deck_content = file.read()
+with open(omega_deck_location, 'r') as file:
+    omega_deck_content = file.read()

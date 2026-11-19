@@ -2,7 +2,7 @@ import unittest
 from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
-from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, nahumekh_deck_content
+from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, omega_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, nahumekh_deck_content
 from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, click_search, click_reserve, click_planet, standard_setup, click_pass, click_hq, click_hand, click_discard, click_attachment_in_play, click_attachment_in_hq, click_choice, click_action, click_in_play, dummy_click
 
 card_array = Initfunctions.init_player_cards()
@@ -99,6 +99,43 @@ class MiscActionsTest(unittest.IsolatedAsyncioTestCase):
         await click_pass(test_game, 1)
         self.assertEqual(test_game.p1.count_units_at_planet(0), 0)
         self.assertEqual(test_game.p2.count_units_at_planet(0), 1)
+
+    async def test_subject_omega_ambush_unit(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(omega_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, tyranid_1=True)
+        test_game.p1.cards = ["Genestealer Prowler"]
+        test_game.infested_planets[0] = True
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        prior_units = test_game.p1.count_units_at_planet(1)
+        await click_planet(test_game, 1, 1)
+        self.assertEqual(test_game.p1.count_units_at_planet(1), prior_units)
+        prior_units = test_game.p1.count_units_at_planet(0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(0), prior_units + 1)
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(test_game.p1.cards, [])
+
+    async def test_subject_omega_ambush_attachment(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(omega_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game, tyranid_1=True)
+        test_game.p1.cards = ["Ymgarl Factor"]
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Genestealer Prowler"), 0)
+        test_game.infested_planets[0] = True
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        await click_in_play(test_game, 1, 1, 0, 1)
+        self.assertEqual(test_game.p1.count_attachments_controlled(), 1)
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(test_game.p1.cards, [])
 
 if __name__ == "__main__":
     unittest.main()
