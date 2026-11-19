@@ -4172,18 +4172,15 @@ class Player:
                     if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
                         if not self.get_once_per_phase_used_given_pos(-2, i):
                             if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", -2, i):
-                                self.game.create_interrupt("Frontline Counsellor", self.name_player,
-                                                           (int(self.number), -2, i), extra_info=origin_planet)
+                                self.game.create_interrupt("Frontline Counsellor", self.name_player, (int(self.number), -2, i), extra_info=origin_planet)
             for i in range(7):
                 if i != origin_planet:
                     for j in range(self.count_units_at_planet(i)):
                         if j != last_element_index or i != destination:
                             if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
                                 if not self.get_once_per_phase_used_given_pos(i, j):
-                                    if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor",
-                                                                                            i, j):
-                                        self.game.create_interrupt("Frontline Counsellor", self.name_player,
-                                                                   (int(self.number), i, j), extra_info=origin_planet)
+                                    if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", i, j):
+                                        self.game.create_interrupt("Frontline Counsellor", self.name_player, (int(self.number), i, j), extra_info=origin_planet)
             if self.game.last_planet_checked_for_battle == destination:
                 if other_player.search_hand_for_card("Wrathful Retribution"):
                     if not other_player.check_if_already_have_reaction("Wrathful Retribution"):
@@ -8689,6 +8686,18 @@ class Player:
             if self.get_all_attachments_at_pos(planet_id, unit_id):
                 if self.game.combat_round_number < 2:
                     return False
+        for i in range(len(self.headquarters)):
+            if self.get_ability_given_pos(-2, i) == "Frontline Counsellor":
+                if not self.get_once_per_phase_used_given_pos(-2, i):
+                    if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", -2, i):
+                        self.game.create_interrupt("Frontline Counsellor", self.name_player, (int(self.number), -2, i), extra_info=planet_id)
+        for i in range(7):
+            if i != planet_id:
+                for j in range(self.count_units_at_planet(i)):
+                    if self.get_ability_given_pos(i, j) == "Frontline Counsellor":
+                        if not self.get_once_per_phase_used_given_pos(i, j):
+                            if not self.check_if_already_have_interrupt_of_position("Frontline Counsellor", i, j):
+                                self.game.create_interrupt("Frontline Counsellor", self.name_player, (int(self.number), i, j), extra_info=planet_id)
         if self.game.imperial_blockades_active[planet_id] > 0:
             other_player = self.get_other_player()
             resources_to_spend = self.game.imperial_blockades_active[planet_id]
