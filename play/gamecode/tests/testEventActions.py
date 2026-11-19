@@ -1290,5 +1290,32 @@ class ActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(test_game.p1.cards_removed_from_game), 1)
         self.assertEqual(test_game.p1.resources, 2)
 
+    async def test_imperial_blockade(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await standard_setup(test_game)
+        test_game.p1.cards = ["Imperial Blockade"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.imperial_blockades_active[0], 1)
+        self.assertEqual(len(test_game.p1.cards), 1)
+        self.assertEqual(test_game.p1.resources, 7)
+        await click_pass(test_game, 2)
+        test_game.p1.cards = ["Imperial Blockade"]
+        test_game.p1.resources = 7
+        await click_action(test_game, 1)
+        await click_hand(test_game, 1, 0)
+        await click_planet(test_game, 1, 0)
+        self.assertEqual(test_game.imperial_blockades_active[0], 2)
+        self.assertEqual(len(test_game.p1.cards), 1)
+        self.assertEqual(test_game.p1.resources, 6)
+        test_game.p2.resources = 7
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("Termagant"), 0)
+        self.assertEqual(test_game.p2.resources, 5)
+
 if __name__ == "__main__":
     unittest.main()
