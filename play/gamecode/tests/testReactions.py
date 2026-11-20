@@ -1406,5 +1406,36 @@ class StandardTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p2.count_units_at_planet(0), 0)
         self.assertEqual(test_game.p2.count_units_at_planet(1), 1)
 
+    async def test_agras_preachings(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(deck_content_1, test_game.planet_array)
+        await test_game.p2.setup_player(deck_content_2, test_game.planet_array)
+        await skip_to_battle_first_planet(test_game)
+        test_game.p1.move_unit_at_planet_to_hq(0, 0)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Agra's Preachings"))
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("10th Company Scout"), 2)
+        test_game.p1.deck = ["Sacred Rose Immolator", "Sacred Rose Immolator", "Sacred Rose Immolator", "Sacred Rose Immolator", "Sacred Rose Immolator", "Sacred Rose Immolator", "Sacred Rose Immolator", "Sacred Rose Immolator"]
+        test_game.p1.resources = 7
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 1)
+        await click_choice(test_game, 1, 0)
+        await click_planet(test_game, 1, 2)
+        self.assertEqual(test_game.choice_context, "Agra's Preachings choices")
+        await click_choice(test_game, 1, 0)
+        self.assertEqual(len(test_game.reactions_needing_resolving), 0)
+        self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
+        self.assertEqual(len(test_game.p1.attachments_at_planet[2]), 1)
+        await click_choice(test_game, 2, 1)
+        await click_pass(test_game, 1)
+        await click_pass(test_game, 2)
+        self.assertEqual(test_game.phase, "HEADQUARTERS")
+        await click_choice(test_game, 1, 0)
+        self.assertEqual(test_game.p1.resources, 6)
+        self.assertEqual(len(test_game.p1.attachments_at_planet[2]), 0)
+        self.assertEqual(test_game.p1.count_units_at_planet(2), 1)
+        self.assertEqual(test_game.p1.get_ability_given_pos(2, 0), "Sacred Rose Immolator")
+
 if __name__ == "__main__":
     unittest.main()

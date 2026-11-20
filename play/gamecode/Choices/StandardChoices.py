@@ -2034,8 +2034,7 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
     elif self.choice_context == "Agra's Preachings choices":
         card_name = primary_player.deck[int(game_update_string[1])]
         card = self.preloaded_find_card(card_name)
-        if card.get_card_type() == "Army" and card.get_faction() == "Astra Militarum" and not \
-                card.check_for_a_trait("Elite"):
+        if card.get_card_type() == "Army" and card.get_faction() == "Astra Militarum" and not card.check_for_a_trait("Elite"):
             card_at_planet = CardClasses.AttachmentCard(
                 card_name, "", "", -1, "", "", -1, False, planet_attachment=True
             )
@@ -2045,7 +2044,6 @@ async def resolve_choice(self, primary_player, secondary_player, name, game_upda
             primary_player.bottom_remaining_cards()
             self.delete_reaction()
             self.reset_choices_available()
-            self.resolving_search_box = False
     elif self.choice_context == "Prototype Crisis Suit choices":
         num, planet_pos, unit_pos = self.reactions_needing_resolving[0].get_position_unit_triggering()
         card_name = primary_player.deck[int(game_update_string[1])]

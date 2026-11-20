@@ -3673,7 +3673,6 @@ class Game:
                     elif self.choice_context == "Agra's Preachings choices":
                         self.delete_reaction()
                         self.reset_choices_available()
-                        self.resolving_search_box = False
                         primary_player.shuffle_deck()
                     elif self.choice_context == "Dark Allegiance Rally":
                         self.delete_reaction()
