@@ -3,7 +3,7 @@ from play.gamecode.GameClass import Game
 from play.gamecode import Initfunctions
 import random
 from play.gamecode.tests.deckLoading import deck_content_1, deck_content_2, imotekh_deck_content, ooe_deck_content, cato_deck_content, nazdreg_deck_content, eldorath_deck_content, shadowsun_deck_content, anrakyr_deck_content
-from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, click_action, click_planet, click_hand, click_hq, click_in_play, click_attachment_in_play, click_choice, click_pass, click_discard
+from play.gamecode.tests.shortcuts import skip_to_battle_first_planet, standard_setup, skip_to_hq_phase, click_action, click_planet, click_hand, click_hq, click_in_play, click_attachment_in_play, click_choice, click_pass, click_discard
 
 
 card_array = Initfunctions.init_player_cards()
@@ -377,6 +377,26 @@ class InPlayActionsTest(unittest.IsolatedAsyncioTestCase):
         await click_choice(test_game, 1, 0)
         self.assertEqual(len(test_game.p1.discard), 2)
         self.assertEqual(test_game.p1.get_ability_given_pos(1, 1), "Lychguard Sentinel")
+
+    async def test_lekor_blight_tongue(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_hq_phase(test_game)
+        test_game.p1.add_card_to_planet(test_game.preloaded_find_card("Lekor Blight-Tongue"), 1)
+        test_game.p2.add_card_to_planet(test_game.preloaded_find_card("10th Company Scout"), 1)
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 1, 0)
+        self.assertFalse(test_game.p1.get_ready_given_pos(1, 0))
+        await click_in_play(test_game, 1, 2, 1, 0)
+        self.assertEqual(test_game.p2.get_card_given_pos(1, 0).infection_lekor, 1)
+        test_game.p1.ready_given_pos(1, 0)
+        await click_action(test_game, 1)
+        await click_in_play(test_game, 1, 1, 1, 0)
+        await click_in_play(test_game, 1, 2, 1, 0)
+        self.assertEqual(test_game.p2.get_card_given_pos(1, 0).infection_lekor, 0)
+        self.assertEqual(test_game.p2.get_damage_given_pos(1, 0), 3)
 
 if __name__ == "__main__":
     unittest.main()

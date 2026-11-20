@@ -448,5 +448,25 @@ class HQActionsTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(test_game.p2.get_damage_given_pos(1, 1), 2)
         self.assertFalse(test_game.p1.get_ready_given_pos(-2, 0))
 
+    async def test_lekor_blight_tongue(self):
+        random.seed(42)
+        test_game = Game("NaN", "P1", "P2", card_array, planet_array, cards_dict, "", [])
+        await test_game.p1.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await test_game.p2.setup_player(nazdreg_deck_content, test_game.planet_array)
+        await skip_to_hq_phase(test_game)
+        test_game.p1.add_to_hq(test_game.preloaded_find_card("Lekor Blight-Tongue"))
+        test_game.p2.add_to_hq(test_game.preloaded_find_card("10th Company Scout"))
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 1)
+        self.assertFalse(test_game.p1.get_ready_given_pos(-2, 1))
+        await click_hq(test_game, 1, 2, 1)
+        self.assertEqual(test_game.p2.get_card_given_pos(-2, 1).infection_lekor, 1)
+        test_game.p1.ready_given_pos(-2, 1)
+        await click_action(test_game, 1)
+        await click_hq(test_game, 1, 1, 1)
+        await click_hq(test_game, 1, 2, 1)
+        self.assertEqual(test_game.p2.get_card_given_pos(-2, 1).infection_lekor, 0)
+        self.assertEqual(test_game.p2.get_damage_given_pos(-2, 1), 3)
+
 if __name__ == "__main__":
     unittest.main()
