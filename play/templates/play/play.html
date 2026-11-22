@@ -966,276 +966,9 @@
                         document.getElementById('resources-player-2').innerHTML = `<h1 style="color: #ffff00">` + split_data[3] + `</h1>`;
                     }
                 } else if (split_data[1] === "IN_PLAY") {
-                    var target_planet_id = "player-" + split_data[2] + "-cards-planet-" + split_data[3];
-                    var element = document.getElementById(target_planet_id);
-                    if (typeof(element) != 'undefined' && element != null)
-                    {
-                        target_user = split_data[4];
-                        document.getElementById(target_planet_id).innerHTML = ``;
-                        for (var i = 5; i < split_data.length; i++) {
-                            var card_data_split = split_data[i].split("|");
-                            var card_name = card_data_split[0];
-                            card_name = card_name.split(' ').join('_');
-                            var is_ready = card_data_split[1];
-                            var damage = card_data_split[2];
-                            if (parseInt(damage) > 9) {
-                                damage = "9+";
-                            }
-                            var faith = card_data_split[3];
-                            if (parseInt(faith) > 6) {
-                                faith = "6+";
-                            }
-                            var hale = card_data_split[4];
-                            var border_type = card_data_split[5];
-                            var additional_helper_text = card_data_split[6];
-                            var aiming_reticle = card_data_split[7];
-                            var attachment_data_position = 8;
-                            var deepstrike = "False";
-                            var original_text = "";
-                            var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
-                            if (hale === "D") {
-                                if (target_user === "{{ user.username }}") {
-                                    original_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                    enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`;
-                                }
-                                card_name = replaceCardback("Cardback", split_data[2]);
-                                deepstrike = "True";
-                            }
-                            let string_id = (i-5).toString();
-                            var card_class = "Card";
-                            if (tokenNames.includes(card_name)) {
-                                card_class = "Token-Card";
-                            }
-                            string_id = "IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + string_id;
-                            if (hale === "B") {
-                                card_name += "_bloodied";
-                            }
-                            var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                            var rotation = "";
-                            var full_string = `<div class="Card-div small-sep">`;
-                            if (is_ready === "E") {
-                                rotation = "rotate: 90deg;";
-                                card_class = "Exhausted-Card";
-                                if (tokenNames.includes(card_name)) {
-                                    card_class = "Exhausted-Token-Card";
-                                }
-                                route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                            }
-                            if (border_type === "playable") {
-                                card_class = card_class + " generic-playable-card";
-                            } else if (border_type === "unplayable") {
-                                card_class = card_class + " generic-unplayable-card";
-                            } else {
-                                card_class = card_class + " generic-blue-border";
-                            }
-                            console.log(card_class);
-                            for (var j = attachment_data_position; j < card_data_split.length; j++) {
-                                var attachment_string_id = (j-attachment_data_position).toString();
-                                var attachment_data_split = card_data_split[j].split("+");
-                                var attachment_name = attachment_data_split[0].split(' ').join('_');
-                                var attachment_ready = attachment_data_split[1];
-                                var is_magus = attachment_data_split[2];
-                                var user_magus = attachment_data_split[3];
-                                var attachment_class = "Attachment-Card";
-                                var att_deepstrike = "False";
-                                var attachment_original_text = "";
-                                var attachment_enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
-                                if (is_magus === "M") {
-                                    if (user_magus == "{{ user.username }}") {
-                                        attachment_original_text = "/static/images/CardImages/" + attachment_name + ".jpg";
-                                        attachment_enlarge_card_formula = ` data-deepstruck=` + attachment_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
-                                    }
-                                    attachment_name = "Cardback";
-                                    att_deepstrike = "True";
-                                }
-                                attachment_string_id = "ATTACHMENT/IN_PLAY/" + split_data[2] + "/" + split_data[3] + "/" + (i-5).toString() + "/" + attachment_string_id;
-                                var attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
-                                var attachment_rotation = "";
-                                if (attachment_ready === "E") {
-                                    attachment_class = "Exhausted-Attachment-Card";
-                                    attachment_rotation = " style='transform:rotate(90deg);'"
-                                    attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
-                                }
-                                var attachment_style_string = "";
-                                if (attachment_rotation === "") {
-                                    attachment_style_string = ` style="margin-left: ` + (j - attachment_data_position).toString() + `vw"`;
-                                } else {
-                                    attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - attachment_data_position).toString() + `vw"`;
-                                }
-                                full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
-                            }
-                            var style_string = "";
-                            if (card_data_split.length > attachment_data_position) {
-                                if (rotation === "") {
-                                    style_string = ` style="margin-left: ` + (card_data_split.length - attachment_data_position).toString() + `vw"`;
-                                } else {
-                                    style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - attachment_data_position).toString() + `vw;"`;
-                                }
-                            } else {
-                                if (rotation === "") {
-                                    style_string = ``;
-                                } else {
-                                    style_string = ` style="rotate: 90deg;"`;
-                                }
-                            }
-                            full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
-                            if (aiming_reticle !== "") {
-                                var style_string_reticle = `style="left: calc(10px + ` + (card_data_split.length - attachment_data_position).toString() + `vw);"`;
-                                full_string += `<img src="/static/images/aiming_reticle_` + aiming_reticle + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
-                            }
-                            if (damage === "0") {
-
-                            } else {
-                                full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
-                            }
-                            if (faith === "0") {
-                                full_string += `</div>`;
-                            } else {
-                                full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img></div>`;
-                            }
-                            document.getElementById(target_planet_id).insertAdjacentHTML("beforeend", full_string);
-                            el = document.getElementById(string_id);
-                            el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
-                        }
-                    }
+                    renderInPlay(data);
                 } else if (split_data[1] === "HQ") {
-                    var target_headquarters = "headquarters-player-" + split_data[2];
-                    target_user = split_data[3];
-                    document.getElementById(target_headquarters).innerHTML = ``;
-                    for (var i = 4; i < split_data.length; i++) {
-                        var card_data_split = split_data[i].split("|");
-                        var card_name = card_data_split[0];
-                        card_name = card_name.split(' ').join('_');
-                        var is_ready = card_data_split[1];
-                        var damage = card_data_split[2];
-                        if (parseInt(damage) > 9) {
-                            damage = "9+";
-                        }
-                        var faith = card_data_split[3];
-                        if (parseInt(faith) > 6) {
-                            faith = "6+";
-                        }
-                        var hale = card_data_split[4];
-                        var border_type = card_data_split[5];
-                        var additional_helper_text = card_data_split[6];
-                        var attachment_start_id = 8;
-                        var target = card_data_split[7];
-                        let string_id = (i-4).toString();
-                        var card_class = "Card";
-                        if (tokenNames.includes(card_name)) {
-                            card_class = "Token-Card";
-                        }
-                        var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
-                        if (hale === "D") {
-                            if (target_user === "{{ user.username }}") {
-                                original_text = "/static/images/CardImages/" + card_name + ".jpg";
-                                enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`;
-                            }
-                            card_name = replaceCardback("Cardback", split_data[2]);
-                            deepstrike = "True";
-                        }
-                        string_id = "HQ/" + split_data[2] + "/" + string_id;
-                        if (hale === "B") {
-                            card_name += "_bloodied";
-                        }
-                        var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                        var rotation = "";
-                        var full_string = `<div class="Card-div small-sep">`;
-                        if (is_ready === "E") {
-                            card_class = "Exhausted-Card";
-                            if (tokenNames.includes(card_name)) {
-                                card_class = "Exhausted-Token-Card";
-                            }
-                            rotation = " style='transform:rotate(90deg);'";
-                        } else if (is_ready === "PR") {
-                            card_class = "Exhausted-Card";
-                            rotation = " style='transform:rotate(270deg);'";
-                        } else if (is_ready === "PE") {
-
-                        }
-                        if (border_type === "playable") {
-                            card_class = card_class + " generic-playable-card";
-                        } else if (border_type === "unplayable") {
-                            card_class = card_class + " generic-unplayable-card";
-                        } else {
-                            card_class = card_class + " generic-blue-border";
-                        }
-                        for (var j = attachment_start_id; j < card_data_split.length; j++) {
-                            var attachment_string_id = (j-attachment_start_id).toString();
-                            var attachment_data_split = card_data_split[j].split("+");
-                            var attachment_name = attachment_data_split[0].split(' ').join('_');
-                            var attachment_ready = attachment_data_split[1];
-                            var is_magus = attachment_data_split[2];
-                            var user_magus = attachment_data_split[3];
-                            var attachment_class = "Attachment-Card";
-                            var att_deepstrike = "False";
-                            var attachment_original_text = "";
-                            var attachment_enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
-                            if (is_magus === "M") {
-                                if (user_magus == "{{ user.username }}") {
-                                    attachment_original_text = "/static/images/CardImages/" + attachment_name + ".jpg";
-                                    attachment_enlarge_card_formula = ` data-deepstruck=` + attachment_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
-                                }
-                                attachment_name = replaceCardback("Cardback", split_data[2]);
-                                att_deepstrike = "True";
-                            }
-                            attachment_string_id = "ATTACHMENT/" + string_id + "/" + attachment_string_id;
-                            var attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
-                            var attachment_rotation = "";
-                            if (attachment_ready === "E") {
-                                attachment_class = "Exhausted-Attachment-Card";
-                                attachment_rotation = " style='transform:rotate(90deg);'"
-                                attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
-                            }
-                            var attachment_style_string = "";
-                            if (attachment_rotation === "") {
-                                attachment_style_string = ` style="margin-left: ` + (j - attachment_start_id).toString() + `vw"`;
-                            } else {
-                                attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j - attachment_start_id).toString() + `vw"`;
-                            }
-                            full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
-                        }
-                        var style_string = ``;
-                        if (card_data_split.length > attachment_start_id) {
-                            if (is_ready === "R") {
-                                style_string = ` style="margin-left: ` + (card_data_split.length - attachment_start_id).toString() + `vw"`;
-                            } else if (is_ready === "PR") {
-                                style_string = ` style="rotate: 270deg; margin-left: ` + (card_data_split.length - attachment_start_id).toString() + `vw"`;
-                            } else if (is_ready === "PE") {
-                                style_string = ` style="margin-left: ` + (card_data_split.length - attachment_start_id).toString() + `vw"`;
-                            } else {
-                                style_string = ` style="rotate: 90deg; margin-left: ` + (card_data_split.length - attachment_start_id).toString() + `vw"`;
-                            }
-                        } else {
-                            if (is_ready === "R") {
-                                style_string = ``;
-                            } else if (is_ready === "E") {
-                                style_string = ` style="rotate: 90deg;"`;
-                            } else if (is_ready === "PR") {
-                                style_string = ` style="rotate: 270deg;"`;
-                            } else {
-                                style_string = ``;
-                            }
-                        }
-                        full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
-                        if (target !== "") {
-                            var style_string_reticle = `style="left: calc(10px + ` + (card_data_split.length - attachment_start_id).toString() + `vw);"`;
-                            full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
-                        }
-                        if (damage === "0") {
-
-                        } else {
-                            full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
-                        }
-                        if (faith === "0") {
-                            full_string += `</div>`;
-                        } else {
-                            full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img></div>`;
-                        }
-                        document.getElementById(target_headquarters).insertAdjacentHTML("beforeend", full_string);
-                        el = document.getElementById(string_id);
-                        el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
-                    }
+                    renderHQ(data);
                 } else if (split_data[1] === "CHOICE") {
                     var full_string = `<div id="choices-container"><div id="header-choices-container">`;
                     if (split_data[2] === "{{ user.username }}") {
@@ -1731,6 +1464,260 @@
                     pos = pos + 1;
                     elem.style.top = pos + 'vh';
                 }
+            }
+        }
+
+        function renderInPlay(data) {
+            var extra_data = data.extra;
+            var target_number = extra_data["Number"];
+            var target_user = extra_data["Name"];
+            var planet_num = extra_data["Planet"];
+            var in_play_data = extra_data["IN_PLAY"];
+            var target_planet_id = "player-" + target_number + "-cards-planet-" + planet_num;
+            var element = document.getElementById(target_planet_id);
+            if (typeof(element) != 'undefined' && element != null)
+            {
+                document.getElementById(target_planet_id).innerHTML = ``;
+                var i = 0;
+                for (var card_data in in_play_data) {
+                    card_data = in_play_data[i];
+                    var card_name = card_data["Name"];
+                    card_name = card_name.split(' ').join('_');
+                    var is_ready = card_data["Ready"];
+                    var damage = card_data["Damage"].toString();
+                    if (parseInt(damage) > 9) {
+                        damage = "9+";
+                    }
+                    var faith = card_data["Faith"].toString();
+                    if (parseInt(faith) > 6) {
+                        faith = "6+";
+                    }
+                    var hale = card_data["Hale"];
+                    var border_type = card_data["Border"];
+                    var additional_helper_text = card_data["Info"];
+                    var target = card_data["Target"];
+                    var deepstrike = card_data["Deepstrike"];
+                    var attachments = card_data["Attachments"];
+                    var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
+                    if (deepstrike === true) {
+                        if (target_user === "{{ user.username }}") {
+                            enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`;
+                        }
+                        card_name = replaceCardback("Cardback", target_number);
+                    }
+                    let string_id = (i).toString();
+                    var card_class = "Card";
+                    if (tokenNames.includes(card_name)) {
+                        card_class = "Token-Card";
+                    }
+                    string_id = "IN_PLAY/" + target_number + "/" + planet_num + "/" + string_id;
+                    if (hale === false) {
+                        card_name += "_bloodied";
+                    }
+                    var route_text = "/static/images/CardImages/" + card_name + ".jpg";
+                    var rotation = "";
+                    var full_string = `<div class="Card-div small-sep">`;
+                    if (is_ready === false) {
+                        rotation = "rotate: 90deg;";
+                        card_class = "Exhausted-Card";
+                        if (tokenNames.includes(card_name)) {
+                            card_class = "Exhausted-Token-Card";
+                        }
+                    }
+                    if (border_type === "playable") {
+                        card_class = card_class + " generic-playable-card";
+                    } else if (border_type === "unplayable") {
+                        card_class = card_class + " generic-unplayable-card";
+                    } else {
+                        card_class = card_class + " generic-blue-border";
+                    }
+                    var j = 0;
+                    for (var attachment_data in attachments) {
+                        attachment_data = attachments[j];
+                        var attachment_string_id = (j).toString();
+                        var attachment_name = attachment_data["Name"].split(' ').join('_');
+                        var attachment_ready = attachment_data["Ready"];
+                        var is_magus = attachment_data["Magus"];
+                        var user_magus = attachment_data["Owner"];
+                        var attachment_class = "Attachment-Card";
+                        var attachment_enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                        if (is_magus === true) {
+                            if (user_magus == "{{ user.username }}") {
+                                attachment_enlarge_card_formula = ` data-deepstruck=` + attachment_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
+                            }
+                            attachment_name = replaceCardback("Cardback", target_number);
+                        }
+                        attachment_string_id = "ATTACHMENT/" + string_id + "/" + attachment_string_id;
+                        var attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
+                        var attachment_rotation = "";
+                        if (attachment_ready === false) {
+                            attachment_class = "Exhausted-Attachment-Card";
+                            attachment_rotation = " style='transform:rotate(90deg);'"
+                            attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
+                        }
+                        var attachment_style_string = "";
+                        if (attachment_rotation === "") {
+                            attachment_style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
+                        } else {
+                            attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j).toString() + `vw"`;
+                        }
+                        full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                        j = j + 1;
+                    }
+                    var style_string = "";
+                    if (is_ready === true) {
+                        style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
+                    } else {
+                        style_string = ` style="rotate: 90deg; margin-left: ` + (j).toString() + `vw;"`;
+                    }
+                    full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                    if (target) {
+                        var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
+                        full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                    }
+                    if (damage !== "0") {
+                        full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
+                    }
+                    if (faith !== "0") {
+                        full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img>`;
+                    }
+                    full_string += `</div>`;
+                    document.getElementById(target_planet_id).insertAdjacentHTML("beforeend", full_string);
+                    el = document.getElementById(string_id);
+                    el.addEventListener('contextmenu', e => showContextMenu(e, string_id));
+                    i = i + 1;
+                }
+            }
+        }
+
+        function renderHQ(data) {
+            var extra_data = data.extra;
+            var target_number = extra_data["Number"];
+            var target_user = extra_data["Name"];
+            var hq_data = extra_data["HQ"];
+            console.log("NEW HQ");
+            console.log(hq_data);
+            var target_headquarters = "headquarters-player-" + target_number;
+            document.getElementById(target_headquarters).innerHTML = ``;
+            var i = 0;
+            for (var card_data in hq_data) {
+                card_data = hq_data[i];
+                var card_name = card_data["Name"];
+                card_name = card_name.split(' ').join('_');
+                var is_ready = card_data["Ready"];
+                var is_pledge = card_data["Pledge"];
+                var damage = card_data["Damage"].toString();
+                if (parseInt(damage) > 9) {
+                    damage = "9+";
+                }
+                var faith = card_data["Faith"].toString();
+                if (parseInt(faith) > 6) {
+                    faith = "6+";
+                }
+                var hale = card_data["Hale"];
+                var border_type = card_data["Border"];
+                var additional_helper_text = card_data["Info"];
+                var target = card_data["Target"];
+                var deepstrike = card_data["Deepstrike"];
+                var attachments = card_data["Attachments"];
+                let string_id = (i).toString();
+                var card_class = "Card";
+                if (tokenNames.includes(card_name)) {
+                    card_class = "Token-Card";
+                }
+                var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
+                if (deepstrike === true) {
+                    if (target_user === "{{ user.username }}") {
+                        enlarge_card_formula = ` data-deepstruck=` + card_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`;
+                    }
+                    card_name = replaceCardback("Cardback", target_number);
+                }
+                string_id = "HQ/" + target_number + "/" + string_id;
+                if (hale === false) {
+                    card_name += "_bloodied";
+                }
+                var route_text = "/static/images/CardImages/" + card_name + ".jpg";
+                var rotation = "";
+                var full_string = `<div class="Card-div small-sep">`;
+                if (is_ready === false) {
+                    card_class = "Exhausted-Card";
+                    if (tokenNames.includes(card_name)) {
+                        card_class = "Exhausted-Token-Card";
+                    }
+                    rotation = " style='transform:rotate(90deg);'";
+                } else if (is_ready === true && is_pledge == true) {
+                    card_class = "Exhausted-Card";
+                    rotation = " style='transform:rotate(270deg);'";
+                }
+                if (border_type === "playable") {
+                    card_class = card_class + " generic-playable-card";
+                } else if (border_type === "unplayable") {
+                    card_class = card_class + " generic-unplayable-card";
+                } else {
+                    card_class = card_class + " generic-blue-border";
+                }
+                var j = 0;
+                for (var attachment_data in attachments) {
+                    attachment_data = attachments[j];
+                    var attachment_string_id = (j).toString();
+                    var attachment_name = attachment_data["Name"].split(' ').join('_');
+                    var attachment_ready = attachment_data["Ready"];
+                    var is_magus = attachment_data["Magus"];
+                    var user_magus = attachment_data["Owner"];
+                    var attachment_class = "Attachment-Card";
+                    var attachment_enlarge_card_formula = ` onmouseover="changeDef(this.src)"`;
+                    if (is_magus === true) {
+                        if (user_magus == "{{ user.username }}") {
+                            attachment_enlarge_card_formula = ` data-deepstruck=` + attachment_name + ` onmouseover='changeDef("/static/images/CardImages/" + this.dataset.deepstruck + ".jpg")'`
+                        }
+                        attachment_name = replaceCardback("Cardback", target_number);
+                    }
+                    attachment_string_id = "ATTACHMENT/" + string_id + "/" + attachment_string_id;
+                    var attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
+                    var attachment_rotation = "";
+                    if (attachment_ready === false) {
+                        attachment_class = "Exhausted-Attachment-Card";
+                        attachment_rotation = " style='transform:rotate(90deg);'"
+                        attachment_route_text = "/static/images/CardImages/" + attachment_name + ".jpg";
+                    }
+                    var attachment_style_string = "";
+                    if (attachment_rotation === "") {
+                        attachment_style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
+                    } else {
+                        attachment_style_string = ` style="rotate: 90deg; margin-left: ` + (j).toString() + `vw"`;
+                    }
+                    full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                    j = j + 1;
+                }
+                var style_string = ``;
+                if (is_ready === true) {
+                    style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
+                } else if (is_ready === true && is_pledge == true) {
+                    style_string = ` style="rotate: 270deg; margin-left: ` + (j).toString() + `vw"`;
+                } else if (is_ready === false && is_pledge == true) {
+                    style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
+                } else {
+                    style_string = ` style="rotate: 90deg; margin-left: ` + (j).toString() + `vw"`;
+                }
+                full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
+                if (target) {
+                    var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
+                    full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                }
+                if (damage === "0") {
+
+                } else {
+                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
+                }
+                if (faith === "0") {
+                    full_string += `</div>`;
+                } else {
+                    full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img></div>`;
+                }
+                document.getElementById(target_headquarters).insertAdjacentHTML("beforeend", full_string);
+                el = document.getElementById(string_id);
+                el.addEventListener('contextmenu', e => showContextMenu(e, string_id))
+                i = i + 1;
             }
         }
 

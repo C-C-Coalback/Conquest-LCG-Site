@@ -721,145 +721,171 @@ class Player:
 
     async def send_hq(self, force=False):
         joined_string = ""
-        if self.headquarters:
-            card_strings = []
-            for i in range(len(self.headquarters)):
-                current_card = self.headquarters[i]
-                single_card_string = current_card.get_name()
-                if current_card.actually_a_deepstrike:
-                    single_card_string = current_card.deepstrike_card_name
-                if single_card_string in self.cards_that_have_errata:
-                    if self.game.apoka:
-                        single_card_string += "_apoka"
-                    elif self.game.blackstone:
-                        single_card_string += "_blackstone"
-                single_card_string = single_card_string + "|"
-                if current_card.ready:
-                    if current_card.check_for_a_trait("Pledge") and not current_card.get_name() == "Grand Schemes":
-                        single_card_string += "PR|"
-                    else:
-                        single_card_string += "R|"
+        info_transmitted = {
+            "Type": "HQ",
+            "Name": self.name_player,
+            "Number": self.get_number(),
+            "HQ": {}
+        }
+        card_strings = []
+        for i in range(len(self.headquarters)):
+            current_card = self.headquarters[i]
+            self.determine_and_set_border(-2, i)
+            extra_info = current_card.get_extra_info_string()
+            card_data_dict = {
+                "Name": current_card.get_name(),
+                "Ready": current_card.get_ready(),
+                "Pledge": current_card.check_for_a_trait("Pledge") and current_card.get_name() != "Grand Schemes",
+                "Damage": 0,
+                "Faith": 0,
+                "Hale": True,
+                "Deepstrike": current_card.actually_a_deepstrike,
+                "Border": current_card.get_border(),
+                "Info": extra_info,
+                "Target": current_card.aiming_reticle_color,
+                "Attachments": {}
+            }
+            single_card_string = current_card.get_name()
+            if current_card.actually_a_deepstrike:
+                card_data_dict["Name"] = current_card.deepstrike_card_name
+                single_card_string = current_card.deepstrike_card_name
+            if single_card_string in self.cards_that_have_errata:
+                if self.game.apoka:
+                    card_data_dict["Name"] += "_apoka"
+                    single_card_string += "_apoka"
+                elif self.game.blackstone:
+                    card_data_dict["Name"] += "_blackstone"
+                    single_card_string += "_blackstone"
+            single_card_string = single_card_string + "|"
+            if current_card.ready:
+                if current_card.check_for_a_trait("Pledge") and not current_card.get_name() == "Grand Schemes":
+                    single_card_string += "PR|"
                 else:
-                    if current_card.check_for_a_trait("Pledge") and not current_card.get_name() == "Grand Schemes":
-                        single_card_string += "PE|"
-                    else:
-                        single_card_string += "E|"
-                card_type = current_card.get_card_type()
-                if current_card.is_unit:
-                    single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
-                elif current_card.get_card_type() == "Support":
-                    single_card_string += str(current_card.get_damage())
-                else:
-                    single_card_string += "0"
-                single_card_string += "|"
-                if current_card.is_unit:
-                    single_card_string += str(current_card.get_faith())
-                elif current_card.get_name() == "Hive Ship Tendrils":
-                    single_card_string += str(current_card.counter)
-                elif current_card.get_name() == "Promethium Mine":
-                    single_card_string += str(current_card.counter)
-                elif current_card.get_name() == "World Engine Beam":
-                    single_card_string += str(current_card.counter)
-                elif current_card.get_name() == "Vamii Industrial Complex":
-                    single_card_string += str(current_card.counter)
-                elif current_card.check_for_a_trait("Pledge"):
-                    single_card_string += str(current_card.counter)
-                else:
-                    single_card_string += "0"
-                single_card_string += "|"
-                if card_type == "Warlord":
-                    if current_card.get_bloodied():
-                        single_card_string += "B|"
-                    else:
-                        single_card_string += "H|"
-                elif current_card.actually_a_deepstrike:
-                    single_card_string += "D|"
-                else:
-                    single_card_string += "H|"
-                single_card_string += self.determine_and_set_border(-2, i)
-                single_card_string += "|"
-                single_card_string += current_card.get_extra_info_string() + "|"
-                if current_card.aiming_reticle_color is not None:
-                    single_card_string += current_card.aiming_reticle_color
-                attachments_list = current_card.get_attachments()
-                for a in range(len(attachments_list)):
-                    single_card_string += "|"
-                    single_card_string += attachments_list[a].get_name()
-                    if attachments_list[a].get_name() in self.cards_that_have_errata:
-                        if self.game.apoka:
-                            single_card_string += "_apoka"
-                        elif self.game.blackstone:
-                            single_card_string += "_blackstone"
-                    single_card_string += "+"
-                    if attachments_list[a].get_ready():
-                        single_card_string += "R"
-                    else:
-                        single_card_string += "E"
-                    single_card_string += "+"
-                    if attachments_list[a].from_magus_harid:
-                        single_card_string += "M+" + attachments_list[a].name_owner
-                    else:
-                        single_card_string += "R+"
-                card_strings.append(single_card_string)
-            for i in range(len(self.cards_in_reserve_hq)):
-                current_card = self.cards_in_reserve_hq[i]
-                single_card_string = current_card.get_name()
-                if single_card_string in self.cards_that_have_errata:
-                    if self.game.apoka:
-                        single_card_string += "_apoka"
-                    elif self.game.blackstone:
-                        single_card_string += "_blackstone"
-                single_card_string = single_card_string + "|"
-                if current_card.ready:
                     single_card_string += "R|"
+            else:
+                if current_card.check_for_a_trait("Pledge") and not current_card.get_name() == "Grand Schemes":
+                    single_card_string += "PE|"
                 else:
                     single_card_string += "E|"
-                if current_card.is_unit:
-                    single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
-                elif current_card.get_card_type() == "Support":
-                    single_card_string += str(current_card.get_damage())
+            card_type = current_card.get_card_type()
+            if current_card.is_unit:
+                single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+                card_data_dict["Damage"] = current_card.get_damage() + current_card.get_indirect_damage()
+            elif current_card.get_card_type() == "Support":
+                single_card_string += str(current_card.get_damage())
+                card_data_dict["Damage"] = current_card.get_damage()
+            else:
+                single_card_string += "0"
+            single_card_string += "|"
+            if current_card.is_unit:
+                single_card_string += str(current_card.get_faith())
+                card_data_dict["Faith"] = current_card.get_faith()
+            elif current_card.get_name() in ["Hive Ship Tendrils", "Promethium Mine", "World Engine Beam", "Vamii Industrial Complex"] or current_card.check_for_a_trait("Pledge"):
+                single_card_string += str(current_card.counter)
+                card_data_dict["Faith"] = current_card.counter
+            else:
+                single_card_string += "0"
+            single_card_string += "|"
+            if card_type == "Warlord":
+                if current_card.get_bloodied():
+                    card_data_dict["Hale"] = False
+                    single_card_string += "B|"
                 else:
-                    single_card_string += "0"
+                    single_card_string += "H|"
+            elif current_card.actually_a_deepstrike:
+                single_card_string += "D|"
+            else:
+                single_card_string += "H|"
+            single_card_string += self.get_border_given_pos(-2, i)
+            single_card_string += "|"
+            single_card_string += extra_info + "|"
+            if current_card.aiming_reticle_color is not None:
+                single_card_string += current_card.aiming_reticle_color
+            attachments_list = current_card.get_attachments()
+            for a in range(len(attachments_list)):
+                attachment = attachments_list[a]
+                attachment_data_dict = {
+                    "Name": attachment.get_name(),
+                    "Ready": attachment.get_ready(),
+                    "Magus": attachment.from_magus_harid,
+                    "Owner": attachment.name_owner
+                }
                 single_card_string += "|"
-                if current_card.is_unit:
-                    single_card_string += str(current_card.get_faith())
+                single_card_string += attachment.get_name()
+                if attachment.get_name() in self.cards_that_have_errata:
+                    if self.game.apoka:
+                        attachment_data_dict["Name"] += "_apoka"
+                        single_card_string += "_apoka"
+                    elif self.game.blackstone:
+                        attachment_data_dict["Name"] += "_blackstone"
+                        single_card_string += "_blackstone"
+                single_card_string += "+"
+                if attachment.get_ready():
+                    single_card_string += "R"
                 else:
-                    single_card_string += "0"
-                single_card_string += "|D|"
-                single_card_string += "|"
-                single_card_string += current_card.get_extra_info_string() + "|"
-                if current_card.aiming_reticle_color is not None:
-                    single_card_string += current_card.aiming_reticle_color
-                attachments_list = current_card.get_attachments()
-                for a in range(len(attachments_list)):
-                    single_card_string += "|"
-                    single_card_string += attachments_list[a].get_name()
-                    if attachments_list[a].get_name() in self.cards_that_have_errata:
-                        if self.game.apoka:
-                            single_card_string = single_card_string + "_apoka"
-                        elif self.game.blackstone:
-                            single_card_string = single_card_string + "_blackstone"
-                    single_card_string += "+"
-                    if attachments_list[a].get_ready():
-                        single_card_string += "R"
-                    else:
-                        single_card_string += "E"
-                    single_card_string += "+"
-                    if attachments_list[a].from_magus_harid:
-                        single_card_string += "M+" + attachments_list[a].name_owner
-                    else:
-                        single_card_string += "R+"
-                card_strings.append(single_card_string)
-            joined_string = "/".join(card_strings)
-            joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" \
-                            + self.name_player + "/" + joined_string
-        else:
-            joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + self.name_player
+                    single_card_string += "E"
+                single_card_string += "+"
+                if attachment.from_magus_harid:
+                    single_card_string += "M+" + attachment.name_owner
+                else:
+                    single_card_string += "R+"
+                card_data_dict["Attachments"][str(a)] = attachment_data_dict
+            card_strings.append(single_card_string)
+            info_transmitted["HQ"][str(i)] = card_data_dict
+        for i in range(len(self.cards_in_reserve_hq)):
+            current_card = self.cards_in_reserve_hq[i]
+            extra_info = current_card.get_extra_info_string()
+            card_data_dict = {
+                "Name": current_card.get_name(),
+                "Ready": current_card.get_ready(),
+                "Pledge": False,
+                "Damage": 0,
+                "Faith": 0,
+                "Bloodied": False,
+                "Deepstrike": True,
+                "Border": "",
+                "Info": extra_info,
+                "Target": current_card.aiming_reticle_color,
+                "Attachments": {}
+            }
+            single_card_string = current_card.get_name()
+            if single_card_string in self.cards_that_have_errata:
+                if self.game.apoka:
+                    card_data_dict["Name"] += "_apoka"
+                    single_card_string += "_apoka"
+                elif self.game.blackstone:
+                    card_data_dict["Name"] += "_blackstone"
+                    single_card_string += "_blackstone"
+            single_card_string = single_card_string + "|"
+            if current_card.ready:
+                single_card_string += "R|"
+            else:
+                single_card_string += "E|"
+            if current_card.is_unit:
+                single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+            elif current_card.get_card_type() == "Support":
+                single_card_string += str(current_card.get_damage())
+            else:
+                single_card_string += "0"
+            single_card_string += "|"
+            if current_card.is_unit:
+                single_card_string += str(current_card.get_faith())
+            else:
+                single_card_string += "0"
+            single_card_string += "|D|"
+            single_card_string += "|"
+            single_card_string += current_card.get_extra_info_string() + "|"
+            if current_card.aiming_reticle_color is not None:
+                single_card_string += current_card.aiming_reticle_color
+            card_strings.append(single_card_string)
+            info_transmitted["HQ"][str(i + len(self.headquarters))] = card_data_dict
+        joined_string = "/".join(card_strings)
+        joined_string = "GAME_INFO/HQ/" + str(self.number) + "/" + self.name_player + "/" + joined_string
         if self.last_hq_string != joined_string or force:
             self.last_hq_string = joined_string
             if not force:
                 self.game.anything_changed_since_last_send = True
-            await self.game.send_update_message(joined_string)
+            await self.game.send_update_message(joined_string, info_transmitted)
 
     def check_for_trait_at_planet(self, planet_pos, trait):
         for i in range(self.count_units_at_planet(planet_pos)):
@@ -1342,114 +1368,152 @@ class Player:
         return ""
 
     async def send_units_at_planet(self, planet_id, force=False):
-        if planet_id != -1:
-            if planet_id == -2:
-                await self.send_hq()
+        if planet_id == -2:
+            await self.send_hq()
+            return None
+        if planet_id == -1:
+            return None
+        joined_string = ""
+        card_strings = []
+        info_transmitted = {
+            "Type": "IN_PLAY",
+            "Name": self.name_player,
+            "Number": self.get_number(),
+            "Planet": str(planet_id),
+            "IN_PLAY": {}
+        }
+        for i in range(self.count_units_at_planet(planet_id)):
+            current_card = self.get_card_given_pos(planet_id, i)
+            self.determine_and_set_border(planet_id, i)
+            extra_info = current_card.get_extra_info_string()
+            if self.game.mode == "RETREAT":
+                extra_info += "\nRETREAT"
+            card_data_dict = {
+                "Name": current_card.get_name(),
+                "Ready": current_card.get_ready(),
+                "Damage": current_card.get_damage() + current_card.get_indirect_damage(),
+                "Faith": current_card.get_faith(),
+                "Hale": True,
+                "Deepstrike": current_card.actually_a_deepstrike,
+                "Border": current_card.get_border(),
+                "Info": extra_info,
+                "Target": current_card.aiming_reticle_color,
+                "Attachments": {}
+            }
+            single_card_string = current_card.get_name()
+            if current_card.actually_a_deepstrike:
+                card_data_dict["Name"] = current_card.deepstrike_card_name
+                single_card_string = current_card.deepstrike_card_name
+            if single_card_string in self.cards_that_have_errata:
+                if self.game.apoka:
+                    card_data_dict["Name"] += "_apoka"
+                    single_card_string = single_card_string + "_apoka"
+                elif self.game.blackstone:
+                    card_data_dict["Name"] += "_blackstone"
+                    single_card_string = single_card_string + "_blackstone"
+            single_card_string = single_card_string + "|"
+            if current_card.ready:
+                single_card_string += "R|"
             else:
-                if self.count_units_at_planet(planet_id) > 0 or self.cards_in_reserve[planet_id]:
-                    card_strings = []
-                    for i in range(self.count_units_at_planet(planet_id)):
-                        current_card = self.get_card_given_pos(planet_id, i)
-                        single_card_string = current_card.get_name()
-                        if current_card.actually_a_deepstrike:
-                            single_card_string = current_card.deepstrike_card_name
-                        if single_card_string in self.cards_that_have_errata:
-                            if self.game.apoka:
-                                single_card_string = single_card_string + "_apoka"
-                            elif self.game.blackstone:
-                                single_card_string = single_card_string + "_blackstone"
-                        single_card_string = single_card_string + "|"
-                        if current_card.ready:
-                            single_card_string += "R|"
-                        else:
-                            single_card_string += "E|"
-                        single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
-                        single_card_string += "|"
-                        single_card_string += str(current_card.get_faith())
-                        single_card_string += "|"
-                        if current_card.actually_a_deepstrike:
-                            single_card_string += "D"
-                        elif current_card.get_card_type() == "Warlord":
-                            if current_card.get_bloodied():
-                                single_card_string += "B"
-                            else:
-                                single_card_string += "H"
-                        else:
-                            single_card_string += "H"
-                        single_card_string += "|"
-                        border_type = self.determine_and_set_border(planet_id, i)
-                        single_card_string += border_type
-                        single_card_string += "|"
-                        single_card_string += current_card.get_extra_info_string()
-                        if self.game.mode == "RETREAT":
-                            single_card_string += "\nRETREAT"
-                        single_card_string += "|"
-                        if current_card.aiming_reticle_color is not None:
-                            single_card_string += current_card.aiming_reticle_color
-                        attachments_list = current_card.get_attachments()
-                        for a in range(len(attachments_list)):
-                            single_card_string += "|"
-                            single_card_string += attachments_list[a].get_name()
-                            if attachments_list[a].get_name() in self.cards_that_have_errata:
-                                if self.game.apoka:
-                                    single_card_string = single_card_string + "_apoka"
-                                elif self.game.blackstone:
-                                    single_card_string = single_card_string + "_blackstone"
-                            single_card_string += "+"
-                            if attachments_list[a].get_ready():
-                                single_card_string += "R"
-                            else:
-                                single_card_string += "E"
-                            single_card_string += "+"
-                            if attachments_list[a].from_magus_harid:
-                                single_card_string += "M+" + attachments_list[a].name_owner
-                            else:
-                                single_card_string += "R+"
-                        card_strings.append(single_card_string)
-                    for i in range(len(self.cards_in_reserve[planet_id])):
-                        current_card = self.cards_in_reserve[planet_id][i]
-                        single_card_string = current_card.get_name()
-                        if single_card_string in self.cards_that_have_errata:
-                            if self.game.apoka:
-                                single_card_string = single_card_string + "_apoka"
-                            elif self.game.blackstone:
-                                single_card_string = single_card_string + "_blackstone"
-                        single_card_string = single_card_string + "|"
-                        if current_card.ready:
-                            single_card_string += "R|"
-                        else:
-                            single_card_string += "E|"
-                        single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
-                        single_card_string += "|"
-                        single_card_string += str(current_card.get_faith())
-                        single_card_string += "|"
-                        single_card_string += "D"
-                        single_card_string += "|"
-                        single_card_string += "|"
-                        single_card_string += "None" + "|"
-                        if current_card.aiming_reticle_color is not None:
-                            single_card_string += current_card.aiming_reticle_color
-                        attachments_list = current_card.get_attachments()
-                        for a in range(len(attachments_list)):
-                            single_card_string += "|"
-                            single_card_string += attachments_list[a].get_name()
-                            single_card_string += "+"
-                            if attachments_list[a].get_ready():
-                                single_card_string += "R"
-                            else:
-                                single_card_string += "E"
-                        card_strings.append(single_card_string)
-                    joined_string = "/".join(card_strings)
-                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/"\
-                                    + self.name_player + "/" + joined_string
+                single_card_string += "E|"
+            single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+            single_card_string += "|"
+            single_card_string += str(current_card.get_faith())
+            single_card_string += "|"
+            if current_card.actually_a_deepstrike:
+                single_card_string += "D"
+            elif current_card.get_card_type() == "Warlord":
+                if current_card.get_bloodied():
+                    card_data_dict["Hale"] = False
+                    single_card_string += "B"
                 else:
-                    joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) +\
-                                    "/" + str(planet_id) + "/" + self.name_player
-                if self.last_planet_strings[planet_id] != joined_string or force:
-                    self.last_planet_strings[planet_id] = joined_string
-                    if not force:
-                        self.game.anything_changed_since_last_send = True
-                    await self.game.send_update_message(joined_string)
+                    single_card_string += "H"
+            else:
+                single_card_string += "H"
+            single_card_string += "|"
+            single_card_string += self.get_border_given_pos(planet_id, i)
+            single_card_string += "|"
+            single_card_string += extra_info
+            single_card_string += "|"
+            if current_card.aiming_reticle_color is not None:
+                single_card_string += current_card.aiming_reticle_color
+            attachments_list = current_card.get_attachments()
+            for a in range(len(attachments_list)):
+                attachment = attachments_list[a]
+                attachment_data_dict = {
+                    "Name": attachment.get_name(),
+                    "Ready": attachment.get_ready(),
+                    "Magus": attachment.from_magus_harid,
+                    "Owner": attachment.name_owner
+                }
+                single_card_string += "|"
+                single_card_string += attachment.get_name()
+                if attachment.get_name() in self.cards_that_have_errata:
+                    if self.game.apoka:
+                        attachment_data_dict["Name"] += "_apoka"
+                        single_card_string = single_card_string + "_apoka"
+                    elif self.game.blackstone:
+                        attachment_data_dict["Name"] += "_blackstone"
+                        single_card_string = single_card_string + "_blackstone"
+                single_card_string += "+"
+                if attachment.get_ready():
+                    single_card_string += "R"
+                else:
+                    single_card_string += "E"
+                single_card_string += "+"
+                if attachment.from_magus_harid:
+                    single_card_string += "M+" + attachment.name_owner
+                else:
+                    single_card_string += "R+"
+                card_data_dict["Attachments"][str(a)] = attachment_data_dict
+            card_strings.append(single_card_string)
+            info_transmitted["IN_PLAY"][str(i)] = card_data_dict
+        for i in range(len(self.cards_in_reserve[planet_id])):
+            current_card = self.cards_in_reserve[planet_id][i]
+            single_card_string = current_card.get_name()
+            card_data_dict = {
+                "Name": current_card.get_name(),
+                "Ready": current_card.get_ready(),
+                "Damage": current_card.get_damage(),
+                "Faith": current_card.get_faith(),
+                "Bloodied": False,
+                "Deepstrike": True,
+                "Border": "",
+                "Info": current_card.get_extra_info_string(),
+                "Target": current_card.aiming_reticle_color,
+                "Attachments": {}
+            }
+            if single_card_string in self.cards_that_have_errata:
+                if self.game.apoka:
+                    card_data_dict["Name"] += "_apoka"
+                    single_card_string = single_card_string + "_apoka"
+                elif self.game.blackstone:
+                    card_data_dict["Name"] += "_blackstone"
+                    single_card_string = single_card_string + "_blackstone"
+            single_card_string = single_card_string + "|"
+            if current_card.ready:
+                single_card_string += "R|"
+            else:
+                single_card_string += "E|"
+            single_card_string += str(current_card.get_damage() + current_card.get_indirect_damage())
+            single_card_string += "|"
+            single_card_string += str(current_card.get_faith())
+            single_card_string += "|"
+            single_card_string += "D"
+            single_card_string += "|"
+            single_card_string += "|"
+            single_card_string += "None" + "|"
+            if current_card.aiming_reticle_color is not None:
+                single_card_string += current_card.aiming_reticle_color
+            card_strings.append(single_card_string)
+            info_transmitted["IN_PLAY"][str(i + self.count_units_at_planet(planet_id))] = card_data_dict
+        joined_string = "/".join(card_strings)
+        joined_string = "GAME_INFO/IN_PLAY/" + str(self.number) + "/" + str(planet_id) + "/" + self.name_player + "/" + joined_string
+        if self.last_planet_strings[planet_id] != joined_string or force:
+            self.last_planet_strings[planet_id] = joined_string
+            if not force:
+                self.game.anything_changed_since_last_send = True
+            await self.game.send_update_message(joined_string, info_transmitted)
 
     async def send_units_at_all_planets(self, force=False):
         for i in range(7):
