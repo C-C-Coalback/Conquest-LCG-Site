@@ -32,3 +32,5 @@ __pycache__/
 /play/gamecode/_trial_temp/
 .vscode
 scratches
+decks/DeckStorage/Test1/*
+decks/DeckStorage/Test2/*

@@ -1082,6 +1082,8 @@
                                 } else if (card_data_split[2] === "unplayable") {
                                     card_class = card_class + " unplayable-hand-card";
                                 }
+                            } else {
+                                card_class = card_class + " generic-blue-border";
                             }
                             let string_id = (i-4).toString();
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
@@ -1117,9 +1119,9 @@
                             var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
                             if (i == 4)
                             {
-                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card first-hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card generic-blue-border hand-card first-hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             } else {
-                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card generic-blue-border hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
                         }
                         document.getElementById(target_id).style.setProperty('--count', Math.max(split_data.length - 4, 2))

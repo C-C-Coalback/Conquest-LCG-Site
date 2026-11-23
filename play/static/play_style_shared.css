@@ -804,7 +804,6 @@ h4 {
 .hand-card {
     margin-left: 2px;
     margin-right: 2px;
-    border: 2px solid aqua;
     border-radius: 5px;
 }
 
@@ -828,7 +827,7 @@ legend {
     top: 24%;
     border: 5px solid blue;
     right: 0;
-    z-index: 1000;
+    z-index: 10000;
     overflow-x:hidden;
     overflow-y:auto;
     display: flex;
