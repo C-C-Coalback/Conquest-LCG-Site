@@ -392,6 +392,15 @@ h4 {
     pointer-events: none;
 }
 
+.info-icon {
+    position:absolute;
+    top: 0;
+    right: 10px;
+    height: 20px;
+    width: 20px;
+    pointer-events: none;
+}
+
 .large-aiming-reticle {
     position: absolute;
     top: 0;

@@ -1575,6 +1575,10 @@
                         var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
                         full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
                     }
+                    if (additional_helper_text !== "None")
+                    {
+                        full_string += `<img src="/static/images/Info_Icon.png" class="info-icon"></img>`;
+                    }
                     if (damage !== "0") {
                         full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
                     }
@@ -1703,6 +1707,10 @@
                 if (target) {
                     var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
                     full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                }
+                if (additional_helper_text !== "None")
+                {
+                    full_string += `<img src="/static/images/Info_Icon.png" class="info-icon"></img>`;
                 }
                 if (damage === "0") {
 
