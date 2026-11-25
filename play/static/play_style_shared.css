@@ -295,7 +295,6 @@ h4 {
 
 .Card-div {
     position: relative;
-    height:110px;
     width:auto;
 }
 
@@ -305,27 +304,23 @@ h4 {
 
 .Card {
     position: relative;
-    height:110px;
     width:77px;
 }
 
 .Token-Card {
     position: relative;
-    height:73px;
     width:51px;
 }
 
 .Exhausted-Token-Card {
     position: relative;
     top:-12px;
-    height:73px;
     width:51px;
 }
 
 .Exhausted-Card {
     position: relative;
     top:-12px;
-    height:110px;
     width:77px;
 }
 
