@@ -295,6 +295,7 @@ h4 {
 
 .Card-div {
     --card-w: 77px;
+    --attachment-count: 0vw;
     width: var(--card-w);
     aspect-ratio: 1469 / 2090;
     display: grid;
@@ -315,7 +316,6 @@ h4 {
     width: var(--card-w);
     aspect-ratio: 1469 / 2090;
     container-type: size;
-    transition: transform .2s;
 }
 
 .rotated .card-frame {
@@ -356,20 +356,27 @@ h4 {
 
 .Damage {
     opacity: 0.7;
-    width: 25cqw;
-    top: 4%;
-    left: 4%;
+    width: 35cqw;
+    bottom: 4%;
+    right: calc(4% - var(--attachment-count));
     color: red;
     pointer-events: none;
 }
 
 .Faith {
     opacity: 0.7;
-    width: 25cqw;
-    top: calc(25cqw + 4%);
-    left: 4%;
+    width: 35cqw;
+    bottom: calc(35cqw + 4%);
+    right: calc(4% - var(--attachment-count));
     color: white;
     pointer-events: none;
+}
+
+.info-icon {
+    top: 2px;
+    right: calc(-2px - var(--attachment-count));
+    pointer-events: none;
+    width: 30cqw;
 }
 
 .badge {
@@ -390,7 +397,23 @@ h4 {
     right: 4%;
 }
 
+.rotated .Damage {
+    transform: rotate(-90deg);
+}
+
+.rotated .Faith {
+    transform: rotate(-90deg);
+}
+
 .rotated .badge {
+    transform: rotate(-90deg);
+}
+
+.rotated .Attachment-Card {
+    transform: rotate(-90deg);
+}
+
+.rotated .Exhausted-Attachment-Card {
     transform: rotate(-90deg);
 }
 
@@ -436,15 +459,6 @@ h4 {
     top: 0;
     height: 110px;
     width: 77px;
-    pointer-events: none;
-}
-
-.info-icon {
-    position:absolute;
-    top: 0;
-    right: 10px;
-    height: 20px;
-    width: 20px;
     pointer-events: none;
 }
 
@@ -849,8 +863,6 @@ h4 {
 }
 
 .hand-card {
-    margin-left: 2px;
-    margin-right: 2px;
     border-radius: 5px;
 }
 
@@ -888,12 +900,9 @@ legend {
     margin-bottom: -5px;
 }
 
-/* ENEMY HAND SHRINKING */
-
-.card-stack {
-    --card-width: 81px;
+.card-stack, .friendly-card-stack {
     --max-width: 250px;
-    --count: 1;
+    --count: 2;
 
     display: flex;
     width: 100%;
@@ -901,27 +910,18 @@ legend {
 }
 
 .card-stack .hand-card {
-    width: var(--card-width);
+    width: var(--card-w);
     flex-shrink: 0;
     margin-left: min(0px, calc(
-        (var(--max-width) - var(--card-width)) / max(1, var(--count) - 1) - var(--card-width)
+        (var(--max-width) - var(--card-w) - 4px) / max(1, var(--count) - 1) - var(--card-w)
     ));
 }
 
-.friendly-card-stack {
-    --card-width: 81px;
-    --count: 2;
-
-    display: flex;
-    width: 100%;
-    max-width: 250px;
-}
-
 .friendly-card-stack .hand-card {
-    width: calc(var(--card-width) - 4px);
+    width: var(--card-w);
     flex-shrink: 0;
     margin-left: min(0px, calc(
-        (100% - var(--card-width)) / max(1, var(--count) - 1) - var(--card-width)
+        (var(--max-width) - var(--card-w) - 4px) / max(1, var(--count) - 1) - var(--card-w)
     ));
 }
 

@@ -1064,8 +1064,8 @@
                     document.getElementById(target_id).innerHTML = ``;
                     var current_card_count = `<legend>CARDS P` + split_data[2] + `: ` + (split_data.length-4).toString() + ` CARDS</legend>`;
                     document.getElementById(target_id).innerHTML = current_card_count;
+                    var own_player_number = split_data[2];
                     if (split_data[3] === "{{ user.username }}") {
-                        own_player_number = split_data[2];
                         draggableHand = [];
                         num_cards_in_hand = 0;
                         for (var i = 4; i < split_data.length; i++) {
@@ -1113,6 +1113,7 @@
                         console.log("hand eventer")
                         updateDraggableHand();
                     } else {
+                        /*
                         for (var i = 4; i < split_data.length; i++) {
                             let string_id = (i-4).toString();
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
@@ -1123,6 +1124,22 @@
                             } else {
                                 document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card generic-blue-border hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
+                        }*/
+                        document.getElementById(target_id).style.setProperty('--count', Math.max(split_data.length - 4, 2))
+                        for (var i = 4; i < split_data.length; i++) {
+                            var card_data_split = split_data[i].split("|");
+                            var card_name = card_data_split[0];
+                            var card_class = "Card";
+                            var div_class = "Card-div hand-card";
+                            if (i == 4) {
+                                div_class = div_class + " first-hand-card";
+                            }
+                            card_class = card_class + " generic-blue-border";
+                            let string_id = (i-4).toString();
+                            string_id = "HAND/" + split_data[2] + "/" + string_id;
+                            var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
+                            var full_string = `<div class="` + div_class + `"><input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` class="` + card_class + `" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()"></div>`;
+                            document.getElementById(target_id).insertAdjacentHTML("beforeend", full_string);
                         }
                         document.getElementById(target_id).style.setProperty('--count', Math.max(split_data.length - 4, 2))
                     }
@@ -1514,9 +1531,18 @@
                         card_name += "_bloodied";
                     }
                     var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                    var full_string = `<div class="Card-div small-sep"><div class="card-frame">`;
+                    var style_string = ` style="`;
+                    var j = 0;
+                    for (var attachment_data in attachments) {
+                        j = j + 1;
+                    }
+                    style_string = style_string + `--attachment-count: ` + (j).toString() + `vw; `;
+                    if (tokenNames.includes(card_name))
+                        style_string = style_string + `--card-w: 51px; `;
+                    style_string = style_string + `"`
+                    var full_string = `<div class="Card-div small-sep"` + style_string + `><div class="card-frame">`;
                     if (is_ready === false) {
-                        full_string = `<div class="Card-div rotated small-sep"><div class="card-frame">`;
+                        full_string = `<div class="Card-div rotated small-sep"` + style_string + `><div class="card-frame">`;
                     }
                     if (border_type === "playable") {
                         card_class = card_class + " generic-playable-card";
@@ -1525,7 +1551,7 @@
                     } else {
                         card_class = card_class + " generic-blue-border";
                     }
-                    var j = 0;
+                    j = 0;
                     for (var attachment_data in attachments) {
                         attachment_data = attachments[j];
                         var attachment_string_id = (j).toString();
@@ -1561,8 +1587,8 @@
                     var style_string = ` style="margin-left: ` + (j).toString() + `vw;"`;
                     full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                     if (target) {
-                        var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
-                        full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                        var style_string_reticle = `style="left: ` + (j).toString() + `vw;"`;
+                        full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle-in-play"></img>`;
                     }
                     if (additional_helper_text !== "None")
                     {
@@ -1627,12 +1653,20 @@
                     card_name += "_bloodied";
                 }
                 var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                var rotation = "";
-                var full_string = `<div class="Card-div small-sep"><div class="card-frame">`;
+                var style_string = ` style="`;
+                var j = 0;
+                for (var attachment_data in attachments) {
+                    j = j + 1;
+                }
+                style_string = style_string + `--attachment-count: ` + (j).toString() + `vw; `;
+                if (tokenNames.includes(card_name))
+                    style_string = style_string + `--card-w: 51px; `;
+                style_string = style_string + `"`
+                var full_string = `<div class="Card-div small-sep"` + style_string + `><div class="card-frame">`;
                 if (is_ready === false && is_pledge === false) {
-                    full_string = `<div class="Card-div rotated small-sep"><div class="card-frame">`;
+                    full_string = `<div class="Card-div rotated small-sep"` + style_string + `><div class="card-frame">`;
                 } else if (is_ready === true && is_pledge === true) {
-                    full_string = `<div class="Card-div rotated small-sep"><div class="card-frame">`;
+                    full_string = `<div class="Card-div rotated small-sep"` + style_string + `><div class="card-frame">`;
                 }
                 if (border_type === "playable") {
                     card_class = card_class + " generic-playable-card";
@@ -1641,7 +1675,7 @@
                 } else {
                     card_class = card_class + " generic-blue-border";
                 }
-                var j = 0;
+                j = 0;
                 for (var attachment_data in attachments) {
                     attachment_data = attachments[j];
                     var attachment_string_id = (j).toString();
@@ -1674,22 +1708,18 @@
                     full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                     j = j + 1;
                 }
-                var style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
+                var style_string = ` style="margin-left: ` + (j).toString() + `vw;"`;
                 full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                 if (target) {
-                    var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
-                    full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                    var style_string_reticle = `style="left: ` + (j).toString() + `vw;"`;
+                    full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle-in-play"></img>`;
                 }
-                if (damage !== "0") {
-                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage"></img>`;
                 if (additional_helper_text !== "None")
                 {
                     full_string += `<img src="/static/images/Info_Icon.png" class="info-icon"></img>`;
                 }
-                if (damage === "0") {
-
-                } else {
-                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
+                if (damage !== "0") {
+                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage"></img>`;
                 }
                 if (faith !== "0") {
                     full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith"></img>`;
