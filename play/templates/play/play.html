@@ -1506,23 +1506,15 @@
                         card_name = replaceCardback("Cardback", target_number);
                     }
                     let string_id = (i).toString();
-                    var card_class = "Card";
-                    if (tokenNames.includes(card_name)) {
-                        card_class = "Token-Card";
-                    }
+                    var card_class = "card-face";
                     string_id = "IN_PLAY/" + target_number + "/" + planet_num + "/" + string_id;
                     if (hale === false) {
                         card_name += "_bloodied";
                     }
                     var route_text = "/static/images/CardImages/" + card_name + ".jpg";
-                    var rotation = "";
-                    var full_string = `<div class="Card-div small-sep">`;
+                    var full_string = `<div class="Card-div small-sep"><div class="card-frame">`;
                     if (is_ready === false) {
-                        rotation = "rotate: 90deg;";
-                        card_class = "Exhausted-Card";
-                        if (tokenNames.includes(card_name)) {
-                            card_class = "Exhausted-Token-Card";
-                        }
+                        full_string = `<div class="Card-div rotated small-sep"><div class="card-frame">`;
                     }
                     if (border_type === "playable") {
                         card_class = card_class + " generic-playable-card";
@@ -1564,24 +1556,19 @@
                         full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                         j = j + 1;
                     }
-                    var style_string = "";
-                    if (is_ready === true) {
-                        style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
-                    } else {
-                        style_string = ` style="rotate: 90deg; margin-left: ` + (j).toString() + `vw;"`;
-                    }
+                    var style_string = ` style="margin-left: ` + (j).toString() + `vw;"`;
                     full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                     if (target) {
                         var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
-                        full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                        full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle-in-play"></img>`;
                     }
                     if (damage !== "0") {
-                        full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
+                        full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage"></img>`;
                     }
                     if (faith !== "0") {
-                        full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img>`;
+                        full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith"></img>`;
                     }
-                    full_string += `</div>`;
+                    full_string += `</div></div>`;
                     document.getElementById(target_planet_id).insertAdjacentHTML("beforeend", full_string);
                     el = document.getElementById(string_id);
                     el.addEventListener('contextmenu', e => showContextMenu(e, string_id));
@@ -1621,10 +1608,7 @@
                 var deepstrike = card_data["Deepstrike"];
                 var attachments = card_data["Attachments"];
                 let string_id = (i).toString();
-                var card_class = "Card";
-                if (tokenNames.includes(card_name)) {
-                    card_class = "Token-Card";
-                }
+                var card_class = "card-face";
                 var enlarge_card_formula = ` data-helpertext="` + additional_helper_text + `" onmouseover="changeDefAndHelp(this.src, this.dataset.helpertext)" onmouseleave="changeDefOut()"`;
                 if (deepstrike === true) {
                     if (target_user === "{{ user.username }}") {
@@ -1638,16 +1622,11 @@
                 }
                 var route_text = "/static/images/CardImages/" + card_name + ".jpg";
                 var rotation = "";
-                var full_string = `<div class="Card-div small-sep">`;
-                if (is_ready === false) {
-                    card_class = "Exhausted-Card";
-                    if (tokenNames.includes(card_name)) {
-                        card_class = "Exhausted-Token-Card";
-                    }
-                    rotation = " style='transform:rotate(90deg);'";
-                } else if (is_ready === true && is_pledge == true) {
-                    card_class = "Exhausted-Card";
-                    rotation = " style='transform:rotate(270deg);'";
+                var full_string = `<div class="Card-div small-sep"><div class="card-frame">`;
+                if (is_ready === false && is_pledge === false) {
+                    full_string = `<div class="Card-div rotated small-sep"><div class="card-frame">`;
+                } else if (is_ready === true && is_pledge === true) {
+                    full_string = `<div class="Card-div rotated small-sep"><div class="card-frame">`;
                 }
                 if (border_type === "playable") {
                     card_class = card_class + " generic-playable-card";
@@ -1689,31 +1668,19 @@
                     full_string += `<input type="image" src=` + attachment_route_text + ` alt=` + attachment_route_text + ` id=` + attachment_string_id + attachment_style_string + ` onclick="testImageButton(this.id);" class=` + attachment_class + attachment_enlarge_card_formula + ` onmouseout="changeDefOut()">`
                     j = j + 1;
                 }
-                var style_string = ``;
-                if (is_ready === true) {
-                    style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
-                } else if (is_ready === true && is_pledge == true) {
-                    style_string = ` style="rotate: 270deg; margin-left: ` + (j).toString() + `vw"`;
-                } else if (is_ready === false && is_pledge == true) {
-                    style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
-                } else {
-                    style_string = ` style="rotate: 90deg; margin-left: ` + (j).toString() + `vw"`;
-                }
+                var style_string = ` style="margin-left: ` + (j).toString() + `vw"`;
                 full_string += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + style_string + ` onclick="testImageButton(this.id);" class="` + card_class + `"` + enlarge_card_formula + ` onmouseout="changeDefOut()">`
                 if (target) {
                     var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
-                    full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle"></img>`;
+                    full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle-in-play"></img>`;
                 }
-                if (damage === "0") {
-
-                } else {
-                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
+                if (damage !== "0") {
+                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage"></img>`;
                 }
-                if (faith === "0") {
-                    full_string += `</div>`;
-                } else {
-                    full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith small-sep"></img></div>`;
+                if (faith !== "0") {
+                    full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith"></img>`;
                 }
+                full_string += `</div></div>`;
                 document.getElementById(target_headquarters).insertAdjacentHTML("beforeend", full_string);
                 el = document.getElementById(string_id);
                 el.addEventListener('contextmenu', e => showContextMenu(e, string_id))

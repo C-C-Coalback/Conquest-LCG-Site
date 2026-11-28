@@ -294,13 +294,42 @@ h4 {
 }
 
 .Card-div {
-    position: relative;
-    height:110px;
-    width:auto;
+    --card-w: 77px;
+    width: var(--card-w);
+    aspect-ratio: 1469 / 2090;
+    display: grid;
+    place-items: center;
+}
+
+.Card-div .rotated {
+    width: calc(var(--card-w) * 2090 / 1469);
+    aspect-ratio: 2090 / 1469;
 }
 
 .Card-div + .Card-div {
     margin-left:0vw;
+}
+
+.card-frame {
+    position: relative;
+    width: var(--card-w);
+    aspect-ratio: 1469 / 2090;
+    container-type: size;
+    transition: transform .2s;
+}
+
+.rotated .card-frame {
+    transform: rotate(90deg); 
+}
+
+.card-frame > * {
+    position: absolute;
+}
+
+.card-face {
+    inset: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .Card {
@@ -330,27 +359,43 @@ h4 {
 }
 
 .Damage {
-    position: absolute;
     opacity: 0.7;
-    width: 30px;
-    height: 30px;
-    top: 0;
-    left: 0;
+    width: 25cqw;
+    top: 4%;
+    left: 4%;
     color: red;
-    font-size: 30px;
     pointer-events: none;
 }
 
 .Faith {
-    position: absolute;
     opacity: 0.7;
-    width: 30px;
-    height: 30px;
-    top: 30px;
-    left: 0;
+    width: 25cqw;
+    top: calc(25cqw + 4%);
+    left: 4%;
     color: white;
-    font-size: 30px;
     pointer-events: none;
+}
+
+.badge {
+    width: 22cqw;
+    aspect-ratio: 1;
+    font-size: 12cqw;
+    display: grid;
+    place-items: center;
+}
+
+.badge-tl {
+    top: 4%;    
+    left: 4%;
+}
+
+.badge-br {
+    bottom: 4%;
+    right: 4%;
+}
+
+.rotated .badge {
+    transform: rotate(-90deg);
 }
 
 .Attachment-Card {
@@ -383,10 +428,16 @@ h4 {
     width: 35px;
 }
 
+.aiming-reticle-in-play {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
 .aiming-reticle {
     position: absolute;
     top: 0;
-    left: 5px;
     height: 110px;
     width: 77px;
     pointer-events: none;
