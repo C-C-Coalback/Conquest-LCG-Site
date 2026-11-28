@@ -7,7 +7,7 @@
     "inplay inplay inplay inplay inplay inplay inplay inplay"
     "removed1 discard1 deck1 resources1 initiative1 hand1 headquarters1 victory1";
     border-right: dashed 1px aliceblue;
-    height: 900px;
+    height: 98vh;
     position: relative;
     width: 81vw;
     overflow-x: scroll;

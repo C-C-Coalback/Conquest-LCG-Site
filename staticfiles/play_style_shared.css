@@ -334,27 +334,23 @@ h4 {
 
 .Card {
     position: relative;
-    height:110px;
     width:77px;
 }
 
 .Token-Card {
     position: relative;
-    height:73px;
     width:51px;
 }
 
 .Exhausted-Token-Card {
     position: relative;
     top:-12px;
-    height:73px;
     width:51px;
 }
 
 .Exhausted-Card {
     position: relative;
     top:-12px;
-    height:110px;
     width:77px;
 }
 
@@ -440,6 +436,15 @@ h4 {
     top: 0;
     height: 110px;
     width: 77px;
+    pointer-events: none;
+}
+
+.info-icon {
+    position:absolute;
+    top: 0;
+    right: 10px;
+    height: 20px;
+    width: 20px;
     pointer-events: none;
 }
 
@@ -846,7 +851,6 @@ h4 {
 .hand-card {
     margin-left: 2px;
     margin-right: 2px;
-    border: 2px solid aqua;
     border-radius: 5px;
 }
 
@@ -870,7 +874,7 @@ legend {
     top: 24%;
     border: 5px solid blue;
     right: 0;
-    z-index: 1000;
+    z-index: 10000;
     overflow-x:hidden;
     overflow-y:auto;
     display: flex;

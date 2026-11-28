@@ -1082,6 +1082,8 @@
                                 } else if (card_data_split[2] === "unplayable") {
                                     card_class = card_class + " unplayable-hand-card";
                                 }
+                            } else {
+                                card_class = card_class + " generic-blue-border";
                             }
                             let string_id = (i-4).toString();
                             string_id = "HAND/" + split_data[2] + "/" + string_id;
@@ -1117,9 +1119,9 @@
                             var route_text = "/static/images/CardImages/" + replaceCardback("Cardback", split_data[2]) + ".jpg";
                             if (i == 4)
                             {
-                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card first-hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card generic-blue-border hand-card first-hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             } else {
-                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
+                                document.getElementById(target_id).innerHTML += `<input type="image" src=` + route_text + ` alt=` + route_text + ` id=` + string_id + ` onclick="testImageButton(this.id);" class="Card generic-blue-border hand-card" onmouseover="changeDef(this.src)" onmouseout="changeDefOut()">`
                             }
                         }
                         document.getElementById(target_id).style.setProperty('--count', Math.max(split_data.length - 4, 2))
@@ -1562,6 +1564,10 @@
                         var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
                         full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle-in-play"></img>`;
                     }
+                    if (additional_helper_text !== "None")
+                    {
+                        full_string += `<img src="/static/images/Info_Icon.png" class="info-icon"></img>`;
+                    }
                     if (damage !== "0") {
                         full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage"></img>`;
                     }
@@ -1674,8 +1680,14 @@
                     var style_string_reticle = `style="left: calc(10px + ` + (j).toString() + `vw);"`;
                     full_string += `<img src="/static/images/aiming_reticle_` + target + `.png" ` + style_string_reticle + ` alt="bugged" class="aiming-reticle-in-play"></img>`;
                 }
-                if (damage !== "0") {
-                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage"></img>`;
+                if (additional_helper_text !== "None")
+                {
+                    full_string += `<img src="/static/images/Info_Icon.png" class="info-icon"></img>`;
+                }
+                if (damage === "0") {
+
+                } else {
+                    full_string += `<img src="/static/images/damagetokens/` + damage + `_Damage.png" alt="` + damage + `" class="Damage small-sep"></img>`;
                 }
                 if (faith !== "0") {
                     full_string += `<img src="/static/images/faithtokens/` + faith + `_faith.png" alt="` + faith + `" class="Faith"></img>`;
